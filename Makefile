@@ -1283,6 +1283,9 @@ testsuite/tools/dump_load_path$(EXE): \
   testsuite/tools/dump_load_path.$(O) runtime/prims.$(O) runtime/libcamlrun.$(A)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 
+testsuite/tools/poisonedruntime$(EXE): testsuite/tools/poisonedruntime.$(O)
+	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
+
 testsuite/tools/test_in_prefix$(EXE): \
   CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
 
@@ -1312,6 +1315,7 @@ endif
 
 partialclean::
 	rm -f testsuite/tools/dump_load_path testsuite/tools/dump_load_path.exe
+	rm -f testsuite/tools/poisonedruntime testsuite/tools/poisonedruntime.exe
 	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
 	rm -f testsuite/tools/test_in_prefix.opt \
         testsuite/tools/test_in_prefix.opt.exe
