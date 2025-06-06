@@ -393,7 +393,7 @@ let make_test_runner ~stdlib_exists_when_renamed ~may_segfault ~with_unix
 (* Describe the various ways in which executables can be produced by our two
    compilers... *)
 type linkage =
-| Default_ocamlc of launch_mode
+| Default_ocamlc of launch_mode * Config.search_method
 | Default_ocamlopt
 | Custom_runtime of runtime_mode
 | Output_obj of compiler * runtime_mode
@@ -462,20 +462,26 @@ let compile_test usr_bin_sh config env test test_program description =
           0
       in
       match test with
-      | Default_ocamlc Header_exe ->
+      | Default_ocamlc(launch_method, search_method) ->
           let args =
-            if config.bytecode_shebangs_by_default then
-              ["-launch-method"; "exe"]
-            else
-              [] in
-          f ~tendered:true args
-      | Default_ocamlc Header_shebang ->
-          let args =
-            if config.bytecode_shebangs_by_default then
-              []
-            else
-              ["-launch-method"; "sh"] in
-          f ~tendered:true args
+            match launch_method with
+            | Header_exe when config.bytecode_shebangs_by_default ->
+                ["-launch-method"; "exe"]
+            | Header_shebang when not config.bytecode_shebangs_by_default ->
+                ["-launch-method"; "sh"]
+            | _ ->
+                [] in
+          let target_launcher_searches_for_ocamlrun =
+            (search_method <> Config.Absolute)
+          in
+          let param =
+            match search_method with
+            | Absolute -> "disable"
+            | Absolute_then_search -> "enable"
+            | Search -> "always"
+          in
+          let args = "-runtime-search" :: param :: args in
+          f ~target_launcher_searches_for_ocamlrun ~tendered:true args
       | Default_ocamlopt ->
           f ~mode:Native []
       | Custom_runtime Static ->
@@ -700,8 +706,12 @@ let run ~sh config env =
                 pp_path ocamlc_where pp_path ocamlopt_where;
   let compile_test = compile_test sh config env in
   let tests = [
-    compile_test (Default_ocamlc Header_exe)
-      "byt_default_exe" "with tender";
+    compile_test (Default_ocamlc(Header_exe, Absolute))
+      "byt_default_exe_disable" "with absolute tender";
+    compile_test (Default_ocamlc(Header_exe, Absolute_then_search))
+      "byt_default_exe_enable" "with fallback tender";
+    compile_test (Default_ocamlc(Header_exe, Search))
+      "byt_default_exe_always" "with relocatable tender";
     compile_test (Custom_runtime Static)
       "custom_static" "-custom static runtime";
     compile_test (Custom_runtime Shared)
@@ -731,8 +741,13 @@ let run ~sh config env =
   ] in
   let tests =
     if config.shebangscripts then
-      (compile_test (Default_ocamlc Header_shebang) "byt_default_sh" "with #!")
-        :: tests
+      (compile_test (Default_ocamlc(Header_shebang, Absolute))
+        "byt_default_sh_disable" "with absolute #!") ::
+      (compile_test (Default_ocamlc(Header_shebang, Absolute_then_search))
+        "byt_default_sh_enable" "with fallback #!") ::
+      (compile_test (Default_ocamlc(Header_shebang, Search))
+        "byt_default_sh_always" "with relocatable #!") ::
+      tests
     else
       tests in
   Printf.printf "Running programs\n%!";
