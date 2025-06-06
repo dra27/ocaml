@@ -199,6 +199,7 @@ META
 
 
 /testsuite/tools/codegen
+/testsuite/tools/dummy
 /testsuite/tools/expect_test
 /testsuite/tools/lexcmm.ml
 /testsuite/tools/parsecmm.ml
