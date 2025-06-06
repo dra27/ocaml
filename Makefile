@@ -969,7 +969,7 @@ TEST_IN_PREFIX_STDLIB =
 endif
 
 testsuite/tools/poisonedruntime$(EXE): testsuite/tools/poisonedruntime.$(O)
-	$(call MKEXE_USING_COMPILER,$@,$^)
+	$(call MKEXE_BOOT,$@,$^)
 
 partialclean::
 	rm -f testsuite/tools/poisonedruntime testsuite/tools/poisonedruntime.exe
