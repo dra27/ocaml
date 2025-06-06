@@ -1239,7 +1239,7 @@ testsuite/tools/dump_load_path$(EXE): \
 	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 
 testsuite/tools/poisonedruntime$(EXE): testsuite/tools/poisonedruntime.$(O)
-	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
+	$(call MKEXE_VIA_CC,$@,$^)
 
 testsuite/tools/test_in_prefix$(EXE): \
   CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
