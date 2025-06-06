@@ -999,8 +999,12 @@ else
 TEST_IN_PREFIX_STDLIB =
 endif
 
+testsuite/tools/poisonedruntime$(EXE): testsuite/tools/poisonedruntime.$(O)
+	$(call MKEXE_USING_COMPILER,$@,$^)
+
 partialclean::
 	rm -f testsuite/tools/dump_load_path testsuite/tools/dump_load_path.exe
+	rm -f testsuite/tools/poisonedruntime testsuite/tools/poisonedruntime.exe
 	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
 	rm -f testsuite/tools/test_in_prefix.opt \
         testsuite/tools/test_in_prefix.opt.exe
