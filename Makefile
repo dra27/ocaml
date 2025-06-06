@@ -1252,7 +1252,7 @@ TEST_IN_PREFIX_STDLIB =
 endif
 
 testsuite/tools/dummy$(EXE): testsuite/tools/dummy.$(O)
-	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
+	$(call MKEXE_VIA_CC,$@,$^)
 
 $(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
 $(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
