@@ -215,11 +215,14 @@ let () =
                                          pp_path prefix;
     Sys.rename new_prefix prefix);
   let env =
-    make_env ~phase:Renamed ~prefix:new_prefix ~bindir_suffix ~libdir_suffix in
+    make_env ~phase:Execution ~prefix:new_prefix ~bindir_suffix ~libdir_suffix
+  in
   (* 3. Re-run the test programs compiled with the normal prefix *)
   Printf.printf "Re-running test programs\n%!";
   List.iter
     (function `Some f -> assert (f env = `None) | `None -> ()) programs;
+  let env =
+    make_env ~phase:Renamed ~prefix:new_prefix ~bindir_suffix ~libdir_suffix in
   (* 4. Finally re-run the main test battery in the new prefix *)
   Compmisc.init_path ~standard_library:libdir ();
   let programs = run_tests env in
