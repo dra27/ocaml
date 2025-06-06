@@ -2043,6 +2043,9 @@ endif
 
 testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 
+testsuite/tools/dummy$(EXE): testsuite/tools/dummy.$(O)
+	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
+
 ocamltest/ocamltest$(EXE): OC_BYTECODE_LINKFLAGS += -g
 ocamltest_BYTECODE_LINKFLAGS = -custom
 
@@ -2090,6 +2093,7 @@ partialclean::
 	rm -f $(addprefix testsuite/lib/*.,cm* o obj a lib)
 	rm -f $(addprefix testsuite/tools/*.,cm* o obj a lib)
 	rm -f testsuite/tools/codegen testsuite/tools/codegen.exe
+	rm -f testsuite/tools/dummy testsuite/tools/dummy.exe
 	rm -f testsuite/tools/expect testsuite/tools/expect.exe
 	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
 	rm -f testsuite/tools/test_in_prefix.opt \
