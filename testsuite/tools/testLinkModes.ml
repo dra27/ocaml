@@ -364,17 +364,46 @@ let make_test_runner ~stdlib_exists_when_renamed ~may_segfault ~with_unix
     tendered && not target_launcher_searches_for_ocamlrun
     && (config.has_relative_libdir = None || not (Environment.is_renamed env))
   in
-  let rec run env =
+  let rec run ~re_executing env =
     let runs =
       test_runs usr_bin_sh test_program_path test_program
                 config env ~via_ocamlrun in
     let execute ({argv0; prefix_path_with_cwd}, outcome) =
       let expected_executable_name, expected_exit_code, expected_argv0 =
         match outcome with
-        | Fail code -> "", code, ""
-        | Success {executable_name; argv0} -> executable_name, 0, argv0
+        | Fail code ->
+            "", code, ""
+        | Success {executable_name; argv0} ->
+            (* Systems which don't have caml_executable_name get particularly
+               fiddly here, because they can fail for multiple reasons in this
+               test! Any tendered executable which was expected to succeed is
+               set to fail here, since the shim for CAML_LD_LIBRARY_PATH will
+               not be applied. *)
+            if tendered && with_unix && Harness.no_caml_executable_name
+               (* Passing the executable directly to ocamlrun will fail if
+                  ocamlrun isn't configured with a relative libdir *)
+               && (not via_ocamlrun || config.has_relative_libdir = None)
+               && (re_executing || Environment.is_renamed env
+                                   && config.has_relative_libdir = None) then
+              "", 134, ""
+            else
+              executable_name, 0, argv0
       in
-      let stubs = tendered && with_unix && config.has_relative_libdir = None in
+      let stubs =
+        tendered && with_unix
+        (* The programs compiled before the prefix is renamed are intentionally
+           run without the runtime in PATH in order to test the bytecode
+           launcher's searching in the image directory before PATH. A side
+           effect of this is that ld.conf then can't be found, because the
+           runtime copied to the testsuite directory doesn't have ld.conf in the
+           correct place. The shim is skipped for systems which don't have
+           caml_executable_name because otherwise we'd have a test which fails
+           in the Original phase and succeeds in the Execution phase, which is a
+           special case too far! *)
+        && (not Harness.no_caml_executable_name
+            && (config.has_relative_libdir = None
+                || not via_ocamlrun && re_executing))
+      in
       run_program
         env config ~runtime:via_ocamlrun ~stubs
         test_program_path ~prefix_path_with_cwd expected_executable_name
@@ -386,9 +415,9 @@ let make_test_runner ~stdlib_exists_when_renamed ~may_segfault ~with_unix
     if Environment.is_renamed env then
       (Harness.erase_file test_program_path; `None)
     else
-      `Some run
+      `Some (run ~re_executing:true)
   in
-  `Some run
+  `Some (run ~re_executing:false)
 
 (* Describe the various ways in which executables can be produced by our two
    compilers... *)
