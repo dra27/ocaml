@@ -1235,7 +1235,11 @@ else
 TEST_IN_PREFIX_STDLIB =
 endif
 
+testsuite/tools/dummy$(EXE): testsuite/tools/dummy.$(O)
+	$(call MKEXE_BOOT,$@,$^)
+
 partialclean::
+	rm -f testsuite/tools/dummy testsuite/tools/dummy.exe
 	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
 	rm -f testsuite/tools/test_in_prefix.opt \
         testsuite/tools/test_in_prefix.opt.exe
