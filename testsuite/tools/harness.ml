@@ -89,7 +89,7 @@ module Import = struct
   | Custom
   | Vanilla
 
-  type phase = Original | Renamed
+  type phase = Original | Execution | Renamed
 
   type mode = Bytecode | Native
 
