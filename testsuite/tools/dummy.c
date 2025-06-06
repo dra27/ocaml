@@ -15,11 +15,13 @@
 /* Micro-program used to sit in PATH to test local path search for bytecode
    executables. */
 
-#define CAML_INTERNALS
-#include <caml/callback.h>
 #include <stdio.h>
 
-int main_os(int argc, char_os **argv)
+#ifdef _WIN32
+int wmain(int argc, wchar_t **argv)
+#else
+int main(int argc, char **argv)
+#endif
 {
   printf("The poisoned runtime has been invoked!\n"
          "This suggests something is wrong in stdlib/header.c\n");
