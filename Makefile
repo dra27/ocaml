@@ -189,7 +189,8 @@ boot/ocamlruns$(EXE): runtime/ocamlruns$(EXE)
 boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
+	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) \
+	                                                    $(USE_STDLIB)) \
 	  -B flexlink.exe support
 	cp $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
 	cp $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
@@ -859,14 +860,14 @@ $(SAK): runtime/sak.$(O)
 runtime/sak.$(O): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
 	$(V_CC)$(SAK_CC) -c $(SAK_CFLAGS) $(OUTPUTOBJ)$@ $<
 
-C_LITERAL = $(shell $(SAK) encode-C-literal '$(1)')
+C_LITERAL = $(shell $(SAK) encode-C-literal $(call QUOTE_SINGLE,$(1)))
 
 runtime/build_config.h: $(ROOTDIR)/Makefile.config \
                         $(ROOTDIR)/Makefile.build_config $(SAK)
 	$(V_GEN){ \
 	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
 	  printf '#define OCAML_STDLIB_DIR %s\n' \
-	         '$(call C_LITERAL,$(TARGET_LIBDIR))'; \
+	         $(call QUOTE_SINGLE,$(call C_LITERAL,$(TARGET_LIBDIR))); \
 	  echo '#define HOST "$(HOST)"'; \
 	} > $@
 
