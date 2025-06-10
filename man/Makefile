@@ -14,6 +14,7 @@
 #**************************************************************************
 
 ROOTDIR = ..
+-include $(ROOTDIR)/Makefile.config
 include $(ROOTDIR)/Makefile.common
 
 DESTDIR ?=
