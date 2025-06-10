@@ -273,13 +273,13 @@ caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 sak$(EXE): sak.$(O)
 	$(call MKEXE_BOOT,$@,$^)
 
-C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
+C_LITERAL = $(shell ./sak$(EXE) encode-C-literal $(call QUOTE_SINGLE,$(1)))
 
 build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
 	{ \
 	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
 	  printf '#define OCAML_STDLIB_DIR %s\n' \
-	         '$(call C_LITERAL,$(TARGET_LIBDIR))'; \
+	         $(call QUOTE_SINGLE,$(call C_LITERAL,$(TARGET_LIBDIR))); \
 	  echo '#define HOST "$(HOST)"'; \
 	} > $@
 
