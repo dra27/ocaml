@@ -38,6 +38,8 @@ DIR_SEP = /
 CONVERT_PATH = $(strip $(1))
 endif
 
+QUOTE_SINGLE = '$(subst ','\'',$(1))'
+
 DESTDIR ?=
 INSTALL_BINDIR := $(DESTDIR)$(BINDIR)
 INSTALL_LIBDIR := $(DESTDIR)$(LIBDIR)
