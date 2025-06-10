@@ -354,6 +354,11 @@ val ar_supports_response_files: bool
 val tsan : bool
 (** Whether ThreadSanitizer instrumentation is enabled *)
 
+val shebangscripts : bool
+(** Whether the target supports shebang scripts
+
+    @since 5.5 *)
+
 (** Access to configuration values *)
 val print_config : out_channel -> unit
 
