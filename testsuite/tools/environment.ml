@@ -67,6 +67,17 @@ let in_libdir env path =
 let in_test_root {test_root; _} path =
   Filename.concat test_root path
 
+(* Any single quote characters are transformed to "'\\''". If the string is
+   split on the single quote characters, the sequence ["\\"; ""] is a single
+   quote character in the unescaped version. *)
+let dequote s =
+  let rec loop = function
+  | "\\" :: "" :: rest -> "'" :: loop rest
+  | chunk :: rest -> chunk :: loop rest
+  | [] -> []
+  in
+  String.concat "" (loop (String.split_on_char '\'' s))
+
 (* [classify_executable file] determines if [file] is :
    - Tendered bytecode with an executable header
    - Scripted bytecode invoking ocamlrun with a #! header
@@ -86,11 +97,39 @@ let classify_executable file =
       | Bytesections.{name = Name.DLLS; len} when len > 0 -> true
       | _ -> false
       in
-      let sections = Bytesections.(all (read_toc ic)) in
+      let toc = Bytesections.read_toc ic in
+      let sections = Bytesections.all toc in
       if start = "#!" then
-        Tendered {header = Header_shebang; dlls = List.exists is_DLLS sections}
+        let runtime =
+          seek_in ic 2;
+          let shebang = String.trim (input_line ic) in
+          if Filename.basename shebang = "sh" then
+            let exec_line = input_line ic in
+            if String.starts_with ~prefix:"exec '" exec_line
+               && String.ends_with ~suffix:"' \"$0\" \"$@\"" exec_line then
+              (* When the path to the runtime can't be directly used in a
+                 shebang, the shell is used instead, the next line is then:
+                   exec '<runtime>' "$0" "$@" *)
+              dequote (String.sub exec_line 6 (String.length exec_line - 17))
+            else
+              Harness.fail_because "%s contains an unexpected exec line: %S"
+                                   file exec_line
+          else
+            shebang
+        in
+        Tendered {header = Header_shebang;
+                  dlls = List.exists is_DLLS sections;
+                  runtime}
       else if List.exists is_RNTM sections then
-        Tendered {header = Header_exe; dlls = List.exists is_DLLS sections}
+        let rntm =
+          Bytesections.read_section_string toc ic Bytesections.Name.RNTM in
+        let len = String.length rntm in
+        if len = 0 || rntm.[len - 1] <> '\000' then
+          Harness.fail_because "%s contains corrupt RNTM: %S" file rntm;
+        let runtime = String.sub rntm 0 (len - 1) in
+        Tendered {header = Header_exe;
+                  dlls = List.exists is_DLLS sections;
+                  runtime}
       else
         Custom)
   with End_of_file | Bytesections.Bad_magic_number ->
@@ -318,9 +357,6 @@ let display_execution level status pid ~runtime program argv0 args
       ld_library_path_name
   end
 
-(* Print a formatted message to [stderr] and [exit 1] *)
-let fail_because fmt = Format.ksprintf (fun s -> prerr_endline s; exit 1) fmt
-
 (* Executes a single command, returning the exit code and lines of output *)
 let run_one (runtime, quiet, fails, program, argv0, args,
              ({environment; verbose; _} as env)) =
@@ -384,8 +420,8 @@ let run_one (runtime, quiet, fails, program, argv0, args,
         display_execution `Error status pid ~runtime program argv0 args env;
         let _ = Unix.lseek stdout 0 Unix.SEEK_SET in
         In_channel.fold_lines format_line () (Unix.in_channel_of_descr stdout);
-        fail_because "%s did not terminate as expected (got %s)"
-                     display_argv0 (string_of_process_status status)
+        Harness.fail_because "%s did not terminate as expected (got %s)"
+                             display_argv0 (string_of_process_status status)
   in
   if not quiet then
     display_execution level status pid ~runtime program argv0 args env;
