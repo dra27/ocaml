@@ -73,3 +73,4 @@ let target = host
 let systhread_supported = false
 let flexdll_dirs = []
 let ar_supports_response_files = true
+let shebangscripts = false

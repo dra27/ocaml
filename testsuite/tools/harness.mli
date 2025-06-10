@@ -23,10 +23,11 @@ module Import : sig
 
   (** Kinds of executable *)
   type executable =
-  | Tendered of {header:launch_mode; dlls:bool}
+  | Tendered of {header: launch_mode; dlls: bool; runtime: string}
       (** Tendered bytecode image. Executable uses the given mechanism to locate
           a suitable runtime to execute the image. [dlls] is [true] if the
-          bytecode image requires additional C libraries to be loaded. *)
+          bytecode image requires additional C libraries to be loaded. [runtime]
+          is the runtime system which it ultimately attempts to exec. *)
   | Custom
       (** {v -custom v} bytecode executable. The executable {e is} the OCaml
           bytecode runtime, with the bytecode image appended to the file. *)
