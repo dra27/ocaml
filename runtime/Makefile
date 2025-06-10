@@ -268,13 +268,13 @@ sak$(EXE): sak.$(O)
 sak.$(O): sak.c caml/misc.h caml/config.h
 	$(SAK_CC) -c $(SAK_CFLAGS) $(OUTPUTOBJ)$@ $<
 
-C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
+C_LITERAL = $(shell ./sak$(EXE) encode-C-literal $(call QUOTE_SINGLE,$(1)))
 
 build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
 	{ \
 	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
 	  printf '#define OCAML_STDLIB_DIR %s\n' \
-	         '$(call C_LITERAL,$(TARGET_LIBDIR))'; \
+	         $(call QUOTE_SINGLE,$(call C_LITERAL,$(TARGET_LIBDIR))); \
 	  echo '#define HOST "$(HOST)"'; \
 	} > $@
 
