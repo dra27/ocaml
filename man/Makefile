@@ -15,9 +15,10 @@
 
 ROOTDIR = ..
 include $(ROOTDIR)/Makefile.config
+include $(ROOTDIR)/Makefile.common
 
 DESTDIR ?=
-INSTALL_DIR=$(DESTDIR)$(MANDIR)/man$(PROGRAMS_MAN_SECTION)
+INSTALL_DIR=$(call QUOTE_SINGLE,$(DESTDIR)$(MANDIR)/man$(PROGRAMS_MAN_SECTION))
 
 install:
 	for i in *.m; do cp \
