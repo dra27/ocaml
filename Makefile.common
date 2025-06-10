@@ -39,6 +39,8 @@ DIR_SEP = /
 CONVERT_PATH = $(strip $(1))
 endif
 
+QUOTE_SINGLE = '$(subst ','\'',$(1))'
+
 V ?= 0
 
 ifeq "$(V)" "0"
