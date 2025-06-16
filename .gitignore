@@ -209,11 +209,9 @@ _build
 /stdlib/camlheader
 /stdlib/target_camlheader*
 /stdlib/camlheader_ur
-/stdlib/runtime.info
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
-/stdlib/target_runtime.info
 
 /testsuite/**/*.result
 /testsuite/**/*.opt_result
