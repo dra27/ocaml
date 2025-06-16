@@ -336,29 +336,15 @@ $(eval $(call _OCAML_COMMON_BASE,$(1)))
 $(basename $(notdir $(1)))_COMMON_LINKFLAGS =
 endef # _OCAML_PROGRAM_BASE
 
-# The correct runtime for bytecode executables is 'ocamlrun' on Windows and
-# '$(BINDIR)/ocamlrun' on Unix.
-# Pre-bootstrap, boot/ocamlc still reads boot/runtime-launch-info and so works.
-# However, $(ROOTDIR)/ocamlc expects -use-runtime '$(BINDIR)/', which
-# boot/ocamlc doesn't yet understand.
-# The workaround, for Unix, is to add -use-runtime '$(BINDIR)/ocamlrun' which
-# both compilers correctly understand.
-# $(BOOTSTRAPPED) will be non-empty after the compiler has been bootstrapped,
-# and is used to ensure that after bootstrapping the compiler is actually being
-# invoked as we want it to be (i.e. all the workarounds automatically become
-# dead code following the bootstrap).
-BOOTSTRAPPED := \
-  $(shell grep -Fq 'launch-method' $(ROOTDIR)/boot/ocamlc && echo Bootstrapped)
-
 ifeq "$(SUFFIXING)" "true"
-RUNTIME_NAME = $(if $(BOOTSTRAPPED),,ocamlrun-$(ZINC_RUNTIME_ID))
+RUNTIME_NAME =
 else
 RUNTIME_NAME = ocamlrun
 endif
 
 BYTECODE_RUNTIME_FLAGS = \
   -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
-  $(if $(BOOTSTRAPPED),-launch-method $(LAUNCH_METHOD))
+  -launch-method $(LAUNCH_METHOD)
 
 ADD_BYTECODE_RUNTIME = \
   $(if $(filter -custom, $(1)),,\
