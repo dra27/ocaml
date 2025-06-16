@@ -1748,12 +1748,6 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
 # in unix.cma and str.cma. This is specified explicitly to suppress the default
 # linking flags (see $(ADD_BYTECODE_RUNTIME) in Makefile.common)
 ocamldoc/ocamldoc$(EXE): OC_BYTECODE_LINKFLAGS += -custom
-else
-# Pre-bootstrap, -launch-method can't be placed by default in
-# $(OC_BYTECODE_LINKFLAGS), since boot/ocamlc doesn't support it, so it has to
-# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc.
-ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += \
-  -launch-method $(LAUNCH_METHOD)
 endif
 
 .PHONY: ocamldoc
@@ -2115,12 +2109,6 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
 # C stubs in unix.cma. This is specified explicitly to suppress the default
 # linking flags (see $(ADD_BYTECODE_RUNTIME) in Makefile.common)
 debugger/ocamldebug$(EXE): OC_BYTECODE_LINKFLAGS += -custom
-else
-# Pre-bootstrap, -launch-method can't be placed by default in
-# $(OC_BYTECODE_LINKFLAGS), since boot/ocamlc doesn't support it, so it has to
-# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc.
-debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += \
-  -launch-method $(LAUNCH_METHOD)
 endif
 
 clean::
@@ -2380,12 +2368,6 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
 # in unix.cma and str.cma. This is specified explicitly to suppress the default
 # linking flags (see $(ADD_BYTECODE_RUNTIME) in Makefile.common)
 tools/ocamltex$(EXE): OC_BYTECODE_LINKFLAGS += -custom
-else
-# Pre-bootstrap, -launch-method can't be placed by default in
-# $(OC_BYTECODE_LINKFLAGS), since boot/ocamlc doesn't support it, so it has to
-# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc.
-tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += \
-  -launch-method $(LAUNCH_METHOD)
 endif
 
 # we need str and unix which depend on the bytecode version of other tools
