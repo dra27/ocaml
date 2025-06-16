@@ -3068,18 +3068,16 @@ AC_CONFIG_COMMANDS_PRE([
   AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
   AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
   eval "exec_prefix=\"$exec_prefix\""
-  # Set variables necessary to create utils/config.generated.ml and the two
-  # runtime-launch-info templates in stdlib.
-  # $ocaml_bindir is used for utils/config.generated.ml and is _empty_ if the
+  # Set variables necessary to create utils/config.generated.ml.
+  # $HOST_BINDIR is always the absolute path to the binary directory, in host
+  #   format (i.e. potentially with backslashes on Windows).
+  # $TARGET_BINDIR can be specified by the caller when building cross-compilers,
+  #   and the value then is used unaltered. Otherwise, $TARGET_BINDIR is set to
+  #   '.' when the compiler is configured with --with-relative-libdir or the
+  #   value of $HOST_BINDIR otherwise.
+  # $ocaml_bindir is used in utils/config.generated.ml and is _empty_ if the
   #   compiler is configured with --with-relative-libdir (otherwise the path
   #   would be embedded in config.cmo)
-  # $HOST_BINDIR and $TARGET_BINDIR are used to generate the two
-  #   runtime-launch-info files. $HOST_BINDIR is always the absolute path to the
-  #   binary directory, in host format (i.e. potentially with backslashes on
-  #   Windows). $TARGET_BINDIR can be specified by the caller when building
-  #   cross-compilers, and the value then is used unaltered. Otherwise,
-  #   $TARGET_BINDIR is set to '.' when the compiler is configured with
-  #   --with-relative-libdir or the value of $HOST_BINDIR otherwise.
   eval "HOST_BINDIR=\"$ocaml_bindir\""
   AS_IF([test "x$bindir_to_libdir" = 'x'],
     [ocaml_bindir="$HOST_BINDIR"],
