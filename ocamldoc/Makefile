@@ -163,14 +163,7 @@ OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 $(eval $(call PROGRAM_SYNONYM,ocamldoc))
 
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-$(OCAMLDOC): LINKFLAGS += $(ROOT_LINK_FLAGS)
-endif
-ifeq "$(SUFFIXING)-$(UNIX_OR_WIN32)" "true-win32"
-$(OCAMLDOC): LINKFLAGS += -runtime-variant -$(ZINC_RUNTIME_ID)
-else ifeq "$(SUFFIXING)" "true"
-$(OCAMLDOC): LINKFLAGS += \
-  -use-prims $(ROOTDIR)/runtime/primitives \
-  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)/ocamlrun-$(ZINC_RUNTIME_ID))
+$(OCAMLDOC): LINKFLAGS += $(BYTECODE_LAUNCHER_FLAGS)
 endif
 
 $(OCAMLDOC): $(EXECMOFILES)
