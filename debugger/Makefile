@@ -37,14 +37,7 @@ ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
   LINKFLAGS += $(addprefix -ccopt$(SPACE), $(OC_MAP_CFLAGS))
 endif
 else
-LINKFLAGS += $(ROOT_LINK_FLAGS)
-endif
-ifeq "$(SUFFIXING)-$(UNIX_OR_WIN32)" "true-win32"
-LINKFLAGS += -runtime-variant -$(ZINC_RUNTIME_ID)
-else ifeq "$(SUFFIXING)" "true"
-LINKFLAGS += \
-  -use-prims $(ROOTDIR)/runtime/primitives \
-  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)/ocamlrun-$(ZINC_RUNTIME_ID))
+LINKFLAGS += $(BYTECODE_LAUNCHER_FLAGS)
 endif
 YACCFLAGS=
 CAMLLEX=$(BEST_OCAMLLEX)
