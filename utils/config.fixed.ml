@@ -75,8 +75,4 @@ let systhread_supported = false
 let flexdll_dirs = []
 let ar_supports_response_files = true
 let suffixing = true
-(* Sys.win32 is runtime-based, so this is still technically a "fixed" value from
-   a bootstrap perspective. This expression can be removed post-bootstrap, as
-   the build system will explicitly use -launch-method for all bytecode
-   linking. *)
-let launch_method = if Sys.win32 then "exe" else "sh"
+let launch_method = "sh"
