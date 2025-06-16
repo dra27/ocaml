@@ -1870,8 +1870,6 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
 # in unix.cma and str.cma. This is specified explicitly to suppress the default
 # linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
 ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += -custom
-else
-ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
 endif
 
 .PHONY: ocamldoc
@@ -2242,8 +2240,6 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
 # C stubs in unix.cma. This is specified explicitly to suppress the default
 # linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
 debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += -custom
-else
-debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
 endif
 
 clean::
@@ -2519,8 +2515,6 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
 # in unix.cma and str.cma. This is specified explicitly to suppress the default
 # linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
 tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += -custom
-else
-tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
 endif
 
 # we need str and unix which depend on the bytecode version of other tools
