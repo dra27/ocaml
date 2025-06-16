@@ -94,7 +94,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  *.cmt *.cmti *.mli *.ml \
 	  "$(INSTALL_LIBDIR)"
 endif
-	$(INSTALL_DATA) target_$(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
+	$(INSTALL_DATA) $(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
 
 ifeq "$(RUNTIMED)" "true"
 install::
@@ -137,13 +137,9 @@ target_camlheader%: tmpheader.exe
 endif
 
 MANGLING = $(filter true,$(SUFFIXING))
-target_$(HEADER_NAME): tmpheader.exe
+$(HEADER_NAME) target_$(HEADER_NAME): tmpheader.exe
 	@{ printf '$(if $(MANGLING),$(ZINC_RUNTIME_ID_HI),\000)'; \
      cat $^; } > $@
-
-$(HEADER_NAME): runtime.info tmpheader.exe
-	@{ cat $^; \
-     printf '$(if $(filter true,$(SUFFIXING)),$(ZINC_RUNTIME_ID))'; } > $@
 
 # The mingw-w64 and MSVC versions of tmpheader.exe are linked with special flags
 # to reduce their size (considerably). In particular, the entry point is
@@ -200,7 +196,7 @@ clean::
 
 .PHONY: distclean
 distclean: clean
-	rm -f sys.ml runtime.info target_runtime.info
+	rm -f sys.ml
 
 .PHONY: clean
 clean::
