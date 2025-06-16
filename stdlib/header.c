@@ -360,12 +360,6 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
     rntm_bindir_end++;
 
   if (*rntm != 0) {
-    /* Legacy RNTM: single string with an extra "\0" character. Interpret this
-       as "Absolute". In particular, for Windows, where boot/ocamlc will be
-       writing "ocamlrun\0" for RNTM, this actually maintains the required
-       "Search" behaviour! This can be removed after a bootstrap. */
-    if (rntm_bindir_end + 1 == rntm_end)
-      rntm_bindir_end++;
     /* Absolute / Absolute_then_search (see bytecomp/bytelink.ml) */
     if (rntm_bindir_end != rntm_end)
       *rntm_bindir_end = Directory_separator_character;
