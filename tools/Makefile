@@ -314,14 +314,7 @@ checkstack$(EXE): checkstack.$(O)
 caml_tex := caml-tex$(EXE)
 
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-$(caml_tex): LINKFLAGS += $(ROOT_LINK_FLAGS)
-endif
-ifeq "$(SUFFIXING)-$(UNIX_OR_WIN32)" "true-win32"
-$(caml_tex): LINKFLAGS += -runtime-variant -$(ZINC_RUNTIME_ID)
-else ifeq "$(SUFFIXING)" "true"
-$(caml_tex): LINKFLAGS += \
-  -use-prims $(ROOTDIR)/runtime/primitives \
-  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)/ocamlrun-$(ZINC_RUNTIME_ID))
+$(caml_tex): LINKFLAGS += $(BYTECODE_LAUNCHER_FLAGS)
 endif
 
 # caml-tex uses str.cma and unix.cma and so must be compiled with
