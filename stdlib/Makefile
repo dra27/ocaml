@@ -93,7 +93,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  *.cmt *.cmti *.mli *.ml *.ml.in \
 	  "$(INSTALL_LIBDIR)"
 endif
-	$(INSTALL_DATA) target_$(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
+	$(INSTALL_DATA) $(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
 
 ifeq "$(RUNTIMED)" "true"
 install::
@@ -147,7 +147,7 @@ endif
 target_$(HEADER_NAME): tmpheader.exe
 	@cat $^ > $@
 
-$(HEADER_NAME): runtime.info tmpheader.exe
+$(HEADER_NAME): tmpheader.exe
 	@cat $^ > $@
 
 # The mingw-w64 and MSVC versions of tmpheader.exe are linked with special flags
