@@ -582,21 +582,6 @@ let write_header outchan =
         try In_channel.with_open_bin header In_channel.input_all
         with Sys_error msg -> raise (Error (Camlheader (msg, header)))
       in
-      (* Compatibility with previous header format - remove post-bootstrap *)
-      let data =
-        if data = "" || not (List.mem data.[0] ['/'; 'e'; 's']) then
-          data
-        else
-          try
-            let exe_start = String.index data '\000' + 2 in
-            let len = String.length data in
-            if exe_start >= len then
-              raise Not_found
-            else
-              String.sub data exe_start (len - exe_start)
-          with Not_found ->
-            raise (Error (Camlheader ("corrupt header", header)))
-      in
       Out_channel.output_string outchan data;
       (* The runtime name needs recording in RNTM *)
       let toc_writer = Bytesections.init_record outchan in

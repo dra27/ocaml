@@ -120,8 +120,7 @@ let parse argv =
     ref {has_ocamlnat = false; has_ocamlopt = false; has_relative_libdir = None;
          has_runtime_search = None; launcher_searches_for_ocamlrun = false;
          target_launcher_searches_for_ocamlrun = false;
-         bytecode_shebangs_by_default = false; libraries = [];
-         zinc_bootstrapped = false}
+         bytecode_shebangs_by_default = false; libraries = []}
   in
   let error fmt = Printf.ksprintf (fun s -> raise (Arg.Bad s)) fmt in
   let check_tree () =
