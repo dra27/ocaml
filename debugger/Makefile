@@ -27,14 +27,7 @@ COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
 LINKFLAGS=-linkall -I $(UNIXDIR) -I $(DYNLINKDIR) -I $(ROOTDIR)/runtime \
           -set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-LINKFLAGS += $(ROOT_LINK_FLAGS)
-endif
-ifeq "$(SUFFIXING)-$(UNIX_OR_WIN32)" "true-win32"
-LINKFLAGS += -runtime-variant -$(ZINC_RUNTIME_ID)
-else ifeq "$(SUFFIXING)" "true"
-LINKFLAGS += \
-  -use-prims $(ROOTDIR)/runtime/primitives \
-  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)/ocamlrun-$(ZINC_RUNTIME_ID))
+LINKFLAGS += $(BYTECODE_LAUNCHER_FLAGS)
 endif
 OC_OCAMLDEPDIRS = $(DIRECTORIES)
 
