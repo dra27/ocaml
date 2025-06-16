@@ -193,18 +193,6 @@ let () =
      | _ ->
          Harness.fail_because "Unexpected response from command -v sh"
   in
-  let config =
-    let boot_ocamlc = Environment.in_test_root env "../../boot/ocamlc" in
-    let ocamlrun = Environment.ocamlrun env in
-    let zinc_bootstrapped =
-      snd (Environment.run_process env ocamlrun [boot_ocamlc; "-config"])
-      |> List.exists (String.starts_with ~prefix:"zinc_runtime_id: ")
-    in
-    let launcher_searches_for_ocamlrun =
-      config.launcher_searches_for_ocamlrun && not zinc_bootstrapped
-    in
-    {config with zinc_bootstrapped; launcher_searches_for_ocamlrun}
-  in
   let run_tests = run_tests ~sh config in
   (* 1. Relocation test *)
   TestRelocation.run ~reproducible config env;
