@@ -457,8 +457,7 @@ module Import = struct
     bytecode_shebangs_by_default: bool;
     shebangscripts: bool;
     filename_mangling: bool;
-    libraries: string list list;
-    zinc_bootstrapped: bool
+    libraries: string list list
   }
 
   module Bytes = Bytes
