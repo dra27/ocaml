@@ -55,6 +55,10 @@ OCaml 4.13 maintenance branch
   "unexpected error".
   (Damien Doligez, review by Sébastien Hinderer)
 
+- #14245: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by Damien Doligez and Samuel Hym)
+
 ### Compiler user-interface and warnings:
 
 - #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
