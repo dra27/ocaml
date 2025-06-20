@@ -99,6 +99,7 @@ objinfo.cmo : \
     ../file_formats/cmo_format.cmi \
     ../file_formats/cmi_format.cmi \
     ../bytecomp/bytesections.cmi \
+    ../bytecomp/byterntm.cmi \
     ../utils/binutils.cmi
 objinfo.cmx : \
     ../bytecomp/symtable.cmx \
@@ -115,6 +116,7 @@ objinfo.cmx : \
     ../file_formats/cmo_format.cmi \
     ../file_formats/cmi_format.cmx \
     ../bytecomp/bytesections.cmx \
+    ../bytecomp/byterntm.cmx \
     ../utils/binutils.cmx
 ocamlcmt.cmo : \
     ../typing/untypeast.cmi \
