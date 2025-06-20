@@ -76,6 +76,10 @@ OCaml 4.11 maintenance branch
   "unexpected error".
   (Damien Doligez, review by Sébastien Hinderer)
 
+- #14245: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by Damien Doligez and Samuel Hym)
+
 ### Compiler user-interface and warnings:
 
 - #10046: Link all DLLs with -static-libgcc on mingw32 to prevent dependency
