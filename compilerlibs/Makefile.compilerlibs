@@ -164,6 +164,7 @@ COMMON_CMI = $(UTILS_CMI) $(PARSING_CMI) $(TYPING_CMI) $(LAMBDA_CMI) $(COMP_CMI)
 COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 
 BYTECOMP = \
+  bytecomp/byterntm.cmo \
   bytecomp/instruct.cmo \
   bytecomp/bytegen.cmo \
   bytecomp/printinstr.cmo \
