@@ -200,6 +200,7 @@ ocamlcommon_SOURCES = \
   $(lambda_SOURCES) $(comp_SOURCES)
 
 ocamlbytecomp_SOURCES = \
+  bytecomp/byterntm.mll \
   bytecomp/instruct.mli bytecomp/instruct.ml \
   bytecomp/bytegen.mli bytecomp/bytegen.ml \
   bytecomp/printinstr.mli bytecomp/printinstr.ml \
@@ -1022,12 +1023,12 @@ natruntop:
 otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/native/dynlink.ml
 	$(MAKE) -C otherlibs/dynlink allopt
 
-# Cleanup the lexer
+# Cleanup the lexers
 
 partialclean::
-	rm -f parsing/lexer.ml
+	rm -f bytecomp/byterntm.ml parsing/lexer.ml
 
-beforedepend:: parsing/lexer.ml
+beforedepend:: bytecomp/byterntm.ml parsing/lexer.ml
 
 # The predefined exceptions and primitives
 
