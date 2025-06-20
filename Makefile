@@ -134,7 +134,7 @@ COMP=bytecomp/lambda.cmo bytecomp/printlambda.cmo \
 
 COMMON=$(UTILS) $(PARSING) $(TYPING) $(COMP)
 
-BYTECOMP=bytecomp/instruct.cmo bytecomp/bytegen.cmo \
+BYTECOMP=bytecomp/byterntm.cmo bytecomp/instruct.cmo bytecomp/bytegen.cmo \
   bytecomp/printinstr.cmo bytecomp/emitcode.cmo \
   bytecomp/bytelink.cmo bytecomp/bytelibrarian.cmo bytecomp/bytepackager.cmo \
   driver/errors.cmo driver/compile.cmo
@@ -866,15 +866,18 @@ natruntop:
 otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/natdynlink.ml
 	$(MAKE) -C otherlibs/dynlink allopt
 
-# The lexer
+# The lexers
+
+bytecomp/byterntm.ml: bytecomp/byterntm.mll
+	$(CAMLLEX) $<
 
 parsing/lexer.ml: parsing/lexer.mll
 	$(CAMLLEX) $<
 
 partialclean::
-	rm -f parsing/lexer.ml
+	rm -f bytecomp/byterntm.ml parsing/lexer.ml
 
-beforedepend:: parsing/lexer.ml
+beforedepend:: bytecomp/byterntm.ml parsing/lexer.ml
 
 # Shared parts of the system compiled with the native-code compiler
 
