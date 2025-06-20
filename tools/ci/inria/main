@@ -287,8 +287,21 @@ if test "$flambda" = "true"; then
   confoptions="$confoptions --enable-flambda --enable-flambda-invariants"
 fi
 
+<<<<<<< HEAD
 main_build() {
   eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
+=======
+case $NODE_NAME in
+  *-32|ocaml-ppc-64-be)
+    # Native compilation not supported
+    ;;
+  *)
+    # Include ocamlnat in the in-prefix tests
+    confoptions="$confoptions --enable-native-toplevel";;
+esac
+
+eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
+>>>>>>> aaf854dfff5
 
   grep -q '^NATIVE_COMPILER=false' Makefile.config && make_native=false
 
@@ -311,6 +324,7 @@ main_build() {
     $make --warn-undefined-variables alldepend
   fi
 
+<<<<<<< HEAD
   $make --warn-undefined-variables install
   rm -rf "$instdir"
 }
@@ -320,6 +334,11 @@ main_build() {
 CLEAN_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vF '/homebrew/' | paste -sd: -)
 
 PATH="$CLEAN_PATH" main_build
+=======
+$make --warn-undefined-variables install
+$make -f Makefile.test -C testsuite/in_prefix test-in-prefix
+rm -rf "$instdir"
+>>>>>>> aaf854dfff5
 
 cd testsuite
 if test -n "$jobs" && test -x /usr/bin/parallel
