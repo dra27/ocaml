@@ -64,6 +64,12 @@ OCaml 4.08 maintenance branch:
   (David Allsopp, review by Jonah Beckford, Antonin Décimo, Samuel Hym,
   Vincent Laviron and ???)
 
+### Tools:
+
+- #14245: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by Samuel Hym and ???)
+
 ### Code generation and optimization
 
 - #7931, #1904: Add FreeBSD/aarch64 support
