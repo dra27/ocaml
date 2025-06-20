@@ -23,6 +23,12 @@ OCaml 5.4 maintenance version
   (David Allsopp, review by Jonah Beckford, Antonin Décimo, Samuel Hym,
   Vincent Laviron and ???)
 
+### Tools:
+
+- #14245: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by Samuel Hym and ???)
+
 ### Compiler user-interface and warnings:
 
 - #14244: Add -set-runtime-default option to the compiler, allowing the default
