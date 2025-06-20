@@ -63,6 +63,12 @@ OCaml 4.08 maintenance branch:
   trying `argv[0]`.
   (David Allsopp, review by ???)
 
+### Tools:
+
+- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by ???)
+
 ### Code generation and optimization
 
 - #7931, #1904: Add FreeBSD/aarch64 support
