@@ -34,6 +34,12 @@ OCaml 5.1.2
   trying `argv[0]`.
   (David Allsopp, review by ???)
 
+### Tools:
+
+- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by ???)
+
 ### Manual and documentation:
 
 - #12840: manual: update runtime tracing chapter for custom events (ex #12335)
