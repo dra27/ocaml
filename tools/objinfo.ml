@@ -212,10 +212,14 @@ let p_list title print = function
       p_title title;
       List.iter print l
 
+let p_runtime =
+  printf "Runtime:\n\t%s\n"
+
 let dump_byte ic =
   Bytesections.read_toc ic;
   let toc = Bytesections.toc () in
   let toc = List.sort Stdlib.compare toc in
+  Option.iter p_runtime (Byterntm.read_runtime ic);
   List.iter
     (fun (section, _) ->
        try
