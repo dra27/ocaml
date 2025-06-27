@@ -1229,6 +1229,43 @@ ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
 partialclean::
 	$(MAKE) -C ocamltest clean
 
+test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
+  stubs.c \
+  harness.mli harness.ml \
+  toolchain.mli toolchain.ml \
+  environment.mli environment.ml \
+  cmdline.mli cmdline.ml \
+  testBytecodeBinaries.mli testBytecodeBinaries.ml \
+  testDynlink.mli testDynlink.ml \
+  testLinkModes.mli testLinkModes.ml \
+  testRelocation.mli testRelocation.ml \
+  testToplevel.mli testToplevel.ml \
+  test_ld_conf.mli test_ld_conf.ml \
+  test_in_prefix.mli test_in_prefix.ml)
+test_in_prefix_LIBRARIES = \
+  otherlibs/unix/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
+
+# Needed for the additional stubs.c (since caml_sys_proc_self_exe is 5.5+)
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
+
+# test_in_prefix% would only match test_in_prefix.opt, hence the missing 'x'!
+testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
+
+testsuite/tools/test_in_prefix$(EXE): OC_BYTECODE_LINKFLAGS += -custom
+
+testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
+
+testsuite/tools/dump_load_path$(EXE): \
+  testsuite/tools/dump_load_path.$(O) runtime/prims.$(O) runtime/libcamlrun.$(A)
+	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(BYTECCLIBS))
+
+partialclean::
+	rm -f testsuite/tools/dump_load_path testsuite/tools/dump_load_path.exe
+	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
+	rm -f testsuite/tools/test_in_prefix.opt \
+        testsuite/tools/test_in_prefix.opt.exe
+
 # Documentation
 
 .PHONY: html_doc
@@ -1583,6 +1620,7 @@ distclean: clean
 	$(MAKE) -C manual distclean
 	$(MAKE) -C ocamldoc distclean
 	$(MAKE) -C ocamltest distclean
+	rm -f testsuite/tools/toolchain.ml
 	$(MAKE) -C otherlibs distclean
 	rm -f $(runtime_CONFIGURED_HEADERS)
 	$(MAKE) -C stdlib distclean
