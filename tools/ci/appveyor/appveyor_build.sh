@@ -27,22 +27,22 @@ else
 fi
 
 function run {
-    if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
-    NAME=$1
-    shift
-    echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    if [[ -n $SHOW_CMD ]]; then (set -x; "$@"); else "$@"; fi
-    CODE=$?
-    if [[ $CODE -ne 0 ]] ; then
-        echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-        if [[ $BUILD_PID -ne 0 ]] ; then
-          kill -KILL $BUILD_PID 2>/dev/null
-          wait $BUILD_PID 2>/dev/null
-        fi
-        exit $CODE
-    else
-        echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
+  NAME=$1
+  shift
+  echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ -n $SHOW_CMD ]]; then (set -x; "$@"); else "$@"; fi
+  CODE=$?
+  if [[ $CODE -ne 0 ]] ; then
+    echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    if [[ $BUILD_PID -ne 0 ]] ; then
+      kill -KILL $BUILD_PID 2>/dev/null
+      wait $BUILD_PID 2>/dev/null
     fi
+    exit $CODE
+  else
+    echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  fi
 }
 
 # Function: set_configuration
@@ -50,42 +50,35 @@ function run {
 # $1:the Windows port. Recognized values: mingw, msvc and msvc64
 # $2: the prefix to use to install
 function set_configuration {
-    case "$1" in
-        cygwin*)
-            dep='--disable-dependency-generation'
-        ;;
-        mingw32)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-w64-mingw32'
-            dep='--disable-dependency-generation'
-        ;;
-        mingw64)
-            build='--build=i686-pc-cygwin'
-            host='--host=x86_64-w64-mingw32'
-            dep='--disable-dependency-generation'
-        ;;
-        msvc32)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-pc-windows'
-            dep='--disable-dependency-generation'
-        ;;
-        msvc64)
-            build='--build=x86_64-pc-cygwin'
-            host='--host=x86_64-pc-windows'
-            # Explicitly test dependency generation on msvc64
-            dep='--enable-dependency-generation'
-        ;;
-    esac
+  args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
+        '--prefix' "$2" \
+        '--enable-ocamltest')
 
-    mkdir -p "$CACHE_DIRECTORY"
-    ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                $dep $build $host --prefix="$2" --enable-ocamltest || ( \
-      rm -f "$CACHE_DIRECTORY/config.cache-$1" ; \
-      ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                  $dep $build $host --prefix="$2" --enable-ocamltest )
+  case "$1" in
+    cygwin*)
+      args+=('--disable-dependency-generation' '--enable-native-toplevel');;
+    mingw32)
+      args+=('--host=i686-w64-mingw32' '--disable-dependency-generation');;
+    mingw64)
+      args+=('--host=x86_64-w64-mingw32' '--disable-dependency-generation' \
+             '--enable-native-toplevel');;
+    msvc32)
+      args+=('--host=i686-pc-windows' '--disable-dependency-generation');;
+    msvc64)
+      # Explicitly test dependency generation on msvc64
+      args+=('--host=x86_64-pc-windows' '--enable-dependency-generation' \
+             '--enable-native-toplevel');;
+  esac
 
-#    FILE=$(pwd | cygpath -f - -m)/Makefile.config
-#    run "Content of $FILE" cat Makefile.config
+  mkdir -p "$CACHE_DIRECTORY"
+  echo './configure' "${args[@]@Q}"
+  if ! ./configure "${args[@]}"; then
+    rm -f "$CACHE_DIRECTORY/config.cache-$1"
+    ./configure "${args[@]}"
+  fi
+
+#  FILE=$(pwd | cygpath -f - -m)/Makefile.config
+#  run "Content of $FILE" cat Makefile.config
 }
 
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
@@ -133,6 +126,9 @@ case "$1" in
       run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    run "test $PORT in prefix" \
+      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
+            test-in-prefix
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
