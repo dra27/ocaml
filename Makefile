@@ -44,7 +44,7 @@ CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -g -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
 DIRS = utils parsing typing bytecomp file_formats lambda middle_end \
   middle_end/closure middle_end/flambda middle_end/flambda/base_types \
-  asmcomp driver toplevel
+  asmcomp driver toplevel runtime
 INCLUDES = $(addprefix -I ,$(DIRS))
 COMPFLAGS=-strict-sequence -principal -absname \
           -w +a-4-9-40-41-42-44-45-48-66-70 \
@@ -75,7 +75,7 @@ TOPLEVELINIT=toplevel/toploop.cmo
 # capitalized module names.
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
-LIBFILES=stdlib.cma std_exit.cmo *.cmi camlheader
+LIBFILES=stdlib.cma std_exit.cmo *.cmi $(HEADER_NAME)
 
 COMPLIBDIR=$(LIBDIR)/compiler-libs
 
@@ -816,9 +816,12 @@ runtime/sak.$(O): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
 C_LITERAL = $(shell $(SAK) encode-C-literal '$(1)')
 
 runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
-	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
-	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
-	echo '#define HOST "$(HOST)"' >> $@
+	{ \
+	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
+	  printf '#define OCAML_STDLIB_DIR %s\n' \
+	         '$(call C_LITERAL,$(TARGET_LIBDIR))'; \
+	  echo '#define HOST "$(HOST)"'; \
+	} > $@
 
 ## Runtime libraries and programs
 
@@ -1183,6 +1186,50 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
 ocamltest: ocamlc ocamlyacc ocamllex otherlibraries
 	$(MAKE) -C ocamltest all
 
+test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
+  stubs.c \
+  toolchain.mli toolchain.ml \
+  harness.mli harness.ml \
+  environment.mli environment.ml \
+  cmdline.mli cmdline.ml \
+  testBytecodeBinaries.mli testBytecodeBinaries.ml \
+  testDynlink.mli testDynlink.ml \
+  testLinkModes.mli testLinkModes.ml \
+  testRelocation.mli testRelocation.ml \
+  testToplevel.mli testToplevel.ml \
+  test_ld_conf.mli test_ld_conf.ml \
+  test_in_prefix.mli test_in_prefix.ml)
+test_in_prefix_LIBRARIES = \
+  otherlibs/unix/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
+
+testsuite/tools/%.cmo: VPATH += otherlibs/unix
+testsuite/tools/%.cmx: VPATH += otherlibs/unix
+
+testsuite/tools/test_in_prefix$(EXE): \
+  CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
+
+testsuite/tools/test_in_prefix$(EXE): \
+  $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmo, $(filter-out %.mli, \
+    $(test_in_prefix_SOURCES))))
+	$(V_OCAMLC)$(FLEXLINK_ENV) $(CAMLC) $(STDLIBFLAGS) -custom -o $@ -I runtime \
+    -I otherlibs/unix -I compilerlibs \
+    $(addsuffix .cma, $(test_in_prefix_LIBRARIES)) $^
+
+testsuite/tools/test_in_prefix.opt$(EXE): \
+  $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmx, $(filter-out %.mli, \
+    $(test_in_prefix_SOURCES))))
+	$(V_OCAMLOPT)$(FLEXLINK_ENV) $(CAMLOPT) $(STDLIBFLAGS) -o $@ \
+    -I otherlibs/unix -I compilerlibs \
+    $(addsuffix .cmxa, $(test_in_prefix_LIBRARIES)) $^
+
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
+
+partialclean::
+	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
+	rm -f testsuite/tools/test_in_prefix.opt \
+        testsuite/tools/test_in_prefix.opt.exe
+
 ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
 	$(MAKE) -C ocamltest allopt
 
@@ -1399,7 +1446,7 @@ partialclean::
 depend: beforedepend
 	(for d in utils parsing typing bytecomp asmcomp middle_end \
          lambda file_formats middle_end/closure middle_end/flambda \
-         middle_end/flambda/base_types \
+         middle_end/flambda/base_types testsuite/tools \
          driver toplevel toplevel/byte toplevel/native; \
 	 do \
 	   $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $$d $(INCLUDES) \
@@ -1414,13 +1461,14 @@ distclean: clean
 	$(MAKE) -C manual distclean
 	$(MAKE) -C ocamldoc distclean
 	$(MAKE) -C ocamltest distclean
+	rm -f testsuite/tools/toolchain.ml
 	$(MAKE) -C otherlibs distclean
 	rm -f $(runtime_CONFIGURED_HEADERS)
 	$(MAKE) -C stdlib distclean
 	$(MAKE) -C testsuite distclean
 	$(MAKE) -C tools distclean
 	rm -f compilerlibs/META
-	rm -f boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
+	rm -f boot/ocamlrun boot/ocamlrun.exe boot/$(HEADER_NAME) \
 	      boot/ocamlruns boot/ocamlruns.exe \
 	      boot/flexlink.byte boot/flexlink.byte.exe \
 	      boot/flexdll_*.o boot/flexdll_*.obj \
