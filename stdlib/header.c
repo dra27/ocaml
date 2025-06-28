@@ -18,8 +18,12 @@
 /* C11's _Noreturn is deprecated in C23 in favour of attributes */
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
   #define NORETURN [[noreturn]]
-#else
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
   #define NORETURN _Noreturn
+#elif defined(_MSC_VER)
+  #define NORETURN __declspec(noreturn)
+#else
+  #define NORETURN
 #endif
 
 #ifdef _WIN32
@@ -217,6 +221,7 @@ static char * read_runtime_path(file_descriptor fd)
   int num_sections;
   uint32_t path_size;
   long ofs;
+  int i;
 
   if (lseek(fd, -TRAILER_SIZE, SEEK_END) == -1) return NULL;
   if (read(fd, buffer, TRAILER_SIZE) < TRAILER_SIZE) return NULL;
@@ -224,7 +229,7 @@ static char * read_runtime_path(file_descriptor fd)
   ofs = TRAILER_SIZE + num_sections * 8;
   if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
   path_size = 0;
-  for (int i = 0; i < num_sections; i++) {
+  for (i = 0; i < num_sections; i++) {
     if (read(fd, buffer, 8) < 8) return NULL;
     if (buffer[0] == 'R' && buffer[1] == 'N' &&
         buffer[2] == 'T' && buffer[3] == 'M') {
