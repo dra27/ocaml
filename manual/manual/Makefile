@@ -170,3 +170,7 @@ clean:
 	manual*.html *.haux *.hind *.svg
 	cd textman; rm -f manual.txt *.haux *.hind
 	cd infoman; rm -f ocaml.info ocaml.info-*  *.haux *.hind
+
+.PHONY: distclean
+distclean:
+	$(MAKE) -C html_processing distclean
