@@ -1,6 +1,47 @@
 OCaml 4.08 maintenance branch:
 ------------------------------
 
+### Code generation and optimization
+
+- #7931, #1904: Add FreeBSD/aarch64 support
+  (Greg V, review by Sébastien Hinderer, Stephen Dolan, Damien Doligez
+   and Xavier Leroy)
+
+### Supported platforms:
+
+- #9699, #10026: add support for iOS and macOS on ARM 64 bits
+  Backported from OCaml 4.12.0
+  (Eduardo Rafael, review by Xavier Leroy, Nicolás Ojeda Bär
+   and Anil Madhavapeddy, additional testing by Michael Schmidt)
+
+### Code generation and optimization
+
+ - #9752, #10026: Revised handling of calling conventions for
+   external C functions.
+   Provide a more precise description of the types of unboxed arguments,
+   so that the ARM64 iOS/macOS calling conventions can be honored.
+   Backported from OCaml 4.12.0
+   (Xavier Leroy, review by Mark Shinwell and Eduardo Rafael)
+
+### Runtime system:
+
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
+- #11763, #11759, #11861, #12509, #12577: Use strict prototypes on primitives.
+  (Antonin Décimo, review by Xavier Leroy, David Allsopp, Sébastien
+   Hinderer and Nick Barnes)
+
+- #11764: Add prototypes to old-style C function definitions.
+  (Antonin Décimo, review by Xavier Leroy)
+
+### Build system:
+
+- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
+  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
+  in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
+  (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
+
 ### Bug fixes:
 
 - #8855, #8858: Links for tools not created when installing with
@@ -12,6 +53,10 @@ OCaml 4.08 maintenance branch:
   causing a performance regression
   (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
    code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
+
+- #8650: ensure that "make" variables are defined before use;
+  revise generation of config/util.ml to better quote special characters
+  (Xavier Leroy, review by David Allsopp)
 
 - #9383: Don't assume that AWKPATH includes .
   (David Allsopp, report by Ian Zimmerman)
@@ -28,6 +73,10 @@ OCaml 4.08 maintenance branch:
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
+
+- #12116, #12993: explicitly build non PIE executables on x86 32bits
+  architectures
+  (Florian Angeletti, review by David Allsopp)
 
 OCaml 4.08.1 (5 August 2019)
 ----------------------------
