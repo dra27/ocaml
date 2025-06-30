@@ -1,6 +1,13 @@
 OCaml 4.11 maintenance branch
 -----------------------------
 
+### Compiler user-interface and warnings:
+
+- #10046: Link all DLLs with -static-libgcc on mingw32 to prevent dependency
+  on libgcc_s_sjlj-1.dll with mingw-w64 runtime 8.0.0 (previously this was
+  only needed for dllunix.dll).
+  (David Allsopp, report by Andreas Hauptmann, review by Xavier Leroy)
+
 ### Bug fixes:
 
 - #10250, #10266: Dynamically allocate alternate signal stacks to
