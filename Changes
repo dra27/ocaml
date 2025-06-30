@@ -13,6 +13,13 @@ OCaml 4.10 maintenance branch
 - #11764: Add prototypes to old-style C function definitions.
   (Antonin Décimo, review by Xavier Leroy)
 
+### Compiler user-interface and warnings:
+
+- #10046: Link all DLLs with -static-libgcc on mingw32 to prevent dependency
+  on libgcc_s_sjlj-1.dll with mingw-w64 runtime 8.0.0 (previously this was
+  only needed for dllunix.dll).
+  (David Allsopp, report by Andreas Hauptmann, review by Xavier Leroy)
+
 ### Build system:
 
 - #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
