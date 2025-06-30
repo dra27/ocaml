@@ -309,6 +309,18 @@ type runtime_launch_info = {
   executable_offset : int
 }
 
+module String = struct
+  include String
+
+  let exists p s =
+    let n = length s in
+    let rec loop i =
+      if i = n then false
+      else if p (unsafe_get s i) then true
+      else loop (succ i) in
+    loop 0
+end
+
 (* See https://www.in-ulm.de/~mascheck/various/shebang/#origin for a deep
    dive into shebangs.
    - Whitespace (space or horizontal tab) delimits the interpreter from an
@@ -468,11 +480,17 @@ let read_runtime_launch_info file =
     else
       {bindir; launcher; buffer; executable_offset}
   with Not_found ->
-    if String.starts_with ~prefix:"#!" buffer then
+    let prefix =
+      if String.length buffer >= 2 then
+        String.sub buffer 0 2
+      else
+        ""
+    in
+    if prefix = "#!" then
       let runtime = String.sub buffer 2 (String.index buffer '\n' - 2) in
       {bindir = Filename.dirname runtime; launcher = Shebang_bin_sh "sh";
        buffer; executable_offset = 0}
-    else if String.starts_with ~prefix:"MZ" buffer then
+    else if prefix = "MZ" then
       {bindir = ""; launcher = Executable; buffer; executable_offset = 0}
     else
       raise (Error (Camlheader ("corrupt header", file)))
