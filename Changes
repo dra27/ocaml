@@ -77,6 +77,15 @@ OCaml 4.08 maintenance branch:
   prevent their C99-compliant snprintf conflicting with ours.
   (David Allsopp, report by Michael Soegtrop, review by Xavier Leroy)
 
+- #10135: Overhaul the FlexDLL bootstrap process. It's now fully integrated
+  with the default build target and controlled by --with-flexdll which allows
+  externally downloaded sources for FlexDLL to be specified. A separate
+  non-shared version of the runtime is built, and shared artefacts are no longer
+  built twice. When bootstrapping, any flexlink in PATH is now ignored and the
+  Cygwin port also supports bootstrapping FlexDLL. flexlink.opt is automatically
+  built and installed as part of opt.opt/world.opt.
+  (David Allsopp, review by Sébastien Hinderer)
+
 - #10250, #10266: Dynamically allocate alternate signal stacks to
   accommodate changes in Glibc 2.34.
   (Xavier Leroy, reports by Tomasz Kłoczko and R.W.M. Jones, review by Anil
