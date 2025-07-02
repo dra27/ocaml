@@ -17,8 +17,21 @@
 
 ROOTDIR = .
 
+# The configure and *clean targets can all be run without running ./configure
+# first.
+# If no goals were specified (i.e. `make`), add defaultentry (since it requires
+# ./configure to be run)
+MAKECMDGOALS ?= defaultentry
+CAN_BE_UNCONFIGURED := $(strip \
+  $(filter-out partialclean clean distclean configure, $(MAKECMDGOALS)))
+
+ifeq "$(CAN_BE_UNCONFIGURED)" ""
+-include Makefile.config
+-include Makefile.common
+else
 include Makefile.config
 include Makefile.common
+endif
 
 # For users who don't read the INSTALL file
 .PHONY: defaultentry
@@ -67,7 +80,7 @@ YACCFLAGS=-v --strict
 CAMLLEX=$(CAMLRUN) boot/ocamllex
 CAMLDEP=$(CAMLRUN) boot/ocamlc -depend
 DEPFLAGS=-slash
-DEPINCLUDES=$(INCLUDES)
+DEPINCLUDES=$(INCLUDES) -I testsuite/tools
 
 OCAMLDOC_OPT=$(WITH_OCAMLDOC:=.opt)
 
@@ -330,6 +343,11 @@ utils/config.ml: utils/config.mlp Makefile.config utils/Makefile Makefile
 reconfigure:
 	./configure $(CONFIGURE_ARGS)
 
+AUTOCONF_TOOL_NAME ?=
+
+configure: configure.ac aclocal.m4 VERSION tools/autogen
+	tools/autogen $(AUTOCONF_TOOL_NAME)
+
 .PHONY: partialclean
 partialclean::
 	rm -f utils/config.ml
@@ -399,7 +417,7 @@ opt-core: runtimeopt
 	$(MAKE) libraryopt
 
 .PHONY: opt
-opt:
+opt: checknative
 	$(MAKE) runtimeopt
 	$(MAKE) ocamlopt
 	$(MAKE) libraryopt
@@ -407,7 +425,7 @@ opt:
 
 # Native-code versions of the tools
 .PHONY: opt.opt
-opt.opt:
+opt.opt: checknative
 	$(MAKE) checkstack
 	$(MAKE) runtime
 	$(MAKE) core
@@ -462,7 +480,8 @@ world: coldstart
 
 # Compile also native code compiler and libraries, fast
 .PHONY: world.opt
-world.opt: coldstart
+world.opt: checknative
+	$(MAKE) coldstart
 	$(MAKE) opt.opt
 
 # FlexDLL sources missing error messages
@@ -871,18 +890,21 @@ beforedepend:: parsing/lexer.ml
 compilerlibs/ocamlcommon.cmxa: $(COMMON:.cmo=.cmx)
 	$(CAMLOPT) -a -linkall -o $@ $^
 partialclean::
-	rm -f compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlcommon.$(A)
+	rm -f compilerlibs/ocamlcommon.cmxa \
+	      compilerlibs/ocamlcommon.a compilerlibs/ocamlcommon.lib
 
 # The bytecode compiler compiled with the native-code compiler
 
 compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP:.cmo=.cmx)
 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $^
 partialclean::
-	rm -f compilerlibs/ocamlbytecomp.cmxa compilerlibs/ocamlbytecomp.$(A)
+	rm -f compilerlibs/ocamlbytecomp.cmxa \
+	      compilerlibs/ocamlbytecomp.a compilerlibs/ocamlbytecomp.lib
 
 ocamlc.opt: compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlbytecomp.cmxa \
             $(BYTESTART:.cmo=.cmx)
-	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^ -cclib "$(BYTECCLIBS)"
+	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^ \
+                 $(addprefix -cclib , $(PTHREAD_CFLAGS)) $(PTHREAD_CAML_LINK)
 
 partialclean::
 	rm -f ocamlc.opt
@@ -892,7 +914,8 @@ partialclean::
 compilerlibs/ocamloptcomp.cmxa: $(OPTCOMP:.cmo=.cmx)
 	$(CAMLOPT) -a -o $@ $^
 partialclean::
-	rm -f compilerlibs/ocamloptcomp.cmxa compilerlibs/ocamloptcomp.$(A)
+	rm -f compilerlibs/ocamloptcomp.cmxa \
+	      compilerlibs/ocamloptcomp.a compilerlibs/ocamloptcomp.lib
 
 ocamlopt.opt: compilerlibs/ocamlcommon.cmxa compilerlibs/ocamloptcomp.cmxa \
               $(OPTSTART:.cmo=.cmx)
@@ -974,7 +997,7 @@ stdlib/libcamlrun.$(A): runtime/libcamlrun.$(A)
 	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
 clean::
 	$(MAKE) -C runtime clean
-	rm -f stdlib/libcamlrun.$(A)
+	rm -f stdlib/libcamlrun.a stdlib/libcamlrun.lib
 
 otherlibs_all := bigarray dynlink raw_spacetime_lib \
   str systhreads unix win32unix
@@ -1004,7 +1027,7 @@ runtime/libasmrun.$(A): makeruntimeopt ;
 stdlib/libasmrun.$(A): runtime/libasmrun.$(A)
 	cp $< $@
 clean::
-	rm -f stdlib/libasmrun.$(A)
+	rm -f stdlib/libasmrun.a stdlib/libasmrun.lib
 
 # The standard library
 
@@ -1026,7 +1049,7 @@ partialclean::
 # The lexer and parser generators
 
 .PHONY: ocamllex
-ocamllex: ocamlyacc ocamlc
+ocamllex: ocamlyacc
 	$(MAKE) -C lex all
 
 .PHONY: ocamllex.opt
@@ -1079,6 +1102,9 @@ parsing/parser.ml: boot/menhir/parser.ml parsing/parser.mly \
 parsing/parser.mli: boot/menhir/parser.mli
 	sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
 
+beforedepend:: parsing/camlinternalMenhirLib.ml \
+  parsing/camlinternalMenhirLib.mli \
+	parsing/parser.ml parsing/parser.mli
 
 partialclean:: partialclean-menhir
 
@@ -1102,6 +1128,59 @@ ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
 
 partialclean::
 	$(MAKE) -C ocamltest clean
+
+test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
+  stubs.c \
+  harness.mli harness.ml \
+  toolchain.mli toolchain.ml \
+  environment.mli environment.ml \
+  cmdline.mli cmdline.ml \
+  testBytecodeBinaries.mli testBytecodeBinaries.ml \
+  testDynlink.mli testDynlink.ml \
+  testLinkModes.mli testLinkModes.ml \
+  testRelocation.mli testRelocation.ml \
+  testToplevel.mli testToplevel.ml \
+  test_ld_conf.mli test_ld_conf.ml \
+  test_in_prefix.mli test_in_prefix.ml)
+test_in_prefix_LIBRARIES = \
+  otherlibs/$(UNIXLIB)/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
+
+testsuite/tools/%.$(O): OC_CPPFLAGS += -I runtime -I otherlibs/$(UNIXLIB)
+testsuite/tools/%.cmi: COMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
+testsuite/tools/%.cmo: COMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
+testsuite/tools/%.cmx: \
+  OPTCOMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
+
+ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
+testsuite/tools/dump_load_path$(EXE): \
+  FLEXLINK_CMD=boot/ocamlrun$(EXE) flexdll/flexlink.exe
+endif
+testsuite/tools/dump_load_path$(EXE): \
+  testsuite/tools/dump_load_path.$(O) runtime/prims.$(O) runtime/libcamlrun.$(A)
+	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
+
+testsuite/tools/test_in_prefix$(EXE): \
+  CAMLC = $(CAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
+
+testsuite/tools/test_in_prefix$(EXE): \
+  $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmo, $(filter-out %.mli, \
+    $(test_in_prefix_SOURCES))))
+	$(FLEXLINK_ENV) $(CAMLC) $(STDLIBFLAGS) -custom -o $@ -I runtime \
+    -I otherlibs/$(UNIXLIB) -I compilerlibs \
+    $(addsuffix .cma, $(test_in_prefix_LIBRARIES)) $^
+
+testsuite/tools/test_in_prefix.opt$(EXE): \
+  $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmx, $(filter-out %.mli, \
+    $(test_in_prefix_SOURCES))))
+	$(FLEXLINK_ENV) $(CAMLOPT) $(STDLIBFLAGS) -o $@ \
+    -I otherlibs/$(UNIXLIB) -I compilerlibs \
+    $(addsuffix .cmxa, $(test_in_prefix_LIBRARIES)) $^
+
+partialclean::
+	rm -f testsuite/tools/dump_load_path testsuite/tools/dump_load_path.exe
+	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
+	rm -f testsuite/tools/test_in_prefix.opt \
+        testsuite/tools/test_in_prefix.opt.exe
 
 # Documentation
 
@@ -1138,6 +1217,16 @@ ocamldebugger: ocamlc ocamlyacc ocamllex otherlibraries
 partialclean::
 	$(MAKE) -C debugger clean
 
+# Check that the native-code compiler is supported
+.PHONY: checknative
+checknative:
+ifeq "$(ARCH)" "none"
+checknative:
+	$(error The native-code compiler is not supported on this platform)
+else
+	@
+endif
+
 # Check that the stack limit is reasonable (Unix-only)
 .PHONY: checkstack
 checkstack:
@@ -1169,7 +1258,8 @@ compilerlibs/ocamlmiddleend.cmxa: $(MIDDLE_END:%.cmo=%.cmx)
 partialclean::
 	rm -f compilerlibs/ocamlmiddleend.cma \
 	      compilerlibs/ocamlmiddleend.cmxa \
-	      compilerlibs/ocamlmiddleend.$(A)
+	      compilerlibs/ocamlmiddleend.a \
+	      compilerlibs/ocamlmiddleend.lib \
 
 # Tools
 
@@ -1223,7 +1313,8 @@ endif
 compilerlibs/ocamlopttoplevel.cmxa: $(OPTTOPLEVEL:.cmo=.cmx)
 	$(CAMLOPT) -a -o $@ $^
 partialclean::
-	rm -f compilerlibs/ocamlopttoplevel.cmxa
+	rm -f compilerlibs/ocamlopttoplevel.cmxa \
+	      compilerlibs/ocamlopttoplevel.a compilerlibs/ocamlopttoplevel.lib
 
 # When the native toplevel executable has an extension (e.g. ".exe"),
 # provide a phony 'ocamlnat' synonym
@@ -1241,7 +1332,7 @@ ocamlnat$(EXE): compilerlibs/ocamlcommon.cmxa compilerlibs/ocamloptcomp.cmxa \
 	$(CAMLOPT_CMD) $(LINKFLAGS) -linkall -o $@ $^
 
 partialclean::
-	rm -f ocamlnat$(EXE)
+	rm -f ocamlnat ocamlnat.exe
 
 toplevel/opttoploop.cmx: otherlibs/dynlink/dynlink.cmxa
 
@@ -1284,24 +1375,29 @@ partialclean::
            lambda middle_end/closure middle_end/flambda \
            middle_end/flambda/base_types asmcomp/debug \
            driver toplevel tools; do \
-	  rm -f $$d/*.cm[ioxt] $$d/*.cmti $$d/*.annot $$d/*.$(S) \
-	    $$d/*.$(O) $$d/*.$(SO); \
+	  rm -f $$d/*.cm[ioxt] $$d/*.cmti $$d/*.annot $$d/*.s $$d/*.asm \
+	    $$d/*.o $$d/*.obj $$d/*.so $$d/*.dll; \
 	done
 
 .PHONY: depend
 depend: beforedepend
 	(for d in utils parsing typing bytecomp asmcomp middle_end \
          lambda file_formats middle_end/closure middle_end/flambda \
-         middle_end/flambda/base_types asmcomp/debug \
+         middle_end/flambda/base_types asmcomp/debug testsuite/tools \
          driver toplevel; \
          do $(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) $$d/*.mli $$d/*.ml || exit; \
          done) > .depend
 
 .PHONY: distclean
 distclean: clean
-	rm -f boot/ocamlrun boot/ocamlrun$(EXE) boot/camlheader \
-	boot/*.cm* boot/libcamlrun.$(A) boot/ocamlc.opt
-	rm -f Makefile.config runtime/caml/m.h runtime/caml/s.h
+	$(MAKE) -C ocamltest distclean
+	rm -f testsuite/tools/toolchain.ml
+	rm -f boot/ocamlrun boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
+	boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
+	rm -f Makefile.config Makefile.build_config
+	rm -f runtime/caml/m.h runtime/caml/s.h
+	rm -rf autom4te.cache
+	rm -f config.log config.status libtool
 	rm -f tools/*.bak
 	rm -f ocaml ocamlc
 	rm -f testsuite/_log*
