@@ -495,9 +495,7 @@ let find_bin_sh () =
   let output_file = Filename.temp_file "caml_bin_sh" "" in
   let result =
   try
-    let cmd =
-      Filename.quote_command ~stdout:output_file "command" ["-p"; "-v"; "sh"]
-    in
+    let cmd = "command -p -v sh > " ^ Filename.quote output_file in
     if !Clflags.verbose then
       Printf.eprintf "+ %s\n" cmd;
     if Sys.command cmd = 0 then
