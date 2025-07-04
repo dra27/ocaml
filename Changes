@@ -7,12 +7,49 @@ OCaml 5.1.2
   (Lucas Pluvinage, Sadiq Jaffer and Olivier Nicole, review by Gabriel Scherer,
    David Allsopp, Tim McGilchrist and Thomas Leonard)
 
+### Runtime system:
+
+- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
+  shared_libs_path item in `ocamlrun -config` in addition to displaying the
+  entries found in ld.conf.
+  (David Allsopp, review by Stephen Dolan)
+
+### Internal/compiler-libs changes:
+
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
+### Build system:
+
+* #12751: --with-target-bindir configure option implemented. This option
+  refers to the location of the runtime binaries on the target system for a
+  cross-compiler and is embedded in executables produced by ocamlc. It does
+  not affect the bytecode executables installed as part of the build. The old
+  mechanism `make TARGET_BINDIR=..` no longer works.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
+
 ### Bug fixes:
+
+- #12726: fix segmentation fault under Windows when executing a bytecode file if
+  the runtime (`ocamlrun.exe`) cannot be found.
+  (Vadim Zborovskii, Nicolás Ojeda Bär, report by Vadim Zborovskii, review by
+  David Allsopp)
+
+* #12751: Always keep within the 128 character limit for shebang lines. Previous
+  fix in #8622 handled building the compiler with a long prefix; this patch
+  extends this to the bytecode executables emitted by that compiler.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
 
 - #13019: Remove linking instructions for the Unix library from threads.cma
   (this was done for threads.cmxa in OCaml 3.11). Eliminates warnings from
   new lld when using threads.cma of duplicated libraries.
   (David Allsopp, review by Nicolás Ojeda Bär)
+
+* #13070: On Windows, when configured with bootstrapped flexdll, don't add
+  +flexdll to the search path when -nostdlib is specified (which then means
+  -L <path-to-flexdll> no longer gets passed to the system linker).
+  (David Allsopp, review by Florian Angeletti)
 
 OCaml 5.1.1 (8 December 2023)
 ----------------------------
