@@ -70,7 +70,10 @@ function set_configuration {
   CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
   CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
 
-  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2" '--enable-ocamltest')
+  args=('--cache-file' "$CACHE_FILE" \
+        '--prefix' "$2" \
+        '--enable-native-toplevel' \
+        '--enable-ocamltest')
 
   case "$1" in
     cygwin*)
@@ -85,6 +88,9 @@ function set_configuration {
       # Explicitly test dependency generation on msvc64
       args+=('--host=x86_64-pc-windows' '--enable-dependency-generation');;
   esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--with-relative-libdir')
+  fi
 
   # Remove old configure cache if the configure script or the OS
   # have changed
@@ -107,7 +113,6 @@ function set_configuration {
 
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 FLEXDLLROOT="$PROGRAMFILES/flexdll"
-OCAMLROOT=$(echo "$OCAMLROOT" | cygpath -f - -m)
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
@@ -172,6 +177,9 @@ case "$1" in
       run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    run "test $PORT in prefix" \
+      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
+            test-in-prefix
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
