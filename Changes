@@ -1,6 +1,49 @@
 OCaml 4.13 maintenance branch
 -----------------------------
 
+### Runtime system:
+
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
+- #11763, #11759, #11861, #12509, #12577: Use strict prototypes on primitives.
+  (Antonin Décimo, review by Xavier Leroy, David Allsopp, Sébastien
+   Hinderer and Nick Barnes)
+
+- #11764: Add prototypes to old-style C function definitions.
+  (Antonin Décimo, review by Xavier Leroy)
+
+### Compiler user-interface and warnings:
+
+- #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
+  Makefile.config.
+  (Damien Doligez, review by Mark Shinwell and Gabriel Scherer)
+
+### Internal/compiler-libs changes:
+
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
+- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
+  shared_libs_path item in `ocamlrun -config` in addition to displaying the
+  entries found in ld.conf.
+  (David Allsopp, review by Stephen Dolan)
+
+### Build system:
+
+- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
+  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
+  in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
+  (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
+
+* #12751: --with-target-bindir configure option implemented. This option
+  refers to the location of the runtime binaries on the target system for a
+  cross-compiler and is embedded in executables produced by ocamlc. It does
+  not affect the bytecode executables installed as part of the build. The old
+  mechanism `make TARGET_BINDIR=..` no longer works.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
+
 ### Bug fixes:
 
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
@@ -10,6 +53,25 @@ OCaml 4.13 maintenance branch
 - #11358, #11378: Refactor the initialization of bytecode threading.
   This avoids a "dangling pointer" warning of GCC 12.1.
   (Xavier Leroy, report by Armaël Guéneau, review by Gabriel Scherer)
+
+- #12116, #12993: explicitly build non PIE executables on x86 32bits
+  architectures
+  (Florian Angeletti, review by David Allsopp)
+
+- #12726: fix segmentation fault under Windows when executing a bytecode file if
+  the runtime (`ocamlrun.exe`) cannot be found.
+  (Vadim Zborovskii, Nicolás Ojeda Bär, report by Vadim Zborovskii, review by
+  David Allsopp)
+
+* #12751: Always keep within the 128 character limit for shebang lines. Previous
+  fix in #8622 handled building the compiler with a long prefix; this patch
+  extends this to the bytecode executables emitted by that compiler.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
+
+* #13070: On Windows, when configured with bootstrapped flexdll, don't add
+  +flexdll to the search path when -nostdlib is specified (which then means
+  -L <path-to-flexdll> no longer gets passed to the system linker).
+  (David Allsopp, review by Florian Angeletti)
 
 
 OCaml 4.13.1 (01 October 2021)
