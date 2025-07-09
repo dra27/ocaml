@@ -114,8 +114,6 @@ static int read_trailer(int fd, struct exec_trailer *trail)
       ? 0 : WRONG_MAGIC;
 }
 
-enum caml_byte_program_mode caml_byte_program_mode = STANDARD;
-
 int caml_attempt_open(char_os **name, struct exec_trailer *trail,
                       int do_open_script)
 {
@@ -369,6 +367,15 @@ static int parse_command_line(char_os **argv)
   return i;
 }
 
+static const char_os * get_stdlib_location(void)
+{
+  const char_os * stdlib;
+  stdlib = caml_secure_getenv(T("OCAMLLIB"));
+  if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
+  if (stdlib == NULL) stdlib = caml_runtime_standard_library_default;
+  return stdlib;
+}
+
 /* Print the configuration of the runtime to stdout; memory allocated is not
    freed, since the runtime will terminate after calling this. */
 static void do_print_config(void)
@@ -379,9 +386,9 @@ static void do_print_config(void)
   /* Print the runtime configuration */
   printf("version: %s\n", OCAML_VERSION_STRING);
   printf("standard_library_default: %s\n",
-         caml_stat_strdup_of_os(OCAML_STDLIB_DIR));
+         caml_stat_strdup_of_os(caml_runtime_standard_library_default));
   printf("standard_library: %s\n",
-         caml_stat_strdup_of_os(caml_get_stdlib_location()));
+         caml_stat_strdup_of_os(get_stdlib_location()));
   printf("int_size: %d\n", 8 * (int)sizeof(value));
   printf("word_size: %d\n", 8 * (int)sizeof(value) - 1);
   printf("os_type: %s\n", OCAML_OS_TYPE);
@@ -427,7 +434,10 @@ static void do_print_config(void)
 
   /* Parse ld.conf and print the effective search path */
   puts("shared_libs_path:");
-  caml_parse_ld_conf();
+  caml_decompose_path(&caml_shared_libs_path,
+                      caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
+  caml_parse_ld_conf(caml_runtime_standard_library_default,
+                     &caml_shared_libs_path);
   for (i = 0; i < caml_shared_libs_path.size; i++) {
     dir = caml_shared_libs_path.contents[i];
     if (dir[0] == 0)
@@ -456,7 +466,7 @@ extern void caml_install_invalid_parameter_handler();
 
 CAMLexport void caml_main(char_os **argv)
 {
-  int fd, pos;
+  int fd = -1, pos;
   struct exec_trailer trail;
   struct channel * chan;
   value res;
@@ -489,9 +499,13 @@ CAMLexport void caml_main(char_os **argv)
   /* Determine position of bytecode file */
   pos = 0;
 
-  /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
-  exe_name = argv[0];
-  fd = caml_attempt_open(&exe_name, &trail, 0);
+  proc_self_exe = caml_executable_name();
+
+  if (caml_byte_program_mode != APPENDED || proc_self_exe == NULL) {
+    /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
+    exe_name = argv[0];
+    fd = caml_attempt_open(&exe_name, &trail, 0);
+  }
 
   /* Little grasshopper wonders why we do that at all, since
      "The current executable is ocamlrun itself, it's never a bytecode
@@ -499,9 +513,17 @@ CAMLexport void caml_main(char_os **argv)
      With -custom, we have an executable that is ocamlrun itself
      concatenated with the bytecode.  So, if the attempt with argv[0]
      failed, it is worth trying again with executable_name. */
-  if (fd < 0 && (proc_self_exe = caml_executable_name()) != NULL) {
-    exe_name = proc_self_exe;
-    fd = caml_attempt_open(&exe_name, &trail, 0);
+  if (caml_byte_program_mode == APPENDED || fd < 0) {
+    if (proc_self_exe != NULL) {
+      exe_name = proc_self_exe;
+      fd = caml_attempt_open(&exe_name, &trail, 0);
+    } else {
+      caml_stat_free(proc_self_exe);
+    }
+    if (fd < 0 && caml_byte_program_mode == APPENDED)
+      error("unable to open file '%s'", caml_stat_strdup_of_os(exe_name));
+  } else {
+    caml_stat_free(proc_self_exe);
   }
 
   if (fd < 0) {
@@ -560,6 +582,16 @@ CAMLexport void caml_main(char_os **argv)
   req_prims = read_section(fd, &trail, "PRIM");
   if (req_prims == NULL) caml_fatal_error("no PRIM section");
   caml_build_primitive_table(shared_lib_path, shared_libs, req_prims);
+  /* Load the embedded overridden caml_standard_library_default value, if one is
+     available. Note that although -custom executables come through this
+     mechanism, they don't define OSLD sections because
+     caml_runtime_standard_library_default and caml_standard_library_default are
+     fundamentally equal and caml_runtime_standard_library_default is set when
+     the -custom executable is linked. */
+  char_os *image_standard_library_default =
+    read_section_to_os(fd, &trail, "OSLD");
+  if (image_standard_library_default != NULL)
+    caml_standard_library_default = image_standard_library_default;
   caml_stat_free(shared_lib_path);
   caml_stat_free(shared_libs);
   caml_stat_free(req_prims);
