@@ -19,7 +19,9 @@ let version = Sys.ocaml_version
 
 let bindir = "%%OCAML_BINDIR%%"
 
-let standard_library_default = "%%LIBDIR%%"
+external standard_library_default : unit -> string = "%standard_library_default"
+
+let standard_library_default = standard_library_default ()
 
 let standard_library =
   try
