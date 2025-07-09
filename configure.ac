@@ -82,6 +82,7 @@ AC_SUBST([OCAML_VERSION_MINOR], [OCAML__VERSION_MINOR])
 AC_SUBST([OCAML_VERSION_PATCHLEVEL], [OCAML__VERSION_PATCHLEVEL])
 AC_SUBST([OCAML_VERSION_EXTRA], [OCAML__VERSION_EXTRA])
 AC_SUBST([OCAML_VERSION_SHORT], [OCAML__VERSION_SHORT])
+AC_SUBST([ocaml_cv_cc_vendor])
 AC_SUBST([CC])
 AC_SUBST([DIFF_FLAGS])
 # Note: This is present for the flexdll bootstrap where it exposed as the old
@@ -99,7 +100,9 @@ AC_SUBST([arch64])
 AC_SUBST([model])
 AC_SUBST([system])
 AC_SUBST([systhread_support])
+AC_SUBST([ocamlsrcdir])
 AC_SUBST([unix_or_win32])
+AC_SUBST([ln])
 AC_SUBST([ocamlyacc_wstr_module])
 AC_SUBST([outputexe])
 AC_SUBST([outputobj])
@@ -124,7 +127,6 @@ AC_SUBST([ocamlc_cppflags])
 AC_SUBST([flexdir])
 AC_SUBST([bootstrapping_flexdll])
 AC_SUBST([flexlink_flags])
-AC_SUBST([long_shebang])
 AC_SUBST([shebangscripts])
 AC_SUBST([AR])
 AC_SUBST([mklib])
@@ -174,15 +176,20 @@ AC_SUBST([flexdll_chain])
 AC_SUBST([PACKLD])
 AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
+AC_SUBST([ocaml_prefix])
+AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
+AC_SUBST([target_bindir])
 
 ## Generated files
 
+AC_CONFIG_FILES([testsuite/tools/toolchain.ml])
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_FILES([manual/src/version.tex])
 AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+AC_CONFIG_FILES([ocamltest/ocamltest_config.mlp])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 AC_CONFIG_HEADERS([runtime/caml/version.h])
@@ -209,6 +216,38 @@ AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
+
+# $cygwin_build_env=true if the build is taking place in any kind of Cygwin-like
+# environment (which may include cross-compiling _from_ Cygwin)
+# All patterns end with * (cf. build-aux/config.sub)
+#
+# In Cygwin itself, the mingw-w64 compilers are cross-compilers
+# (host=x86_64-pc-cygwin; target=*-w64-mingw32) and $build when running from
+# within Cygwin is always *-pc-cygwin.
+#
+# In MSYS2, the mingw-w64 compiler are normal host compilers, which MSYS2 makes
+# available through different Environments (in a similar to the Microsoft Visual
+# Studio Tools Command Prompts; see https://www.msys2.org/docs/environments/).
+# It is possible to use MSYS2's "Cygwin" gcc (the equivalent of compiling native
+# Cygwin), in which case $build is *-*-msys*.
+# The mingw-w64 Environments manually set $build to *-w64-mingw32, but the
+# _native_ value inferred by config.guess (which uses uname -s) will be
+# *-pc-mingw32 (for the 32-bit _target_ environments, even though MSYS2 is a
+# 64-bit build environment) and *-pc-mingw64 (for the 64-bit _target_
+# environments).
+#
+# This leads to the four patterns below, all of which imply that the build is
+# taking place on a system where Cygwin's utilities (cygpath, etc.) can be
+# expected to be found and semantics (CYGWIN=winsymlinks:native, etc.) expected
+# to apply.
+#
+# Note that although build=x86_64-pc-mingw64 will be accepted here, it is highly
+# likely that that's a misconfigured environment, and the script will
+# subsequently fail if host has not been altered to x86_64-w64-mingw32.
+AS_CASE([$build],
+  [*-*-cygwin*|*-*-msys*|*-*-mingw32*|*-*-mingw64*],
+    [cygwin_build_env=true],
+  [cygwin_build_env=false])
 
 # Systems that are known not to work, even in bytecode only.
 
@@ -374,7 +413,29 @@ AC_ARG_ENABLE([cmm-invariants],
 
 AC_ARG_WITH([target-bindir],
   [AS_HELP_STRING([--with-target-bindir],
-    [location of binary programs on target system])])
+    [location of the runtime binaries on the target system])],
+  [TARGET_BINDIR=$withval],
+  [TARGET_BINDIR=''])
+
+AC_ARG_WITH([target-sh],
+  [AS_HELP_STRING([--with-target-sh],
+    [location of Posix sh on the target system])],
+  [AS_IF([test x"$withval" = 'xno'],
+    [target_launch_method='exe'],
+    [target_launch_method="$withval"])],
+  [target_launch_method=''])
+
+AC_ARG_WITH([stublibs],
+  [AS_HELP_STRING([--with-stublibs],
+    [additional directory for searching for bytecode stub libraries])],
+  [AS_IF([test x"$withval" = 'xno'],
+    [ocaml_additional_stublibs_dir=''],
+    [dnl A user wishing to add "yes" to ld.conf may do so manually - catch
+     dnl --with-stublibs as an error.
+    AS_IF([test x"$withval" = 'xyes'],
+     [AC_MSG_ERROR([--with-stublibs needs an argument])])
+    ocaml_additional_stublibs_dir="$withval"])],
+  [ocaml_additional_stublibs_dir=''])
 
 AC_ARG_ENABLE([reserved-header-bits],
   [AS_HELP_STRING([--enable-reserved-header-bits=BITS],
@@ -530,14 +591,35 @@ AS_CASE([$ocaml_cv_cc_vendor],
 #  TODO: why can we not use $CPP in multicore, fix this?
   [CPP="$CC -E -P"])
 
+# Absolute path to the toplevel source directory
+
+# A sentinel character (X) is added at the end of the directory name
+# and then removed, in case the directory name finishes with an odd character.
+# (The $(...) construct strips trailing \n characters.)
+# Also, it is important to use `printf` rather than `echo` because the
+# behaviour of `echo` is indeterminate and uncontrollable if the
+# absolute path contains backslashes, which will definitely be the case
+# on Windows
+# See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
+# for the detailed explanation.
+
+ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+ocamlsrcdir=${ocamlsrcdir%X}
+
 # Libraries to build depending on the host
 
-AS_CASE([$host],
-  [*-*-mingw32|*-pc-windows],
+AS_CASE([$cygwin_build_env,$host],
+  [true,*-w64-mingw32*|true,*-pc-windows],
     [unix_or_win32="win32"
+    OCAML_CHECK_LN_ON_WINDOWS
+    default_separator='\'
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     ocamlyacc_wstr_module="yacc/wstr"],
   [unix_or_win32="unix"
+  ln='ln -sf'
+  default_separator='/'
   ocamlyacc_wstr_module=""])
+
 AS_CASE([$host],
   [*-*-cygwin*|*-*-mingw32|*-pc-windows],
     [exeext=".exe"],
@@ -558,24 +640,42 @@ AS_IF([test x"$enable_str_lib" != "xno"],
 ## TODO: have two values, one for host and one for target
 AC_SYS_INTERPRETER
 
-long_shebang=false
-AS_IF(
-  [test "x$interpval" = "xyes"],
-    [AS_CASE([$host],
-      [*-cygwin|*-*-mingw32|*-pc-windows],
-        [shebangscripts=false],
-      [shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       AS_IF([test "${#expanded_bindir}" -gt 115],[long_shebang=true])
-      ]
-    )],
-  [shebangscripts=false]
+shebangscripts=false
+launch_method='exe'
+AS_IF([test "x$interpval" = "xyes"],
+  [AS_CASE([$host],
+    [*-cygwin],
+      [# Cygwin supports shebangs, which we use for the compiler itself, but
+      # partially for legacy, and partially so that executables can be easily
+      # run from outside Cygwin, the executables ocamlc and ocamlopt produce do
+      # not use shebang scripts
+      shebangscripts=true
+      launch_method='sh'
+      AS_IF([test x"$target_launch_method" = 'x'],
+        [target_launch_method='exe'])],
+    [*-*-mingw32*|*-pc-windows], [],
+    [shebangscripts=true
+    launch_method='sh']
+  )]
 )
+
+# stdlib/runtime.info and stdlib/target_runtime.info are generated by commands
+# in config.status, rather than by the .in mechanism, since the latter cannot
+# reliably process binary files.
+AC_CONFIG_COMMANDS([shebang],
+  [printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
+    > stdlib/runtime.info
+  printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
+    > stdlib/target_runtime.info],
+dnl These declarations are put in a here-document in configure, so the command
+dnl in '$(...)' _is_ evaluated as the content is written to config.status (by
+dnl standard interpretation of a here-document). The sed commands quote any
+dnl nefarious single quotes which may appear in any of the strings.
+  [launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
+  target_launch_method=\
+'$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
+  TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'])
 
 # Are we building a cross-compiler
 
@@ -768,12 +868,17 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
     OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
                         [$internal_cppflags], [$host])
 
-    AS_CASE([$host],
-      [*-w64-mingw32|*-pc-windows],
-      [flexlink_where="$(cmd /c "$flexlink" -where 2>/dev/null)"
-      AS_IF([test -z "$flexlink_where"],
-        [AC_MSG_ERROR([$flexlink is not executable from a native Win32 process])
-      ])])
+    # When building on Cygwin/MSYS2, flexlink may be a shell script which
+    # then cannot be executed by ocamlc/ocamlopt. Having located flexlink,
+    # ensure it can be executed from a native Windows process. The check
+    # is only necessary when cross-compiling.
+    AS_IF([test x"$build" != x"$host"],[
+      AS_IF([$cygwin_build_env],
+        [flexlink_where="$(cmd /c "$flexlink" -where 2>/dev/null)"
+        AS_IF([test -z "$flexlink_where"],
+          [AC_MSG_ERROR(m4_normalize([$flexlink is not executable from a
+          native Win32 process]))])])
+    ])
   ])
 
   OCAML_TEST_FLEXDLL_H([$flexdir])
@@ -2122,11 +2227,50 @@ AS_IF([test x"$prefix" = "xNONE"],
     [i686-w64-mingw32], [prefix='C:/ocamlmgw'],
     [x86_64-w64-mingw32], [prefix='C:/ocamlmgw64'],
     [i686-pc-windows], [prefix='C:/ocamlms'],
-    [x86_64-pc-windows], [prefix='C:/ocamlms64'])],
-  [AS_IF([test x"$unix_or_win32" = "xwin32" \
-          && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ],
-    [AS_CASE([$build],
-      [*-pc-cygwin], [prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")"])])])
+    [x86_64-pc-windows], [prefix='C:/ocamlms64'])])
+
+# Normalise $prefix, if necessary, on Windows. There are 9 variables to be
+# considered:
+# - $prefix and $exec_prefix. These are autoconf variables containing the values
+#   specified for --prefix and --exec-prefix respectively, or NONE if these
+#   flags were not given on the command line. These two variables are written to
+#   Makefile.config and are in _build_ format. On native Windows, the values
+#   must be suitable to pass to _both_ native Windows processes and Cygwin/MSYS2
+#   commands. The values are ultimately converted to Windows paths using slashes
+#   (i.e. C:/foo)
+# - $bindir and $libdir. These similarly contain the values specified for
+#   --bindir and --libdir, or defaults relative to $exec_prefix otherwise.
+#   Unlike --prefix, values specified to configure for --bindir and --libdir are
+#   assumed to be suitable for both native Windows processes and Cygwin/MSYS2.
+#   These two variables ultimately end up in Makefile.config as $(BINDIR) and
+#   $(LIBDIR) and are used for installation commands only.
+# - $ocaml_prefix, $ocaml_bindir and $ocaml_libdir are the _expanded_ values of
+#   $prefix, $bindir and $libdir so that the values can be inserted into OCaml
+#   strings (typically in utils/config.generated.ml). On Windows, these preserve
+#   the backslashes present in the value passed to --prefix.
+# - $TARGET_BINDIR and $TARGET_LIBDIR. These are both precious environment
+#   variables (meaning their value is recorded by configure) but they default to
+#   $ocaml_bindir and $ocaml_libdir respectively.
+ocaml_bindir="$bindir"
+ocaml_libdir="$libdir"
+ocaml_prefix="$prefix"
+AS_CASE([$cygwin_build_env,$host],
+  [true,*-w64-mingw32*|true,*-pc-windows],
+    [prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")"
+    AS_IF([test "x${ocaml_prefix%%/*}" != "x$ocaml_prefix"],
+      # $prefix contained a slash - normalise it with cygpath. The rationale for
+      # this allows both `./configure --prefix $PWD/install` (which will be a
+      # Cygwin path) and also systems lazily using slashes instead of
+      # backslashes (i.e. C:/Backslashes/Scare/Us) to work.
+      [ocaml_prefix="$prefix"],
+      # $prefix was using backslashes - preserve these in the build, but
+      # continue to use slashes for the Makefile variables.
+      [AS_IF([test "x$bindir" = 'x${exec_prefix}/bin'],
+        [ocaml_bindir='${exec_prefix}\bin'],
+        [ocaml_bindir="$bindir"])
+      AS_IF([test "x$libdir" = 'x${exec_prefix}/lib/ocaml'],
+        [ocaml_libdir='${exec_prefix}\lib\ocaml'],
+        [ocaml_libdir="$libdir"])])])
 
 # Define a few macros that were defined in config/m-nt.h
 # but whose value is not guessed properly by configure
@@ -2152,6 +2296,38 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
+
+# Evaluate install directories
+AC_CONFIG_COMMANDS_PRE([
+  saved_exec_prefix="$exec_prefix"
+  saved_prefix="$prefix"
+  prefix="$ocaml_prefix"
+  AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
+  AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
+  eval "exec_prefix=\"$exec_prefix\""
+  eval "ocaml_bindir=\"$ocaml_bindir\""
+  eval "ocaml_libdir=\"$ocaml_libdir\""
+  AS_IF([test x"$TARGET_BINDIR" = 'x'],[TARGET_BINDIR="$ocaml_bindir"])
+  TARGET_LIBDIR="$ocaml_libdir"
+  AS_IF([test x"$target_launch_method" = 'x'],
+    [target_launch_method="$launch_method"])
+  prefix="$saved_prefix"
+  exec_prefix="$saved_exec_prefix"])
+
+# Create ld.conf
+AC_CONFIG_COMMANDS([runtime/ld.conf],
+  [rm -f runtime/ld.conf
+  test x"$ocaml_additional_stublibs_dir" = 'x' || \
+    echo "$ocaml_additional_stublibs_dir" > runtime/ld.conf
+  if $supports_shared_libraries; then
+    echo ".${default_separator}stublibs" >> runtime/ld.conf
+  fi
+  echo "." >> runtime/ld.conf],
+  [ocaml_additional_stublibs_dir=\
+'$(echo "$ocaml_additional_stublibs_dir" | sed -e "s/'/'\"'\"'/g")'
+  ocaml_libdir='$(echo "$ocaml_libdir" | sed -e "s/'/'\"'\"'/g")'
+  default_separator='$default_separator'
+  supports_shared_libraries='$supports_shared_libraries'])
 
 # Just before config.status is generated, determine the final values for MKEXE,
 # MKDLL, MKMAINDLL and MKEXE_VIA_CC. The final variables controlling these are:
