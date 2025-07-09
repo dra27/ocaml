@@ -28,6 +28,16 @@ EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
 
+ifeq "$(UNIX_OR_WIN32)" "win32"
+DIR_SEP := \$ # There must a space following the $
+CONVERT_PATH = $(subst /,$(DIR_SEP),$(strip $(1)))
+else
+DIR_SEP = /
+CONVERT_PATH = $(strip $(1))
+endif
+
+QUOTE_SINGLE = '$(subst ','\'',$(1))'
+
 DESTDIR ?=
 INSTALL_BINDIR := $(DESTDIR)$(BINDIR)
 INSTALL_LIBDIR := $(DESTDIR)$(LIBDIR)
@@ -132,6 +142,14 @@ SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 # in config.mlp.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
 
+# Allow Makefile.cross to override the Standard Library default for the compiler
+# itself.
+HOST_LIBDIR ?= $(TARGET_LIBDIR)
+
+OC_COMMON_LINKFLAGS += \
+  -set-runtime-default \
+    $(call QUOTE_SINGLE,standard_library_default=$(HOST_LIBDIR))
+
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
@@ -201,18 +219,25 @@ OCAMLYACCFLAGS ?=
 
 SAK = $(ROOTDIR)/runtime/sak$(EXE)
 
-# stdlib/StdlibModules cannot be include'd unless $(SAK) has been built. These
-# two rules add that dependency. They have to be pattern rules since
-# Makefile.common is included before default targets.
-$(ROOTDIR)/%/sak$(EXE):
-	$(MAKE) -C $(ROOTDIR)/$* sak$(EXE)
-
-ifneq "$(REQUIRES_CONFIGURATION)" ""
-$(ROOTDIR)/%/StdlibModules: $(SAK) ;
-endif
-
 # Used with the Microsoft toolchain to merge generated manifest files into
 # executables
 if_file_exists = ( test ! -f $(1) || $(2) && rm -f $(1) )
 MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
   mt -nologo -outputresource:$(1) -manifest $(1).manifest)
+
+# ocamlc has several mechanisms for linking a bytecode image to the runtime
+# which executes it. The exact mechanism depends on the platform and the precise
+# location of the runtime. The boot compiler (boot/ocamlc) therefore needs this
+# additional information, which comes from the stdlib build and is copied into
+# boot/ as part of coldstart. See read_runtime_launch_info in
+# bytecomp/bytelink.ml for further details.
+HEADER_NAME = camlheader
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+# Ensure that no command can create Cygwin symbolic links by ensuring that
+# symlink(2) will fail if native NTFS symlinks aren't available.
+export CYGWIN := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(CYGWIN)) winsymlinks:nativestrict)
+export MSYS := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(MSYS)) winsymlinks:nativestrict)
+endif
