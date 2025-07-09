@@ -138,22 +138,7 @@ let synchronize_primitive num symb =
     assert (actual_num = num)
   end
 
-(* Read the [ld.conf] file and return the corresponding list of directories *)
-
-let ld_conf_contents () =
-  let path = ref [] in
-  begin try
-    let ic = open_in (Filename.concat Config.standard_library "ld.conf") in
-    begin try
-      while true do
-        path := input_line ic :: !path
-      done
-    with End_of_file -> ()
-    end;
-    close_in ic
-  with Sys_error _ -> ()
-  end;
-  List.rev !path
+external ld_conf_contents : string -> string list = "caml_dynlink_parse_ld_conf"
 
 (* Split the CAML_LD_LIBRARY_PATH environment variable and return
    the corresponding list of directories.  *)
@@ -169,7 +154,8 @@ let ld_library_path_contents () =
 let init_compile nostdlib =
   search_path :=
     ld_library_path_contents() @
-    (if nostdlib then [] else ld_conf_contents())
+    (if nostdlib then [] else
+      ld_conf_contents Config.standard_library_effective)
 
 (* Initialization for linking in core (dynlink or toplevel) *)
 
@@ -177,7 +163,7 @@ let init_toplevel dllpaths =
   search_path :=
     ld_library_path_contents() @
     dllpaths @
-    ld_conf_contents();
+    ld_conf_contents Config.standard_library_default;
   opened_dlls :=
     List.map (fun dll -> "", Execution dll)
       (Array.to_list (get_current_dlls()));
@@ -187,3 +173,5 @@ let reset () =
   search_path := [];
   opened_dlls :=[];
   linking_in_core := false
+
+let search_path () = !search_path
