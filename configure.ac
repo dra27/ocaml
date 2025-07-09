@@ -61,6 +61,7 @@ profinfo_width=0
 instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+target_libdir_is_relative=false
 
 # Information about the package
 
@@ -142,6 +143,7 @@ AC_SUBST([has_monotonic_clock])
 AC_SUBST([otherlibraries])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
+AC_SUBST([as_is_cc])
 AC_SUBST([with_debugger]) # TODO: rename this variable
 AC_SUBST([with_camltex])
 AC_SUBST([ocamldoc])
@@ -181,6 +183,7 @@ AC_SUBST([ocaml_bindir])
 AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
 AC_SUBST([target_bindir])
+AC_SUBST([target_libdir_is_relative])
 
 ## Generated files
 
@@ -484,6 +487,14 @@ AC_ARG_ENABLE([mmap-map-stack],
   [AS_HELP_STRING([--enable-mmap-map-stack],
     [use mmap to allocate stacks instead of malloc])])
 
+AC_ARG_WITH([relative-libdir],
+  [AS_HELP_STRING([--with-relative-libdir],
+    [location of the Standard Library, specified relative to --bindir])],
+  [AS_IF([test x"$withval" = 'xno'],
+    [bindir_to_libdir=''],
+    [bindir_to_libdir="$withval"])],
+  [bindir_to_libdir=''])
+
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
     [use the AFL fuzzer])])
@@ -604,8 +615,8 @@ AS_CASE([$ocaml_cv_cc_vendor],
 # See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
 # for the detailed explanation.
 
-ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
-ocamlsrcdir=${ocamlsrcdir%X}
+srcdir_abs=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+srcdir_abs=${srcdir_abs%X}
 
 # Libraries to build depending on the host
 
@@ -614,10 +625,11 @@ AS_CASE([$cygwin_build_env,$host],
     [unix_or_win32="win32"
     OCAML_CHECK_LN_ON_WINDOWS
     default_separator='\'
-    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$srcdir_abs")"
     ocamlyacc_wstr_module="yacc/wstr"],
   [unix_or_win32="unix"
   ln='ln -sf'
+  ocamlsrcdir="$srcdir_abs"
   default_separator='/'
   ocamlyacc_wstr_module=""])
 
@@ -664,7 +676,7 @@ AS_IF([test "x$interpval" = "xyes"],
 # in config.status, rather than by the .in mechanism, since the latter cannot
 # reliably process binary files.
 AC_CONFIG_COMMANDS([shebang],
-  [printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
+  [printf '%s\n%s\000\n' "$launch_method" "$HOST_BINDIR" \
     > stdlib/runtime.info
   printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
     > stdlib/target_runtime.info],
@@ -675,7 +687,7 @@ dnl nefarious single quotes which may appear in any of the strings.
   [launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
-  ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
+  HOST_BINDIR='$(echo "$HOST_BINDIR" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'])
 
 # Are we building a cross-compiler
@@ -982,6 +994,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
 
 AC_CHECK_HEADER([math.h])
 AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD])])
+AC_CHECK_HEADER([libgen.h],[AC_DEFINE([HAS_LIBGEN_H], [1])])
 AC_CHECK_HEADER([stdint.h],[AC_DEFINE([HAS_STDINT_H])])
 AC_CHECK_HEADER([pthread_np.h],[AC_DEFINE([HAS_PTHREAD_NP_H])])
 AC_CHECK_HEADER([dirent.h], [AC_DEFINE([HAS_DIRENT])], [],
@@ -1402,24 +1415,33 @@ AS_IF([test -n "$target_alias"],
 # to avoiding forking a C compiler process for each compilation by ocamlopt.
 # Both AS and ASPP can be overridden by the user.
 
-default_as="$CC -c"
-default_aspp="$CC -c"
+as_is_cc=true
+default_as=''
 
 AS_CASE([$as_target,$ocaml_cv_cc_vendor],
   [*-*-linux*,gcc-*],
     [AS_CASE([$as_cpu],
       [x86_64|arm*|aarch64*|i[[3-6]]86|riscv*],
-        [default_as="${toolpref}as"])],
+        [default_as="${toolpref}as"
+        as_is_cc=false])],
+  [*-*-cygwin,gcc-*],
+    [default_as="${toolpref}as"
+    as_is_cc=false],
   [i686-pc-windows,*],
     [default_as="ml -nologo -coff -Cp -c -Fo"
-    default_aspp="$default_as"],
+    default_aspp="$default_as"
+    as_is_cc=false],
   [x86_64-pc-windows,*],
     [default_as="ml64 -nologo -Cp -c -Fo"
-    default_aspp="$default_as"],
+    default_aspp="$default_as"
+    as_is_cc=false],
   [*-*-darwin*,clang-*],
-    [default_as="$default_as -Wno-trigraphs"
+    [default_as="$CC -c -Wno-trigraphs"
     default_aspp="$default_as"],
   [])
+
+AS_IF([test -z "$default_as"],[default_as="$CC -c"])
+AS_IF([test -z "$default_aspp"],[default_aspp="$CC -c"])
 
 AS_IF([test "$with_pic"],
   [fpic=true
@@ -1843,11 +1865,26 @@ AC_CHECK_FUNC([pwrite], [AC_DEFINE([HAS_PWRITE])])
 
 ## -fdebug-prefix-map support by the C compiler
 AS_CASE([$ocaml_cv_cc_vendor,$host],
-  [*,*-*-mingw32], [cc_has_debug_prefix_map=false],
   [*,*-pc-windows], [cc_has_debug_prefix_map=false],
   [xlc*,powerpc-ibm-aix*], [cc_has_debug_prefix_map=false],
   [sunc*,sparc-sun-*], [cc_has_debug_prefix_map=false],
   [OCAML_CC_HAS_DEBUG_PREFIX_MAP])
+
+## -ffile-prefix-map support by the C compiler - used in the build, not by
+## the compiler
+AS_IF([test x"$bindir_to_libdir" != 'x'],
+  [srcdir_abs_real="$(realpath "$srcdir_abs" 2>/dev/null)"
+  AS_IF([test x"$srcdir_abs_real" = 'x'],[srcdir_abs_real="$srcdir_abs"])
+  AX_CHECK_COMPILE_FLAG([-ffile-prefix-map=old=new],
+    [internal_cflags="$internal_cflags -ffile-prefix-map=$srcdir_abs=+build"
+    AS_IF([test x"$srcdir_abs_real" != x"$srcdir_abs"],
+      [internal_cflags="$internal_cflags \
+-ffile-prefix-map=$srcdir_abs_real=+build"])],
+    [AS_IF([$cc_has_debug_prefix_map],
+      [internal_cflags="$internal_cflags -fdebug-prefix-map=$srcdir_abs=+build"
+      AS_IF([test x"$srcdir_abs_real" != x"$srcdir_abs"],
+        [internal_cflags="$internal_cflags \
+-fdebug-prefix-map=$srcdir_abs_real=+build"])])], [$warn_error_flag])])
 
 ## Does stat support nanosecond precision
 
@@ -2273,6 +2310,23 @@ AS_CASE([$cygwin_build_env,$host],
         [ocaml_libdir='${exec_prefix}\lib\ocaml'],
         [ocaml_libdir="$libdir"])])])
 
+AS_IF([test x"$libdir" = x'${exec_prefix}/lib/ocaml'],
+  [AS_IF([test x"$bindir_to_libdir" != 'x'],
+    [ocaml_libdir="$bindir_to_libdir"
+    target_libdir_is_relative=true
+    AS_CASE([$cygwin_build_env,$host],
+      [true,*-w64-mingw32*|true,*-pc-windows],
+        [build_bindir_to_libdir="$(LC_ALL=C.UTF-8 cygpath \
+                                   "$bindir_to_libdir")"],
+      [build_bindir_to_libdir="$bindir_to_libdir"])
+    AS_CASE([$build_bindir_to_libdir],
+      [./*],[libdir="$bindir${build_bindir_to_libdir[#].}"],
+      [../*],[libdir="$bindir/$build_bindir_to_libdir"],
+      [AC_MSG_ERROR([--with-relative-libdir requires a relative path])])])],
+  [AS_IF([test x"$bindir_to_libdir" != 'x'],
+    [AC_MSG_ERROR(m4_normalize([--with-relative-libdir and --libdir cannot both
+      be specified]))])])
+
 # Define a few macros that were defined in config/m-nt.h
 # but whose value is not guessed properly by configure
 # (all this should be understood and fixed)
@@ -2306,10 +2360,30 @@ AC_CONFIG_COMMANDS_PRE([
   AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
   AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
   eval "exec_prefix=\"$exec_prefix\""
-  eval "ocaml_bindir=\"$ocaml_bindir\""
+  # Set variables necessary to create utils/config.generated.ml and the two
+  # runtime-launch-info templates in stdlib.
+  # $ocaml_bindir is used for utils/config.generated.ml and is _empty_ if the
+  #   compiler is configured with --with-relative-libdir (otherwise the path
+  #   would be embedded in config.cmo)
+  # $HOST_BINDIR and $TARGET_BINDIR are used to generate the two
+  #   runtime-launch-info files. $HOST_BINDIR is always the absolute path to the
+  #   binary directory, in host format (i.e. potentially with backslashes on
+  #   Windows). $TARGET_BINDIR can be specified by the caller when building
+  #   cross-compilers, and the value then is used unaltered. Otherwise,
+  #   $TARGET_BINDIR is set to '.' when the compiler is configured with
+  #   --with-relative-libdir or the value of $HOST_BINDIR otherwise.
+  eval "HOST_BINDIR=\"$ocaml_bindir\""
+  AS_IF([test "x$bindir_to_libdir" = 'x'],
+    [ocaml_bindir="$HOST_BINDIR"],
+    [ocaml_bindir=''])
+  AS_IF([test x"$TARGET_BINDIR" = 'x'],
+    [AS_IF([test "x$bindir_to_libdir" = 'x'],
+      [TARGET_BINDIR="$HOST_BINDIR"],
+      [TARGET_BINDIR='.'])])
   eval "ocaml_libdir=\"$ocaml_libdir\""
-  AS_IF([test x"$TARGET_BINDIR" = 'x'],[TARGET_BINDIR="$ocaml_bindir"])
-  TARGET_LIBDIR="$ocaml_libdir"
+  AS_IF([test "x$bindir_to_libdir" = 'x'],
+    [TARGET_LIBDIR="$ocaml_libdir"],
+    [TARGET_LIBDIR="$bindir_to_libdir"])
   AS_IF([test x"$target_launch_method" = 'x'],
     [target_launch_method="$launch_method"])
   prefix="$saved_prefix"
