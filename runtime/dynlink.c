@@ -38,6 +38,10 @@
 
 #include "build_config.h"
 
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 #ifndef NATIVE_CODE
 
 /* The table of primitives */
@@ -76,15 +80,6 @@ static c_primitive lookup_primitive(char * name)
    listed there to the search path */
 
 #define LD_CONF_NAME T("ld.conf")
-
-CAMLexport char_os * caml_get_stdlib_location(void)
-{
-  char_os * stdlib;
-  stdlib = caml_secure_getenv(T("OCAMLLIB"));
-  if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = OCAML_STDLIB_DIR;
-  return stdlib;
-}
 
 /* Return a copy of [path], interpreting explicit-relative paths relative to
    [root]. [root] must not end with a directory separator. The result of this
@@ -148,7 +143,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
         caml_stat_free(libroot);
         continue;
       }
-      ldconf = open_os(ldconfname, O_RDONLY, 0);
+      ldconf = open_os(ldconfname, O_RDONLY | O_BINARY, 0);
       if (ldconf == -1)
         caml_fatal_error("cannot read loader config file %s",
                              caml_stat_strdup_of_os(ldconfname));
@@ -167,14 +162,19 @@ CAMLexport char_os * caml_parse_ld_conf(void)
       p = wconfig;
       while (*p != '\0') {
         for (q = p; *q != '\0' && *q != '\n'; q++) /*nothing*/;
-        last = *q;
+        char_os *r = q;
+        if (*q == '\n') {
+          r++;
+          /* Ignore any trailing CR characters, so that CR*LF is uniformly
+             treated as a single LF. */
+          while (q > p && *(q - 1) == '\r')
+            q--;
+        }
         *q = '\0';
         entry = make_relative_path_absolute(p, libroot);
         length += strlen_os(entry) + 1;
         caml_ext_table_add(&entries, entry);
-        p = q;
-        if (last == '\n')
-          p++;
+        p = r;
       }
 
       caml_stat_free(wconfig);
