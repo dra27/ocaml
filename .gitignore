@@ -48,6 +48,7 @@ _build
 /ocaml-*.cache
 /config.log
 /config.status
+/flexlink.opt
 /libtool
 /ocamlc.opt
 /expunge
@@ -67,8 +68,10 @@ _build
 /asmcomp/CSE.ml
 
 /boot/ocamlrun
+/boot/ocamlruns
 /boot/camlheader
 /boot/ocamlc.opt
+/boot/flexlink.byte
 
 /bytecomp/opcodes.ml
 /bytecomp/opcodes.mli
@@ -80,6 +83,8 @@ _build
 
 /emacs/ocamltags
 /emacs/*.elc
+
+/flexdll-sources
 
 /lambda/runtimedef.ml
 
@@ -118,6 +123,7 @@ _build
 /ocamltest/ocamltest
 /ocamltest/ocamltest.opt
 /ocamltest/ocamltest_config.ml
+/ocamltest/ocamltest_config.mlp
 /ocamltest/ocamltest_unix.ml
 /ocamltest/tsl_lexer.ml
 /ocamltest/tsl_parser.ml
@@ -192,17 +198,19 @@ _build
 /runtime/ld.conf
 /runtime/.gdb_history
 /runtime/.dep
+/runtime/build_config.h
+/runtime/sak
 /runtime/domain_state32.inc
 /runtime/domain_state64.inc
 
 /stdlib/camlheader
-/stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
+/stdlib/target_camlheader*
 /stdlib/camlheader_ur
+/stdlib/runtime.info
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
+/stdlib/target_runtime.info
 
 /testsuite/**/*.result
 /testsuite/**/*.opt_result
@@ -221,6 +229,9 @@ _build
 /testsuite/tools/lexcmm.ml
 /testsuite/tools/parsecmm.ml
 /testsuite/tools/parsecmm.mli
+/testsuite/tools/test_in_prefix
+/testsuite/tools/test_in_prefix.opt
+/testsuite/tools/toolchain.ml
 
 /tools/ocamldep
 /tools/ocamldep.opt
