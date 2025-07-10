@@ -78,7 +78,7 @@ INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
                        file_formats lambda)
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -strict-sequence -warn-error A \
  -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
-LINKFLAGS = $(INCLUDES)
+LINKFLAGS = $(INCLUDES) $(OC_COMMON_LINKFLAGS)
 VPATH := $(filter-out -I,$(INCLUDES))
 
 .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
@@ -109,7 +109,7 @@ CSLPROF_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
   pprintast.cmo \
   lexer.cmo parse.cmo
 
-$(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) profiling.cmo $(CSLPROF),)
+$(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) $(CSLPROF),profiling.cmo)
 
 ocamlcp_cmos = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
                warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
@@ -168,12 +168,6 @@ $(call byte_and_opt,ocamlmktop,$(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP),)
 # Converter olabl/ocaml 2.99 to ocaml 3
 
 LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
-
-ifeq ($(UNIX_OR_WIN32),unix)
-LN := ln -sf
-else
-LN := cp -pf
-endif
 
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
@@ -325,11 +319,17 @@ caml_tex_files := \
   $(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.cma \
   caml_tex.ml
 
+# checkstack tool
+
+checkstack$(EXE): checkstack.$(O)
+	$(MKEXE) $(OUTPUTEXE)$@ $<
+
 #Scan latex files, and run ocaml code examples
 
 caml_tex := caml-tex$(EXE)
 
-$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
+$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
+                         -I $(ROOTDIR)/runtime
 $(caml_tex): $(caml_tex_files)
 	$(ROOTDIR)/runtime/ocamlrun$(EXE) $(ROOTDIR)/ocamlc$(EXE) -nostdlib \
 	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
