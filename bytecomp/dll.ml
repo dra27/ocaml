@@ -144,20 +144,62 @@ let synchronize_primitive num symb =
 
 (* Read the [ld.conf] file and return the corresponding list of directories *)
 
+let rtrim_cr s =
+  if s = "" then s
+  else
+    let len = String.length s in
+    let i = ref len in
+    while !i > 0 && s.[!i - 1] = '\r' do
+      decr i
+    done;
+    if !i <> len then
+      String.sub s 0 !i
+    else
+      s
+
+let ld_conf_contents dir =
+  let dir = Filename.concat dir "" in
+  let is_separator =
+    if Sys.win32 then
+      function '/' | '\\' -> true | _ -> false
+    else
+      Char.equal '/'
+  in
+  let translate line =
+    if line = "" then
+      ""
+    else
+      let len = String.length line in
+      if line.[0] = '.' then
+        if len = 1 then
+          dir
+        else if is_separator line.[1] then
+          dir ^ String.sub line 2 (len - 2)
+        else if line.[1] = '.' && (len = 2 || is_separator line.[2]) then
+          Filename.concat dir line
+        else
+          line
+      else
+        line
+  in
+  try
+    In_channel.with_open_bin (Filename.concat dir "ld.conf") @@ fun ic ->
+      let lines = String.split_on_char '\n' (In_channel.input_all ic) in
+      match List.rev lines with
+      | [] -> assert false (* String.split_on_char doesn't return [] *)
+      | [""] -> []
+      | last :: rev_rest ->
+          let f s = translate (rtrim_cr s) in
+          let last = translate last in
+          List.rev_map f rev_rest @ if last = "" then [] else [last]
+  with Sys_error _ -> []
+
 let ld_conf_contents () =
-  let path = ref [] in
-  begin try
-    let ic = open_in (Filename.concat Config.standard_library "ld.conf") in
-    begin try
-      while true do
-        path := input_line ic :: !path
-      done
-    with End_of_file -> ()
-    end;
-    close_in ic
-  with Sys_error _ -> ()
-  end;
-  List.rev !path
+  let dirs = [
+    Sys.getenv_opt "OCAMLLIB";
+    Sys.getenv_opt "CAMLLIB";
+    Some Config.standard_library_default] in
+  List.concat_map (Option.fold ~none:[] ~some:ld_conf_contents) dirs
 
 (* Split the CAML_LD_LIBRARY_PATH environment variable and return
    the corresponding list of directories.  *)
@@ -196,3 +238,5 @@ let reset () =
   opened_dlls :=[];
   names_of_opened_dlls := [];
   linking_in_core := false
+
+let search_path () = !search_path
