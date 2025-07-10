@@ -12,6 +12,13 @@
 #*                                                                        *
 #**************************************************************************
 
+branches:
+  only:
+    - relocatable-base-4.14
+
+# Do not build feature branch with open Pull Requests
+skip_branch_with_pr: true
+
 # Compile the 64 bits version
 platform:
   - x64
@@ -35,6 +42,14 @@ environment:
   matrix:
     - PORT: mingw32
       BOOTSTRAP_FLEXDLL: true
+    - PORT: mingw32
+      BOOTSTRAP_FLEXDLL: true
+      RELOCATABLE: true
+    - PORT: mingw64
+      BOOTSTRAP_FLEXDLL: true
+    - PORT: mingw64
+      BOOTSTRAP_FLEXDLL: true
+      RELOCATABLE: true
     - PORT: msvc64
       BOOTSTRAP_FLEXDLL: false
       BUILD_MODE: steps
@@ -45,7 +60,7 @@ environment:
         "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
 
 matrix:
-  fast_finish: true
+  fast_finish: false
 
 cache:
   - C:\cygwin64\var\cache\setup
