@@ -58,6 +58,7 @@
 #include "caml/sys.h"
 #include "caml/version.h"
 #include "caml/callback.h"
+#include "caml/startup.h"
 #include "caml/startup_aux.h"
 
 static char * error_message(void)
@@ -114,10 +115,12 @@ static void caml_sys_check_path(value name)
 
 extern void caml_terminate_signals(void);
 
-CAMLprim value caml_sys_exit(value retcode_v)
-{
-  int retcode = Int_val(retcode_v);
+CAMLnoreturn_start
+void caml_do_exit(int)
+CAMLnoreturn_end;
 
+CAMLexport void caml_do_exit(int retcode)
+{
   if ((caml_verb_gc & 0x400) != 0) {
     /* cf caml_gc_counters */
     double minwords = Caml_state->stat_minor_words
@@ -162,6 +165,11 @@ CAMLprim value caml_sys_exit(value retcode_v)
   caml_terminate_signals();
 #endif
   exit(retcode);
+}
+
+CAMLprim value caml_sys_exit(value retcode)
+{
+  caml_do_exit(Int_val(retcode));
 }
 
 #ifndef O_BINARY
@@ -432,6 +440,7 @@ void caml_sys_init(char_os * exe_name, char_os **argv)
 #endif
 #endif
 
+#ifdef HAS_SYSTEM
 CAMLprim value caml_sys_system_command(value command)
 {
   CAMLparam1 (command);
@@ -454,6 +463,12 @@ CAMLprim value caml_sys_system_command(value command)
     retcode = 255;
   CAMLreturn (Val_int(retcode));
 }
+#else
+CAMLprim value caml_sys_system_command(value command)
+{
+  caml_invalid_argument("Sys.command not implemented");
+}
+#endif
 
 double caml_sys_time_include_children_unboxed(value include_children)
 {
@@ -604,6 +619,49 @@ CAMLprim value caml_sys_const_backend_type(value unit)
 {
   return Val_int(1); /* Bytecode backed */
 }
+
+/* The native code linker doesn't synthesise calls to this primitive, instead
+   putting the required string statically in caml_standard_library_nat if any of
+   the compilation units use %standard_library_default. The primitive is omitted
+   completely in libasmrun as there are no other existing instances in the
+   native runtime where OCAML_STDLIB_DIR ends up being embedded. */
+#ifndef NATIVE_CODE
+/* If this remains unset than caml_runtime_standard_library_default is used */
+char_os *caml_standard_library_default = NULL;
+
+CAMLprim value caml_sys_const_standard_library_default(value unit)
+{
+  return caml_copy_string_of_os(
+    caml_standard_library_default ? caml_standard_library_default
+                                  : caml_runtime_standard_library_default);
+}
+#endif
+
+CAMLprim value caml_sys_get_stdlib_dirs(value vstdlib_default)
+{
+  CAMLparam1(vstdlib_default);
+  CAMLlocal3(result, eff, root_dir);
+
+  char_os *stdlib_default = caml_stat_strdup_to_os(String_val(vstdlib_default));
+  char_os *root = NULL, *stdlib;
+
+  stdlib =
+    caml_locate_standard_library(caml_exe_name, stdlib_default, &root);
+
+  eff = caml_copy_string_of_os(stdlib);
+  if (root == NULL) {
+    root_dir = Val_none;
+  } else {
+    root_dir = caml_copy_string_of_os(root);
+    root_dir = caml_alloc_some(root_dir);
+  }
+  result = caml_alloc_small(2, 0);
+  Field(result, 0) = eff;
+  Field(result, 1) = root_dir;
+
+  CAMLreturn(result);
+}
+
 CAMLprim value caml_sys_get_config(value unit)
 {
   CAMLparam0 ();   /* unit is unused */
