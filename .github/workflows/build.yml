@@ -42,7 +42,7 @@ jobs:
           persist-credentials: false
       - name: Configure tree
         run: |
-          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --with-relative-libdir=../lib/ocaml --enable-runtime-search=always --enable-runtime-search-target' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+          MAKE_ARG=-j CONFIG_ARG='--with-relative-libdir=../lib/ocaml --enable-runtime-search=always --enable-runtime-search-target' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
       - name: Build
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
