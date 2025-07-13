@@ -19,6 +19,8 @@ open Misc
 open Config
 open Cmo_format
 
+module String = Misc.Stdlib.String
+
 module Dep = struct
   type t = string * string
   let compare = compare
@@ -221,7 +223,7 @@ let debug_info = ref ([] : (int * Instruct.debug_event list * string list) list)
 
 (* Link in a compilation unit *)
 
-let link_compunit output_fun currpos_fun inchan file_name compunit =
+let link_compunit accu output_fun currpos_fun inchan file_name compunit =
   check_consistency file_name compunit;
   seek_in inchan compunit.cu_pos;
   let code_block = LongString.input_bytes inchan compunit.cu_codesize in
@@ -240,45 +242,43 @@ let link_compunit output_fun currpos_fun inchan file_name compunit =
     debug_info := (currpos_fun(), debug_event_list, debug_dirs) :: !debug_info
   end;
   Array.iter output_fun code_block;
-  if !Clflags.link_everything then
-    List.iter Symtable.require_primitive compunit.cu_primitives
+  let fold_primitive needs_stdlib name =
+    if !Clflags.link_everything then
+      Symtable.require_primitive name;
+    (needs_stdlib || name = "%standard_library_default")
+  in
+  List.fold_left fold_primitive accu compunit.cu_primitives
 
 (* Link in a .cmo file *)
 
-let link_object output_fun currpos_fun file_name compunit =
-  let inchan = open_in_bin file_name in
-  try
-    link_compunit output_fun currpos_fun inchan file_name compunit;
-    close_in inchan
-  with
-    Symtable.Error msg ->
-      close_in inchan; raise(Error(Symbol_error(file_name, msg)))
-  | x ->
-      close_in inchan; raise x
+let link_object accu output_fun currpos_fun file_name compunit =
+  In_channel.with_open_bin file_name @@ fun inchan ->
+    try link_compunit accu output_fun currpos_fun inchan file_name compunit
+    with Symtable.Error msg -> raise(Error(Symbol_error(file_name, msg)))
 
 (* Link in a .cma file *)
 
-let link_archive output_fun currpos_fun file_name units_required =
-  let inchan = open_in_bin file_name in
-  try
-    List.iter
-      (fun cu ->
+let link_archive accu output_fun currpos_fun file_name units_required =
+  In_channel.with_open_bin file_name @@ fun inchan ->
+    List.fold_left
+      (fun accu cu ->
          let name = file_name ^ "(" ^ cu.cu_name ^ ")" in
          try
-           link_compunit output_fun currpos_fun inchan name cu
+           link_compunit accu output_fun currpos_fun inchan name cu
          with Symtable.Error msg ->
            raise(Error(Symbol_error(name, msg))))
-      units_required;
-    close_in inchan
-  with x -> close_in inchan; raise x
+      accu units_required
 
 (* Link in a .cmo or .cma file *)
 
-let link_file output_fun currpos_fun = function
+let link_file output_fun currpos_fun accu = function
     Link_object(file_name, unit) ->
-      link_object output_fun currpos_fun file_name unit
+      link_object accu output_fun currpos_fun file_name unit
   | Link_archive(file_name, units) ->
-      link_archive output_fun currpos_fun file_name units
+      link_archive accu output_fun currpos_fun file_name units
+
+let link_files output_fun currpos_fun =
+  List.fold_left (link_file output_fun currpos_fun) false
 
 (* Output the debugging information *)
 (* Format is:
@@ -306,6 +306,232 @@ let make_absolute file =
   else Location.rewrite_absolute_path
          (Filename.concat (Sys.getcwd()) file)
 
+type launch_method =
+| Shebang_bin_sh of string
+| Shebang_runtime
+| Executable
+
+(* See https://www.in-ulm.de/~mascheck/various/shebang/#origin for a deep
+   dive into shebangs.
+   - Whitespace (space or horizontal tab) delimits the interpreter from an
+     optional argument
+   - The path clearly must not contain a linefeed
+   - A maximum length of 125 (128 less the #! and the newline) is picked as a
+     portable maximum (it's actually Linux's prior to kernel v5.1), rather than
+     actually probing the maximum length in configure *)
+let invalid_for_shebang_line path =
+  let invalid_char = function ' ' | '\t' | '\n' -> true | _ -> false in
+  String.length path > 125 || String.exists invalid_char path
+
+let find_bin_sh () =
+  let output_file = Filename.temp_file "caml_bin_sh" "" in
+  let result =
+  try
+    let run command args =
+      let cmd =
+        Filename.quote_command ~stdout:output_file command args
+      in
+      if !Clflags.verbose then
+        Printf.eprintf "+ %s\n" cmd;
+      (Sys.command cmd = 0)
+    in
+    (* While [command -v] and [command -p] are long-standing Posix commands,
+       the ability to combine them as [command -p -v] is actually Posix Issue 7
+       and so of course Solaris does not support it *)
+    if run "command" ["-p"; "-v"; "sh"] ||
+       run "sh" ["-c"; "PATH=\"`getconf PATH`\" command -v sh"] then
+      In_channel.with_open_text output_file input_line
+    else
+      ""
+  with Sys_error _
+     | End_of_file -> ""
+  in
+  remove_file output_file;
+  result
+
+(* Writes the shell script version of the bytecode launcher to outchan *)
+let write_sh_launcher outchan bin_sh bindir search runtime =
+  let open struct type tag = DEA | E | EA end in
+  let l tag fmt =
+    let output s =
+      match tag, search with
+      | DEA, _
+      | E, Config.Enable
+      | EA, (Config.Enable | Config.Always) ->
+          output_string outchan (String.trim s);
+          output_char outchan '\n'
+      | _ ->
+          ()
+    in
+    Printf.ksprintf output fmt
+  in
+  let runtime = Filename.quote runtime in
+  let bin = Filename.quote (Filename.concat bindir "") in
+  let exec =
+    if search = Config.Disable then
+      runtime
+    else
+      {|"$c"|}
+  in
+  let release =
+    Printf.sprintf "%d.%d" Sys.ocaml_release.major Sys.ocaml_release.minor
+  in
+  (* Each of the three search modes requires a slightly different shell script.
+     However, these shell scripts do have one very useful property: the script
+     for Absolute_then_search adds lines to the script for Search which adds
+     lines to the script for Absolute, but none of them change lines (apart from
+     a trivial tweak to the exec line for the Absolute script).
+     The lines below are laid out to reflect this, with the tag letters
+     D(isable) for the lines in the Absolute script, A(lways) for the lines in
+     Search script and E(nable) for the Absolute_then_search script. If a line
+     is emitted, it is first passed to String.trim, which allows indentation and
+     a column-based layout to be used.
+
+     The Absolute script just needs to exec the runtime. The two searching modes
+     do a few more calculations and will ultimately exec the contents of $c
+     (which is why exec_arg above is set to the literal string {v "$c" v}).
+
+     In the script itself:
+     - $r is the name of the runtime ('ocamlrun', 'ocamlrund', etc.)
+     - $d is calculated in the script as $(dirname "$0") - i.e. the directory
+       containing the bytecode executable itself
+     - $c will ultimately be the runtime to exec. If it is empty, then the
+       script displays an error message. In Absolute_then_search, $c will be the
+       first runtime to try (i.e. the runtime in bindir), and the bindir passed
+       must end with a separator (which is ensured by Filename.concat above)
+
+     The script tries up to three options:
+     - exec $c, if it exists (prefer the runtime in bindir)
+     - exec $d/$r, if it exists (prefer a runtime in the same directory
+       as the bytecode executable)
+     - otherwise try $(command -v "$r") (search PATH for the runtime)
+
+     If the script fails to find an interpreter, $c will always be empty
+       (since [command -v] will have returned an empty string) and an
+       error message can be displayed. *)
+  l DEA {|#!%s                                                     |} bin_sh;
+  l  EA {|r=%s                                                     |} runtime;
+  l  E  {|c=%s"$r"                                                 |} bin;
+  l  E  {|if ! test -f "$c"; then                                  |};
+  l  EA {|  d="$(dirname "$0" 2>/dev/null)"                        |};
+  l  EA {|  test -z "$d" || d="${d%%/}/"                           |};
+  l  EA {|  c="$(command -v "$d$r")"                               |};
+  l  EA {|  test -n "$c" || c="$(command -v "$r")"                 |};
+  l  E  {|fi                                                       |};
+  l  EA {|if test -z "$c"; then                                    |};
+  l  EA {|  echo 'This program requires an OCaml %s interpreter'>&2|} release;
+  l  EA {|  echo "$r not found either alongside $0 or in \$PATH">&2|};
+  l  EA {|else                                                     |};
+  l DEA {|  exec %s "$0" "$@"                                      |} exec;
+  l  EA {|fi                                                       |};
+  l  EA {|exit 126                                                 |}
+
+(* Writes the executable header to outchan and writes the RNTM section, if
+   needed. Returns a toc_writer (i.e. Bytesections.init_record is always
+   called) *)
+
+let write_header outchan =
+  let zinc_runtime_id, write_exe_launcher =
+    let header =
+      let header = "runtime-launch-info" in
+      try Load_path.find header
+      with Not_found -> raise (Error (File_not_found header))
+    in
+    let data =
+      try In_channel.with_open_bin header In_channel.input_all
+      with Sys_error msg -> raise (Error (Camlheader (msg, header)))
+    in
+    let zinc_runtime_id, offset =
+      if String.length data < 2 then
+        raise (Error (Camlheader ("corrupt header", header)))
+      (* Compatibility with previous header format - remove post-bootstrap *)
+      else if List.mem data.[0] ['/'; 'e'; 's'] then
+        None, String.index data '\000' + 2
+      else if data.[0] = '\000' then
+        None, 1
+      else
+        let zinc = Misc.RuntimeID.of_zinc_hi (String.sub data 0 2) in
+        if Option.fold ~none:false ~some:Misc.RuntimeID.is_zinc zinc then
+          zinc, 2
+        else
+          raise (Error (Camlheader ("corrupt header", header)))
+    in
+    let write_exe_header outchan =
+      let len = String.length data in
+      Out_channel.output_substring outchan data offset (len - offset)
+    in
+    zinc_runtime_id, write_exe_header
+  in
+  let runtime, search =
+    if String.length !Clflags.use_runtime > 0 then
+      make_absolute !Clflags.use_runtime, Config.Disable
+    else
+      let runtime =
+        let runtime = "ocamlrun" ^ !Clflags.runtime_variant in
+        let some = Misc.RuntimeID.ocamlrun !Clflags.runtime_variant in
+        Option.fold ~none:runtime ~some zinc_runtime_id
+      in
+      if !Clflags.search_method <> Config.Disable then
+        runtime, !Clflags.search_method
+      else
+        Filename.concat !Clflags.target_bindir runtime, Config.Disable
+  in
+  (* Determine which method will be used for launching the executable:
+     Executable: concatenate the bytecode image to the executable stub
+     Shebang_runtime: #! line with the required runtime
+     Shebang_bin_sh: #! for a shell script calling exec *)
+  let launcher =
+    match !Clflags.launch_method with
+    | Config.Executable ->
+        Executable
+    | Config.Shebang sh ->
+        if search <> Config.Disable || invalid_for_shebang_line runtime then
+          let sh =
+            match sh with
+            | Some sh -> sh
+            | None -> find_bin_sh ()
+          in
+          if sh = "" || invalid_for_shebang_line sh then
+            Executable
+          else
+            Shebang_bin_sh sh
+        else
+          Shebang_runtime
+  in
+  (* Write the header *)
+  match launcher with
+  | Shebang_runtime ->
+      assert (search = Config.Disable);
+      (* Use the runtime directly *)
+      Printf.fprintf outchan "#!%s\n" runtime;
+      Bytesections.init_record outchan
+  | Shebang_bin_sh bin_sh ->
+      (* Use the shebang launcher *)
+      write_sh_launcher outchan bin_sh bindir search runtime;
+      Bytesections.init_record outchan
+  | Executable ->
+      (* Use the executable stub launcher *)
+      write_exe_launcher outchan;
+      (* The runtime name needs recording in RNTM *)
+      let toc_writer = Bytesections.init_record outchan in
+      (* stdlib/header.c determines which mode is needed based on whether the
+         RNTM section contains an embedded NUL character. For Absolute, the path
+         is written verbatim (no extra NUL), otherwise the directory separator
+         just before the basename is effectively turned into a NUL (for Search,
+         there is no dirname, so the string "begins" with a NUL character). *)
+      if search = Disable then
+        output_string outchan runtime
+      else begin
+        if search = Enable then
+          (* Ensure bindir does _not_ end up with a separator *)
+          output_string outchan
+            (Filename.(dirname (concat bindir current_dir_name)));
+        output_char outchan '\000';
+        output_string outchan runtime
+      end;
+      Bytesections.record toc_writer RNTM;
+      toc_writer
+
 (* Create a bytecode executable file *)
 
 let link_bytecode ?final_name tolink exec_name standalone =
@@ -327,37 +553,13 @@ let link_bytecode ?final_name tolink exec_name standalone =
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file exec_name)
     (fun () ->
-       if standalone && !Clflags.with_runtime then begin
-         (* Copy the header *)
-         let header =
-           if String.length !Clflags.use_runtime > 0
-           then "camlheader_ur" else "camlheader" ^ !Clflags.runtime_variant
-         in
-         try
-           let inchan = open_in_bin (Load_path.find header) in
-           copy_file inchan outchan;
-           close_in inchan
-         with
-         | Not_found -> raise (Error (File_not_found header))
-         | Sys_error msg -> raise (Error (Camlheader (header, msg)))
-       end;
-       let toc_writer = Bytesections.init_record outchan in
-       (* The path to the bytecode interpreter (in use_runtime mode) *)
-       if String.length !Clflags.use_runtime > 0 && !Clflags.with_runtime then
-       begin
-         let runtime = make_absolute !Clflags.use_runtime in
-         let runtime =
-           (* shebang mustn't exceed 128 including the #! and \0 *)
-           if String.length runtime > 125 || String.contains runtime ' ' then
-             "/bin/sh\n\
-              exec " ^ Filename.quote runtime ^ " \"$0\" \"$@\""
-           else
-             runtime
-         in
-         output_string outchan runtime;
-         output_char outchan '\n';
-         Bytesections.record toc_writer Bytesections.Name.RNTM
-       end;
+       let toc_writer =
+         (* Write the header and set the path to the bytecode interpreter *)
+         if standalone && !Clflags.with_runtime then
+           write_header outchan
+         else
+           Bytesections.init_record outchan
+       in
        (* The bytecode *)
        let start_code = pos_out outchan in
        Symtable.init();
@@ -373,7 +575,9 @@ let link_bytecode ?final_name tolink exec_name standalone =
        end;
        let output_fun = output_bytes outchan
        and currpos_fun () = pos_out outchan - start_code in
-       List.iter (link_file output_fun currpos_fun) tolink;
+       let needs_stdlib =
+         link_files output_fun currpos_fun tolink
+       in
        if check_dlls then Dll.close_all_dlls();
        (* The final STOP instruction *)
        output_byte outchan Opcodes.opSTOP;
@@ -396,6 +600,18 @@ let link_bytecode ?final_name tolink exec_name standalone =
          ~filename:final_name ~kind:"bytecode executable"
          outchan (Symtable.initial_global_table());
        Bytesections.record toc_writer DATA;
+       (* -custom executables don't need OSLD sections - the correct value is
+          already included in the runtime. *)
+       if standalone && needs_stdlib then begin
+         (* OCaml Standard Library Default location *)
+         let standard_library_default =
+           Option.value
+             ~default:Config.standard_library_default
+             !Clflags.standard_library_default
+         in
+         output_string outchan standard_library_default;
+         Bytesections.record toc_writer OSLD
+       end;
        (* The map of global identifiers *)
        Symtable.output_global_map outchan;
        Bytesections.record toc_writer SYMB;
@@ -467,6 +683,49 @@ let output_cds_file outfile =
        Bytesections.write_toc_and_trailer toc_writer;
     )
 
+(* [c_string_literal_of_string s] returns the C literal string representation of
+   [s], suitable for embedding in a C source file with type [char_os *]. The
+   result includes the quote markers. *)
+let c_string_literal_of_string s =
+  let b = Buffer.create (String.length s * 2) in
+  let utf16le = Bytes.create 4 in
+  let escape u =
+    match Uchar.to_int u with
+      (* Characters with C escape sequences *)
+    | 000 (* '\0' *) -> Buffer.add_string b "\\0"
+    | 009 (* '\t' *) -> Buffer.add_string b "\\t"
+    | 010 (* '\n' *) -> Buffer.add_string b "\\n"
+    | 013 (* '\r' *) -> Buffer.add_string b "\\r"
+    | 034 (* '\"' *) -> Buffer.add_string b "\\\""
+    | 092 (* '\\' *) -> Buffer.add_string b "\\\\"
+      (* Most C compilers will have no problem processing UTF-8 in the strings
+         with the characters above converted to their C representations. On
+         Windows, where the string is [wchar_t *], all characters for which
+         iswprint returns 0 are escaped using the extended [\x] notation. *)
+    | c when Config.target_win32 && (c < 32 (* ' ' *) || c >= 127) ->
+        (* Convert u to UTF-16LE, allowing for surrogate pairs *)
+        let len = Bytes.set_utf_16le_uchar utf16le 0 u in
+        for i = 1 to len / 2 do
+          Printf.bprintf b "\\x%04x" (Bytes.get_uint16_le utf16le ((i - 1) * 2))
+        done
+    | _ ->
+        Buffer.add_utf_8_uchar b u
+  in
+  if Config.target_win32 then
+    Buffer.add_char b 'L';
+  Buffer.add_char b '"';
+  Seq.iter escape (String.to_utf_8_seq s);
+  Buffer.add_char b '"';
+  Buffer.contents b
+
+let emit_runtime_standard_library_default outchan =
+  let stdlib =
+    let default = Config.standard_library_default in
+    Option.value ~default !Clflags.standard_library_default in
+  let literal = c_string_literal_of_string stdlib in
+  Printf.fprintf outchan
+    "const char_os * caml_runtime_standard_library_default = %s;\n" literal
+
 (* Output a bytecode executable as a C file *)
 
 (* Primitives declared in the included headers but re-declared in the
@@ -475,6 +734,13 @@ let guarded_primitives = [
     "caml_get_public_method", "caml__get_public_method";
     "caml_set_oo_id", "caml__set_oo_id";
   ]
+
+let output_without_guarded_primitives outchan s =
+  List.iter (fun (f, f') -> Printf.fprintf outchan "\n#define %s %s" f f')
+    guarded_primitives;
+  output_string outchan s;
+  List.iter (fun (f, _) -> Printf.fprintf outchan "\n#undef %s" f)
+    guarded_primitives
 
 let link_bytecode_as_c tolink outfile with_main =
   let outchan = open_out outfile in
@@ -490,15 +756,13 @@ let link_bytecode_as_c tolink outfile with_main =
 \n#ifdef __cplusplus\
 \nextern \"C\" {\
 \n#endif";
-       List.iter (fun (f, f') -> Printf.fprintf outchan "\n#define %s %s" f f')
-         guarded_primitives;
-       output_string outchan "\
+       output_without_guarded_primitives outchan "\
 \n#include <caml/mlvalues.h>\
 \n#include <caml/startup.h>\
 \n#include <caml/sys.h>\
-\n#include <caml/misc.h>\n";
-       List.iter (fun (f, _) -> Printf.fprintf outchan "\n#undef %s" f)
-         guarded_primitives;
+\n#include <caml/misc.h>\
+\n\
+\nconst enum caml_byte_program_mode caml_byte_program_mode = EMBEDDED;\n";
        output_string outchan "\nstatic int caml_code[] = {\n";
        Symtable.init();
        clear_crc_interfaces ();
@@ -507,7 +771,7 @@ let link_bytecode_as_c tolink outfile with_main =
          output_code_string outchan code;
          currpos := !currpos + Bytes.length code
        and currpos_fun () = !currpos in
-       List.iter (link_file output_fun currpos_fun) tolink;
+       ignore (link_files output_fun currpos_fun tolink);
        (* The final STOP instruction *)
        Printf.fprintf outchan "\n0x%x};\n\n" Opcodes.opSTOP;
        (* The table of global data *)
@@ -528,6 +792,7 @@ let link_bytecode_as_c tolink outfile with_main =
        output_data_string outchan
          (Marshal.to_string sections []);
        output_string outchan "\n};\n\n";
+       emit_runtime_standard_library_default outchan;
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
        (* The entry point *)
@@ -535,7 +800,6 @@ let link_bytecode_as_c tolink outfile with_main =
          output_string outchan "\
 \nint main_os(int argc, char_os **argv)\
 \n{\
-\n  caml_byte_program_mode = COMPLETE_EXE;\
 \n  caml_startup_code(caml_code, sizeof(caml_code),\
 \n                    caml_data, sizeof(caml_data),\
 \n                    caml_sections, sizeof(caml_sections),\
@@ -597,23 +861,21 @@ let build_custom_runtime prim_name exec_name =
     if not !Clflags.with_runtime
     then ""
     else "-lcamlrun" ^ !Clflags.runtime_variant in
-  let debug_prefix_map =
-    if Config.c_has_debug_prefix_map && not !Clflags.keep_camlprimc_file then
-      let flag =
-        [Printf.sprintf "-fdebug-prefix-map=%s=camlprim.c" prim_name]
-      in
-        if Ccomp.linker_is_flexlink then
-          "-link" :: flag
-        else
-          flag
+  let stable_name =
+    if not !Clflags.keep_camlprimc_file then
+      Some "camlprim.c"
     else
-      [] in
-  let exitcode =
-    (Clflags.std_include_flag "-I" ^ " " ^ Config.bytecomp_c_libraries)
+      None
   in
-  Ccomp.call_linker Ccomp.Exe exec_name
-    (debug_prefix_map @ [prim_name] @ List.rev !Clflags.ccobjs @ [runtime_lib])
-    exitcode = 0
+  let prims_obj = Filename.temp_file "camlprim" Config.ext_obj in
+  let result =
+    Ccomp.compile_file ~output:prims_obj ?stable_name prim_name = 0
+    && Ccomp.call_linker Ccomp.Exe exec_name
+        ([prims_obj] @ List.rev !Clflags.ccobjs @ [runtime_lib])
+        (Clflags.std_include_flag "-I" ^ " " ^ Config.bytecomp_c_libraries) = 0
+  in
+  remove_file prims_obj;
+  result
 
 let append_bytecode bytecode_name exec_name =
   let oc = open_out_gen [Open_wronly; Open_append; Open_binary] 0 exec_name in
@@ -681,16 +943,15 @@ let link objfiles output_name =
          #ifdef __cplusplus\n\
          extern \"C\" {\n\
          #endif\n\
-         #ifdef _WIN64\n\
-         #ifdef __MINGW32__\n\
-         typedef long long value;\n\
-         #else\n\
-         typedef __int64 value;\n\
-         #endif\n\
-         #else\n\
-         typedef long value;\n\
-         #endif\n";
+         #define CAML_INTERNALS";
+         output_without_guarded_primitives poc
+           "\n#include <caml/mlvalues.h>";
+         output_string poc "\n#include <caml/startup.h>\n\
+         \n\
+         const enum caml_byte_program_mode \
+           caml_byte_program_mode = APPENDED;\n";
          Symtable.output_primitive_table poc;
+         emit_runtime_standard_library_default poc;
          output_string poc "\
          #ifdef __cplusplus\n\
          }\n\
