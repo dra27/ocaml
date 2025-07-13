@@ -34,7 +34,8 @@ CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -I otherlibs/dynlink
 ARCHES=amd64 arm64 power s390x riscv
 VPATH = utils parsing typing bytecomp file_formats lambda middle_end \
   middle_end/closure middle_end/flambda middle_end/flambda/base_types \
-  asmcomp driver toplevel tools $(addprefix otherlibs/, $(ALL_OTHERLIBS))
+  asmcomp driver toplevel tools runtime \
+  $(addprefix otherlibs/, $(ALL_OTHERLIBS))
 INCLUDES = $(addprefix -I ,$(VPATH))
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
@@ -199,6 +200,7 @@ ocamlcommon_SOURCES = \
   $(lambda_SOURCES) $(comp_SOURCES)
 
 ocamlbytecomp_SOURCES = \
+  bytecomp/byterntm.mll \
   bytecomp/instruct.mli bytecomp/instruct.ml \
   bytecomp/bytegen.mli bytecomp/bytegen.ml \
   bytecomp/printinstr.mli bytecomp/printinstr.ml \
@@ -475,9 +477,11 @@ utils/config_boot.ml: utils/config.fixed.ml utils/config.common.ml
 utils/config_main.ml: utils/config.generated.ml utils/config.common.ml
 	$(V_GEN)cat $^ > $@
 
+ADDITIONAL_CONFIGURE_ARGS ?=
 .PHONY: reconfigure
 reconfigure:
-	ac_read_git_config=true ./configure $(CONFIGURE_ARGS)
+	ac_read_git_config=true ./configure $(CONFIGURE_ARGS) \
+	                                    $(ADDITIONAL_CONFIGURE_ARGS)
 
 utils/domainstate.ml: utils/domainstate.ml.c runtime/caml/domain_state.tbl
 	$(V_GEN)$(CPP) -I runtime/caml $< > $@
@@ -630,12 +634,16 @@ flexlink.byte$(EXE): $(FLEXDLL_SOURCES)
 	rm -f $(FLEXDLL_SOURCE_DIR)/flexlink.exe
 	$(MAKE) -C $(FLEXDLL_SOURCE_DIR) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlrun$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
+	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) \
+	                                 $(USE_RUNTIME_PRIMS) \
+	                                 $(BYTECODE_LAUNCHER_FLAGS) \
+	                                 $(USE_STDLIB)) \
 	  flexlink.exe support
 	cp $(FLEXDLL_SOURCE_DIR)/flexlink.exe $@
+	cp $(addprefix $(FLEXDLL_SOURCE_DIR)/, $(FLEXDLL_OBJECTS)) $(ROOTDIR)
 
 partialclean::
-	rm -f flexlink.byte flexlink.byte.exe
+	rm -f flexlink.byte flexlink.byte.exe flexdll_*.o flexdll_*.obj
 
 $(BYTE_BINDIR)/flexlink$(EXE): \
     boot/ocamlrun$(EXE) flexlink.byte$(EXE) | $(BYTE_BINDIR)
@@ -643,7 +651,6 @@ $(BYTE_BINDIR)/flexlink$(EXE): \
 # Start with a copy to ensure that the result is always executable
 	cp boot/ocamlrun$(EXE) $@
 	cat flexlink.byte$(EXE) >> $@
-	cp $(addprefix $(FLEXDLL_SOURCE_DIR)/, $(FLEXDLL_OBJECTS)) $(BYTE_BINDIR)
 
 partialclean::
 	rm -f $(BYTE_BINDIR)/flexlink $(BYTE_BINDIR)/flexlink.exe
@@ -696,9 +703,9 @@ compare:
 # The core system has to be rebuilt after bootstrap anyway, so strip ocamlc
 # and ocamllex, which means the artefacts should be identical.
 	mv ocamlc$(EXE) ocamlc.tmp
-	$(OCAMLRUN) tools/stripdebug -all ocamlc.tmp ocamlc$(EXE)
+	$(OCAMLRUN) tools/stripdebug$(EXE) -all ocamlc.tmp ocamlc$(EXE)
 	mv lex/ocamllex$(EXE) ocamllex.tmp
-	$(OCAMLRUN) tools/stripdebug -all ocamllex.tmp lex/ocamllex$(EXE)
+	$(OCAMLRUN) tools/stripdebug$(EXE) -all ocamllex.tmp lex/ocamllex$(EXE)
 	rm -f ocamllex.tmp ocamlc.tmp
 	@if $(CMPCMD) boot/ocamlc ocamlc$(EXE) \
          && $(CMPCMD) boot/ocamllex lex/ocamllex$(EXE); \
@@ -726,7 +733,7 @@ promote-cross: promote-common
 # Promote the newly compiled system to the rank of bootstrap compiler
 # (Runs on the new runtime, produces code for the new runtime)
 .PHONY: promote
-promote: PROMOTE = $(OCAMLRUN) tools/stripdebug -all
+promote: PROMOTE = $(OCAMLRUN) tools/stripdebug$(EXE) -all
 promote: promote-common
 	rm -f boot/ocamlrun$(EXE)
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
@@ -861,11 +868,10 @@ flexlink.opt$(EXE): \
     $(FLEXDLL_SOURCES) | $(BYTE_BINDIR)/flexlink$(EXE) $(OPT_BINDIR)
 	rm -f $(FLEXDLL_SOURCE_DIR)/flexlink.exe
 	$(MAKE) -C $(FLEXDLL_SOURCE_DIR) $(FLEXLINK_BUILD_ENV) \
-	  OCAMLOPT='$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib' flexlink.exe
+	  OCAMLOPT='$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib $(SET_RELATIVE_STDLIB)' flexlink.exe
 	cp $(FLEXDLL_SOURCE_DIR)/flexlink.exe $@
 	rm -f $(OPT_BINDIR)/flexlink$(EXE)
 	cd $(OPT_BINDIR); $(LN) $(call ROOT_FROM, $(OPT_BINDIR))/$@ flexlink$(EXE)
-	cp $(addprefix $(BYTE_BINDIR)/, $(FLEXDLL_OBJECTS)) $(OPT_BINDIR)
 
 partialclean::
 	rm -f flexlink.opt$(EXE) $(OPT_BINDIR)/flexlink$(EXE)
@@ -937,6 +943,10 @@ ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
 ocamlc_SOURCES = driver/main.mli driver/main.ml
 
 ocamlc$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32 -g
+
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamlc_BYTECODE_LINKFLAGS += -set-runtime-default standard_library_default=.
+endif
 
 partialclean::
 	rm -f ocamlc ocamlc.exe ocamlc.opt ocamlc.opt.exe
@@ -1015,12 +1025,12 @@ natruntop:
 otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/native/dynlink.ml
 	$(MAKE) -C otherlibs/dynlink allopt
 
-# Cleanup the lexer
+# Cleanup the lexers
 
 partialclean::
-	rm -f parsing/lexer.ml
+	rm -f bytecomp/byterntm.ml parsing/lexer.ml
 
-beforedepend:: parsing/lexer.ml
+beforedepend:: bytecomp/byterntm.ml parsing/lexer.ml
 
 # The predefined exceptions and primitives
 
@@ -1178,8 +1188,7 @@ runtime_BUILT_HEADERS = $(addprefix runtime/, \
 ## Targets to build and install
 
 runtime_PROGRAMS = runtime/ocamlrun$(EXE)
-runtime_BYTECODE_STATIC_LIBRARIES = $(addprefix runtime/, \
-  ld.conf libcamlrun.$(A))
+runtime_BYTECODE_STATIC_LIBRARIES = runtime/libcamlrun.$(A)
 runtime_BYTECODE_SHARED_LIBRARIES =
 runtime_NATIVE_STATIC_LIBRARIES = \
   runtime/libasmrun.$(A) runtime/libcomprmarsh.$(A)
@@ -1259,10 +1268,6 @@ endif
 
 ## Generated non-object files
 
-runtime/ld.conf: $(ROOTDIR)/Makefile.config
-	$(V_GEN)echo "$(STUBLIBDIR)" > $@ && \
-	echo "$(LIBDIR)" >> $@
-
 runtime/primitives: runtime/gen_primitives.sh $(runtime_BYTECODE_C_SOURCES)
 	$(V_GEN)runtime/gen_primitives.sh $@ $(runtime_BYTECODE_C_SOURCES)
 
@@ -1297,12 +1302,18 @@ $(SAK): runtime/sak.$(O)
 runtime/sak.$(O): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
 	$(V_CC)$(SAK_CC) -c $(SAK_CFLAGS) $(OUTPUTOBJ)$@ $<
 
-C_LITERAL = $(shell $(SAK) encode-C-literal '$(1)')
+C_LITERAL = $(shell $(SAK) encode-C-literal $(call QUOTE_SINGLE,$(1)))
 
-runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
-	$(V_GEN)echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@ && \
-	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@ && \
-	echo '#define HOST "$(HOST)"' >> $@
+runtime/build_config.h: $(ROOTDIR)/Makefile.config \
+                        $(ROOTDIR)/Makefile.build_config $(SAK)
+	$(V_GEN){ \
+	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
+	  printf '#define OCAML_STDLIB_DIR %s\n' \
+	         $(call QUOTE_SINGLE,$(call C_LITERAL,$(TARGET_LIBDIR))); \
+	  echo '#define HOST "$(HOST)"'; \
+	} > $@
+
+runtime/prims.$(O): runtime/build_config.h
 
 ## Runtime libraries and programs
 
@@ -1493,7 +1504,7 @@ makeruntime: runtime-all
 stdlib/libcamlrun.$(A): runtime-all
 	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
 clean::
-	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll ld.conf)
+	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll)
 	rm -f $(addprefix runtime/, ocamlrun ocamlrund ocamlruni ocamlruns sak)
 	rm -f $(addprefix runtime/, \
 	  ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe sak.exe)
@@ -1576,6 +1587,10 @@ ocamllex.opt: ocamlopt
 	$(MAKE) lex-allopt
 
 lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
+
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamllex_BYTECODE_LINKFLAGS += -set-runtime-default standard_library_default=.
+endif
 
 partialclean::
 	rm -f lex/*.cm* lex/*.o lex/*.obj \
@@ -1736,6 +1751,15 @@ ocamldoc/%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 
 ocamldoc/%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+# ocamldoc needs a custom runtime when building statically owing to the C stubs
+# in unix.cma and str.cma. This is specified explicitly to suppress the default
+# linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
+ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += -custom
+else
+ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
+
 .PHONY: ocamldoc
 ocamldoc: ocamldoc/ocamldoc$(EXE) ocamldoc/odoc_test.cmo
 
@@ -1864,6 +1888,43 @@ $(asmgen_OBJECT): $(asmgen_SOURCE)
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
 endif
 
+test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
+  stubs.c \
+  toolchain.mli toolchain.ml \
+  harness.mli harness.ml \
+  environment.mli environment.ml \
+  cmdline.mli cmdline.ml \
+  testBytecodeBinaries.mli testBytecodeBinaries.ml \
+  testDynlink.mli testDynlink.ml \
+  testLinkModes.mli testLinkModes.ml \
+  testRelocation.mli testRelocation.ml \
+  testToplevel.mli testToplevel.ml \
+  test_ld_conf.mli test_ld_conf.ml \
+  test_in_prefix.mli test_in_prefix.ml)
+test_in_prefix_LIBRARIES = \
+  otherlibs/unix/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
+
+# XXX TODO Are these artefacts from an earlier version, or a necessary part?
+#$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
+#$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
+#
+# test_in_prefix% would only match test_in_prefix.opt, hence the missing 'x'!
+testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
+
+test_in_prefix_BYTECODE_LINKFLAGS = -custom
+
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+# testsuite/tools/test_in_prefix cannot use a relative stdlib because it is run
+# from testsuite/tools, not from the installation tree (the alternative would be
+# to compile it directly with the installed compiler)
+testsuite/tools/test_in_prefix$(EXE): OC_COMMON_LINKFLAGS += \
+  -set-runtime-default 'standard_library_default=$(LIBDIR)'
+testsuite/tools/test_in_prefix.opt$(EXE): OC_COMMON_LINKFLAGS += \
+  -set-runtime-default 'standard_library_default=$(LIBDIR)'
+endif
+
+testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
+
 ocamltest/ocamltest$(EXE): OC_BYTECODE_LINKFLAGS += -custom
 
 ocamltest/ocamltest$(EXE): ocamlc ocamlyacc ocamllex
@@ -1911,6 +1972,9 @@ partialclean::
 	rm -f $(addprefix testsuite/tools/*.,cm* o obj a lib)
 	rm -f testsuite/tools/codegen testsuite/tools/codegen.exe
 	rm -f testsuite/tools/expect testsuite/tools/expect.exe
+	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
+	rm -f testsuite/tools/test_in_prefix.opt \
+        testsuite/tools/test_in_prefix.opt.exe
 	rm -f testsuite/tools/lexcmm.ml
 	rm -f $(addprefix testsuite/tools/parsecmm., ml mli output)
 
@@ -2050,6 +2114,15 @@ debugger/ocamldebug.cmo: $(ocamldebug_DEBUGGER_OBJECTS)
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
 
 debugger/ocamldebug_entry.cmo: debugger/ocamldebug.cmo
+
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+# ocamldebug needs a custom runtime when building statically owing to the
+# C stubs in unix.cma. This is specified explicitly to suppress the default
+# linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
+debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += -custom
+else
+debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
 
 clean::
 	rm -f debugger/ocamldebug debugger/ocamldebug.exe
@@ -2303,6 +2376,15 @@ $(ocamltex): VPATH += $(addprefix otherlibs/,str unix)
 
 tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+# ocamltex needs a custom runtime when building statically owing to the C stubs
+# in unix.cma and str.cma. This is specified explicitly to suppress the default
+# linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
+tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += -custom
+else
+tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
+
 # we need str and unix which depend on the bytecode version of other tools
 # thus we use the othertools target
 ## Test compilation of backend-specific parts
@@ -2425,8 +2507,9 @@ distclean: clean
 	$(MAKE) -C manual distclean
 	rm -f ocamldoc/META
 	rm -f $(addprefix ocamltest/,ocamltest_config.ml ocamltest_unix.ml)
+	rm -f testsuite/tools/toolchain.ml
 	$(MAKE) -C otherlibs distclean
-	rm -f $(runtime_CONFIGURED_HEADERS)
+	rm -f $(runtime_CONFIGURED_HEADERS) runtime/ld.conf
 	$(MAKE) -C stdlib distclean
 	$(MAKE) -C testsuite distclean
 	rm -f tools/eventlog_metadata tools/*.bak
@@ -2444,13 +2527,15 @@ distclean: clean
 install:
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 	$(MKDIR) "$(INSTALL_STUBLIBDIR)"
+endif
 	$(MKDIR) "$(INSTALL_COMPLIBDIR)"
 	$(MKDIR) "$(INSTALL_DOCDIR)"
 	$(MKDIR) "$(INSTALL_INCDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
 	$(INSTALL_PROG) $(runtime_PROGRAMS) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) $(runtime_BYTECODE_STATIC_LIBRARIES) \
+	$(INSTALL_DATA) runtime/ld.conf $(runtime_BYTECODE_STATIC_LIBRARIES) \
 	  "$(INSTALL_LIBDIR)"
 ifneq "$(runtime_BYTECODE_SHARED_LIBRARIES)" ""
 	$(INSTALL_PROG) $(runtime_BYTECODE_SHARED_LIBRARIES) \
@@ -2574,8 +2659,7 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	  flexlink.byte$(EXE) "$(INSTALL_BINDIR)"
 endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(MKDIR) "$(INSTALL_FLEXDLLDIR)"
-	$(INSTALL_DATA) $(addprefix $(BYTE_BINDIR)/, $(FLEXDLL_OBJECTS)) \
-    "$(INSTALL_FLEXDLLDIR)"
+	$(INSTALL_DATA) $(FLEXDLL_OBJECTS) "$(INSTALL_FLEXDLLDIR)"
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(INSTALL_DATA) Makefile.config "$(INSTALL_LIBDIR)"
 	$(INSTALL_DATA) $(DOC_FILES) "$(INSTALL_DOCDIR)"
