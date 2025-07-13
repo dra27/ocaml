@@ -118,7 +118,6 @@ let configuration_variables =
   p "native_c_compiler" native_c_compiler;
   p "bytecomp_c_libraries" bytecomp_c_libraries;
   p "native_c_libraries" native_c_libraries;
-  p "compression_c_libraries" compression_c_libraries;
   p "native_pack_linker" native_pack_linker;
   p "architecture" architecture;
   p "model" model;
