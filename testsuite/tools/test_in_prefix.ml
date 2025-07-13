@@ -119,8 +119,8 @@ let () =
     (Unix.stat (Filename.concat libdir "camlheader")).Unix.st_size in
   let bytecode_shebangs_by_default =
     Config.launch_method <> Config.Executable in
-  let launcher_searches_for_ocamlrun = Sys.win32 in
-  let target_launcher_searches_for_ocamlrun = Sys.win32 in
+  let launcher_searches_for_ocamlrun = false in
+  let target_launcher_searches_for_ocamlrun = false in
   let config =
     {config with libraries;
                  launcher_searches_for_ocamlrun;
@@ -198,6 +198,18 @@ let () =
      | (0, [where]) -> where
      | _ ->
          Harness.fail_because "Unexpected response from command -v sh"
+  in
+  let config =
+    let boot_ocamlc = Environment.in_test_root env "../../boot/ocamlc" in
+    let ocamlrun = Environment.ocamlrun env in
+    let zinc_bootstrapped =
+      snd (Environment.run_process env ocamlrun [boot_ocamlc; "-config"])
+      |> List.exists (String.starts_with ~prefix:"zinc_runtime_id: ")
+    in
+    let launcher_searches_for_ocamlrun =
+      config.launcher_searches_for_ocamlrun && not zinc_bootstrapped
+    in
+    {config with zinc_bootstrapped; launcher_searches_for_ocamlrun}
   in
   let run_tests = run_tests ~sh config in
   (* 1. Relocation test *)
