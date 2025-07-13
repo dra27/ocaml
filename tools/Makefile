@@ -42,7 +42,7 @@ DIRS = $(addprefix $(ROOTDIR)/,utils parsing typing bytecomp \
 INCLUDES = $(addprefix -I ,$(DIRS))
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -strict-sequence \
 -warn-error +A -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
-LINKFLAGS = $(INCLUDES)
+LINKFLAGS = $(INCLUDES) $(OC_COMMON_LINKFLAGS)
 VPATH := $(filter-out -I,$(INCLUDES))
 
 programs_byte := \
@@ -156,12 +156,6 @@ install::
 # Converter olabl/ocaml 2.99 to ocaml 3
 
 LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
-
-ifeq ($(UNIX_OR_WIN32),unix)
-LN := ln -sf
-else
-LN := cp -pf
-endif
 
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
@@ -322,7 +316,8 @@ caml_tex := caml-tex$(EXE)
 # $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
 # compiler does not necessarily have the correct shared library
 # configuration.
-$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str unix)
+$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str unix) \
+                         -I $(ROOTDIR)/runtime
 $(caml_tex): $(caml_tex_files)
 	$(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS) \
 	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^

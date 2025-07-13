@@ -31,12 +31,6 @@ else
 defaultentry: world
 endif
 
-ifeq "$(UNIX_OR_WIN32)" "win32"
-LN = cp
-else
-LN = ln -sf
-endif
-
 include stdlib/StdlibModules
 
 CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g -use-prims runtime/primitives
@@ -44,13 +38,13 @@ CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -g -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
 DIRS = utils parsing typing bytecomp file_formats lambda middle_end \
   middle_end/closure middle_end/flambda middle_end/flambda/base_types \
-  asmcomp driver toplevel
+  asmcomp driver toplevel runtime
 INCLUDES = $(addprefix -I ,$(DIRS))
 COMPFLAGS=-strict-sequence -principal -absname \
           -w +a-4-9-40-41-42-44-45-48-66-70 \
           -warn-error +a \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
-LINKFLAGS=
+LINKFLAGS=$(OC_COMMON_LINKFLAGS)
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -75,7 +69,7 @@ TOPLEVELINIT=toplevel/toploop.cmo
 # capitalized module names.
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
-LIBFILES=stdlib.cma std_exit.cmo *.cmi camlheader
+LIBFILES=stdlib.cma std_exit.cmo *.cmi $(HEADER_NAME)
 
 COMPLIBDIR=$(LIBDIR)/compiler-libs
 
@@ -106,9 +100,11 @@ utils/config_main.ml: utils/config.mlp $(CONFIG_MODULE_DEPENDENCIES)
 utils/config_boot.ml: utils/config.fixed.ml $(CONFIG_MODULE_DEPENDENCIES)
 	$(MAKE) -C utils config_boot.ml
 
+ADDITIONAL_CONFIGURE_ARGS ?=
 .PHONY: reconfigure
 reconfigure:
-	ac_read_git_config=true ./configure $(CONFIGURE_ARGS)
+	ac_read_git_config=true ./configure $(CONFIGURE_ARGS) \
+	                                    $(ADDITIONAL_CONFIGURE_ARGS)
 
 utils/domainstate.ml: utils/domainstate.ml.c runtime/caml/domain_state.tbl
 	$(CPP) -I runtime/caml $< > $@
@@ -140,6 +136,7 @@ USE_STDLIB = -nostdlib -I ../stdlib
 FLEXDLL_OBJECTS = \
   flexdll_$(FLEXDLL_CHAIN).$(O) flexdll_initer_$(FLEXDLL_CHAIN).$(O)
 FLEXLINK_BUILD_ENV = \
+  MSVCC_ROOT= \
   MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
   CHAINS=$(FLEXDLL_CHAIN) ROOTDIR=..
 FLEXDLL_SOURCE_FILES = \
@@ -152,7 +149,8 @@ boot/ocamlruns$(EXE): runtime/ocamlruns$(EXE)
 boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
+	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) \
+	                                                    $(USE_STDLIB)) \
 	  -B flexlink.exe support
 	cp $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
 	cp $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
@@ -174,11 +172,10 @@ coldstart: $(COLDSTART_DEPS)
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	$(MAKE) runtime-all
 	$(MAKE) -C stdlib \
-	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
-	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
+	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' USE_BOOT_OCAMLC=true all
 else
-	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
-    CAMLC='$$(BOOT_OCAMLC)' all
+	$(MAKE) -C stdlib \
+	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' USE_BOOT_OCAMLC=true all
 	$(MAKE) boot/flexlink.byte$(EXE)
 	$(MAKE) runtime-all
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
@@ -385,7 +382,8 @@ endif
 flexlink.opt$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
     OCAML_FLEXLINK='$(value OCAMLRUN) $$(ROOTDIR)/boot/flexlink.byte$(EXE)' \
-	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib" -B flexlink.exe
+	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib \
+$(SET_RELATIVE_STDLIB)" -B flexlink.exe
 	cp $(FLEXDLL_SOURCES)/flexlink.exe $@
 
 partialclean::
@@ -662,8 +660,7 @@ runtime_BUILT_HEADERS = $(addprefix runtime/, \
 ## Targets to build and install
 
 runtime_PROGRAMS = runtime/ocamlrun$(EXE)
-runtime_BYTECODE_STATIC_LIBRARIES = $(addprefix runtime/, \
-  ld.conf libcamlrun.$(A))
+runtime_BYTECODE_STATIC_LIBRARIES = runtime/libcamlrun.$(A)
 runtime_BYTECODE_SHARED_LIBRARIES =
 runtime_NATIVE_STATIC_LIBRARIES = runtime/libasmrun.$(A)
 runtime_NATIVE_SHARED_LIBRARIES =
@@ -740,10 +737,6 @@ endif
 
 ## Generated non-object files
 
-runtime/ld.conf: $(ROOTDIR)/Makefile.config
-	echo "$(STUBLIBDIR)" > $@
-	echo "$(LIBDIR)" >> $@
-
 # If primitives contain duplicated lines (e.g. because the code is defined
 # like
 # #ifdef X
@@ -771,9 +764,16 @@ runtime/primitives: \
                     echo runtime/primitives.new)
 	cp $^ $@
 
+ifeq "$(UNIX_OR_WIN32)" "unix"
+  CHAR_OS = char
+else
+  CHAR_OS = wchar_t
+endif
+
 runtime/prims.c : runtime/primitives
 	export LC_ALL=C; \
 	(echo '#include "caml/config.h"'; \
+	 echo '#include "build_config.h"'; \
 	 echo 'typedef intnat value;'; \
 	 echo 'typedef value (*c_primitive)(void);'; \
 	 echo; \
@@ -785,7 +785,12 @@ runtime/prims.c : runtime/primitives
 	 echo; \
 	 echo 'const char * const caml_names_of_builtin_cprim[] = {'; \
 	 sed -e 's/.*/  "&",/' $<; \
-	 echo '  0 };') > $@
+	 echo '  0 };'; \
+	 echo; \
+	 echo 'enum caml_byte_program_mode {STANDARD, APPENDED, EMBEDDED};'; \
+	 echo 'enum caml_byte_program_mode caml_byte_program_mode = STANDARD;'; \
+	 echo "const $(CHAR_OS) *caml_runtime_standard_library_default = \
+OCAML_STDLIB_DIR;") > $@
 
 runtime/caml/opnames.h : runtime/caml/instruct.h
 	tr -d '\r' < $< | \
@@ -813,12 +818,18 @@ $(SAK): runtime/sak.$(O)
 runtime/sak.$(O): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
 	$(SAK_CC) -c $(SAK_CFLAGS) $(OUTPUTOBJ)$@ $<
 
-C_LITERAL = $(shell $(SAK) encode-C-literal '$(1)')
+C_LITERAL = $(shell $(SAK) encode-C-literal $(call QUOTE_SINGLE,$(1)))
 
-runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
-	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
-	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
-	echo '#define HOST "$(HOST)"' >> $@
+runtime/build_config.h: $(ROOTDIR)/Makefile.config \
+                        $(ROOTDIR)/Makefile.build_config $(SAK)
+	{ \
+	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
+	  printf '#define OCAML_STDLIB_DIR %s\n' \
+	         $(call QUOTE_SINGLE,$(call C_LITERAL,$(TARGET_LIBDIR))); \
+	  echo '#define HOST "$(HOST)"'; \
+	} > $@
+
+runtime/prims.$(O): runtime/build_config.h
 
 ## Runtime libraries and programs
 
@@ -1035,7 +1046,7 @@ makeruntime: runtime-all
 stdlib/libcamlrun.$(A): runtime-all
 	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
 clean::
-	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll ld.conf)
+	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll)
 	rm -f $(addprefix runtime/, ocamlrun ocamlrund ocamlruni ocamlruns sak)
 	rm -f $(addprefix runtime/, \
 	  ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe sak.exe)
@@ -1182,6 +1193,60 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
 # OCamltest
 ocamltest: ocamlc ocamlyacc ocamllex otherlibraries
 	$(MAKE) -C ocamltest all
+
+test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
+  stubs.c \
+  toolchain.mli toolchain.ml \
+  harness.mli harness.ml \
+  environment.mli environment.ml \
+  cmdline.mli cmdline.ml \
+  testBytecodeBinaries.mli testBytecodeBinaries.ml \
+  testDynlink.mli testDynlink.ml \
+  testLinkModes.mli testLinkModes.ml \
+  testRelocation.mli testRelocation.ml \
+  testToplevel.mli testToplevel.ml \
+  test_ld_conf.mli test_ld_conf.ml \
+  test_in_prefix.mli test_in_prefix.ml)
+test_in_prefix_LIBRARIES = \
+  otherlibs/unix/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
+
+testsuite/tools/%.cmo: DIRS += otherlibs/unix testsuite/tools
+testsuite/tools/%.cmx: DIRS += otherlibs/unix testsuite/tools
+
+testsuite/tools/test_in_prefix$(EXE): \
+  CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
+
+testsuite/tools/test_in_prefix$(EXE): \
+  $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmo, $(filter-out %.mli, \
+    $(test_in_prefix_SOURCES))))
+	$(FLEXLINK_ENV) $(CAMLC) $(STDLIBFLAGS) -custom -o $@ -I runtime \
+    -I otherlibs/unix -I compilerlibs $(TEST_IN_PREFIX_STDLIB) \
+    $(addsuffix .cma, $(test_in_prefix_LIBRARIES)) $^
+
+testsuite/tools/test_in_prefix.opt$(EXE): \
+  $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmx, $(filter-out %.mli, \
+    $(test_in_prefix_SOURCES))))
+	$(FLEXLINK_ENV) $(CAMLOPT) $(STDLIBFLAGS) -o $@ \
+    -I otherlibs/unix -I compilerlibs $(TEST_IN_PREFIX_STDLIB) \
+    $(addsuffix .cmxa, $(test_in_prefix_LIBRARIES)) $^
+
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+# testsuite/tools/test_in_prefix cannot use a relative stdlib because it is run
+# from testsuite/tools, not from the installation tree (the alternative would be
+# to compile it directly with the installed compiler)
+TEST_IN_PREFIX_STDLIB = \
+  -set-runtime-default 'standard_library_default=$(LIBDIR)'
+else
+TEST_IN_PREFIX_STDLIB =
+endif
+
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
+
+partialclean::
+	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
+	rm -f testsuite/tools/test_in_prefix.opt \
+        testsuite/tools/test_in_prefix.opt.exe
 
 ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
 	$(MAKE) -C ocamltest allopt
@@ -1399,7 +1464,7 @@ partialclean::
 depend: beforedepend
 	(for d in utils parsing typing bytecomp asmcomp middle_end \
          lambda file_formats middle_end/closure middle_end/flambda \
-         middle_end/flambda/base_types \
+         middle_end/flambda/base_types testsuite/tools \
          driver toplevel toplevel/byte toplevel/native; \
 	 do \
 	   $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $$d $(INCLUDES) \
@@ -1414,13 +1479,14 @@ distclean: clean
 	$(MAKE) -C manual distclean
 	$(MAKE) -C ocamldoc distclean
 	$(MAKE) -C ocamltest distclean
+	rm -f testsuite/tools/toolchain.ml
 	$(MAKE) -C otherlibs distclean
-	rm -f $(runtime_CONFIGURED_HEADERS)
+	rm -f $(runtime_CONFIGURED_HEADERS) runtime/ld.conf
 	$(MAKE) -C stdlib distclean
 	$(MAKE) -C testsuite distclean
 	$(MAKE) -C tools distclean
 	rm -f compilerlibs/META
-	rm -f boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
+	rm -f boot/ocamlrun boot/ocamlrun.exe boot/$(HEADER_NAME) \
 	      boot/ocamlruns boot/ocamlruns.exe \
 	      boot/flexlink.byte boot/flexlink.byte.exe \
 	      boot/flexdll_*.o boot/flexdll_*.obj \
@@ -1434,12 +1500,14 @@ distclean: clean
 install:
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 	$(MKDIR) "$(INSTALL_STUBLIBDIR)"
+endif
 	$(MKDIR) "$(INSTALL_COMPLIBDIR)"
 	$(MKDIR) "$(INSTALL_DOCDIR)"
 	$(MKDIR) "$(INSTALL_INCDIR)"
 	$(INSTALL_PROG) $(runtime_PROGRAMS) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) $(runtime_BYTECODE_STATIC_LIBRARIES) \
+	$(INSTALL_DATA) runtime/ld.conf $(runtime_BYTECODE_STATIC_LIBRARIES) \
 	  "$(INSTALL_LIBDIR)"
 ifneq "$(runtime_BYTECODE_SHARED_LIBRARIES)" ""
 	$(INSTALL_PROG) $(runtime_BYTECODE_SHARED_LIBRARIES) \

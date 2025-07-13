@@ -62,7 +62,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST_QUOTE,FLEXDLL_DIR) \
 	    $(call SUBST_STRING,FLEXDLL_CHAIN) \
 	    $(call SUBST,HOST) \
-	    $(call SUBST_STRING,BINDIR) \
+	    $(call SUBST_STRING,OCAML_BINDIR) \
 	    $(call SUBST_STRING,LIBDIR) \
 	    $(call SUBST_STRING,MKDLL_EXP) \
 	    $(call SUBST_STRING,MKEXE_EXP) \
@@ -71,6 +71,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST_STRING,MKMAINDLL) \
 	    $(call SUBST,MODEL) \
 	    $(call SUBST_STRING,NATIVECCLIBS) \
+	    $(call SUBST,AS_IS_CC) \
 	    $(call SUBST_STRING,OCAMLC_CFLAGS) \
 	    $(call SUBST_STRING,OCAMLC_CPPFLAGS) \
 	    $(call SUBST_STRING,OCAMLOPT_CFLAGS) \
