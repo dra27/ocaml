@@ -45,6 +45,7 @@ OCAML_CC_VENDOR = @ocaml_cc_vendor@
 
 LAUNCH_METHOD = @launch_method@
 TARGET_LAUNCH_METHOD = @target_launch_method@
+SUFFIXING = @suffixing@
 
 # Which tool to use to display differences between files
 DIFF=@DIFF@
@@ -85,6 +86,9 @@ MKEXE_EXTRA_FLAGS = @mkexe_extra_flags@
 
 BUILD_TRIPLET = @build@
 
+# Zinc Runtime ID is needed for installation only
+ZINC_RUNTIME_ID=@zinc_runtime_id@
+
 # Platform-dependent command to create symbolic links
 LN = @ln@
 
@@ -93,3 +97,5 @@ runtime_ASM_OBJECTS = $(addprefix runtime/,@runtime_asm_objects@)
 
 # Platform-dependent module for ocamlyacc
 ocamlyacc_WSTR_MODULE = @ocamlyacc_wstr_module@
+
+RUNTIME_SEARCH = @runtime_search@
