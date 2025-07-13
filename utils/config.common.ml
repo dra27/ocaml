@@ -19,6 +19,16 @@
 (* The main OCaml version string has moved to ../build-aux/ocaml_version.m4 *)
 let version = Sys.ocaml_version
 
+external standard_library_default : unit -> string = "%standard_library_default"
+
+let standard_library_default = standard_library_default ()
+
+external stdlib_dirs : string -> string * string option
+   = "caml_sys_get_stdlib_dirs"
+
+let standard_library_effective, relative_root_dir =
+  stdlib_dirs standard_library_default
+
 let standard_library =
   try
     Sys.getenv "OCAMLLIB"
@@ -26,7 +36,11 @@ let standard_library =
   try
     Sys.getenv "CAMLLIB"
   with Not_found ->
-    standard_library_default
+    standard_library_effective
+
+let standard_library_relative = relative_root_dir <> None
+
+let bindir = Option.value ~default:bindir relative_root_dir
 
 let exec_magic_number = "Caml1999X032"
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
@@ -64,6 +78,7 @@ let lazy_tag = 246
 let max_young_wosize = 256
 let stack_threshold = 32 (* see runtime/caml/config.h *)
 let stack_safety_margin = 6
+let target_win32 = Sys.win32
 let default_executable_name =
   match Sys.os_type with
     "Unix" -> "a.out"
@@ -78,9 +93,20 @@ let configuration_variables =
   let p x v = (x, String v) in
   let p_int x v = (x, Int v) in
   let p_bool x v = (x, Bool v) in
+  let is_explicit_relative path =
+    path = Filename.current_dir_name
+    || path = Filename.parent_dir_name
+    || Filename.is_relative path && not (Filename.is_implicit path)
+  in
+  let standard_library_relative =
+    if is_explicit_relative standard_library_default then
+      standard_library_default
+    else
+      "" in
 [
   p "version" version;
-  p "standard_library_default" standard_library_default;
+  p "standard_library_default" standard_library_effective;
+  p "standard_library_relative" standard_library_relative;
   p "standard_library" standard_library;
   p "ccomp_type" ccomp_type;
   p "c_compiler" c_compiler;
@@ -92,6 +118,7 @@ let configuration_variables =
   p "native_c_compiler" native_c_compiler;
   p "bytecomp_c_libraries" bytecomp_c_libraries;
   p "native_c_libraries" native_c_libraries;
+  p "compression_c_libraries" compression_c_libraries;
   p "native_pack_linker" native_pack_linker;
   p "architecture" architecture;
   p "model" model;
