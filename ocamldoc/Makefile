@@ -54,7 +54,7 @@ endif
 
 
 INCLUDE_DIRS = $(addprefix $(ROOTDIR)/,\
-  utils parsing typing driver bytecomp toplevel) generators
+  utils parsing typing driver bytecomp toplevel runtime) generators
 INCLUDES_DEP = $(addprefix -I ,$(INCLUDE_DIRS))
 INCLUDES_NODEP = $(addprefix -I $(ROOTDIR)/,\
   compilerlibs otherlibs/str otherlibs/dynlink \
@@ -67,7 +67,8 @@ COMPFLAGS = \
   -g $(INCLUDES) -absname -w +a-4-9-41-42-44-45-48 -warn-error +A \
   -strict-sequence -strict-formats -bin-annot -principal
 
-LINKFLAGS = $(INCLUDES)
+LINKFLAGS = $(INCLUDES) \
+  -set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
 
 CMOFILES=\
   odoc_config.cmo \
