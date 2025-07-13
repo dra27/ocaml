@@ -21,12 +21,12 @@
 let boot_cannot_call s = "/ The boot compiler should not call " ^ s
 
 let bindir = "/tmp"
-let standard_library_default = "/tmp"
 let ccomp_type = "n/a"
 let c_compiler = boot_cannot_call "the C compiler"
 let c_output_obj = ""
 let c_has_debug_prefix_map = false
 let as_has_debug_prefix_map = false
+let as_is_cc = false
 let ocamlc_cflags = ""
 let ocamlc_cppflags = ""
 let ocamlopt_cflags = ""
@@ -35,6 +35,7 @@ let bytecomp_c_libraries = ""
 let bytecomp_c_compiler = ""
 let native_c_compiler = c_compiler
 let native_c_libraries = ""
+let compression_c_libraries = ""
 let native_pack_linker = boot_cannot_call "the linker"
 let default_rpath = ""
 let mksharedlibrpath = ""
