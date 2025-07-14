@@ -154,6 +154,31 @@ let dequote_between ~prefix ~suffix s =
   else
     None
 
+let is_runtime_id =
+  String.for_all (function '0'..'9' | 'a'..'v' -> true | _ -> false)
+
+let cut_runtime_id name =
+  let len = String.length name in
+  if len < 6 || name.[len - 5] <> '-' then
+    name, None
+  else
+    let id = String.sub name (len - 4) 4 in
+    if is_runtime_id id then
+      String.sub name 0 (len - 5), Some (Misc.RuntimeID.of_string id)
+    else
+      name, None
+
+let cut_path name =
+  let basename = Filename.basename name in
+  let dir = String.sub name 0 (String.length name - String.length basename) in
+  let name, runtime_id = cut_runtime_id basename in
+  dir, name, runtime_id
+
+type search_mode =
+| Absolute of string
+| Absolute_then_search of string
+| Search
+
 (* Return the runtime used by this tendered/standalone image. Raise Not_found
    for an image compiled with -without-runtime. *)
 let read_runtime ic =
@@ -169,18 +194,51 @@ let read_runtime ic =
          shell is used instead, the next line is then:
            exec '<runtime>' "$0" "$@" *)
       match dequote_between ~prefix:{|exec |} ~suffix:{| "$0" "$@"|} line with
-      | None ->
-          Printf.ksprintf failwith "Unexpected exec line: %S" line
       | Some runtime ->
-          runtime
+          let dir, runtime, id = cut_path runtime in
+          runtime, id, Absolute dir
+      | None ->
+          (* Both -runtime-search enable and -runtime-search always add a
+             variable r containing the name of the runtime. *)
+          match dequote_between ~prefix:{|r=|} ~suffix:{||} line with
+          | None ->
+              Printf.ksprintf failwith "Unexpected sh line: %S" line
+          | Some runtime ->
+              let runtime, id = cut_runtime_id runtime in
+              (* -runtime-search enable also adds a variable c containing the
+                 default path to be tried. *)
+              let line = input_line ic in
+              match dequote_between ~prefix:{|c=|} ~suffix:{|"$r"|} line with
+              | Some dir ->
+                  runtime, id, Absolute_then_search dir
+              | None ->
+                  runtime, id, Search
     else
       (* Direct reference to ocamlrun ("#!/usr/bin/ocamlrun", etc.) *)
-      shebang
+      let dir, runtime, id = cut_path shebang in
+      runtime, id, Absolute dir
   else
     (* ... otherwise look for an RNTM section (read_section_string will raise
        Not_found if there isn't one) *)
     let rntm = read_section_string ic "RNTM" in
     let len = String.length rntm in
-    if len = 0 || rntm.[len - 1] <> '\000' then
+    if len = 0 then
       Printf.ksprintf failwith "Corrupt RNTM: %S" rntm;
-    String.sub rntm 0 (len - 1)
+    try
+      let dir, name = Misc.cut_at rntm '\000' in
+      if name = "" then
+        if Sys.win32 then
+          let runtime, id = cut_runtime_id dir in
+          runtime, id, Search
+        else
+          let dir, runtime, id = cut_path dir in
+          runtime, id, Absolute dir
+      else
+        let runtime, id = cut_runtime_id name in
+        if dir = "" then
+          runtime, id, Search
+        else
+          runtime, id, Absolute_then_search (dir ^ Filename.dir_sep)
+    with Not_found ->
+      let dir, runtime, id = cut_path rntm in
+      runtime, id, Absolute dir
