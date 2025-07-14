@@ -84,6 +84,12 @@ let print_cmo_infos cu =
 let print_spaced_string s =
   printf " %s" s
 
+let dllib (suffixed, name) =
+  if suffixed then
+    Printf.sprintf "%s-<target>-<bytecode-runtime-id>" name
+  else
+    name
+
 let print_cma_infos (lib : Cmo_format.library) =
   printf "Force custom: %a\n" yesno_of_bool lib.lib_custom;
   printf "Extra C object files:";
@@ -93,7 +99,7 @@ let print_cma_infos (lib : Cmo_format.library) =
   List.iter print_spaced_string (List.rev lib.lib_ccopts);
   printf "\n";
   print_string "Extra dynamically-loaded libraries:";
-  List.iter print_spaced_string (List.rev lib.lib_dllibs);
+  List.iter print_spaced_string (List.rev_map dllib lib.lib_dllibs);
   printf "\n";
   List.iter print_cmo_infos lib.lib_units
 
@@ -256,6 +262,28 @@ let display_runtime_id ({Misc.RuntimeID.dev; release; no_flat_float_array; fp;
     printf "\t  - %d reserved header bit%s\n"
       reserved (if reserved = 1 then "" else "s")
 
+let display_runtime_id search (valid, _invalid) =
+  display_runtime_id (List.hd valid);
+  match search with
+  | Bytesections.Absolute _ ->
+      ()
+  | _ ->
+    let int31, static, no_compression =
+      let open Misc.RuntimeID in
+      let f (int31, static, no_compression) (t : Misc.RuntimeID.t) =
+        (t.int31 || int31,
+         t.static || static,
+         t.no_compression || no_compression)
+      in
+      List.fold_left f (false, false, false) valid
+    in
+    if not int31 then
+      printf "\t  - Image uses 63-bit integers\n";
+    if not static then
+      printf "\t  - Image requires dynamic loading support\n";
+    if not no_compression then
+      printf "\t  - Image uses compressed marshalling\n"
+
 let dump_byte ic =
   Bytesections.read_toc ic;
   let toc = Bytesections.toc () in
@@ -264,8 +292,19 @@ let dump_byte ic =
     try
       let runtime, id, search = Bytesections.read_runtime ic in
       let runtime =
-        let some t = "-" ^ Misc.RuntimeID.to_string t in
-        runtime ^ Option.fold ~none:"" ~some id
+        match id with
+        | Some ([id], _) ->
+            runtime ^ "-" ^ Misc.RuntimeID.to_string id
+        | Some ((id::_) as ids, _) ->
+            let primary = Misc.RuntimeID.to_string id in
+            let ids =
+              let f id = String.make 1 (Misc.RuntimeID.to_string id).[1] in
+              List.map f ids
+            in
+            let ids = String.concat "" ids in
+            Printf.sprintf "%s-%c[%s]%c%c"
+                           runtime primary.[0] ids primary.[2] primary.[3]
+        | _ -> runtime
       in
       let runtime =
         match search with
@@ -275,7 +314,7 @@ let dump_byte ic =
         | Bytesections.Absolute dir -> dir ^ runtime
       in
       printf "Runtime:\n\t%s\n" runtime;
-      Option.iter display_runtime_id id
+      Option.iter (display_runtime_id search) id
     with Not_found -> ()
   in
   List.iter

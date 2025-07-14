@@ -19,6 +19,7 @@
 
 /* The interface of this file is "caml/intext.h" */
 
+#include <stdbool.h>
 #include <string.h>
 #include "caml/alloc.h"
 #include "caml/codefrag.h"
@@ -911,6 +912,13 @@ CAMLprim value caml_output_value(value vchan, value v, value flags)
   caml_output_val(channel, v, flags);
   Unlock(channel);
   CAMLreturn (Val_unit);
+}
+
+CAMLprim value caml_output_value_with_compat(value vchan, value v, value flags)
+{
+  struct caml_extern_state* s = get_extern_state ();
+  caml_output_value(vchan, v, flags);
+  return Val_bool(s->compat_32);
 }
 
 CAMLprim value caml_output_value_to_bytes(value v, value flags)

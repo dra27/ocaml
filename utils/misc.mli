@@ -706,9 +706,10 @@ module RuntimeID : sig
   }
 
   val make_zinc: ?dev:bool -> ?release:int
+    -> ?int31:bool -> ?static:bool -> ?no_compression:bool
     -> unit -> t
   (** Returns the Zinc Runtime ID for the given parameters (using default values
-      from {!Config} as necessary) *)
+      from {!Config} and {!Sys} as necessary) *)
 
   val make_bytecode: ?dev:bool -> ?release:int
     -> ?no_flat_float_array:bool
@@ -740,4 +741,72 @@ module RuntimeID : sig
 
   val of_string: string -> t
   (** Converts the 4-character representation back to a {!t} *)
+
+  val ocamlrun: ?runtime_id:t -> string -> string
+  (** [ocamlrun ?runtime_id variant] returns the name for the runtime for the
+      given Zinc Runtime ID ([runtime_id] defaults to {!make_zinc}).
+
+      e.g. [ocamlrun ~runtime_id:(make_zinc ~release_number:21 is_release:true)
+                     "d" = "ocamlrund-001b"]
+  *)
+
+  val zinc_quintets:
+    int31:bool -> static:bool -> no_compression:bool -> char list * char list
+  (** The Zinc Runtime ID consists of the release of OCaml and, at present, 3
+      other pertinent bits of information which relate to a bytecode image
+      itself. These are:
+
+      - Whether the image uses integer constants larger than 31 bits
+      - Whether the image requires shared library support (to load C stubs)
+      - Whether the image uses compressed marshalling
+
+      There are therefore 8 possible Zinc Runtime IDs for any given release,
+      some or all of which may be available for a given build. The 3 bits are
+      intentionally arranged so that they occupy a quintet of their own,
+      separate from release number.
+
+      [zinc_quintets ~int31 ~static] returns a pair of lists of these quintet
+      values. The first list is runtimes which will be capable of running the
+      image (given [~int31] and [~static]) and the second is the list of
+      runtimes which will not. All 8 quintets appear in one of the lists, except
+      for ['0'] (which is a 64-bit runtime with shared library and compressed
+      marshalling support - i.e. the most capable runtime.) as this quintet is
+      always the best choice if available.
+
+      These two lists are used by the bytecode linker to determine the best
+      order to search for runtimes in. For example,
+
+      [zinc_quintets ~int31:false ~static:true ~no_compression:true
+        = (['2'; '4'; '6'], ['3'; '1'; '5'; '7'])]
+
+      [~int31:false ~static:true ~no_compression:true] implies a bytecode image
+      which doesn't load any DLLs, doesn't use compressed marshalling, but does
+      have some int63 constants. A 32-bit runtime is going to print an error if
+      it loads this image, hence [[3; 1; 5; 7]] are all in the second list.
+      [[0; 2; 4; 6]] are all 64-bit runtimes, with decreasing functionality.
+  *)
+
+  val shared_runtime: ?runtime_id:t -> ?host:string
+    -> ?prefix:string -> Sys.backend_type -> string
+  (** [shared_runtime ?runtime_id ?host ?prefix backend] returns the name of the
+      shared runtime for the given [backend]. [runtime_id] defaults to
+      {!make_bytecode} if [backend = Sys.Bytecode] and {!make_native} if
+      [backend = Sys.Native] and [host] to {!Config.target}. [prefix] defaults
+      to ["-l"] and the function does not append {!Config.ext_dll}.
+
+      e.g. [shared_runtime ~runtime_id:(make_native ~release_number:21
+                                                    ~is_release:true)
+                           ~host:"x86_64-pc-linux-gnu" Native
+                             = "-lasmrun-x86_64-pc-linux-gnu-001b"] *)
+
+  val stubslib: ?runtime_id:t -> ?host:string -> string -> string
+  (** [stublibs ?runtime_id ?host dllname] returns the name for the given DLL
+      basename. [dllname] should not include {!Config.ext_dll} (and the result
+      does not include it either). [host] and [runtime_id] default to
+      {!Config.target} and {!make_bytecode} respectively.
+
+      e.g. [stubslib ~runtime_id:(make_bytecode ~release_number:21
+                                                ~is_release:true
+                     ~host:"x86_64-pc-linux-gnu" "dllunixbyt"
+                       = "dllunixbyt-x86_64-pc-linux-gnu-001b"] *)
 end
