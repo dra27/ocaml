@@ -42,7 +42,8 @@ $(and $(filter-out 1,$(words $1)),$(error \
 $(call PROGRAM_SYNONYM, $1)
 
 $1$(EXE): $3 $2
-	$$(CAMLC) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
+	$$(CAMLC) $$(call ADD_BYTECODE_LAUNCHER_FLAGS, $$(LINKFLAGS)) \
+	          $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
 
 $(call PROGRAM_SYNONYM, $1.opt)
 
@@ -78,7 +79,7 @@ INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
                        file_formats lambda)
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -strict-sequence -warn-error A \
  -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
-LINKFLAGS = $(INCLUDES)
+LINKFLAGS = $(INCLUDES) $(OC_COMMON_LINKFLAGS)
 VPATH := $(filter-out -I,$(INCLUDES))
 
 .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
@@ -109,7 +110,7 @@ CSLPROF_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
   pprintast.cmo \
   lexer.cmo parse.cmo
 
-$(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) profiling.cmo $(CSLPROF),)
+$(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) $(CSLPROF),profiling.cmo)
 
 ocamlcp_cmos = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
                warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
@@ -144,7 +145,7 @@ $(call byte_and_opt,ocamlmklib,ocamlmklibconfig.cmo config.cmo \
 
 
 ocamlmklibconfig.ml: $(ROOTDIR)/Makefile.config Makefile
-	(echo 'let bindir = "$(BINDIR)"'; \
+	(echo 'let bindir = {|$(OCAML_BINDIR)|}'; \
          echo 'let supports_shared_libraries = $(SUPPORTS_SHARED_LIBRARIES)';\
          echo 'let default_rpath = "$(RPATH)"'; \
          echo 'let mksharedlibrpath = "$(MKSHAREDLIBRPATH)"'; \
@@ -168,12 +169,6 @@ $(call byte_and_opt,ocamlmktop,$(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP),)
 # Converter olabl/ocaml 2.99 to ocaml 3
 
 LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
-
-ifeq ($(UNIX_OR_WIN32),unix)
-LN := ln -sf
-else
-LN := cp -pf
-endif
 
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
@@ -325,11 +320,25 @@ caml_tex_files := \
   $(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.cma \
   caml_tex.ml
 
+# checkstack tool
+
+checkstack$(EXE): checkstack.$(O)
+	$(MKEXE) $(OUTPUTEXE)$@ $<
+
 #Scan latex files, and run ocaml code examples
 
 caml_tex := caml-tex$(EXE)
 
-$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+$(caml_tex): LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
+
+# caml-tex uses str.cma and unix.cma and so must be compiled with
+# $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
+# compiler does not necessarily have the correct shared library
+# configuration.
+$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
+                         -I $(ROOTDIR)/runtime
 $(caml_tex): $(caml_tex_files)
 	$(ROOTDIR)/runtime/ocamlrun$(EXE) $(ROOTDIR)/ocamlc$(EXE) -nostdlib \
 	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
