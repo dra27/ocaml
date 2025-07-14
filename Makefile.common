@@ -27,6 +27,18 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
+$(SPACE) :=
+HASH := \#
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+DIR_SEP := \$ # There must a space following the $
+CONVERT_PATH = $(subst /,$(DIR_SEP),$(strip $(1)))
+else
+DIR_SEP = /
+CONVERT_PATH = $(strip $(1))
+endif
+
+QUOTE_SINGLE = '$(subst ','\'',$(1))'
 
 DESTDIR ?=
 INSTALL_BINDIR := $(DESTDIR)$(BINDIR)
@@ -48,6 +60,9 @@ FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 # to runtime/ocamlrun, because it's less frequently used.
 OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
 NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
+
+# Standard library flags
+STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/stdlib
 
 TEST_BOOT_OCAMLC_OPT = $(shell \
   test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
@@ -110,6 +125,24 @@ SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 # in config.mlp.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
 
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+  SRCDIR_ENCODED = $(subst =,%+,$(subst :,%.,$(subst %,%$(HASH),$(SRCDIR_ABS))))
+  SRCDIR_ABS_REAL := $(shell realpath $(SRCDIR_ABS) 2>/dev/null)
+  SRCDIR_REAL_ENCODED = \
+    $(subst =,%+,$(subst :,%.,$(subst %,%$(HASH),$(SRCDIR_ABS_REAL))))
+  BUILD_PATH_PREFIX_MAP ?=
+  export BUILD_PATH_PREFIX_MAP := \
+    $(BUILD_PATH_PREFIX_MAP)$\
+      :.=$(SRCDIR_ENCODED)$\
+      $(if $(SRCDIR_REAL_ENCODED),:.=$(SRCDIR_REAL_ENCODED))
+OC_COMMON_LINKFLAGS += \
+-set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
+PRIVATE_CFLAGS = $(OC_MAP_CFLAGS)
+else
+OC_COMMON_LINKFLAGS =
+PRIVATE_CFLAGS =
+endif # ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
@@ -125,8 +158,8 @@ REQUIRED_HEADERS := $(RUNTIME_HEADERS) $(wildcard *.h)
 endif
 
 %.$(O): %.c $(REQUIRED_HEADERS)
-	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
-	  $(OUTPUTOBJ)$@ $<
+	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(PRIVATE_CFLAGS) \
+	  $(OC_CPPFLAGS) $(CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
 $(DEPDIR):
 	$(MKDIR) $@
@@ -166,12 +199,63 @@ OCAMLYACCFLAGS ?=
 
 SAK = $(ROOTDIR)/runtime/sak$(EXE)
 
-# stdlib/StdlibModules cannot be include'd unless $(SAK) has been built. These
-# two rules add that dependency. They have to be pattern rules since
-# Makefile.common is included before default targets.
-$(ROOTDIR)/%/sak$(EXE):
-	$(MAKE) -C $(ROOTDIR)/$* sak$(EXE)
+# The correct runtime for bytecode executables is 'ocamlrun' on Windows and
+# '$(BINDIR)/ocamlrun' on Unix.
+# Pre-bootstrap, boot/ocamlc still reads boot/runtime-launch-info and so works.
+# However, $(ROOTDIR)/ocamlc expects -use-runtime '$(BINDIR)/', which
+# boot/ocamlc doesn't yet understand.
+# The workaround, for Unix, is to add -use-runtime '$(BINDIR)/ocamlrun' which
+# both compilers correctly understand.
+# $(BOOTSTRAPPED) will be non-empty after the compiler has been bootstrapped,
+# and is used to ensure that after bootstrapping the compiler is actually being
+# invoked as we want it to be (i.e. all the workarounds automatically become
+# dead code following the bootstrap).
+BOOTSTRAPPED := \
+  $(shell grep -Fq 'launch-method' $(ROOTDIR)/boot/ocamlc && echo Bootstrapped)
 
-ifneq "$(REQUIRES_CONFIGURATION)" ""
-$(ROOTDIR)/%/StdlibModules: $(SAK) ;
+ifeq "$(UNIX_OR_WIN32)$(BOOTSTRAPPED)" "win32"
+
+# Historically, the native Windows ports are assumed to be finding ocamlrun
+# using a PATH search.
+ifeq "$(SUFFIXING)" "true"
+# Pre-bootstrap, this workaround is needed for Windows which (ab)uses
+# -runtime-variant to specify the suffix without also specifying the path.
+BYTECODE_RUNTIME_FLAGS = -runtime-variant -$(ZINC_RUNTIME_ID)
+else
+BYTECODE_RUNTIME_FLAGS =
+endif
+
+else
+
+ifeq "$(SUFFIXING)" "true"
+RUNTIME_NAME = $(if $(BOOTSTRAPPED),,ocamlrun-$(ZINC_RUNTIME_ID))
+else
+RUNTIME_NAME = ocamlrun
+endif
+
+BYTECODE_RUNTIME_FLAGS = \
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
+  $(if $(BOOTSTRAPPED),-launch-method $(LAUNCH_METHOD))
+
+endif
+
+ADD_BYTECODE_RUNTIME = \
+  $(if $(filter -custom, $(1)),,\
+    -use-prims $(ROOTDIR)/runtime/primitives $(BYTECODE_RUNTIME_FLAGS))
+
+# ocamlc has several mechanisms for linking a bytecode image to the runtime
+# which executes it. The exact mechanism depends on the platform and the precise
+# location of the runtime. The boot compiler (boot/ocamlc) therefore needs this
+# additional information, which comes from the stdlib build and is copied into
+# boot/ as part of coldstart. See read_runtime_launch_info in
+# bytecomp/bytelink.ml for further details.
+HEADER_NAME = camlheader
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+# Ensure that no command can create Cygwin symbolic links by ensuring that
+# symlink(2) will fail if native NTFS symlinks aren't available.
+export CYGWIN := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(CYGWIN)) winsymlinks:nativestrict)
+export MSYS := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(MSYS)) winsymlinks:nativestrict)
 endif

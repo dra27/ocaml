@@ -45,7 +45,8 @@ COMPFLAGS=-strict-sequence -principal -absname \
           -warn-error +a \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
 LINKFLAGS=$(OC_COMMON_LINKFLAGS)
-BYTECODE_LINKFLAGS = $(call ADD_BYTECODE_RUNTIME, $(LINKFLAGS)) $(LINKFLAGS)
+BYTECODE_LINKFLAGS = \
+  $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, $(LINKFLAGS)) $(LINKFLAGS)
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -272,14 +273,14 @@ coreboot:
 	$(MAKE) promote-cross
 # Rebuild ocamlc and ocamllex (run on runtime/ocamlrun)
 	$(MAKE) partialclean
-	$(MAKE) ocamlc ocamllex ocamltools
+	$(MAKE) IN_COREBOOT_CYCLE=true ocamlc ocamllex ocamltools
 # Rebuild the library (using runtime/ocamlrun ./ocamlc)
 	$(MAKE) library-cross
 # Promote the new compiler and the new runtime
 	$(MAKE) OCAMLRUN=runtime/ocamlrun$(EXE) promote
 # Rebuild the core system
 	$(MAKE) partialclean
-	$(MAKE) core
+	$(MAKE) IN_COREBOOT_CYCLE=true core
 # Check if fixpoint reached
 	$(MAKE) compare
 
@@ -299,6 +300,7 @@ endif
 # Never mind, just do make bootstrap to reach fixpoint again.
 .PHONY: bootstrap
 bootstrap: coreboot
+	rm -f utils/config.ml
 	$(MAKE) all
 
 # Compile everything the first time
@@ -378,8 +380,9 @@ DOC_FILES=\
   LICENSE
 
 # Installation
+
 .PHONY: install
-install:
+install::
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
@@ -989,7 +992,6 @@ testsuite/tools/dummy$(EXE): testsuite/tools/dummy.$(O)
 	$(call MKEXE_USING_COMPILER,$@,$^)
 
 partialclean::
-	rm -f testsuite/tools/dummy testsuite/tools/dummy.exe
 	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
 	rm -f testsuite/tools/test_in_prefix.opt \
         testsuite/tools/test_in_prefix.opt.exe
