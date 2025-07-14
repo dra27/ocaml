@@ -1242,4 +1242,14 @@ module RuntimeID = struct
               ansi = set 3 q3; mutable_string = set 4 q3}
       else
         None
+
+  let of_zinc_hi ?(dev = not Config.is_release)
+                 ?(release = Config.release_number) s =
+    Option.map (fun id -> {id with dev; release}) (of_string ("00" ^ s))
+
+  let ocamlrun variant runtime_id =
+    if is_zinc runtime_id then
+      Printf.sprintf "ocamlrun%s-%s" variant (to_string runtime_id)
+    else
+      invalid_arg "Misc.RuntimeID.ocamlrun"
 end
