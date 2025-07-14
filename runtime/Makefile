@@ -54,7 +54,7 @@ endif
 # Targets to build and install
 
 PROGRAMS := ocamlrun$(EXE)
-BYTECODE_STATIC_LIBRARIES := ld.conf libcamlrun.$(A)
+BYTECODE_STATIC_LIBRARIES := libcamlrun.$(A)
 BYTECODE_SHARED_LIBRARIES :=
 NATIVE_STATIC_LIBRARIES := libasmrun.$(A)
 NATIVE_SHARED_LIBRARIES :=
@@ -160,7 +160,7 @@ INSTALL_INCDIR=$(INSTALL_LIBDIR)/caml
 .PHONY: install
 install:
 	$(INSTALL_PROG) $(PROGRAMS) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) $(BYTECODE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
+	$(INSTALL_DATA) ld.conf $(BYTECODE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
 ifneq "$(BYTECODE_SHARED_LIBRARIES)" ""
 	$(INSTALL_PROG) $(BYTECODE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
 endif
@@ -176,7 +176,7 @@ endif
 
 .PHONY: clean
 clean:
-	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
+	rm -f *.o *.obj *.a *.lib *.so *.dll
 	rm -f ocamlrun ocamlrund ocamlruni ocamlruns sak
 	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe sak.exe
 	rm -f primitives primitives.new prims.c $(BUILT_HEADERS)
@@ -185,13 +185,9 @@ clean:
 
 .PHONY: distclean
 distclean: clean
-	rm -f $(CONFIGURED_HEADERS)
+	rm -f $(CONFIGURED_HEADERS) ld.conf
 
 # Generated non-object files
-
-ld.conf: $(ROOTDIR)/Makefile.config
-	echo "$(STUBLIBDIR)" > $@
-	echo "$(LIBDIR)" >> $@
 
 # If primitives contain duplicated lines (e.g. because the code is defined
 # like
@@ -218,9 +214,16 @@ primitives: $(shell ./gen_primitives.sh > primitives.new; \
                     cmp -s primitives primitives.new || echo primitives.new)
 	cp $^ $@
 
+ifeq "$(UNIX_OR_WIN32)" "unix"
+  CHAR_OS = char
+else
+  CHAR_OS = wchar_t
+endif
+
 prims.c : primitives
 	export LC_ALL=C; \
 	(echo '#include "caml/config.h"'; \
+	 echo '#include "build_config.h"'; \
 	 echo 'typedef intnat value;'; \
 	 echo 'typedef value (*c_primitive)(void);'; \
 	 echo; \
@@ -232,7 +235,12 @@ prims.c : primitives
 	 echo; \
 	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
 	 sed -e 's/.*/  "&",/' $<; \
-	 echo '  0 };') > $@
+	 echo '  0 };'; \
+	 echo; \
+	 echo 'enum caml_byte_program_mode {STANDARD, APPENDED, EMBEDDED};'; \
+   echo 'enum caml_byte_program_mode caml_byte_program_mode = STANDARD;'; \
+	 echo "const $(CHAR_OS) *caml_runtime_standard_library_default = \
+OCAML_STDLIB_DIR;") > $@
 
 caml/opnames.h : caml/instruct.h
 	tr -d '\r' < $< | \
@@ -262,9 +270,14 @@ sak.$(O): sak.c caml/misc.h caml/config.h
 C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
 
 build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
-	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
-	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
-	echo '#define HOST "$(HOST)"' >> $@
+	{ \
+	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
+	  printf '#define OCAML_STDLIB_DIR %s\n' \
+	         '$(call C_LITERAL,$(TARGET_LIBDIR))'; \
+	  echo '#define HOST "$(HOST)"'; \
+	} > $@
+
+prims.$(O): build_config.h
 
 # Libraries and programs
 
@@ -358,8 +371,8 @@ $(1).$(O): $(2).c
 else
 $(1).$(O): $(2).c $(CONFIGURED_HEADERS) $(BUILT_HEADERS) $(RUNTIME_HEADERS)
 endif # ifneq "$(COMPUTE_DEPS)" "false"
-	$$(CC) -c $$(OC_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) $$(CPPFLAGS) \
-	  $$(OUTPUTOBJ)$$@ $$<
+	$$(CC) -c $$(OC_CFLAGS) $$(PRIVATE_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) \
+	  $$(CPPFLAGS) $$(OUTPUTOBJ)$$@ $$<
 endef
 
 object_types := % %.b %.bd %.bi %.bpic
