@@ -99,3 +99,65 @@ let pos_first_section ic =
 let reset () =
   section_table := [];
   section_beginning := 0
+
+(* Reverses Filename.Unix.quote. *)
+let dequote s =
+  let l = String.length s - 1 in
+  assert (l >= 1 && s.[0] = '\'' && s.[l] = '\'');
+  let b = Buffer.create l in
+  let rec loop s b i =
+    if i = l then
+      Buffer.contents b
+    else
+      let c = s.[i] in
+      assert
+        (c <> '\''
+         || (i + 3 < l && s.[i+1] = '\\' && s.[i+2] = '\'' && s.[i+3] = '\''));
+      Buffer.add_char b c;
+      loop s b (i + if c = '\'' then 4 else 1)
+  in
+  loop s b 1
+
+(* [dequote_between ~prefix ~suffix s] returns [Some (dequote s')] when [s] is
+   [prefix ^ s' ^ suffix] (note that [s'] is therefore single-quoted) and [None]
+   otherwise. *)
+let dequote_between ~prefix ~suffix s =
+  let s_len = String.length s in
+  let prefix_len = String.length prefix in
+  let suffix_len = String.length suffix in
+  if String.starts_with ~prefix:(prefix ^ "'") s
+     && String.ends_with ~suffix:("'" ^ suffix) s then
+    Some (dequote (String.sub s prefix_len (s_len - prefix_len - suffix_len)))
+  else
+    None
+
+(* Return the runtime used by this tendered/standalone image. Raise Not_found
+   for an image compiled with -without-runtime. *)
+let read_runtime ic =
+  seek_in ic 0;
+  (* Check for a shebang line... *)
+  if really_input_string ic 2 = "#!" then
+    (* Read the interpreter string *)
+    let shebang = String.trim (input_line ic) in
+    (* If the interpreter is sh, parse the script *)
+    if Filename.basename shebang = "sh" then
+      let line = input_line ic in
+      (* When the path to the runtime can't be directly used in a shebang, the
+         shell is used instead, the next line is then:
+           exec '<runtime>' "$0" "$@" *)
+      match dequote_between ~prefix:{|exec |} ~suffix:{| "$0" "$@"|} line with
+      | None ->
+          Printf.ksprintf failwith "Unexpected exec line: %S" line
+      | Some runtime ->
+          runtime
+    else
+      (* Direct reference to ocamlrun ("#!/usr/bin/ocamlrun", etc.) *)
+      shebang
+  else
+    (* ... otherwise look for an RNTM section (read_section_string will raise
+       Not_found if there isn't one) *)
+    let rntm = read_section_string ic "RNTM" in
+    let len = String.length rntm in
+    if len = 0 || rntm.[len - 1] <> '\000' then
+      Printf.ksprintf failwith "Corrupt RNTM: %S" rntm;
+    String.sub rntm 0 (len - 1)
