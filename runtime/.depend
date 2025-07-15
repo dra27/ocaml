@@ -39,7 +39,7 @@ startup_byt_b.$(O): startup_byt.c caml/config.h caml/m.h caml/s.h caml/alloc.h \
  caml/minor_gc.h caml/address_class.h caml/domain.h caml/minor_gc.h \
  caml/misc.h caml/mlvalues.h caml/osdeps.h caml/memory.h caml/prims.h \
  caml/printexc.h caml/reverse.h caml/signals.h caml/stacks.h caml/sys.h \
- caml/startup.h caml/startup_aux.h caml/version.h
+ caml/startup.h caml/startup_aux.h caml/version.h build_config.h
 freelist_b.$(O): freelist.c caml/config.h caml/m.h caml/s.h caml/custom.h \
  caml/mlvalues.h caml/config.h caml/misc.h caml/domain_state.h \
  caml/domain_state.tbl caml/freelist.h caml/gc.h caml/gc_ctrl.h \
@@ -181,7 +181,7 @@ sys_b.$(O): sys.c caml/config.h caml/m.h caml/s.h caml/alloc.h caml/misc.h \
  caml/mlvalues.h caml/osdeps.h caml/memory.h caml/gc.h caml/major_gc.h \
  caml/freelist.h caml/minor_gc.h caml/address_class.h caml/domain.h \
  caml/signals.h caml/stacks.h caml/sys.h caml/version.h caml/callback.h \
- caml/startup_aux.h
+ caml/startup.h caml/exec.h caml/startup_aux.h
 meta_b.$(O): meta.c caml/alloc.h caml/misc.h caml/config.h caml/m.h caml/s.h \
  caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/backtrace_prim.h caml/backtrace.h caml/exec.h caml/codefrag.h \
@@ -259,7 +259,8 @@ dynlink_b.$(O): dynlink.c caml/config.h caml/m.h caml/s.h caml/alloc.h \
  caml/domain_state.tbl caml/dynlink.h caml/fail.h caml/mlvalues.h \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/prims.h caml/signals.h
+ caml/memory.h caml/prims.h caml/signals.h caml/startup.h caml/exec.h \
+ build_config.h
 spacetime_byt_b.$(O): spacetime_byt.c caml/fail.h caml/misc.h caml/config.h \
  caml/m.h caml/s.h caml/mlvalues.h caml/domain_state.h \
  caml/domain_state.tbl caml/mlvalues.h
@@ -272,7 +273,8 @@ unix_b.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 bigarray_b.$(O): bigarray.c caml/alloc.h caml/misc.h caml/config.h caml/m.h \
  caml/s.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/bigarray.h caml/custom.h caml/fail.h caml/intext.h caml/io.h \
@@ -353,7 +355,7 @@ startup_byt_bd.$(O): startup_byt.c caml/config.h caml/m.h caml/s.h caml/alloc.h 
  caml/minor_gc.h caml/address_class.h caml/domain.h caml/minor_gc.h \
  caml/misc.h caml/mlvalues.h caml/osdeps.h caml/memory.h caml/prims.h \
  caml/printexc.h caml/reverse.h caml/signals.h caml/stacks.h caml/sys.h \
- caml/startup.h caml/startup_aux.h caml/version.h
+ caml/startup.h caml/startup_aux.h caml/version.h build_config.h
 freelist_bd.$(O): freelist.c caml/config.h caml/m.h caml/s.h caml/custom.h \
  caml/mlvalues.h caml/config.h caml/misc.h caml/domain_state.h \
  caml/domain_state.tbl caml/freelist.h caml/gc.h caml/gc_ctrl.h \
@@ -495,7 +497,7 @@ sys_bd.$(O): sys.c caml/config.h caml/m.h caml/s.h caml/alloc.h caml/misc.h \
  caml/mlvalues.h caml/osdeps.h caml/memory.h caml/gc.h caml/major_gc.h \
  caml/freelist.h caml/minor_gc.h caml/address_class.h caml/domain.h \
  caml/signals.h caml/stacks.h caml/sys.h caml/version.h caml/callback.h \
- caml/startup_aux.h
+ caml/startup.h caml/exec.h caml/startup_aux.h
 meta_bd.$(O): meta.c caml/alloc.h caml/misc.h caml/config.h caml/m.h caml/s.h \
  caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/backtrace_prim.h caml/backtrace.h caml/exec.h caml/codefrag.h \
@@ -573,7 +575,8 @@ dynlink_bd.$(O): dynlink.c caml/config.h caml/m.h caml/s.h caml/alloc.h \
  caml/domain_state.tbl caml/dynlink.h caml/fail.h caml/mlvalues.h \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/prims.h caml/signals.h
+ caml/memory.h caml/prims.h caml/signals.h caml/startup.h caml/exec.h \
+ build_config.h
 spacetime_byt_bd.$(O): spacetime_byt.c caml/fail.h caml/misc.h caml/config.h \
  caml/m.h caml/s.h caml/mlvalues.h caml/domain_state.h \
  caml/domain_state.tbl caml/mlvalues.h
@@ -586,7 +589,8 @@ unix_bd.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 bigarray_bd.$(O): bigarray.c caml/alloc.h caml/misc.h caml/config.h caml/m.h \
  caml/s.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/bigarray.h caml/custom.h caml/fail.h caml/intext.h caml/io.h \
@@ -672,7 +676,7 @@ startup_byt_bi.$(O): startup_byt.c caml/config.h caml/m.h caml/s.h caml/alloc.h 
  caml/minor_gc.h caml/address_class.h caml/domain.h caml/minor_gc.h \
  caml/misc.h caml/mlvalues.h caml/osdeps.h caml/memory.h caml/prims.h \
  caml/printexc.h caml/reverse.h caml/signals.h caml/stacks.h caml/sys.h \
- caml/startup.h caml/startup_aux.h caml/version.h
+ caml/startup.h caml/startup_aux.h caml/version.h build_config.h
 freelist_bi.$(O): freelist.c caml/config.h caml/m.h caml/s.h caml/custom.h \
  caml/mlvalues.h caml/config.h caml/misc.h caml/domain_state.h \
  caml/domain_state.tbl caml/freelist.h caml/gc.h caml/gc_ctrl.h \
@@ -814,7 +818,7 @@ sys_bi.$(O): sys.c caml/config.h caml/m.h caml/s.h caml/alloc.h caml/misc.h \
  caml/mlvalues.h caml/osdeps.h caml/memory.h caml/gc.h caml/major_gc.h \
  caml/freelist.h caml/minor_gc.h caml/address_class.h caml/domain.h \
  caml/signals.h caml/stacks.h caml/sys.h caml/version.h caml/callback.h \
- caml/startup_aux.h
+ caml/startup.h caml/exec.h caml/startup_aux.h
 meta_bi.$(O): meta.c caml/alloc.h caml/misc.h caml/config.h caml/m.h caml/s.h \
  caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/backtrace_prim.h caml/backtrace.h caml/exec.h caml/codefrag.h \
@@ -892,7 +896,8 @@ dynlink_bi.$(O): dynlink.c caml/config.h caml/m.h caml/s.h caml/alloc.h \
  caml/domain_state.tbl caml/dynlink.h caml/fail.h caml/mlvalues.h \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/prims.h caml/signals.h
+ caml/memory.h caml/prims.h caml/signals.h caml/startup.h caml/exec.h \
+ build_config.h
 spacetime_byt_bi.$(O): spacetime_byt.c caml/fail.h caml/misc.h caml/config.h \
  caml/m.h caml/s.h caml/mlvalues.h caml/domain_state.h \
  caml/domain_state.tbl caml/mlvalues.h
@@ -905,7 +910,8 @@ unix_bi.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 bigarray_bi.$(O): bigarray.c caml/alloc.h caml/misc.h caml/config.h caml/m.h \
  caml/s.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/bigarray.h caml/custom.h caml/fail.h caml/intext.h caml/io.h \
@@ -986,7 +992,7 @@ startup_byt_bpic.$(O): startup_byt.c caml/config.h caml/m.h caml/s.h caml/alloc.
  caml/minor_gc.h caml/address_class.h caml/domain.h caml/minor_gc.h \
  caml/misc.h caml/mlvalues.h caml/osdeps.h caml/memory.h caml/prims.h \
  caml/printexc.h caml/reverse.h caml/signals.h caml/stacks.h caml/sys.h \
- caml/startup.h caml/startup_aux.h caml/version.h
+ caml/startup.h caml/startup_aux.h caml/version.h build_config.h
 freelist_bpic.$(O): freelist.c caml/config.h caml/m.h caml/s.h caml/custom.h \
  caml/mlvalues.h caml/config.h caml/misc.h caml/domain_state.h \
  caml/domain_state.tbl caml/freelist.h caml/gc.h caml/gc_ctrl.h \
@@ -1128,7 +1134,7 @@ sys_bpic.$(O): sys.c caml/config.h caml/m.h caml/s.h caml/alloc.h caml/misc.h \
  caml/mlvalues.h caml/osdeps.h caml/memory.h caml/gc.h caml/major_gc.h \
  caml/freelist.h caml/minor_gc.h caml/address_class.h caml/domain.h \
  caml/signals.h caml/stacks.h caml/sys.h caml/version.h caml/callback.h \
- caml/startup_aux.h
+ caml/startup.h caml/exec.h caml/startup_aux.h
 meta_bpic.$(O): meta.c caml/alloc.h caml/misc.h caml/config.h caml/m.h caml/s.h \
  caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/backtrace_prim.h caml/backtrace.h caml/exec.h caml/codefrag.h \
@@ -1206,7 +1212,8 @@ dynlink_bpic.$(O): dynlink.c caml/config.h caml/m.h caml/s.h caml/alloc.h \
  caml/domain_state.tbl caml/dynlink.h caml/fail.h caml/mlvalues.h \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/prims.h caml/signals.h
+ caml/memory.h caml/prims.h caml/signals.h caml/startup.h caml/exec.h \
+ build_config.h
 spacetime_byt_bpic.$(O): spacetime_byt.c caml/fail.h caml/misc.h caml/config.h \
  caml/m.h caml/s.h caml/mlvalues.h caml/domain_state.h \
  caml/domain_state.tbl caml/mlvalues.h
@@ -1219,7 +1226,8 @@ unix_bpic.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 bigarray_bpic.$(O): bigarray.c caml/alloc.h caml/misc.h caml/config.h caml/m.h \
  caml/s.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/bigarray.h caml/custom.h caml/fail.h caml/intext.h caml/io.h \
@@ -1397,7 +1405,7 @@ sys_n.$(O): sys.c caml/config.h caml/m.h caml/s.h caml/alloc.h caml/misc.h \
  caml/mlvalues.h caml/osdeps.h caml/memory.h caml/gc.h caml/major_gc.h \
  caml/freelist.h caml/minor_gc.h caml/address_class.h caml/domain.h \
  caml/signals.h caml/stacks.h caml/sys.h caml/version.h caml/callback.h \
- caml/startup_aux.h
+ caml/startup.h caml/exec.h caml/startup_aux.h
 parsing_n.$(O): parsing.c caml/config.h caml/m.h caml/s.h caml/mlvalues.h \
  caml/config.h caml/misc.h caml/domain_state.h caml/mlvalues.h \
  caml/domain_state.tbl caml/memory.h caml/gc.h caml/major_gc.h \
@@ -1435,7 +1443,8 @@ unix_n.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 printexc_n.$(O): printexc.c caml/backtrace.h caml/mlvalues.h caml/config.h \
  caml/m.h caml/s.h caml/misc.h caml/domain_state.h caml/domain_state.tbl \
  caml/exec.h caml/callback.h caml/debugger.h caml/fail.h caml/misc.h \
@@ -1511,7 +1520,8 @@ dynlink_n.$(O): dynlink.c caml/config.h caml/m.h caml/s.h caml/alloc.h \
  caml/domain_state.tbl caml/dynlink.h caml/fail.h caml/mlvalues.h \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/prims.h caml/signals.h
+ caml/memory.h caml/prims.h caml/signals.h caml/startup.h caml/exec.h \
+ build_config.h
 clambda_checks_n.$(O): clambda_checks.c caml/mlvalues.h caml/config.h caml/m.h \
  caml/s.h caml/misc.h caml/domain_state.h caml/mlvalues.h \
  caml/domain_state.tbl
@@ -1709,7 +1719,7 @@ sys_nd.$(O): sys.c caml/config.h caml/m.h caml/s.h caml/alloc.h caml/misc.h \
  caml/mlvalues.h caml/osdeps.h caml/memory.h caml/gc.h caml/major_gc.h \
  caml/freelist.h caml/minor_gc.h caml/address_class.h caml/domain.h \
  caml/signals.h caml/stacks.h caml/sys.h caml/version.h caml/callback.h \
- caml/startup_aux.h
+ caml/startup.h caml/exec.h caml/startup_aux.h
 parsing_nd.$(O): parsing.c caml/config.h caml/m.h caml/s.h caml/mlvalues.h \
  caml/config.h caml/misc.h caml/domain_state.h caml/mlvalues.h \
  caml/domain_state.tbl caml/memory.h caml/gc.h caml/major_gc.h \
@@ -1747,7 +1757,8 @@ unix_nd.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 printexc_nd.$(O): printexc.c caml/backtrace.h caml/mlvalues.h caml/config.h \
  caml/m.h caml/s.h caml/misc.h caml/domain_state.h caml/domain_state.tbl \
  caml/exec.h caml/callback.h caml/debugger.h caml/fail.h caml/misc.h \
@@ -1823,7 +1834,8 @@ dynlink_nd.$(O): dynlink.c caml/config.h caml/m.h caml/s.h caml/alloc.h \
  caml/domain_state.tbl caml/dynlink.h caml/fail.h caml/mlvalues.h \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/prims.h caml/signals.h
+ caml/memory.h caml/prims.h caml/signals.h caml/startup.h caml/exec.h \
+ build_config.h
 clambda_checks_nd.$(O): clambda_checks.c caml/mlvalues.h caml/config.h caml/m.h \
  caml/s.h caml/misc.h caml/domain_state.h caml/mlvalues.h \
  caml/domain_state.tbl
@@ -2021,7 +2033,7 @@ sys_ni.$(O): sys.c caml/config.h caml/m.h caml/s.h caml/alloc.h caml/misc.h \
  caml/mlvalues.h caml/osdeps.h caml/memory.h caml/gc.h caml/major_gc.h \
  caml/freelist.h caml/minor_gc.h caml/address_class.h caml/domain.h \
  caml/signals.h caml/stacks.h caml/sys.h caml/version.h caml/callback.h \
- caml/startup_aux.h
+ caml/startup.h caml/exec.h caml/startup_aux.h
 parsing_ni.$(O): parsing.c caml/config.h caml/m.h caml/s.h caml/mlvalues.h \
  caml/config.h caml/misc.h caml/domain_state.h caml/mlvalues.h \
  caml/domain_state.tbl caml/memory.h caml/gc.h caml/major_gc.h \
@@ -2059,7 +2071,8 @@ unix_ni.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 printexc_ni.$(O): printexc.c caml/backtrace.h caml/mlvalues.h caml/config.h \
  caml/m.h caml/s.h caml/misc.h caml/domain_state.h caml/domain_state.tbl \
  caml/exec.h caml/callback.h caml/debugger.h caml/fail.h caml/misc.h \
@@ -2135,7 +2148,8 @@ dynlink_ni.$(O): dynlink.c caml/config.h caml/m.h caml/s.h caml/alloc.h \
  caml/domain_state.tbl caml/dynlink.h caml/fail.h caml/mlvalues.h \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/prims.h caml/signals.h
+ caml/memory.h caml/prims.h caml/signals.h caml/startup.h caml/exec.h \
+ build_config.h
 clambda_checks_ni.$(O): clambda_checks.c caml/mlvalues.h caml/config.h caml/m.h \
  caml/s.h caml/misc.h caml/domain_state.h caml/mlvalues.h \
  caml/domain_state.tbl
@@ -2333,7 +2347,7 @@ sys_npic.$(O): sys.c caml/config.h caml/m.h caml/s.h caml/alloc.h caml/misc.h \
  caml/mlvalues.h caml/osdeps.h caml/memory.h caml/gc.h caml/major_gc.h \
  caml/freelist.h caml/minor_gc.h caml/address_class.h caml/domain.h \
  caml/signals.h caml/stacks.h caml/sys.h caml/version.h caml/callback.h \
- caml/startup_aux.h
+ caml/startup.h caml/exec.h caml/startup_aux.h
 parsing_npic.$(O): parsing.c caml/config.h caml/m.h caml/s.h caml/mlvalues.h \
  caml/config.h caml/misc.h caml/domain_state.h caml/mlvalues.h \
  caml/domain_state.tbl caml/memory.h caml/gc.h caml/major_gc.h \
@@ -2371,7 +2385,8 @@ unix_npic.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 printexc_npic.$(O): printexc.c caml/backtrace.h caml/mlvalues.h caml/config.h \
  caml/m.h caml/s.h caml/misc.h caml/domain_state.h caml/domain_state.tbl \
  caml/exec.h caml/callback.h caml/debugger.h caml/fail.h caml/misc.h \
@@ -2447,7 +2462,8 @@ dynlink_npic.$(O): dynlink.c caml/config.h caml/m.h caml/s.h caml/alloc.h \
  caml/domain_state.tbl caml/dynlink.h caml/fail.h caml/mlvalues.h \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/prims.h caml/signals.h
+ caml/memory.h caml/prims.h caml/signals.h caml/startup.h caml/exec.h \
+ build_config.h
 clambda_checks_npic.$(O): clambda_checks.c caml/mlvalues.h caml/config.h caml/m.h \
  caml/s.h caml/misc.h caml/domain_state.h caml/mlvalues.h \
  caml/domain_state.tbl
