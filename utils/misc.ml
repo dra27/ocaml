@@ -212,6 +212,104 @@ module Stdlib = struct
       | Exit -> None
   end
 
+  (* Not to be exposed *)
+  module Uchar = struct
+    include Uchar
+
+    let decode_bits = 24
+
+    let[@inline] utf_decode_length d = (d lsr decode_bits) land 0b111
+    let[@inline] utf_decode_uchar d = unsafe_of_int (d land 0xFFFFFF)
+    let[@inline] utf_decode n u = ((8 lor n) lsl decode_bits) lor (to_int u)
+    let[@inline] utf_decode_invalid n = (n lsl decode_bits) lor (to_int rep)
+
+  end
+
+  (* Not to be exposed *)
+  module Bytes = struct
+    include Bytes
+
+    external unsafe_get_uint8 : bytes -> int -> int = "%bytes_unsafe_get"
+
+    let dec_invalid = Uchar.utf_decode_invalid
+    let[@inline] dec_ret n u = Uchar.utf_decode n (Uchar.unsafe_of_int u)
+
+    let[@inline] not_in_x80_to_xBF b = b lsr 6 <> 0b10
+    let[@inline] not_in_xA0_to_xBF b = b lsr 5 <> 0b101
+    let[@inline] not_in_x80_to_x9F b = b lsr 5 <> 0b100
+    let[@inline] not_in_x90_to_xBF b = b < 0x90 || 0xBF < b
+    let[@inline] not_in_x80_to_x8F b = b lsr 4 <> 0x8
+
+    let[@inline] utf_8_uchar_2 b0 b1 =
+      ((b0 land 0x1F) lsl 6) lor
+      ((b1 land 0x3F))
+
+    let[@inline] utf_8_uchar_3 b0 b1 b2 =
+      ((b0 land 0x0F) lsl 12) lor
+      ((b1 land 0x3F) lsl 6) lor
+      ((b2 land 0x3F))
+
+    let[@inline] utf_8_uchar_4 b0 b1 b2 b3 =
+      ((b0 land 0x07) lsl 18) lor
+      ((b1 land 0x3F) lsl 12) lor
+      ((b2 land 0x3F) lsl 6) lor
+      ((b3 land 0x3F))
+
+    let get_utf_8_uchar b i =
+      let b0 = get_uint8 b i in (* raises if [i] is not a valid index. *)
+      let get = unsafe_get_uint8 in
+      let max = length b - 1 in
+      match Char.unsafe_chr b0 with (* See The Unicode Standard, Table 3.7 *)
+      | '\x00' .. '\x7F' -> dec_ret 1 b0
+      | '\xC2' .. '\xDF' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_xBF b1 then dec_invalid 1 else
+          dec_ret 2 (utf_8_uchar_2 b0 b1)
+      | '\xE0' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_xA0_to_xBF b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          dec_ret 3 (utf_8_uchar_3 b0 b1 b2)
+      | '\xE1' .. '\xEC' | '\xEE' .. '\xEF' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_xBF b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          dec_ret 3 (utf_8_uchar_3 b0 b1 b2)
+      | '\xED' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_x9F b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          dec_ret 3 (utf_8_uchar_3 b0 b1 b2)
+      | '\xF0' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x90_to_xBF b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          let i = i + 1 in if i > max then dec_invalid 3 else
+          let b3 = get b i in if not_in_x80_to_xBF b3 then dec_invalid 3 else
+          dec_ret 4 (utf_8_uchar_4 b0 b1 b2 b3)
+      | '\xF1' .. '\xF3' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_xBF b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          let i = i + 1 in if i > max then dec_invalid 3 else
+          let b3 = get b i in if not_in_x80_to_xBF b3 then dec_invalid 3 else
+          dec_ret 4 (utf_8_uchar_4 b0 b1 b2 b3)
+      | '\xF4' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_x8F b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          let i = i + 1 in if i > max then dec_invalid 3 else
+          let b3 = get b i in if not_in_x80_to_xBF b3 then dec_invalid 3 else
+          dec_ret 4 (utf_8_uchar_4 b0 b1 b2 b3)
+      | _ -> dec_invalid 1
+  end
+
   module String = struct
     include String
     module Set = Set.Make(String)
@@ -227,6 +325,16 @@ module Stdlib = struct
         i = len || (f t.[i] && loop (i + 1))
       in
       loop 0
+
+    let rec to_utf_8_seq b i () =
+      if i >= Bytes.length b then
+        Seq.Nil
+      else
+        let next = Bytes.get_utf_8_uchar b i in
+        let u = Uchar.utf_decode_uchar next in
+        Seq.Cons(u, to_utf_8_seq b (i + Uchar.utf_decode_length next))
+
+    let to_utf_8_seq s = to_utf_8_seq (Bytes.unsafe_of_string s) 0
 
     let print ppf t =
       Format.pp_print_string ppf t
@@ -1187,4 +1295,113 @@ module Magic_number = struct
          match check_current kind info with
            | Error err -> Error (Unexpected_error err)
            | Ok () -> Ok info
+end
+
+module RuntimeID = struct
+  type t = {
+    dev: bool;
+    release: int;
+    reserved: int;
+    no_flat_float_array: bool;
+    fp: bool;
+    tsan: bool;
+    int31: bool;
+    static: bool;
+    naked_pointers: bool;
+    ansi: bool;
+    mutable_string: bool;
+  }
+
+  let make fn ?(dev = not Config.is_release)
+              ?(release = Config.release_number)
+              ?(reserved = Config.profinfo_width)
+              ?(no_flat_float_array = not Config.flat_float_array)
+              ?(fp = Config.with_frame_pointers)
+              ?(tsan = false)
+              ?(int31 = (Sys.int_size = 31))
+              ?(static = not Config.supports_shared_libraries)
+              ?(naked_pointers = Config.naked_pointers)
+              ?(ansi = Config.target_win32 && not Config.windows_unicode)
+              ?(mutable_string = not Config.safe_string) () =
+    if release < 0 || release > 63 || reserved < 0 || reserved > 31 then
+      invalid_arg fn
+    else
+      {dev; release; reserved; no_flat_float_array; fp; tsan; int31; static;
+       naked_pointers; ansi; mutable_string}
+
+  let make_zinc =
+    make "Misc.RuntimeID.make_zinc"
+      ~reserved:0 ~fp:false ~tsan:false ~naked_pointers:false
+      ~ansi:false ~mutable_string:false
+
+  let make_bytecode =
+    make "Misc.RuntimeID.make_bytecode" ~fp:false ~tsan:false
+
+  let make_native = make "Misc.RuntimeID.make_native"
+
+  let is_zinc = function
+  | {dev = _; release = _; reserved = 0; no_flat_float_array = _; fp = false;
+     tsan = false; int31 = _; static = _; naked_pointers = false;
+     ansi = false; mutable_string = false} ->
+      true
+  | _ ->
+      false
+
+  let is_bytecode = function
+  | {dev = _; release = _; reserved = _; no_flat_float_array = _; fp = false;
+     tsan = false; int31 = _; static = _; naked_pointers = _;
+     ansi = _; mutable_string = _} -> true
+  | _ -> false
+
+  let is_native _ = true
+
+  let to_string t =
+    let alpha = "0123456789abcdefghijklmnopqrstuv" in
+    let bit bit cond = if cond then 1 lsl bit else 0 in
+    let q0 =
+      (bit 0 t.dev) lor
+      ((t.release lsl 1) land 0b11110) (* 4 bits *)
+    in
+    let q1 =
+      t.release lsr 4 lor               (* 2 bits *)
+      ((t.reserved lsl 2) land 0b11100) (* 3 bits *)
+    in
+    let q2 =
+      t.reserved lsr 3 lor (* 2 bits *)
+      bit 2 t.no_flat_float_array lor
+      bit 3 t.fp lor
+      bit 4 t.tsan
+    in
+    let q3 =
+      bit 0 t.int31 lor
+      bit 1 t.static lor
+      bit 2 t.naked_pointers lor
+      bit 3 t.ansi lor
+      bit 4 t.mutable_string
+    in
+    Printf.sprintf "%c%c%c%c" alpha.[q0] alpha.[q1] alpha.[q2] alpha.[q3]
+
+  let of_string s =
+    if String.length s <> 4 then
+      None
+    else
+      let convert c =
+        match c with
+        | '0'..'9' -> Char.code c - Char.code '0'
+        | 'a'..'v' -> Char.code c - Char.code 'a' + 10
+        | _ -> min_int
+      in
+      let set bit q = (q land (1 lsl bit) <> 0) in
+      let q0 = convert s.[0] in
+      let q1 = convert s.[1] in
+      let q2 = convert s.[2] in
+      let q3 = convert s.[3] in
+      if q0 + q1 + q2 + q3 >= 0 then
+        Some {dev = set 0 q0; release = ((q1 land 0b11) lsl 4) lor (q0 lsr 1);
+              reserved = ((q2 land 0b11) lsl 2) lor (q1 lsr 2);
+              no_flat_float_array = set 2 q2; fp = set 3 q2; tsan = set 4 q2;
+              int31 = set 0 q3; static = set 1 q3; naked_pointers = set 2 q3;
+              ansi = set 3 q3; mutable_string = set 4 q3}
+      else
+        None
 end
