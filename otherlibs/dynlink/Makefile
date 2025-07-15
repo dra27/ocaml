@@ -139,6 +139,9 @@ $(LOCAL_SRC)/Makefile: $(LOCAL_SRC)/Makefile.copy-sources Makefile
             >> $@; \
         done
 
+$(LOCAL_SRC)/dll.ml:
+	sed -e '/caml_dynlink_parse/s/_parse_/_parse_runtime_/' $< > $@
+
 # Rules to automatically generate dependencies for the local copy of the
 # compilerlibs sources.
 
@@ -235,7 +238,7 @@ dynlink_platform_intf.mli: dynlink_platform_intf.ml
 $(eval $(call PROGRAM_SYNONYM,extract_crc))
 
 $(extract_crc): dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
-	$(OCAMLC) -o $@ $^
+	$(OCAMLC) -o $@ $(OC_COMMON_LINKFLAGS) $^
 
 install:
 	$(INSTALL_DATA) \
