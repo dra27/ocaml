@@ -117,12 +117,18 @@ let add_ccobjs origin l =
   end
 
 let runtime_lib () =
-  let libname = "libasmrun" ^ !Clflags.runtime_variant ^ ext_lib in
-  try
-    if !Clflags.nopervasives || not !Clflags.with_runtime then []
-    else [ Load_path.find libname ]
-  with Not_found ->
-    raise(Error(File_not_found libname))
+  if !Clflags.runtime_variant = "_shared" then
+    if Config.suffixing then
+      [Misc.RuntimeID.shared_runtime Sys.Native]
+    else
+      ["-lasmrun_shared"]
+  else
+    let libname = "libasmrun" ^ !Clflags.runtime_variant ^ ext_lib in
+    try
+      if !Clflags.nopervasives || not !Clflags.with_runtime then []
+      else [ Load_path.find libname ]
+    with Not_found ->
+      raise(Error(File_not_found libname))
 
 let object_file_name name =
   let file_name =
@@ -243,6 +249,13 @@ let make_globals_map units_list ~crc_interfaces =
     crc_interfaces defined
 
 let make_startup_file ~ppf_dump units_list ~crc_interfaces =
+  let need_stdlib =
+    let needs_stdlib = function
+    | ({ui_need_stdlib = true; _}, _, _) -> true
+    | _ -> false
+    in
+      List.exists needs_stdlib units_list
+  in
   let compile_phrase p = Asmgen.compile_phrase ~ppf_dump p in
   Location.input_name := "caml_startup"; (* set name of "current" input *)
   Compilenv.reset "_startup";
@@ -256,6 +269,14 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
   Array.iteri
     (fun i name -> compile_phrase (Cmm_helpers.predef_exception i name))
     Runtimedef.builtin_exceptions;
+  if need_stdlib then begin
+    let standard_library_default =
+      Option.value ~default:Config.standard_library_effective
+                   !Clflags.standard_library_default in
+    compile_phrase
+      (Cmm_helpers.emit_global_string_constant
+        "caml_standard_library_nat" standard_library_default)
+  end;
   compile_phrase (Cmm_helpers.global_table name_list);
   let globals_map = make_globals_map units_list ~crc_interfaces in
   compile_phrase (Cmm_helpers.globals_map globals_map);
