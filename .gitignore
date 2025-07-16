@@ -95,6 +95,8 @@ _build
 /lex/ocamllex.opt
 /lex/parser.output
 
+/man/*.link
+
 /manual/manual/cmds/warnings-help.etex
 /manual/manual/warnings-help.etex
 

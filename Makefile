@@ -1449,6 +1449,9 @@ depend: beforedepend
          do $(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) $$d/*.mli $$d/*.ml || exit; \
          done) > .depend
 
+clean::
+	$(MAKE) -C man clean
+
 .PHONY: distclean
 distclean: clean
 	$(MAKE) -C ocamltest distclean
