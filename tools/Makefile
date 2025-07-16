@@ -188,9 +188,6 @@ else
 endif
 endef
 
-$(foreach tool, $(install_files), \
-  $(eval $(call INSTALL_ONE_TOOL,$(tool))))
-
 # The preprocessor for asm generators
 
 cvt_emit := cvt_emit$(EXE)
@@ -353,6 +350,11 @@ opt.opt: $(caml_tex)
 endif
 clean::
 	rm -f -- caml-tex caml-tex.exe caml_tex.cm?
+
+# This must appear after all updates to $(install_files)
+
+$(foreach tool, $(install_files), \
+  $(eval $(call INSTALL_ONE_TOOL,$(tool))))
 
 # Common stuff
 
