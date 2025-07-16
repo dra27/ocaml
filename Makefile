@@ -1469,6 +1469,9 @@ depend: beforedepend
 	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) -bytecode \
 		-impl driver/compdynlink.mlbyte >> .depend
 
+clean::
+	$(MAKE) -C man clean
+
 .PHONY: distclean
 distclean: clean
 	$(MAKE) -C ocamltest distclean
