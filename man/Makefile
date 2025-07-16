@@ -14,17 +14,43 @@
 #**************************************************************************
 
 ROOTDIR = ..
-include $(ROOTDIR)/Makefile.config
+include $(ROOTDIR)/Makefile.common
 
-DESTDIR ?=
-INSTALL_DIR=$(call QUOTE_SINGLE,$(DESTDIR)$(MANDIR)/man$(PROGRAMS_MAN_SECTION))
+MANPAGES = \
+  ocaml ocamlc ocamlcp ocamldebug ocamldep ocamldoc ocamllex ocamlmktop \
+  ocamlopt ocamlprof ocamlrun ocamlyacc
 
-install:
-	for i in *.m; do cp \
-	  $$i $(INSTALL_DIR)/`basename $$i .m`.$(PROGRAMS_MAN_SECTION); done
-	echo '.so man$(PROGRAMS_MAN_SECTION)/ocamlc.$(PROGRAMS_MAN_SECTION)' \
-	     > $(INSTALL_DIR)/ocamlc.opt.$(PROGRAMS_MAN_SECTION)
-	echo '.so man$(PROGRAMS_MAN_SECTION)/ocamlopt.$(PROGRAMS_MAN_SECTION)' \
-	     > $(INSTALL_DIR)/ocamlopt.opt.$(PROGRAMS_MAN_SECTION)
-	echo '.so man$(PROGRAMS_MAN_SECTION)/ocamlcp.$(PROGRAMS_MAN_SECTION)' \
-	     > $(INSTALL_DIR)/ocamloptp.$(PROGRAMS_MAN_SECTION)
+INSTALL_MANDIR_PROGRAMS = man$(PROGRAMS_MAN_SECTION)
+
+INSTALL_DIR = $(call QUOTE_SINGLE,$(INSTALL_MANDIR)/$(INSTALL_MANDIR_PROGRAMS))
+
+ocamlc.opt.link: ocamlc.m
+ocamlopt.opt.link: ocamlopt.m
+ocamloptp.link: ocamlcp.m
+
+%.link: $(ROOTDIR)/Makefile.config
+	echo '.so $(INSTALL_MANDIR_PROGRAMS)/'\
+'$(basename $(filter %.m,$^)).$(PROGRAMS_MAN_SECTION)' > $@
+
+define INSTALL_MAN
+install::
+	$(INSTALL_DATA) \
+	  $(1).m $(INSTALL_DIR)/$(1).$(PROGRAMS_MAN_SECTION)
+endef
+
+$(foreach page, $(MANPAGES), \
+  $(eval $(call INSTALL_MAN,$(page))))
+
+.PHONY: install
+
+install:: ocamlc.opt.link ocamlopt.opt.link ocamloptp.link
+	$(INSTALL_DATA) ocamlc.opt.link \
+	     $(INSTALL_DIR)/ocamlc.opt.$(PROGRAMS_MAN_SECTION)
+	$(INSTALL_DATA) ocamlopt.opt.link \
+	     $(INSTALL_DIR)/ocamlopt.opt.$(PROGRAMS_MAN_SECTION)
+	$(INSTALL_DATA) ocamloptp.link \
+	     $(INSTALL_DIR)/ocamloptp.$(PROGRAMS_MAN_SECTION)
+
+.PHONY: clean
+clean:
+	rm -f *.link
