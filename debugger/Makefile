@@ -68,7 +68,7 @@ ocamldebug$(EXE): $(libraries) $(compiler_objects) ocamldebug.cmo \
 	$(V_LINKC)$(CAMLC) $(LINKFLAGS) -o $@ -linkall $^
 
 install:
-	$(INSTALL_PROG) ocamldebug$(EXE) "$(INSTALL_BINDIR)"
+	$(call INSTALL_ITEMS, ocamldebug$(EXE), bin)
 
 .PHONY: clean
 clean::

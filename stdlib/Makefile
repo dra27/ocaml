@@ -84,12 +84,12 @@ endif
 
 ifeq "$(RUNTIMED)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderd "$(INSTALL_LIBDIR)/camlheaderd"
+	$(call INSTALL_ITEM, target_camlheaderd, lib, , camlheaderd)
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderi "$(INSTALL_LIBDIR)/camlheaderi"
+	$(call INSTALL_ITEM, target_camlheaderi, lib, , camlheaderi)
 endif
 
 .PHONY: installopt
