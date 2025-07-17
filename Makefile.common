@@ -130,7 +130,7 @@ INSTALL_SECTION_stublibs = $(INSTALL_STUBLIBDIR)
 QUOTE_SINGLE = '$(subst ','\'',$(1))'
 
 INSTALL_DESPATCH_install_MKDIR = \
-  $(MKDIR) $(call QUOTE_SINGLE,$(INSTALL_SECTION_$(1))$(addprefix /,$(2)))
+  mkdir -p $(call QUOTE_SINGLE,$(INSTALL_SECTION_$(1))$(addprefix /,$(2)))
 
 MK_LINK = \
   (cd "$(INSTALL_SECTION_$(2))$(addprefix /,$(3))" && \

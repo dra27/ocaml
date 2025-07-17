@@ -279,8 +279,7 @@ OBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 $(call byte_and_opt,ocamlobjinfo,$(OBJINFO),objinfo_helper$(EXE))
 
 install::
-	$(INSTALL_PROG) \
-	  objinfo_helper$(EXE) "$(INSTALL_LIBDIR)/objinfo_helper$(EXE)"
+	$(call INSTALL_ITEM, objinfo_helper$(EXE), libexec)
 
 primreq=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
