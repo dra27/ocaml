@@ -133,19 +133,13 @@ $(call byte_and_opt,ocamloptp,$(ocamlcp_cmos) ocamloptp.cmo,)
 opt:: profiling.cmx
 
 install::
-	$(INSTALL_DATA) \
-	  profiling.cmi profiling.cmo \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmi profiling.cmo, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  profiling.cmt profiling.cmti \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmt profiling.cmti, lib)
 endif
 
 installopt::
-	$(INSTALL_DATA) \
-          profiling.cmx profiling.$(O) \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmx profiling.$(O), lib)
 
 # To help building mixed-mode libraries (OCaml + C)
 
@@ -182,13 +176,11 @@ LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
 define INSTALL_ONE_TOOL
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(INSTALL_PROG) "$(1)" "$(INSTALL_BINDIR)/$(1).byte$(EXE)"
+	$(call INSTALL_ITEM, $(1), bin, , $(1).byte$(EXE), \
+	                     $(if $(wildcard $(1).opt),, $(1)$(EXE)))
 endif
 	$(if $(wildcard $(1).opt), \
-	  $(INSTALL_PROG) "$(1).opt" "$(INSTALL_BINDIR)/$(1).opt$(EXE)")
-	(cd "$(INSTALL_BINDIR)" && \
-	  $(LN) "$(1).$(if $(wildcard $(1).opt$(EXE)),opt,byte)$(EXE)" \
-	        "$(1)$(EXE)")
+	  $(call INSTALL_ITEM, $(1).opt, bin, , $(1).opt$(EXE), $(1)$(EXE)))
 endef
 
 # The preprocessor for asm generators
@@ -221,10 +213,8 @@ READ_CMT= \
 $(call byte_and_opt,read_cmt,$(READ_CMT),)
 
 install::
-	$(INSTALL_PROG) \
-	  read_cmt$(if $(wildcard read_cmt.opt),.opt) \
-	  "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"
-
+	$(call INSTALL_ITEM, \
+	  read_cmt$(if $(wildcard read_cmt.opt),.opt), bin, , ocamlcmt$(EXE))
 
 # The bytecode disassembler
 
@@ -275,8 +265,7 @@ OBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 $(call byte_and_opt,ocamlobjinfo,$(OBJINFO),objinfo_helper$(EXE))
 
 install::
-	$(INSTALL_PROG) \
-	  objinfo_helper$(EXE) "$(INSTALL_LIBDIR)/objinfo_helper$(EXE)"
+	$(call INSTALL_ITEM, objinfo_helper$(EXE), libexec)
 
 primreq=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
@@ -321,9 +310,7 @@ $(call byte_and_opt,cmpbyt,$(CMPBYT),)
 
 ifeq "$(RUNTIMEI)" "true"
 install::
-	$(INSTALL_PROG) \
-	  ocaml-instr-graph ocaml-instr-report \
-	  "$(INSTALL_BINDIR)/"
+	$(call INSTALL_ITEMS, ocaml-instr-graph ocaml-instr-report, bin)
 endif
 
 CAMLTEX= $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
