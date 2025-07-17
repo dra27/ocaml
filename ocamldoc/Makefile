@@ -314,7 +314,8 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 endif
 	$(if $(wildcard stdlib_man), \
-	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANDIR_LIBRARIES)")
+	  $(call INSTALL_ITEMS, stdlib_man/*, \
+	    man, $(INSTALL_MANDIR_LIBRARIES)))
 
 # Note: at the moment, $(INSTALL_MANDIR_LIBRARIES) is created even if the doc
 # has not been built. This is not clean and should be changed.
