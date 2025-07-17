@@ -2777,7 +2777,7 @@ endif
 	done
 ifeq "$(build_ocamldoc)" "true"
 	$(call INSTALL_MKDIR, $(INSTALL_LIBDIR)/ocamldoc)
-	$(call INSTALL_ITEM, $(OCAMLDOC), bin)
+	$(call INSTALL_ITEM, ocamldoc/ocamldoc$(EXE), bin)
 	$(call INSTALL_ITEMS, \
 	  ocamldoc/ocamldoc.hva ocamldoc/*.cmi ocamldoc/odoc_info.cma \
 	  ocamldoc/META, \
@@ -2875,7 +2875,7 @@ endif
 	    lib, compiler-libs)
 ifeq "$(build_ocamldoc)" "true"
 	$(call INSTALL_MKDIR, $(INSTALL_LIBDIR)/ocamldoc)
-	$(call INSTALL_ITEMS, $(OCAMLDOC_OPT), bin)
+	$(call INSTALL_ITEMS, ocamldoc/ocamldoc.opt$(EXE), bin)
 	$(call INSTALL_ITEMS, \
 	  ocamldoc/*.cmx ocamldoc/odoc_info.$(A) \
 	  ocamldoc/odoc_info.cmxa, \
