@@ -2671,32 +2671,42 @@ endif
 	$(call INSTALL_ITEMS, runtime/caml/domain_state.tbl runtime/caml/*.h, lib, caml)
 	$(call INSTALL_ITEMS, ocaml$(EXE), bin)
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(call INSTALL_STRIPPED_BYTE_PROG,\
-               ocamlc$(EXE), bin, ocamlc.byte$(EXE))
+	if test -f ocamlopt$(EXE); then \
+	  $(call INSTALL_STRIPPED_BYTE_PROG, ocamlc$(EXE), bin, ocamlc.byte$(EXE)); \
+	else \
+	  $(call INSTALL_STRIPPED_BYTE_PROG, ocamlc$(EXE), bin, ocamlc.byte$(EXE), \
+	                                     ocamlc$(EXE)); \
+	fi
 endif
 	$(MAKE) INSTALL_MODE=$(INSTALL_MODE) -C stdlib install
 
 define INSTALL_ONE_NAT_TOOL
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(call INSTALL_ITEM, tools/$(1)$(EXE), bin, , $(1).byte$(EXE))
 	if test -f "tools/$(1)".opt$(EXE); then \
-	  $(call INSTALL_ITEM, tools/$(1).opt$(EXE), bin) && \
-	  $(call LINK_ITEM, $(1).opt$(EXE), bin, , $(1)$(EXE)); \
+	  $(call INSTALL_ITEM, tools/$(1)$(EXE), bin, , $(1).byte$(EXE)); \
+	  $(call INSTALL_ITEM, tools/$(1).opt$(EXE), bin, , , \
+	                       $(1)$(EXE)); \
 	else \
-	  $(call LINK_ITEM, $(1).byte$(EXE), bin, , $(1)$(EXE)); \
+	  $(call INSTALL_ITEM, tools/$(1)$(EXE), bin, , $(1).byte$(EXE), \
+	                       $(1)$(EXE)); \
 	fi
 else
 	if test -f "tools/$(1)".opt$(EXE); then \
-	  $(call INSTALL_ITEM, tools/$(1).opt$(EXE), bin) && \
-	  $(call LINK_ITEM, $(1).opt$(EXE), bin, , $(1)$(EXE)); \
+	  $(call INSTALL_ITEM, tools/$(1).opt$(EXE), bin, , , \
+	                       $(1)$(EXE)); \
 	fi
 endif
 endef
 
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 install::
-	$(call INSTALL_ITEM, lex/ocamllex$(EXE), bin, , ocamllex.byte$(EXE))
+	if test -f ocamlopt$(EXE); then \
+	  $(call INSTALL_ITEM, lex/ocamllex$(EXE), bin, , ocamllex.byte$(EXE)); \
+	else \
+	  $(call INSTALL_ITEM, lex/ocamllex$(EXE), bin, , ocamllex.byte$(EXE), \
+	                       ocamllex$(EXE)); \
+	fi
 endif
 
 $(foreach tool, $(TOOLS_TO_INSTALL_NAT), \
@@ -2800,7 +2810,11 @@ ifeq "$(TOOLCHAIN)" "msvc"
 	$(call INSTALL_ITEM, $(FLEXDLL_SOURCE_DIR)/$(FLEXDLL_MANIFEST), bin)
 endif
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(call INSTALL_ITEM, flexlink.byte$(EXE), bin)
+	if test -f flexlink.opt$(EXE); then \
+	  $(call INSTALL_ITEM, flexlink.byte$(EXE), bin); \
+	else \
+	  $(call INSTALL_ITEM, flexlink.byte$(EXE), bin, , flexlink$(EXE)); \
+	fi
 endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(call INSTALL_MKDIR, $(INSTALL_FLEXDLLDIR))
 	$(call INSTALL_ITEMS, $(FLEXDLL_OBJECTS), lib, flexdll)
@@ -2809,16 +2823,7 @@ endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(call INSTALL_ITEMS, Makefile.config, lib)
 	$(call INSTALL_ITEMS, $(DOC_FILES), doc)
-ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	if test -f ocamlopt$(EXE); then $(MAKE) INSTALL_MODE=$(INSTALL_MODE) installopt; else \
-	   $(call LINK_ITEM, ocamlc.byte$(EXE), bin, , ocamlc$(EXE)); \
-	   $(call LINK_ITEM, ocamllex.byte$(EXE), bin, , ocamllex$(EXE)); \
-	   (test -f flexlink.byte$(EXE) && \
-	      $(call LINK_ITEM, flexlink.byte$(EXE), bin, , flexlink$(EXE))) || true; \
-	fi
-else
 	if test -f ocamlopt$(EXE); then $(MAKE) INSTALL_MODE=$(INSTALL_MODE) installopt; fi
-endif
 
 # Installation of the native-code compiler
 .PHONY: installopt
@@ -2890,32 +2895,18 @@ endif
 	for i in $(OTHERLIBS); do \
 	  $(MAKE) -C otherlibs/$$i installopt || exit $$?; \
 	done
-ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	if test -f ocamlopt.opt$(EXE); then $(MAKE) installoptopt; else \
-	   $(call LINK_ITEM, ocamlc.byte$(EXE), bin, , ocamlc$(EXE)); \
-	   $(call LINK_ITEM, ocamlopt.byte$(EXE), bin, , ocamlopt$(EXE)); \
-	   $(call LINK_ITEM, ocamllex.byte$(EXE), bin, , ocamllex$(EXE)); \
-	   (test -f flexlink.byte$(EXE) && \
-	      $(call LINK_ITEM, flexlink.byte$(EXE), bin, , flexlink$(EXE))) || true; \
-	fi
-else
 	if test -f ocamlopt.opt$(EXE); then $(MAKE) installoptopt; fi
-endif
 	$(call INSTALL_ITEMS, \
           tools/profiling.cmx tools/profiling.$(O), \
 	  lib, profiling)
 
 .PHONY: installoptopt
 installoptopt:
-	$(call INSTALL_ITEMS, ocamlc.opt$(EXE), bin)
-	$(call INSTALL_ITEMS, ocamlopt.opt$(EXE), bin)
-	$(call INSTALL_ITEMS, lex/ocamllex.opt$(EXE), bin)
-	$(call LINK_ITEM, ocamlc.opt$(EXE), bin, , ocamlc$(EXE))
-	$(call LINK_ITEM, ocamlopt.opt$(EXE), bin, , ocamlopt$(EXE))
-	$(call LINK_ITEM, ocamllex.opt$(EXE), bin, , ocamllex$(EXE))
+	$(call INSTALL_ITEM, ocamlc.opt$(EXE), bin, , , ocamlc$(EXE))
+	$(call INSTALL_ITEM, ocamlopt.opt$(EXE), bin, , , ocamlopt$(EXE))
+	$(call INSTALL_ITEM, lex/ocamllex.opt$(EXE), bin, , , ocamllex$(EXE))
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-	$(call INSTALL_ITEMS, flexlink.opt$(EXE), bin)
-	$(call LINK_ITEM, flexlink.opt$(EXE), bin, , flexlink$(EXE))
+	$(call INSTALL_ITEM, flexlink.opt$(EXE), bin, , , flexlink$(EXE))
 endif
 	$(call INSTALL_ITEMS, \
 	   utils/*.cmx parsing/*.cmx typing/*.cmx bytecomp/*.cmx \
