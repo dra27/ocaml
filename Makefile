@@ -2880,15 +2880,7 @@ ifeq "$(build_ocamldoc)" "true"
 	$(call INSTALL_MKDIR, $(INSTALL_LIBDIR)/ocamldoc)
 	$(call INSTALL_ITEMS, $(OCAMLDOC_OPT), bin)
 	$(call INSTALL_ITEMS, \
-	  $(OCAMLDOC_LIBCMIS), \
-	  lib, ocamldoc)
-ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(call INSTALL_ITEMS, \
-	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS), \
-	  lib, ocamldoc)
-endif
-	$(call INSTALL_ITEMS, \
-	  ocamldoc/ocamldoc.hva ocamldoc/*.cmx ocamldoc/odoc_info.$(A) \
+	  ocamldoc/*.cmx ocamldoc/odoc_info.$(A) \
 	  ocamldoc/odoc_info.cmxa, \
 	  lib, ocamldoc)
 endif
