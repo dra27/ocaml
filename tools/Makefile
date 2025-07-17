@@ -257,9 +257,7 @@ clean::
 # Eventlog metadata file
 
 install::
-	$(INSTALL_DATA) \
-	  eventlog_metadata \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, eventlog_metadata, lib)
 
 # Copy a bytecode executable, stripping debug info
 

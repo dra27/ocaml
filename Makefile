@@ -437,14 +437,11 @@ endif
 	$(call INSTALL_ITEMS, $(BYTESTART) $(TOPLEVELSTART), \
 	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
 	$(call INSTALL_ITEMS, $(expunge), libexec)
-	$(INSTALL_DATA) \
-	   toplevel/topdirs.cmi \
-	   "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, toplevel/topdirs.cmi, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	   toplevel/topdirs.cmt \
-	   toplevel/topdirs.cmti toplevel/topdirs.mli \
-	   "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, \
+	    toplevel/topdirs.cmt toplevel/topdirs.cmti toplevel/topdirs.mli, \
+	  lib)
 endif
 	$(MAKE) -C tools install
 ifeq "$(UNIX_OR_WIN32)" "unix" # Install manual pages only on Unix
