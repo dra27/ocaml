@@ -357,9 +357,7 @@ $(call byte_and_opt,cmpbyt,$(CMPBYT),)
 
 ifeq "$(RUNTIMEI)" "true"
 install::
-	$(INSTALL_PROG) \
-	  ocaml-instr-graph ocaml-instr-report \
-	  "$(INSTALL_BINDIR)/"
+	$(call INSTALL_ITEMS, ocaml-instr-graph ocaml-instr-report, bin)
 endif
 
 CAMLTEX= $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
