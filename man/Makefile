@@ -21,8 +21,6 @@ MANPAGES = \
   ocaml ocamlc ocamlcp ocamldebug ocamldep ocamldoc ocamllex ocamlmktop \
   ocamlopt ocamlprof ocamlrun ocamlyacc
 
-INSTALL_DIR = $(call QUOTE_SINGLE,$(INSTALL_MANDIR)/$(INSTALL_MANDIR_PROGRAMS))
-
 ocamlc.opt.link: ocamlc.m
 ocamlopt.opt.link: ocamlopt.m
 ocamloptp.link: ocamlcp.m
@@ -33,8 +31,8 @@ ocamloptp.link: ocamlcp.m
 
 define INSTALL_MAN
 install::
-	$(INSTALL_DATA) \
-	  $(1).m $(INSTALL_DIR)/$(1).$(PROGRAMS_MAN_SECTION)
+	$(call INSTALL_ITEM, \
+	  $(1).m, man, $(INSTALL_MANDIR_PROGRAMS), $(1).$(PROGRAMS_MAN_SECTION))
 endef
 
 $(foreach page, $(MANPAGES), \
@@ -43,12 +41,12 @@ $(foreach page, $(MANPAGES), \
 .PHONY: install
 
 install:: ocamlc.opt.link ocamlopt.opt.link ocamloptp.link
-	$(INSTALL_DATA) ocamlc.opt.link \
-	     $(INSTALL_DIR)/ocamlc.opt.$(PROGRAMS_MAN_SECTION)
-	$(INSTALL_DATA) ocamlopt.opt.link \
-	     $(INSTALL_DIR)/ocamlopt.opt.$(PROGRAMS_MAN_SECTION)
-	$(INSTALL_DATA) ocamloptp.link \
-	     $(INSTALL_DIR)/ocamloptp.$(PROGRAMS_MAN_SECTION)
+	$(call INSTALL_ITEM, ocamlc.opt.link, \
+	  man, $(INSTALL_MANDIR_PROGRAMS), ocamlc.opt.$(PROGRAMS_MAN_SECTION))
+	$(call INSTALL_ITEM, ocamlopt.opt.link, \
+	  man, $(INSTALL_MANDIR_PROGRAMS), ocamlopt.opt.$(PROGRAMS_MAN_SECTION))
+	$(call INSTALL_ITEM, ocamloptp.link, \
+	  man, $(INSTALL_MANDIR_PROGRAMS), ocamloptp.$(PROGRAMS_MAN_SECTION))
 
 .PHONY: clean
 clean:

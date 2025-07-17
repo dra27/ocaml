@@ -125,19 +125,13 @@ $(call byte_and_opt,ocamloptp,$(ocamlcp_cmos) ocamloptp.cmo,)
 opt:: profiling.cmx
 
 install::
-	$(INSTALL_DATA) \
-	  profiling.cmi profiling.cmo \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmi profiling.cmo, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  profiling.cmt profiling.cmti \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmt profiling.cmti, lib)
 endif
 
 installopt::
-	$(INSTALL_DATA) \
-          profiling.cmx profiling.$(O) \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmx profiling.$(O), lib)
 
 # To help building mixed-mode libraries (OCaml + C)
 
@@ -174,17 +168,16 @@ LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
 define INSTALL_ONE_TOOL
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(INSTALL_PROG) "$(1)$(EXE)" "$(INSTALL_BINDIR)/$(1).byte$(EXE)"; \
 	if test -f "$(1)".opt$(EXE); then \
-	  $(INSTALL_PROG) "$(1).opt$(EXE)" "$(INSTALL_BINDIR)" && \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
+	  $(call INSTALL_ITEM, $(1)$(EXE), bin, , $(1).byte$(EXE)); \
+	  $(call INSTALL_ITEM, $(1).opt$(EXE), bin, , , $(1)$(EXE)); \
 	else \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).byte$(EXE)" "$(1)$(EXE)"); \
+	  $(call INSTALL_ITEM, $(1)$(EXE), \
+	    bin, , $(1).byte$(EXE), $(1)$(EXE)); \
 	fi
 else
 	if test -f "$(1)".opt$(EXE); then \
-	  $(INSTALL_PROG) "$(1).opt$(EXE)" "$(INSTALL_BINDIR)"; \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
+	  $(call INSTALL_ITEM, $(1).opt$(EXE), bin, , , $(1)$(EXE)); \
 	fi
 endif
 endef
@@ -216,10 +209,9 @@ $(call byte_and_opt,ocamlcmt,$(ocamlcmt_objects),)
 
 install::
 	if test -f ocamlcmt.opt$(EXE); then \
-	  $(INSTALL_PROG)\
-	    ocamlcmt.opt$(EXE) "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"; \
+	  $(call INSTALL_ITEM, ocamlcmt.opt$(EXE), bin, , ocamlcmt$(EXE)); \
 	else \
-	  $(INSTALL_PROG) ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
+	  $(call INSTALL_ITEM, ocamlcmt$(EXE), bin); \
 	fi
 
 # The bytecode disassembler
@@ -289,9 +281,7 @@ clean::
 # Eventlog metadata file
 
 install::
-	$(INSTALL_DATA) \
-	  eventlog_metadata \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, eventlog_metadata, lib)
 
 # Copy a bytecode executable, stripping debug info
 
