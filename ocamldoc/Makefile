@@ -338,15 +338,7 @@ installopt_really:
 	$(INSTALL_PROG) \
 	   $(OCAMLDOC_OPT) "$(INSTALL_BINDIR)/$(OCAMLDOC_OPT)$(EXE)"
 	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBCMIS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-endif
-	$(INSTALL_DATA) \
-	  ocamldoc.hva *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
+	  *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
 	  "$(INSTALL_LIBDIR)/ocamldoc"
 
 # TODO: also split into several rules
