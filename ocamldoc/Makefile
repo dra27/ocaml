@@ -318,7 +318,8 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 endif
 	if test -d stdlib_man; then \
-	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANDIR_LIBRARIES)"; \
+	  $(call INSTALL_ITEMS, stdlib_man/*, \
+	    man, $(INSTALL_MANDIR_LIBRARIES)); \
 	else : ; fi
 
 # Note: at the moment, $(INSTALL_MANDIR_LIBRARIES) is created even if the doc
