@@ -2782,9 +2782,6 @@ ifeq "$(build_ocamldoc)" "true"
 	  ocamldoc/ocamldoc.hva ocamldoc/*.cmi ocamldoc/odoc_info.cma \
 	  ocamldoc/META, \
 	  lib, ocamldoc)
-	$(call INSTALL_ITEMS, \
-	  $(OCAMLDOC_LIBCMIS), \
-	  lib, ocamldoc)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(call INSTALL_ITEMS, \
 	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS), \
