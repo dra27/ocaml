@@ -126,18 +126,15 @@ CMIFILES=thread.cmi mutex.cmi condition.cmi event.cmi threadUnix.cmi
 
 install:
 	if test -f $(DLLTHREADS); then \
-	  $(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"; \
+	  $(call INSTALL_ITEMS, $(DLLTHREADS), stublibs); \
 	fi
-	mkdir -p "$(INSTALL_LIBDIR_VMTHREADS)"
-	$(INSTALL_DATA) libvmthreads.a "$(INSTALL_LIBDIR_VMTHREADS)"
-	$(INSTALL_DATA) \
-	  $(CMIFILES) \
-	  threads.cma stdlib.cma unix.cma \
-	  "$(INSTALL_LIBDIR_VMTHREADS)"
+	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_VMTHREADS))
+	$(call INSTALL_ITEMS, libvmthreads.a, lib, $(INSTALL_LIBDIR_VMTHREADS))
+	$(call INSTALL_ITEMS, $(CMIFILES) threads.cma stdlib.cma unix.cma, \
+	  lib, $(INSTALL_LIBDIR_VMTHREADS))
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(CMIFILES:.cmi=.mli) $(CMIFILES:.cmi=.cmti) \
-	  "$(INSTALL_LIBDIR_VMTHREADS)"
+	$(call INSTALL_ITEMS, $(CMIFILES:.cmi=.mli) $(CMIFILES:.cmi=.cmti), \
+	  lib, $(INSTALL_LIBDIR_VMTHREADS))
 endif
 
 installopt:
