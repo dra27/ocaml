@@ -243,20 +243,14 @@ $(extract_crc): dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
 	$(OCAMLC) -o $@ $^
 
 install:
-	$(INSTALL_DATA) \
-	  dynlink.cmi dynlink.cma \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmi dynlink.cma, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  dynlink.cmti dynlink.mli \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmti dynlink.mli, lib)
 endif
 
 installopt:
 ifeq "$(strip $(NATDYNLINK))" "true"
-	$(INSTALL_DATA) \
-	  $(NATOBJS) dynlink.cmxa dynlink.$(A) \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, $(NATOBJS) dynlink.cmxa dynlink.$(A), lib)
 endif
 
 partialclean:
