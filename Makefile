@@ -551,9 +551,12 @@ endif
 
 .PHONY: installoptopt
 installoptopt:
-	$(call INSTALL_ITEM, ocamlc.opt, bin, , , ocamlc$(EXE))
-	$(call INSTALL_ITEM, ocamlopt.opt, bin, , , ocamlopt$(EXE))
-	$(call INSTALL_ITEM, lex/ocamllex.opt, bin, , , ocamllex$(EXE))
+	$(call INSTALL_ITEM, ocamlc.opt, bin, , ocamlc.opt$(EXE), \
+	                                        ocamlc$(EXE))
+	$(call INSTALL_ITEM, ocamlopt.opt, bin, , ocamlopt.opt$(EXE), \
+	                                          ocamlopt$(EXE))
+	$(call INSTALL_ITEM, lex/ocamllex.opt, bin, , ocamllex.opt$(EXE), \
+	                                              ocamllex$(EXE))
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(call INSTALL_ITEM, flexlink.opt$(EXE), bin, , , flexlink$(EXE))
 endif

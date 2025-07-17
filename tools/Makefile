@@ -178,14 +178,14 @@ install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	if test -f "$(1)".opt; then \
 	  $(call INSTALL_ITEM, $(1), bin, , $(1).byte$(EXE)); \
-	  $(call INSTALL_ITEM, $(1).opt, bin, , , $(1)$(EXE)); \
+	  $(call INSTALL_ITEM, $(1).opt, bin, , $(1).opt$(EXE), $(1)$(EXE)); \
 	else \
 	  $(call INSTALL_ITEM, $(1), \
 	    bin, , $(1).byte$(EXE), $(1)$(EXE)); \
 	fi
 else
 	if test -f "$(1)".opt; then \
-	  $(call INSTALL_ITEM, $(1).opt, bin, , , $(1)$(EXE)); \
+	  $(call INSTALL_ITEM, $(1).opt, bin, , $(1).opt$(EXE), $(1)$(EXE)); \
 	fi
 endif
 endef
@@ -226,7 +226,7 @@ install::
 	if test -f read_cmt.opt; then \
 	  $(call INSTALL_ITEM, read_cmt.opt, bin, , ocamlcmt$(EXE)); \
 	else \
-	  $(call INSTALL_ITEM, read_cmt, bin); \
+	  $(call INSTALL_ITEM, read_cmt, bin, , ocamlcmt$(EXE)); \
 	fi
 
 
@@ -279,8 +279,7 @@ OBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 $(call byte_and_opt,ocamlobjinfo,$(OBJINFO),objinfo_helper$(EXE))
 
 install::
-	$(INSTALL_PROG) \
-	  objinfo_helper$(EXE) "$(INSTALL_LIBDIR)/objinfo_helper$(EXE)"
+	$(call INSTALL_ITEM, objinfo_helper$(EXE), libexec)
 
 primreq=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
