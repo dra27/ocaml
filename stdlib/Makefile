@@ -102,31 +102,29 @@ LEGACY_OBJS=$(patsubst stdlib__%,"$(INSTALL_LIBDIR)/%", \
 install::
 # Transitional: when upgrading from 4.06 -> 4.07, module M is in stdlib__m.cm*,
 # while previously it was in m.cm*, which confuses the compiler.
-	rm -f $(LEGACY_OBJS)
+	$(call INSTALL_RM, $(LEGACY_OBJS))
 # Remove "old" pervasives.* and bigarray.* to avoid getting confused with the
 # Stdlib versions.
-	rm -f "$(INSTALL_LIBDIR)/pervasives.*" "$(INSTALL_LIBDIR)/bigarray.*"
+	$(call INSTALL_RM, \
+	  "$(INSTALL_LIBDIR)/pervasives.*" "$(INSTALL_LIBDIR)/bigarray.*")
 # End transitional
-	$(INSTALL_DATA) \
-	  stdlib.cma std_exit.cmo *.cmi camlheader_ur \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, stdlib.cma std_exit.cmo *.cmi camlheader_ur, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
+	$(call INSTALL_ITEMS, \
 	  *.cmt *.cmti *.ml \
 	  $(if $(filter bigarray, $(OTHERLIBRARIES)), \
-	    $(filter-out bigarray.mli, $(wildcard *.mli)), *.mli) \
-	  "$(INSTALL_LIBDIR)"
+	    $(filter-out bigarray.mli, $(wildcard *.mli)), *.mli), lib)
 endif
-	$(INSTALL_DATA) $(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
+	$(call INSTALL_ITEMS, $(HEADER_NAME), lib)
 
 ifeq "$(RUNTIMED)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderd "$(INSTALL_LIBDIR)/camlheaderd"
+	$(call INSTALL_ITEM, target_camlheaderd, lib, , camlheaderd)
 endif
 
 ifeq "$(RUNTIMEI)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderi "$(INSTALL_LIBDIR)/camlheaderi"
+	$(call INSTALL_ITEM, target_camlheaderi, lib, , camlheaderi)
 endif
 
 .PHONY: installopt
@@ -134,9 +132,7 @@ installopt: installopt-default
 
 .PHONY: installopt-default
 installopt-default:
-	$(INSTALL_DATA) \
-	  stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx, lib)
 
 ifeq "$(HASHBANGSCRIPTS)" "true"
 
