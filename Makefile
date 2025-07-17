@@ -740,8 +740,8 @@ endif
            compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlcommon.$(A) \
 	   compilerlibs/ocamlbytecomp.cmxa compilerlibs/ocamlbytecomp.$(A) \
 	   compilerlibs/ocamloptcomp.cmxa  compilerlibs/ocamloptcomp.$(A) \
-	   $(BYTESTART:.cmo=.cmx) $(BYTESTART:.cmo=.$(O)) \
-	   $(OPTSTART:.cmo=.cmx) $(OPTSTART:.cmo=.$(O)) \
+	   $(BYTESTART:.cmo=.$(O)) \
+	   $(OPTSTART:.cmo=.$(O)) \
 	   "$(INSTALL_COMPLIBDIR)"
 	if test -f ocamlnat$(EXE) ; then \
 	  $(INSTALL_PROG) \
