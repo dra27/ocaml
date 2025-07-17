@@ -107,30 +107,23 @@ lib$(CLIBNAME).$(A): $(COBJS)
 install::
 ifneq "$(STUBSLIB)" ""
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-	$(INSTALL_PROG) $(STUBSDLL) "$(INSTALL_STUBLIBDIR)"
+	$(call INSTALL_ITEMS, $(STUBSDLL), stublibs)
 endif
-	$(INSTALL_DATA) $(STUBSLIB) "$(INSTALL_LIBDIR)/"
+	$(call INSTALL_ITEMS, $(STUBSLIB), lib)
 endif
-
-	$(INSTALL_DATA) \
-	  $(LIBNAME).cma $(CMIFILES) \
-	  "$(INSTALL_LIBDIR)/"
+	$(call INSTALL_ITEMS, $(LIBNAME).cma $(CMIFILES), lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(CMIFILES:.cmi=.mli) \
-          $(CMIFILES:.cmi=.cmti) \
-	  "$(INSTALL_LIBDIR)/"
+	$(call INSTALL_ITEMS, $(CMIFILES:.cmi=.mli) $(CMIFILES:.cmi=.cmti), lib)
 endif
 ifneq "$(HEADERS)" ""
-	$(INSTALL_DATA) $(HEADERS) "$(INSTALL_LIBDIR_CAML)/"
+	$(call INSTALL_ITEMS, $(HEADERS), lib, $(INSTALL_LIBDIR_CAML))
 endif
 
 installopt:
-	$(INSTALL_DATA) \
-	   $(CAMLOBJS_NAT) $(LIBNAME).cmxa $(LIBNAME).$(A) \
-	   "$(INSTALL_LIBDIR)/"
+	$(call INSTALL_ITEMS, \
+	   $(CAMLOBJS_NAT) $(LIBNAME).cmxa $(LIBNAME).$(A), lib)
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-	  $(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, $(LIBNAME).cmxs, libexec)
 endif
 
 partialclean:
