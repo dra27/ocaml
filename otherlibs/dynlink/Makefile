@@ -235,22 +235,15 @@ extract_crc: dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
 	                  $(OC_COMMON_LINKFLAGS)) $(OC_COMMON_LINKFLAGS) $^
 
 install:
-	$(INSTALL_DATA) \
-	  dynlink.cmi dynlink.cma \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmi dynlink.cma, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  dynlink.cmti dynlink.mli \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmti dynlink.mli, lib)
 endif
-	$(INSTALL_PROG) \
-	  extract_crc "$(INSTALL_LIBDIR)/extract_crc$(EXE)"
+	$(call INSTALL_ITEM, extract_crc, libexec, , extract_crc$(EXE))
 
 installopt:
 	if $(NATDYNLINK); then \
-	  $(INSTALL_DATA) \
-	    $(NATOBJS) dynlink.cmxa dynlink.$(A) \
-	    "$(INSTALL_LIBDIR)"; \
+	  $(call INSTALL_ITEMS, $(NATOBJS) dynlink.cmxa dynlink.$(A), lib); \
 	fi
 
 partialclean:
