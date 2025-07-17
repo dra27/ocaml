@@ -16,8 +16,9 @@ build: [
    "--with-stublibs=..\\stublibs" {os = "win32"}]
   [make "-j%{jobs}%" "world"]
   [make "-j%{jobs}%" "world.opt"]
+  [make "INSTALL_MODE=opam" "install"]
 ]
-install: [make "install"]
+install: ["sh" "./%{name}%-fixup.sh" prefix]
 maintainer: "caml-list@inria.fr"
 homepage: "https://github.com/ocaml/ocaml/"
 bug-reports: "https://github.com/ocaml/ocaml/issues"
