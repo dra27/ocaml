@@ -1537,14 +1537,15 @@ NATIVE_ARTEFACT_DIRS = \
 
 .PHONY: install
 install::
-	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)"
+	$(call INSTALL_BEGIN)
+	$(call INSTALL_MKDIR, bin)
+	$(call INSTALL_MKDIR, lib)
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-	$(MKDIR) "$(INSTALL_STUBLIBDIR)"
+	$(call INSTALL_MKDIR, stublibs)
 endif
-	$(MKDIR) "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(MKDIR) "$(INSTALL_DOCDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR_CAML)"
+	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_MKDIR, doc)
+	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_CAML))
 
 ifeq "$(SUFFIXING)" "true"
 MANGLE_RUNTIME_NAME = $(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)
@@ -1556,16 +1557,9 @@ endif
 
 define INSTALL_RUNTIME
 install::
-	$(INSTALL_PROG) \
-    runtime/$(1)$(EXE) \
-      "$(INSTALL_BINDIR)/$(call MANGLE_RUNTIME_NAME,$(1))"
-ifeq "$(SUFFIXING)" "true"
-	cd "$(INSTALL_BINDIR)" && \
-    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
-	cd "$(INSTALL_BINDIR)" && \
-    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
-	    "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
-endif
+	$$(call INSTALL_ITEM, runtime/$(1)$(EXE), bin, , \
+    $(call MANGLE_RUNTIME_NAME,$(1)), $(if $(filter true, $(SUFFIXING)), \
+      $(1)$(EXE) $(1)-$(ZINC_RUNTIME_ID)$(EXE)))
 endef
 define INSTALL_RUNTIME_LIB
 ifeq "$(2)" "BYTECODE"
@@ -1573,57 +1567,62 @@ install::
 else
 installopt::
 endif
-	$(INSTALL_PROG) \
-    runtime/lib$(1)_shared$(EXT_DLL) \
-	    "$(INSTALL_LIBDIR)/$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))"
-ifeq "$(SUFFIXING)" "true"
-	cd "$(INSTALL_LIBDIR)" && \
-    $(LN) "$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))" \
-    "lib$(1)_shared$(EXT_DLL)"
-endif
+	$$(call INSTALL_ITEM, runtime/lib$(1)_shared$(EXT_DLL), libexec, , \
+	  $(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2)), \
+      $(if $(filter true, $(SUFFIXING)), lib$(1)_shared$(EXT_DLL)))
 endef
 
 $(foreach runtime, $(runtime_PROGRAMS), \
   $(eval $(call INSTALL_RUNTIME,$(runtime))))
 
 install::
-	$(INSTALL_DATA) runtime/ld.conf $(runtime_BYTECODE_STATIC_LIBRARIES) \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, runtime/ld.conf $(runtime_BYTECODE_STATIC_LIBRARIES), \
+	  lib)
 
 $(foreach shared_runtime, $(runtime_BYTECODE_SHARED_LIBRARIES), \
   $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),BYTECODE)))
 
 install::
-	$(INSTALL_DATA) runtime/caml/domain_state.tbl runtime/caml/*.h \
-	  "$(INSTALL_LIBDIR_CAML)"
-	$(INSTALL_PROG) ocaml$(EXE) "$(INSTALL_BINDIR)"
+	$(call INSTALL_ITEMS, \
+	    runtime/caml/domain_state.tbl runtime/caml/*.h, \
+	  lib, $(INSTALL_LIBDIR_CAML))
+	$(call INSTALL_ITEMS, ocaml$(EXE), bin)
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(INSTALL_PROG) ocamlc$(EXE) "$(INSTALL_BINDIR)/ocamlc.byte$(EXE)"
+	if test -f ocamlopt$(EXE); then \
+	  $(call INSTALL_ITEM, \
+	    ocamlc$(EXE), bin, , ocamlc.byte$(EXE)); \
+	else \
+	  $(call INSTALL_ITEM, \
+	    ocamlc$(EXE), bin, , ocamlc.byte$(EXE), ocamlc$(EXE)); \
+	fi
 endif
 	$(MAKE) -C stdlib install
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(INSTALL_PROG) lex/ocamllex$(EXE) \
-	  "$(INSTALL_BINDIR)/ocamllex.byte$(EXE)"
+	if test -f ocamlopt$(EXE); then \
+	  $(call INSTALL_ITEM, \
+	    lex/ocamllex$(EXE), bin, , ocamllex.byte$(EXE)); \
+	else \
+	  $(call INSTALL_ITEM, \
+	    lex/ocamllex$(EXE), bin, , ocamllex.byte$(EXE), ocamllex$(EXE)); \
+	fi
 endif
-	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) \
-	  $(call COMPILER_ARTEFACT_DIRS, *.cmi) \
-	  "$(INSTALL_LIBDIR_COMPILERLIBS)"
+	$(call INSTALL_ITEMS, $(ocamlyacc_PROGRAM)$(EXE), bin)
+	$(call INSTALL_ITEMS, \
+	    $(call COMPILER_ARTEFACT_DIRS, *.cmi), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(call COMPILER_ARTEFACT_DIRS, *.cmt *.cmti *.mli) \
-	  "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	   toplevel/byte/*.cmt \
-	   "$(INSTALL_LIBDIR_COMPILERLIBS)"
+	$(call INSTALL_ITEMS, \
+	    $(call COMPILER_ARTEFACT_DIRS, *.cmt *.cmti *.mli), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, toplevel/byte/*.cmt, \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
 endif
-	$(INSTALL_DATA) \
-	  compilerlibs/*.cma compilerlibs/META \
-	  "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	   $(BYTESTART) $(TOPLEVELSTART) \
-	   "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_PROG) $(expunge) "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, compilerlibs/*.cma compilerlibs/META, \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    $(BYTESTART) $(TOPLEVELSTART), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, $(expunge), libexec)
 # If installing over a previous OCaml version, ensure the module is removed
 # from the previous installation.
 	rm -f "$(INSTALL_LIBDIR)"/topdirs.cm* "$(INSTALL_LIBDIR)/topdirs.mli"
@@ -1645,137 +1644,116 @@ endif
 	fi
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 ifeq "$(TOOLCHAIN)" "msvc"
-	$(INSTALL_DATA) $(FLEXDLL_SOURCES)/$(FLEXDLL_MANIFEST) \
-    "$(INSTALL_BINDIR)/"
+	# Technically this should not be installed with "executable"
+	# permissions, but in practice that request will be ignored.
+	$(call INSTALL_ITEMS, $(FLEXDLL_SOURCE_DIR)/$(FLEXDLL_MANIFEST), bin)
 endif
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(INSTALL_PROG) \
-	  boot/flexlink.byte$(EXE) "$(INSTALL_BINDIR)/flexlink.byte$(EXE)"
-endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(MKDIR) "$(INSTALL_LIBDIR_FLEXDLL)"
-	$(INSTALL_DATA) $(addprefix stdlib/flexdll/, $(FLEXDLL_OBJECTS)) \
-    "$(INSTALL_LIBDIR_FLEXDLL)"
-endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-	$(INSTALL_DATA) Makefile.config "$(INSTALL_LIBDIR)"
-	$(INSTALL_DATA) $(DOC_FILES) "$(INSTALL_DOCDIR)"
-ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	if test -f ocamlopt$(EXE); then $(MAKE) installopt; else \
-	   cd "$(INSTALL_BINDIR)"; \
-	   $(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
-	   $(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
-	   (test -f flexlink.byte$(EXE) && \
-	      $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true; \
+	if test -f flexlink.opt$(EXE); then \
+	  $(call INSTALL_ITEMS, boot/flexlink.byte$(EXE), bin); \
+	else \
+	  $(call INSTALL_ITEM, \
+	    boot/flexlink.byte$(EXE), bin, , , flexlink$(EXE)); \
 	fi
-else
+endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
+	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_FLEXDLL))
+	$(call INSTALL_ITEMS, \
+	    $(addprefix stdlib/flexdll/, $(FLEXDLL_OBJECTS)), \
+	  lib, $(INSTALL_LIBDIR_FLEXDLL))
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+	$(call INSTALL_ITEMS, Makefile.config, lib)
+	$(call INSTALL_ITEMS, $(DOC_FILES), doc)
 	if test -f ocamlopt$(EXE); then $(MAKE) installopt; fi
-endif
+	$(call INSTALL_END)
 
 # Installation of the native-code compiler
 .PHONY: installopt
 installopt::
-	$(INSTALL_DATA) $(runtime_NATIVE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, $(runtime_NATIVE_STATIC_LIBRARIES), lib)
 
 $(foreach shared_runtime, $(runtime_NATIVE_SHARED_LIBRARIES), \
   $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),NATIVE)))
 
 installopt::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(INSTALL_PROG) ocamlopt$(EXE) "$(INSTALL_BINDIR)/ocamlopt.byte$(EXE)"
+	$(call INSTALL_ITEM, ocamlopt$(EXE), bin, , ocamlopt.byte$(EXE))
 endif
 	$(MAKE) -C stdlib installopt
-	$(INSTALL_DATA) \
-	    middle_end/*.cmi \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	    middle_end/closure/*.cmi \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	    middle_end/flambda/*.cmi \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	    middle_end/flambda/base_types/*.cmi \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	    asmcomp/*.cmi \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
+	$(call INSTALL_ITEMS, \
+	    middle_end/*.cmi, \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    middle_end/closure/*.cmi, \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    middle_end/flambda/*.cmi, \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    middle_end/flambda/base_types/*.cmi, \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    asmcomp/*.cmi, \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	    $(addprefix middle_end/, *.cmt *.cmti *.mli) \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	    $(addprefix middle_end/closure/, *.cmt *.cmti *.mli) \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	    $(addprefix middle_end/flambda/, *.cmt *.cmti *.mli) \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	    $(addprefix middle_end/flambda/base_types/, *.cmt *.cmti *.mli) \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	    $(addprefix asmcomp/, *.cmt *.cmti *.mli) \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
+	$(call INSTALL_ITEMS, \
+	    $(addprefix middle_end/, *.cmt *.cmti *.mli), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    $(addprefix middle_end/closure/, *.cmt *.cmti *.mli), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    $(addprefix middle_end/flambda/, *.cmt *.cmti *.mli), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    $(addprefix middle_end/flambda/base_types/, *.cmt *.cmti *.mli), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    $(addprefix asmcomp/, *.cmt *.cmti *.mli), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
 endif
-	$(INSTALL_DATA) \
-	    $(OPTSTART) \
-	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
+	$(call INSTALL_ITEMS, \
+	    $(OPTSTART), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
 ifneq "$(WITH_OCAMLDOC)" ""
 	$(MAKE) -C ocamldoc installopt
 endif
 	for i in $(OTHERLIBRARIES); do \
 	  $(MAKE) -C otherlibs/$$i installopt || exit $$?; \
 	done
-ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	if test -f ocamlopt.opt$(EXE); then $(MAKE) installoptopt; else \
-	   cd "$(INSTALL_BINDIR)"; \
-	   $(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
-	   $(LN) ocamlopt.byte$(EXE) ocamlopt$(EXE); \
-	   $(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
-	   (test -f flexlink.byte$(EXE) && \
-	     $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true; \
-	fi
-else
 	if test -f ocamlopt.opt$(EXE); then $(MAKE) installoptopt; fi
-endif
 	$(MAKE) -C tools installopt
 
 .PHONY: installoptopt
 installoptopt:
-	$(INSTALL_PROG) ocamlc.opt$(EXE) "$(INSTALL_BINDIR)"
-	$(INSTALL_PROG) ocamlopt.opt$(EXE) "$(INSTALL_BINDIR)"
-	$(INSTALL_PROG) lex/ocamllex.opt$(EXE) "$(INSTALL_BINDIR)"
-	cd "$(INSTALL_BINDIR)"; \
-	   $(LN) ocamlc.opt$(EXE) ocamlc$(EXE); \
-	   $(LN) ocamlopt.opt$(EXE) ocamlopt$(EXE); \
-	   $(LN) ocamllex.opt$(EXE) ocamllex$(EXE)
+	$(call INSTALL_ITEM, ocamlc.opt$(EXE), bin, , , ocamlc$(EXE))
+	$(call INSTALL_ITEM, ocamlopt.opt$(EXE), bin, , , ocamlopt$(EXE))
+	$(call INSTALL_ITEM, lex/ocamllex.opt$(EXE), bin, , , ocamllex$(EXE))
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-	$(INSTALL_PROG) flexlink.opt$(EXE) "$(INSTALL_BINDIR)"
-	cd "$(INSTALL_BINDIR)"; \
-	  $(LN) flexlink.opt$(EXE) flexlink$(EXE)
+	$(call INSTALL_ITEM, flexlink.opt$(EXE), bin, , , flexlink$(EXE))
 endif
-	$(INSTALL_DATA) \
-	  $(call COMPILER_ARTEFACT_DIRS, *.cmx, $(NATIVE_ARTEFACT_DIRS)) \
-	  toplevel/native/tophooks.cmi \
-    "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
-	   "$(INSTALL_LIBDIR_COMPILERLIBS)"
-	$(INSTALL_DATA) \
-	   $(BYTESTART:.cmo=.$(O)) \
-	   $(OPTSTART:.cmo=.$(O)) \
-	   $(TOPLEVELSTART:.cmo=.$(O)) \
-	   "$(INSTALL_LIBDIR_COMPILERLIBS)"
+	$(call INSTALL_ITEMS, \
+	    $(call COMPILER_ARTEFACT_DIRS, *.cmx, $(NATIVE_ARTEFACT_DIRS)) \
+	    toplevel/native/tophooks.cmi, \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, compilerlibs/*.cmxa compilerlibs/*.$(A), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_ITEMS, \
+	    $(BYTESTART:.cmo=.$(O)) \
+	    $(OPTSTART:.cmo=.$(O)) \
+	    $(TOPLEVELSTART:.cmo=.$(O)), \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
 ifeq "$(INSTALL_OCAMLNAT)" "true"
-	  $(INSTALL_PROG) ocamlnat$(EXE) "$(INSTALL_BINDIR)"
+	  $(call INSTALL_ITEMS, ocamlnat$(EXE), bin)
 endif
 
 # Installation of the *.ml sources of compiler-libs
 .PHONY: install-compiler-sources
 install-compiler-sources:
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(call COMPILER_ARTEFACT_DIRS, *.ml, $(NATIVE_ARTEFACT_DIRS)) \
-	  toplevel/byte/*.ml \
-	  "$(INSTALL_LIBDIR_COMPILERLIBS)"
+	$(call INSTALL_ITEMS, \
+	    $(call COMPILER_ARTEFACT_DIRS, *.ml, $(NATIVE_ARTEFACT_DIRS)) \
+	    toplevel/byte/*.ml, \
+	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
 endif
 
 include .depend
