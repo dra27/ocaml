@@ -2722,9 +2722,6 @@ install::
 	   driver/*.cmi \
 	   toplevel/*.cmi, \
 	   lib, compiler-libs)
-	$(call INSTALL_ITEMS, \
-	   toplevel/byte/*.cmi, \
-	   lib, compiler-libs)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(call INSTALL_ITEMS, \
 	   utils/*.cmt utils/*.cmti utils/*.mli \
