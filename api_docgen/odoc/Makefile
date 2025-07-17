@@ -183,8 +183,7 @@ $(ALL_PAGED_DOC:%=build/%.3o.stamp):build/%.3o.stamp:build/%.odocl | build/
 # Man pages are the only installed documentation
 .PHONY:install
 install:
-	$(MKDIR) "$(INSTALL_MANDIR_LIBRARIES)"
-	$(if $(wildcard build/man/libref), \
-	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANDIR_LIBRARIES)")
-	$(if $(wildcard build/man/compilerlibref), \
-	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANDIR_LIBRARIES)")
+	$(call INSTALL_ITEMS_OPT, \
+	  build/man/libref/*, man, $(INSTALL_MANDIR_LIBRARIES))
+	$(call INSTALL_ITEMS_OPT, \
+	  build/man/compilerlibref/*, man, $(INSTALL_MANDIR_LIBRARIES))
