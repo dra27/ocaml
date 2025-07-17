@@ -82,10 +82,11 @@ LEGACY_OBJS=$(patsubst stdlib__%,"$(INSTALL_LIBDIR)/%", \
 install::
 # Transitional: when upgrading from 4.06 -> 4.07, module M is in stdlib__m.cm*,
 # while previously it was in m.cm*, which confuses the compiler.
-	rm -f $(LEGACY_OBJS)
+	$(call INSTALL_RM, $(LEGACY_OBJS))
 # Remove "old" pervasives.* and bigarray.* to avoid getting confused with the
 # Stdlib versions.
-	rm -f "$(INSTALL_LIBDIR)/pervasives.*" "$(INSTALL_LIBDIR)/bigarray.*"
+	$(call INSTALL_RM, \
+	  "$(INSTALL_LIBDIR)/pervasives.*" "$(INSTALL_LIBDIR)/bigarray.*")
 # End transitional
 	$(call INSTALL_ITEMS, stdlib.cma std_exit.cmo *.cmi camlheader_ur, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"

@@ -446,24 +446,22 @@ common-install::
 	$(call INSTALL_BEGIN)
 	$(call INSTALL_ITEMS, VERSION, lib)
 	$(MAKE) -C runtime install
-	$(call INSTALL_ITEMS, ocaml$(EXE), bin)
+	$(call INSTALL_ITEM, ocaml, bin, , ocaml$(EXE))
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 ifeq "$(NATIVE_COMPILER)" "true"
-	$(call INSTALL_ITEM, \
-	  ocamlc$(EXE), bin, , ocamlc.byte$(EXE))
+	$(call INSTALL_ITEM, ocamlc, bin, , ocamlc.byte$(EXE))
 else
-	$(call INSTALL_ITEM, \
-	  ocamlc$(EXE), bin, , ocamlc.byte$(EXE), ocamlc$(EXE))
+	$(call INSTALL_ITEM, ocamlc, bin, , ocamlc.byte$(EXE), ocamlc$(EXE))
 endif
 endif
 	$(MAKE) -C stdlib install
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 ifeq "$(NATIVE_COMPILER)" "true"
 	$(call INSTALL_ITEM, \
-	  lex/ocamllex$(EXE), bin, , ocamllex.byte$(EXE))
+	  lex/ocamllex, bin, , ocamllex.byte$(EXE))
 else
 	$(call INSTALL_ITEM, \
-	  lex/ocamllex$(EXE), bin, , ocamllex.byte$(EXE), ocamllex$(EXE))
+	  lex/ocamllex, bin, , ocamllex.byte$(EXE), ocamllex$(EXE))
 endif
 endif
 	$(call INSTALL_ITEMS, yacc/ocamlyacc$(EXE), bin)
@@ -480,7 +478,7 @@ endif
 	$(call INSTALL_ITEMS, \
 	    $(BYTESTART) $(TOPLEVELSTART), \
 	  lib, $(INSTALL_LIBDIR_COMPILERLIBS))
-	$(call INSTALL_ITEMS, $(expunge), libexec)
+	$(call INSTALL_ITEMS, expunge, libexec, , expunge$(EXE))
 	$(call INSTALL_ITEMS, toplevel/topdirs.cmi, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(call INSTALL_ITEMS, \
@@ -496,7 +494,7 @@ endif
 	done
 # Transitional: findlib 1.7.3 is confused if leftover num.cm? files remain
 # from an previous installation of OCaml before otherlibs/num was removed.
-	rm -f "$(INSTALL_LIBDIR)"/num.cm?
+	$(call INSTALL_RM, "$(INSTALL_LIBDIR)"/num.cm?)
 # End transitional
 ifneq "$(WITH_OCAMLDOC)" ""
 	$(MAKE) -C ocamldoc install
@@ -528,7 +526,7 @@ endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 full-installopt native-install:
 	$(MAKE) -C runtime installopt
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(call INSTALL_ITEM, ocamlopt$(EXE), bin, , ocamlopt.byte$(EXE))
+	$(call INSTALL_ITEM, ocamlopt, bin, , ocamlopt.byte$(EXE))
 endif
 	$(MAKE) -C stdlib installopt
 	$(call INSTALL_ITEMS, \
@@ -580,9 +578,12 @@ endif
 
 .PHONY: full-installoptopt installopt installoptopt
 full-installoptopt installopt installoptopt:
-	$(call INSTALL_ITEM, ocamlc.opt$(EXE), bin, , , ocamlc$(EXE))
-	$(call INSTALL_ITEM, ocamlopt.opt$(EXE), bin, , , ocamlopt$(EXE))
-	$(call INSTALL_ITEM, lex/ocamllex.opt$(EXE), bin, , , ocamllex$(EXE))
+	$(call INSTALL_ITEM, ocamlc.opt, bin, , ocamlc.opt$(EXE), \
+	                                        ocamlc$(EXE))
+	$(call INSTALL_ITEM, ocamlopt.opt, bin, , ocamlopt.opt$(EXE), \
+	                                          ocamlopt$(EXE))
+	$(call INSTALL_ITEM, lex/ocamllex.opt, bin, , ocamllex.opt$(EXE), \
+	                                              ocamllex$(EXE))
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(call INSTALL_ITEM, flexlink.opt$(EXE), bin, , , flexlink$(EXE))
 endif

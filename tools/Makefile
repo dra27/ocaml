@@ -180,7 +180,7 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	                     $(if $(wildcard $(1).opt),, $(1)$(EXE)))
 endif
 	$(if $(wildcard $(1).opt), \
-	  $(call INSTALL_ITEM, $(1).opt$(EXE), bin, , , $(1)$(EXE)))
+	  $(call INSTALL_ITEM, $(1).opt, bin, , $(1).opt$(EXE), $(1)$(EXE)))
 endef
 
 # The preprocessor for asm generators
@@ -214,7 +214,7 @@ $(call byte_and_opt,read_cmt,$(READ_CMT),)
 
 install::
 	$(call INSTALL_ITEM, \
-	  ocamlcmt$(if $(wildcard ocamlcmt.opt),.opt), bin, , ocamlcmt$(EXE))
+	  read_cmt$(if $(wildcard read_cmt.opt),.opt), bin, , ocamlcmt$(EXE))
 
 # The bytecode disassembler
 
@@ -265,8 +265,7 @@ OBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 $(call byte_and_opt,ocamlobjinfo,$(OBJINFO),objinfo_helper$(EXE))
 
 install::
-	$(INSTALL_PROG) \
-	  objinfo_helper$(EXE) "$(INSTALL_LIBDIR)/objinfo_helper$(EXE)"
+	$(call INSTALL_ITEM, objinfo_helper$(EXE), libexec)
 
 primreq=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
