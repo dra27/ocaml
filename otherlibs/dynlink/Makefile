@@ -247,7 +247,7 @@ install:
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(call INSTALL_ITEMS, dynlink.cmti dynlink.mli, lib)
 endif
-	$(INSTALL_PROG) $(extract_crc) "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, $(extract_crc), libexec)
 
 installopt:
 	if $(NATDYNLINK); then \
