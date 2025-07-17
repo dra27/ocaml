@@ -132,19 +132,13 @@ $(call byte_and_opt,ocamlcp,$(ocamlcp_cmos) ocamlcp.cmo,)
 opt:: profiling.cmx
 
 install::
-	$(INSTALL_DATA) \
-	  profiling.cmi profiling.cmo \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmi profiling.cmo, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  profiling.cmt profiling.cmti \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmt profiling.cmti, lib)
 endif
 
 installopt::
-	$(INSTALL_DATA) \
-          profiling.cmx profiling.$(O) \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmx profiling.$(O), lib)
 
 # To help building mixed-mode libraries (OCaml + C)
 
@@ -224,17 +218,16 @@ addlabels: addlabels.cmo
 define INSTALL_ONE_TOOL
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(INSTALL_PROG) "$(1)" "$(INSTALL_BINDIR)/$(1).byte$(EXE)"; \
 	if test -f "$(1)".opt; then \
-	  $(INSTALL_PROG) "$(1).opt" "$(INSTALL_BINDIR)/$(1).opt$(EXE)" && \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
+	  $(call INSTALL_ITEM, $(1), bin, , $(1).byte$(EXE)); \
+	  $(call INSTALL_ITEM, $(1).opt, bin, , , $(1)$(EXE)); \
 	else \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).byte$(EXE)" "$(1)$(EXE)"); \
+	  $(call INSTALL_ITEM, $(1), \
+	    bin, , $(1).byte$(EXE), $(1)$(EXE)); \
 	fi
 else
 	if test -f "$(1)".opt; then \
-	  $(INSTALL_PROG) "$(1).opt" "$(INSTALL_BINDIR)/$(1).opt$(EXE)"; \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
+	  $(call INSTALL_ITEM, $(1).opt, bin, , , $(1)$(EXE)); \
 	fi
 endif
 endef
@@ -276,9 +269,9 @@ $(call byte_and_opt,read_cmt,$(READ_CMT),)
 
 install::
 	if test -f read_cmt.opt; then \
-	  $(INSTALL_PROG) read_cmt.opt "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"; \
+	  $(call INSTALL_ITEM, read_cmt.opt, bin, , ocamlcmt$(EXE)); \
 	else \
-	  $(INSTALL_PROG) read_cmt "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"; \
+	  $(call INSTALL_ITEM, read_cmt, bin); \
 	fi
 
 
@@ -330,8 +323,7 @@ OBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 $(call byte_and_opt,ocamlobjinfo,$(OBJINFO),objinfo_helper$(EXE))
 
 install::
-	$(INSTALL_PROG) \
-	  objinfo_helper$(EXE) "$(INSTALL_LIBDIR)/objinfo_helper$(EXE)"
+	$(call INSTALL_ITEM, objinfo_helper$(EXE), libexec)
 
 primreq=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
@@ -376,9 +368,7 @@ $(call byte_and_opt,cmpbyt,$(CMPBYT),)
 
 ifeq "$(RUNTIMEI)" "true"
 install::
-	$(INSTALL_PROG) \
-	  ocaml-instr-graph ocaml-instr-report \
-	  "$(INSTALL_BINDIR)/"
+	$(call INSTALL_ITEMS, ocaml-instr-graph ocaml-instr-report, bin)
 endif
 
 CAMLTEX= $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
