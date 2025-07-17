@@ -1988,8 +1988,8 @@ endif
 	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
 	   "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	   $(ocamlc_MODULES:=.cmx) $(ocamlc_MODULES:=.$(O)) \
-	   $(ocamlopt_MODULES:=.cmx) $(ocamlopt_MODULES:=.$(O)) \
+	   $(ocamlc_MODULES:=.$(O)) \
+	   $(ocamlopt_MODULES:=.$(O)) \
 	   $(ocaml_MODULES:=.$(O)) \
 	   "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_OCAMLNAT)" "true"
