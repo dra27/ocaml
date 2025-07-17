@@ -115,20 +115,17 @@ install::
 # If installing over a previous OCaml version, ensure the module is removed
 # from the previous installation.
 	rm -f "$(INSTALL_LIBDIR)"/profiling.cm* "$(INSTALL_LIBDIR)/profiling.$(O)"
-	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
-	$(INSTALL_DATA) \
-	  profiling.cmi profiling.cmo \
-	  "$(INSTALL_LIBDIR_PROFILING)"
+	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_PROFILING))
+	$(call INSTALL_ITEMS, profiling.cmi profiling.cmo, \
+	  lib, $(INSTALL_LIBDIR_PROFILING))
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  profiling.cmt profiling.cmti \
-	  "$(INSTALL_LIBDIR_PROFILING)"
+	$(call INSTALL_ITEMS, profiling.cmt profiling.cmti, \
+	  lib, $(INSTALL_LIBDIR_PROFILING))
 endif
 
 installopt::
-	$(INSTALL_DATA) \
-          profiling.cmx profiling.$(O) \
-	  "$(INSTALL_LIBDIR_PROFILING)"
+	$(call INSTALL_ITEMS, profiling.cmx profiling.$(O), \
+	  lib, $(INSTALL_LIBDIR_PROFILING))
 
 # To help building mixed-mode libraries (OCaml + C)
 OCAMLMKLIB = config.cmo build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo
@@ -147,10 +144,9 @@ ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
 # othertools means "after the toplevel has been built" here
 othertools: ocamlmktop_init.cmo
 install::
-	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLMKTOP)"
-	$(INSTALL_DATA) \
-    ocamlmktop_init.cmi ocamlmktop_init.cmo \
-    "$(INSTALL_LIBDIR_OCAMLMKTOP)"
+	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_OCAMLMKTOP))
+	$(call INSTALL_ITEMS, ocamlmktop_init.cmi ocamlmktop_init.cmo, \
+    lib, $(INSTALL_LIBDIR_OCAMLMKTOP))
 
 # Converter olabl/ocaml 2.99 to ocaml 3
 
@@ -159,17 +155,16 @@ LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
 define INSTALL_ONE_TOOL
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(INSTALL_PROG) "$(1)$(EXE)" "$(INSTALL_BINDIR)/$(1).byte$(EXE)"; \
 	if test -f "$(1)".opt$(EXE); then \
-	  $(INSTALL_PROG) "$(1).opt$(EXE)" "$(INSTALL_BINDIR)" && \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
+	  $(call INSTALL_ITEM, $(1)$(EXE), bin, , $(1).byte$(EXE)); \
+	  $(call INSTALL_ITEM, $(1).opt$(EXE), bin, , , $(1)$(EXE)); \
 	else \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).byte$(EXE)" "$(1)$(EXE)"); \
+	  $(call INSTALL_ITEM, $(1)$(EXE), \
+	    bin, , $(1).byte$(EXE), $(1)$(EXE)); \
 	fi
 else
 	if test -f "$(1)".opt$(EXE); then \
-	  $(INSTALL_PROG) "$(1).opt$(EXE)" "$(INSTALL_BINDIR)"; \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
+	  $(call INSTALL_ITEM, $(1).opt$(EXE), bin, , , $(1)$(EXE)); \
 	fi
 endif
 endef
@@ -203,10 +198,9 @@ ocamlcmt.opt$(EXE): $(call byte2native, $(OCAMLCMT))
 
 install::
 	if test -f ocamlcmt.opt$(EXE); then \
-	  $(INSTALL_PROG)\
-	    ocamlcmt.opt$(EXE) "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"; \
+	  $(call INSTALL_ITEM, ocamlcmt.opt$(EXE), bin, , ocamlcmt$(EXE)); \
 	else \
-	  $(INSTALL_PROG) ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
+	  $(call INSTALL_ITEM, ocamlcmt$(EXE), bin); \
 	fi
 
 # The bytecode disassembler
