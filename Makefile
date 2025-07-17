@@ -2817,7 +2817,7 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	      $(call LINK_ITEM, flexlink.byte$(EXE), bin, , flexlink$(EXE))) || true; \
 	fi
 else
-	if test -f ocamlopt$(EXE); then INSTALL_MODE=$(INSTALL_MODE) $(MAKE) installopt; fi
+	if test -f ocamlopt$(EXE); then $(MAKE) INSTALL_MODE=$(INSTALL_MODE) installopt; fi
 endif
 
 # Installation of the native-code compiler
