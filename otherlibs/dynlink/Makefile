@@ -262,24 +262,22 @@ dynlink_platform_intf.mli: dynlink_platform_intf.ml
 install:
 # If installing over a previous OCaml version, ensure dynlink is removed from
 # the previous installation.
-	rm -f "$(INSTALL_LIBDIR)"/dynlink.cm* "$(INSTALL_LIBDIR)/dynlink.mli" \
-        "$(INSTALL_LIBDIR)/dynlink.$(A)" \
-        $(addprefix "$(INSTALL_LIBDIR)/", $(notdir $(NATOBJS)))
-	$(MKDIR) "$(INSTALL_LIBDIR_DYNLINK)"
-	$(INSTALL_DATA) \
-	  dynlink.cmi dynlink.cma META \
-	  "$(INSTALL_LIBDIR_DYNLINK)"
+	$(call INSTALL_RM, \
+	  "$(INSTALL_LIBDIR)"/dynlink.cm* \
+	  "$(INSTALL_LIBDIR)/dynlink.mli" \
+	  "$(INSTALL_LIBDIR)/dynlink.$(A)" \
+	  $(addprefix "$(INSTALL_LIBDIR)/", $(notdir $(NATOBJS))))
+	$(call INSTALL_ITEMS, dynlink.cmi dynlink.cma META, \
+	  lib, $(INSTALL_LIBDIR_DYNLINK))
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  dynlink.cmti dynlink.mli \
-	  "$(INSTALL_LIBDIR_DYNLINK)"
+	$(call INSTALL_ITEMS, dynlink.cmti dynlink.mli, \
+	  lib, $(INSTALL_LIBDIR_DYNLINK))
 endif
 
 installopt:
 ifeq "$(strip $(NATDYNLINK))" "true"
-	$(INSTALL_DATA) \
-	  $(NATOBJS) dynlink.cmxa dynlink.$(A) \
-	  "$(INSTALL_LIBDIR_DYNLINK)"
+	$(call INSTALL_ITEMS, $(NATOBJS) dynlink.cmxa dynlink.$(A), \
+	  lib, $(INSTALL_LIBDIR_DYNLINK))
 endif
 
 partialclean:
