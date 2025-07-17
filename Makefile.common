@@ -119,6 +119,10 @@ INSTALL_ITEMS = \
   $(call INSTALL_DESPATCH_$(INSTALL_MODE)_ITEMS,$\
     $(strip $(1)),$(strip $(2)),$(strip $(3)))
 
+# INSTALL_BEGIN and INSTALL_END are used in the root Makefile's install target
+INSTALL_BEGIN = $(INSTALL_DESPATCH_$(INSTALL_MODE)_BEGIN)
+INSTALL_END = $(INSTALL_DESPATCH_$(INSTALL_MODE)_END)
+
 # Normal installation
 INSTALL_CMD_bin = $(INSTALL_PROG)
 INSTALL_CMD_doc = $(INSTALL_DATA)
@@ -150,6 +154,9 @@ INSTALL_DESPATCH_install_ITEM = \
 
 INSTALL_DESPATCH_install_ITEMS = $(INSTALL_DESPATCH_install_ITEM)
 
+INSTALL_DESPATCH_install_BEGIN = @
+INSTALL_DESPATCH_install_END = @
+
 INSTALL_DESPATCH_display_MKDIR = \
   echo $(call QUOTE_SINGLE,++ MKDIR $(1))
 
@@ -165,6 +172,9 @@ INSTALL_DESPATCH_display_ITEM = \
     $(call MKLINK_display,$(if $(4),$(4),$(notdir $(1))),$(2),$(3),$(5)))
 
 INSTALL_DESPATCH_display_ITEMS = $(INSTALL_DESPATCH_display_ITEM)
+
+INSTALL_DESPATCH_display_BEGIN = @
+INSTALL_DESPATCH_display_END = @
 
 INSTALL_DESPATCH_list_MKDIR =
 
@@ -187,6 +197,9 @@ INSTALL_DESPATCH_list_ITEMS = \
     echo $(call QUOTE_SINGLE,++ \
            $(INSTALL_SECTION_$(2))$(addprefix /,$(3))/$(notdir $(file)));) \
   true
+
+INSTALL_DESPATCH_list_BEGIN = @
+INSTALL_DESPATCH_list_END = @
 
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 

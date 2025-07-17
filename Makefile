@@ -2658,6 +2658,7 @@ INSTALL_LIBDIR_DYNLINK = $(INSTALL_LIBDIR)/dynlink
 # Installation
 .PHONY: install
 install::
+	$(call INSTALL_BEGIN)
 	$(call INSTALL_MKDIR, $(INSTALL_BINDIR))
 	$(call INSTALL_MKDIR, $(INSTALL_LIBDIR))
 	$(call INSTALL_MKDIR, $(INSTALL_STUBLIBDIR))
@@ -2826,6 +2827,7 @@ endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(call INSTALL_ITEMS, Makefile.config, lib)
 	$(call INSTALL_ITEMS, $(DOC_FILES), doc)
 	if test -f ocamlopt$(EXE); then $(MAKE) INSTALL_MODE=$(INSTALL_MODE) installopt; fi
+	$(call INSTALL_END)
 
 # Installation of the native-code compiler
 .PHONY: installopt
