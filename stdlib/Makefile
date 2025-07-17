@@ -152,9 +152,8 @@ installopt-noprof:
 
 .PHONY: installopt-prof
 installopt-prof:
-	$(INSTALL_DATA) \
-	  stdlib.p.cmxa stdlib.p.$(A) std_exit.p.$(O) \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, \
+	  stdlib.p.cmxa stdlib.p.$(A) std_exit.p.$(O), lib)
 
 ifeq "$(HASHBANGSCRIPTS)" "true"
 
