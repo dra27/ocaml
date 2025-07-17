@@ -229,9 +229,6 @@ install:
 	$(INSTALL_DATA) \
 	  ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) META \
 	  "$(INSTALL_LIBDIR)/ocamldoc"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBCMIS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
