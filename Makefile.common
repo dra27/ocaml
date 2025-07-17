@@ -168,6 +168,23 @@ INSTALL_DESPATCH_display_LINK = \
          $(abspath $(INSTALL_SECTION_$(2))$(addprefix /,$(3))/$(1)) -> \
          $(if $(4),$(4),$(notdir $(1))))
 
+INSTALL_DESPATCH_list_MKDIR =
+INSTALL_DESPATCH_list_ITEM = \
+  echo $(call QUOTE_SINGLE,++ \
+         $(abspath $(INSTALL_SECTION_$(2))$(addprefix /,$(3))/$\
+                     $(if $(4),$(4),$(notdir $(1)))))
+
+INSTALL_DESPATCH_list_ITEMS = \
+  $(foreach file, $(wildcard $(1)), \
+    echo $(call QUOTE_SINGLE,++ \
+           $(INSTALL_SECTION_$(2))$(addprefix /,$(3))/$(notdir $(file)));) \
+  true
+
+INSTALL_DESPATCH_list_LINK = \
+  echo $(call QUOTE_SINGLE,++ \
+         $(abspath $(INSTALL_SECTION_$(2))$(addprefix /,$(3))/$\
+                     $(if $(4),$(4),$(notdir $(1)))))
+
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 
 IN_COREBOOT_CYCLE ?= false
