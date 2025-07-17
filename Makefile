@@ -493,7 +493,7 @@ endif
 	done
 # Transitional: findlib 1.7.3 is confused if leftover num.cm? files remain
 # from an previous installation of OCaml before otherlibs/num was removed.
-	rm -f "$(INSTALL_LIBDIR)"/num.cm?
+	$(call INSTALL_RM, "$(INSTALL_LIBDIR)"/num.cm?)
 # End transitional
 ifneq "$(WITH_OCAMLDOC)" ""
 	$(MAKE) -C ocamldoc install
@@ -577,9 +577,12 @@ endif
 
 .PHONY: full-installoptopt installopt installoptopt
 full-installoptopt installopt installoptopt:
-	$(call INSTALL_ITEM, ocamlc.opt, bin, , , ocamlc$(EXE))
-	$(call INSTALL_ITEM, ocamlopt.opt, bin, , , ocamlopt$(EXE))
-	$(call INSTALL_ITEM, lex/ocamllex.opt, bin, , , ocamllex$(EXE))
+	$(call INSTALL_ITEM, ocamlc.opt, bin, , ocamlc.opt$(EXE), \
+	                                        ocamlc$(EXE))
+	$(call INSTALL_ITEM, ocamlopt.opt, bin, , ocamlopt.opt$(EXE), \
+	                                          ocamlopt$(EXE))
+	$(call INSTALL_ITEM, lex/ocamllex.opt, bin, , ocamllex.opt$(EXE), \
+	                                              ocamllex$(EXE))
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(call INSTALL_ITEM, flexlink.opt$(EXE), bin, , , flexlink$(EXE))
 endif

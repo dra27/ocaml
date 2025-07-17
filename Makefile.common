@@ -152,7 +152,7 @@ INSTALL_install_PREFIX =
 INSTALL_DESPATCH_install_RM = rm -f $(1)
 
 INSTALL_DESPATCH_install_MKDIR = \
-  $(MKDIR) $(call QUOTE_SINGLE,$(INSTALL_SECTION_$(1))$(addprefix /,$(2))) \
+  mkdir -p $(call QUOTE_SINGLE,$(INSTALL_SECTION_$(1))$(addprefix /,$(2))) \
     $(SH_AND)
 
 MK_LINK = \
