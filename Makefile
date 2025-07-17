@@ -2760,9 +2760,6 @@ endif
 	   driver/*.cmi \
 	   toplevel/*.cmi \
 	   "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	   toplevel/byte/*.cmi \
-	   "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	   utils/*.cmt utils/*.cmti utils/*.mli \
