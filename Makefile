@@ -2943,8 +2943,8 @@ endif
 	   compilerlibs/*.cmxa compilerlibs/*.$(A), \
 	   lib, compiler-libs)
 	$(call INSTALL_ITEMS, \
-	   $(ocamlc_CMX_FILES) $(ocamlc_CMX_FILES:.cmx=.$(O)) \
-	   $(ocamlopt_CMX_FILES) $(ocamlopt_CMX_FILES:.cmx=.$(O)) \
+	   $(ocamlc_CMX_FILES:.cmx=.$(O)) \
+	   $(ocamlopt_CMX_FILES:.cmx=.$(O)) \
 	   $(ocamlnat_CMX_FILES:.cmx=.$(O)), \
 	   lib, compiler-libs)
 ifeq "$(INSTALL_OCAMLNAT)" "true"
