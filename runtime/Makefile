@@ -170,15 +170,9 @@ endif
 
 define INSTALL_RUNTIME
 install::
-	$(INSTALL_PROG) \
-    $(1)$(EXE) "$(INSTALL_BINDIR)/$(call MANGLE_RUNTIME_NAME,$(1))"
-ifeq "$(SUFFIXING)" "true"
-	cd "$(INSTALL_BINDIR)" && \
-    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
-	cd "$(INSTALL_BINDIR)" && \
-    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
-	    "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
-endif
+	$$(call INSTALL_ITEM, $(1)$(EXE), bin, , \
+    $(call MANGLE_RUNTIME_NAME,$(1)), $(if $(filter true, $(SUFFIXING)), \
+      $(1)$(EXE) $(1)-$(ZINC_RUNTIME_ID)$(EXE)))
 endef
 define INSTALL_RUNTIME_LIB
 ifeq "$(2)" "BYTECODE"
@@ -186,32 +180,28 @@ install::
 else
 installopt::
 endif
-	$(INSTALL_PROG) \
-    lib$(1)_shared$(EXT_DLL) \
-	    "$(INSTALL_LIBDIR)/$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))"
-ifeq "$(SUFFIXING)" "true"
-	cd "$(INSTALL_LIBDIR)" && \
-    $(LN) "$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))" \
-    "lib$(1)_shared$(EXT_DLL)"
-endif
+	$$(call INSTALL_ITEM, lib$(1)_shared$(EXT_DLL), libexec, , \
+	   $(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2)), \
+	     $(if $(filter true, $(SUFFIXING)), lib$(1)_shared$(EXT_DLL)))
 endef
 
 $(foreach runtime, $(PROGRAMS), \
   $(eval $(call INSTALL_RUNTIME,$(runtime))))
 
 install::
-	$(INSTALL_DATA) ld.conf $(BYTECODE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, ld.conf $(BYTECODE_STATIC_LIBRARIES), lib)
 
 $(foreach shared_runtime, $(BYTECODE_SHARED_LIBRARIES), \
   $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),BYTECODE)))
 
 install::
-	mkdir -p "$(INSTALL_LIBDIR_CAML)"
-	$(INSTALL_DATA) caml/domain_state.tbl caml/*.h "$(INSTALL_LIBDIR_CAML)"
+	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_CAML))
+	$(call INSTALL_ITEMS, caml/domain_state.tbl caml/*.h, \
+	  lib, $(INSTALL_LIBDIR_CAML))
 
 .PHONY: installopt
 installopt::
-	$(INSTALL_DATA) $(NATIVE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, $(NATIVE_STATIC_LIBRARIES), lib)
 
 $(foreach shared_runtime, $(NATIVE_SHARED_LIBRARIES), \
   $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),NATIVE)))
