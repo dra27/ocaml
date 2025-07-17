@@ -303,20 +303,19 @@ odoc_see_lexer.ml: odoc_see_lexer.mll
 
 .PHONY: install
 install:
-	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
-	$(MKDIR) "$(INSTALL_MANDIR_LIBRARIES)"
-	$(INSTALL_PROG) $(OCAMLDOC) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) \
-	  ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) \
-	  "$(INSTALL_LIBDIR_OCAMLDOC)"
+	$(call INSTALL_MKDIR, bin)
+	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_OCAMLDOC))
+	$(call INSTALL_MKDIR, man, $(INSTALL_MANDIR_LIBRARIES))
+	$(call INSTALL_ITEMS, $(OCAMLDOC), bin)
+	$(call INSTALL_ITEMS, ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA), \
+	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR_OCAMLDOC)"
+	$(call INSTALL_ITEMS, $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS), \
+	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 endif
 	if test -d stdlib_man; then \
-	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANDIR_LIBRARIES)"; \
+	  $(call INSTALL_ITEMS, stdlib_man/*, \
+	    man, $(INSTALL_MANDIR_LIBRARIES)); \
 	else : ; fi
 
 # Note: at the moment, $(INSTALL_MANDIR_LIBRARIES) is created even if the doc
@@ -328,12 +327,12 @@ installopt:
 
 .PHONY: installopt_really
 installopt_really:
-	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
-	$(INSTALL_PROG) $(OCAMLDOC_OPT) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) \
-	  *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
-	  "$(INSTALL_LIBDIR_OCAMLDOC)"
+	$(call INSTALL_MKDIR, bin)
+	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_OCAMLDOC))
+	$(call INSTALL_ITEMS, $(OCAMLDOC_OPT), bin)
+	$(call INSTALL_ITEMS, \
+	  *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA), \
+	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 
 # TODO: also split into several rules
 
