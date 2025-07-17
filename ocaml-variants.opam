@@ -96,8 +96,9 @@ build: [
     "--disable-warn-error"
   ]
   [make "-j%{jobs}%"]
+  [make "INSTALL_MODE=opam" "install"]
 ]
-install: [make "install"]
+install: ["sh" "./%{name}%-fixup.sh" prefix]
 conflicts: [
   "system-msvc"
 ]
