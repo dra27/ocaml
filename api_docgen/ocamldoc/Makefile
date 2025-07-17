@@ -121,7 +121,7 @@ build/latex/compilerlibs_input.tex: | build/latex
 
 .PHONY: install
 install:
-	$(MKDIR) "$(INSTALL_LIBRARIES_MAN_DIR)"
+	$(call INSTALL_MKDIR, $(INSTALL_LIBRARIES_MAN_DIR))
 	if test -d build/man; then \
-	  $(INSTALL_DATA) build/man/*.3o "$(INSTALL_LIBRARIES_MAN_DIR)"; \
+	  $(call INSTALL_ITEMS, build/man/*.3o, man, man3); \
 	fi

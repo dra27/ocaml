@@ -50,7 +50,8 @@ datarootdir=@datarootdir@
 LIBDIR=@libdir@
 
 ### Where to install the stub code for the standard library
-STUBLIBDIR=@libdir@/stublibs
+STUBLIBDIR_NAME=stublibs
+STUBLIBDIR=@libdir@/$(STUBLIBDIR_NAME)
 
 ### Where to install the man pages
 # Man pages for commands go in $(MANDIR)/man1

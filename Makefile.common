@@ -93,6 +93,81 @@ INSTALL_PROGRAMS_MAN_DIR := $(DESTDIR)$(PROGRAMS_MAN_DIR)
 INSTALL_LIBRARIES_MAN_DIR := $(DESTDIR)$(LIBRARIES_MAN_DIR)
 INSTALL_DOCDIR := $(DESTDIR)$(DOCDIR)
 
+INSTALL_MODE ?= install
+
+# INSTALL_MKDIR declares an installation directory
+#   $1 = directory to create (should be unquoted)
+INSTALL_MKDIR = \
+  $(call INSTALL_DESPATCH_$(INSTALL_MODE)_MKDIR,$\
+    $(strip $(1)))
+
+# INSTALL_ITEM installs a single file
+#   $1 = source file (may include directories)
+#   $2 = section (bin, lib, libexec, man, doc)
+#   $3 = directory within section (may be empty)
+#   $4 = target basename (may be omitted)
+INSTALL_ITEM = \
+  $(call INSTALL_DESPATCH_$(INSTALL_MODE)_ITEM,$\
+    $(strip $(1)),$(strip $(2)),$(strip $(3)),$(strip $(4)))
+
+# INSTALL_ITEM installs a series of files to a single directory
+#   $1 = source file(s) (may include directories and glob patterns)
+#   $2 = section (as for INSTALL_ITEM)
+#   $3 = directory within section (may be omitted)
+INSTALL_ITEMS = \
+  $(call INSTALL_DESPATCH_$(INSTALL_MODE)_ITEMS,$\
+    $(strip $(1)),$(strip $(2)),$(strip $(3)))
+
+# LINK_ITEM creates a symbolic link, automatically falling back to INSTALL_ITEM
+# if symlinks are not supported.
+#   $1 = source file (specified relative to the installed location)
+#   $2 = section (as for INSTALL_ITEM)
+#   $3 = directory within section (may be empty)
+#   $4 = target basename (mandatory)
+LINK_ITEM = \
+  $(call INSTALL_DESPATCH_$(INSTALL_MODE)_LINK,$\
+    $(strip $(1)),$(strip $(2)),$(strip $(3)),$(strip $(4)))
+
+# Normal installation
+INSTALL_CMD_bin = $(INSTALL_PROG)
+INSTALL_CMD_doc = $(INSTALL_DATA)
+INSTALL_CMD_lib = $(INSTALL_DATA)
+INSTALL_CMD_libexec = $(INSTALL_PROG)
+INSTALL_CMD_man = $(INSTALL_DATA)
+
+INSTALL_SECTION_bin = $(INSTALL_BINDIR)
+INSTALL_SECTION_doc = $(INSTALL_DOCDIR)
+INSTALL_SECTION_lib = $(INSTALL_LIBDIR)
+INSTALL_SECTION_libexec = $(INSTALL_LIBDIR)
+INSTALL_SECTION_man = $(INSTALL_MANDIR)
+
+QUOTE_SINGLE = '$(subst ','\'',$(1))'
+
+INSTALL_DESPATCH_install_MKDIR = \
+  $(MKDIR) $(call QUOTE_SINGLE,$(1))
+
+INSTALL_DESPATCH_install_ITEM = \
+  $(INSTALL_CMD_$(2)) $(1) \
+    $(call QUOTE_SINGLE,$\
+      $(INSTALL_SECTION_$(2))$(addprefix /,$(3))$(addprefix /,$(4)))
+
+INSTALL_DESPATCH_install_ITEMS = $(INSTALL_DESPATCH_install_ITEM)
+
+INSTALL_DESPATCH_install_LINK = \
+  (cd "$(INSTALL_SECTION_$(2))$(addprefix /,$(3))" && \
+    $(LN) "$(1)" "$(if $(4),$(4),$(notdir $(1)))")
+
+INSTALL_DESPATCH_display_MKDIR = \
+  echo $(call QUOTE_SINGLE,++ MKDIR $(1))
+INSTALL_DESPATCH_display_ITEM = \
+  echo $(call QUOTE_SINGLE,++ INSTALL $(1) \
+         $(INSTALL_SECTION_$(2))$(addprefix /,$(3))$(addprefix /,$(4)))
+INSTALL_DESPATCH_display_ITEMS = $(INSTALL_DESPATCH_display_ITEM)
+INSTALL_DESPATCH_display_LINK = \
+  echo $(call QUOTE_SINGLE,++ LN \
+         $(abspath $(INSTALL_SECTION_$(2))$(addprefix /,$(3))/$(1)) -> \
+         $(if $(4),$(4),$(notdir $(1))))
+
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 
 IN_COREBOOT_CYCLE ?= false
@@ -453,9 +528,8 @@ endef # OCAML_LIBRARY
 
 # Installing a bytecode executable, with debug information removed
 define INSTALL_STRIPPED_BYTE_PROG
-$(OCAMLRUN) $(ROOTDIR)/tools/stripdebug$(EXE) $(1) $(1).tmp \
-&& $(INSTALL_PROG) $(1).tmp $(2) \
-&& rm $(1).tmp
+$(OCAMLRUN) $(ROOTDIR)/tools/stripdebug$(EXE) $(1) $(1).stripped \
+&& $(call INSTALL_ITEM, $(1).stripped, $(2), , $(3))
 endef # INSTALL_STRIPPED_BYTE_PROG
 
 # ocamlc has several mechanisms for linking a bytecode image to the runtime

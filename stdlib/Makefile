@@ -64,25 +64,25 @@ INSTALL_STDLIB_META_DIR=$(DESTDIR)$(LIBDIR)/stdlib
 
 .PHONY: install
 install::
-	$(INSTALL_DATA) \
-	  stdlib.cma std_exit.cmo *.cmi "$(INSTALL_LIBDIR)"
-	$(MKDIR) "$(INSTALL_STDLIB_META_DIR)"
-	$(INSTALL_DATA) META "$(INSTALL_STDLIB_META_DIR)"
+	$(call INSTALL_ITEMS, \
+	  stdlib.cma std_exit.cmo *.cmi, lib)
+	$(call INSTALL_MKDIR, $(INSTALL_STDLIB_META_DIR))
+	$(call INSTALL_ITEMS, META, lib, stdlib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  *.cmt *.cmti *.mli *.ml *.ml.in \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, \
+	  *.cmt *.cmti *.mli *.ml *.ml.in, \
+	  lib)
 endif
-	$(INSTALL_DATA) target_$(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
+	$(call INSTALL_ITEM, target_$(HEADER_NAME), lib, , $(HEADER_NAME))
 
 .PHONY: installopt
 installopt: installopt-default
 
 .PHONY: installopt-default
 installopt-default:
-	$(INSTALL_DATA) \
-	  stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, \
+	  stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx, \
+	  lib)
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 HEADERPROGRAM = header

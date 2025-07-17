@@ -101,26 +101,26 @@ INSTALL_THREADSLIBDIR=$(INSTALL_LIBDIR)/$(LIBNAME)
 
 install:
 	if test -f dllthreads$(EXT_DLL); then \
-	  $(INSTALL_PROG) dllthreads$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
+	  $(call INSTALL_ITEMS, dllthreads$(EXT_DLL), libexec, stublibs); \
 	fi
-	$(INSTALL_DATA) libthreads.$(A) "$(INSTALL_LIBDIR)"
-	$(MKDIR) "$(INSTALL_THREADSLIBDIR)"
-	$(INSTALL_DATA) \
-	  $(CMIFILES) threads.cma META \
-	  "$(INSTALL_THREADSLIBDIR)"
+	$(call INSTALL_ITEMS, libthreads.$(A), lib)
+	$(call INSTALL_MKDIR, $(INSTALL_THREADSLIBDIR))
+	$(call INSTALL_ITEMS, \
+	  $(CMIFILES) threads.cma META, \
+	  lib, $(LIBNAME))
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(CMIFILES:.cmi=.cmti) \
-	  "$(INSTALL_THREADSLIBDIR)"
-	$(INSTALL_DATA) $(MLIFILES) "$(INSTALL_THREADSLIBDIR)"
+	$(call INSTALL_ITEMS, \
+	  $(CMIFILES:.cmi=.cmti), \
+	  lib, $(LIBNAME))
+	$(call INSTALL_ITEMS, $(MLIFILES), lib, $(LIBNAME))
 endif
-	$(INSTALL_DATA) caml/threads.h "$(INSTALL_INCDIR)"
+	$(call INSTALL_ITEMS, caml/threads.h, lib, caml)
 
 installopt:
-	$(INSTALL_DATA) libthreadsnat.$(A) "$(INSTALL_LIBDIR)"
-	$(INSTALL_DATA) \
-	  $(THREADS_NCOBJS) threads.cmxa threads.$(A) \
-	  "$(INSTALL_THREADSLIBDIR)"
+	$(call INSTALL_ITEMS, libthreadsnat.$(A), lib)
+	$(call INSTALL_ITEMS, \
+	  $(THREADS_NCOBJS) threads.cmxa threads.$(A), \
+	  lib, $(LIBNAME))
 
 %.cmi: %.mli
 	$(V_OCAMLC)$(CAMLC) -c $(COMPFLAGS) $<
