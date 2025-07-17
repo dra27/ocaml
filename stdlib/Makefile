@@ -84,26 +84,23 @@ install::
 # bigarray.mli is only installed if the legacy bigarray library is _not_ being
 # compiled (since its bigarray.mli will override ours)
 install::
-	$(INSTALL_DATA) \
-	  stdlib.cma std_exit.cmo *.cmi camlheader_ur \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, stdlib.cma std_exit.cmo *.cmi camlheader_ur, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
+	$(call INSTALL_ITEMS, \
 	  *.cmt *.cmti *.ml \
 	  $(if $(filter bigarray, $(OTHERLIBRARIES)), \
-	    $(filter-out bigarray.mli, $(wildcard *.mli)), *.mli) \
-	  "$(INSTALL_LIBDIR)"
+	    $(filter-out bigarray.mli, $(wildcard *.mli)), *.mli), lib)
 endif
-	$(INSTALL_DATA) $(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
+	$(call INSTALL_ITEMS, $(HEADER_NAME), lib)
 
 ifeq "$(RUNTIMED)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderd "$(INSTALL_LIBDIR)/camlheaderd"
+	$(call INSTALL_ITEM, target_camlheaderd, lib, , camlheaderd)
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderi "$(INSTALL_LIBDIR)/camlheaderi"
+	$(call INSTALL_ITEM, target_camlheaderi, lib, , camlheaderi)
 endif
 
 .PHONY: installopt
@@ -121,9 +118,7 @@ installopt-default::
   fi
 
 installopt-default::
-	$(INSTALL_DATA) \
-	  stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx, lib)
 
 ifeq "$(SHEBANGSCRIPTS)" "true"
 
