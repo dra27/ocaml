@@ -23,10 +23,10 @@ else
 endif
 
 odoc-%:
-	$(MAKE) -C odoc $* ROOTDIR=../..
+	$(MAKE) -C odoc $* ROOTDIR=../.. SUBDIR_NAME=api_docgen/odoc
 
 ocamldoc-%:
-	$(MAKE) -C ocamldoc $* ROOTDIR=../..
+	$(MAKE) -C ocamldoc $* ROOTDIR=../.. SUBDIR_NAME=api_docgen/odoc
 
 clean:
 	rm -rf build odoc/build ocamldoc/build
