@@ -13,6 +13,8 @@
 #*                                                                        *
 #**************************************************************************
 
+SUBDIR_NAME = otherlibs/win32unix
+
 # Note: since this directory is Windows-specific, it may be good to make sure
 # its content can not be compiled under Unix.
 # This directory could even become a subdirectory of the unix directory.
