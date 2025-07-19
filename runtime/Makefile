@@ -158,7 +158,6 @@ all: $(BYTECODE_STATIC_LIBRARIES) \
 allopt: $(NATIVE_STATIC_LIBRARIES) \
         $(NATIVE_SHARED_LIBRARIES:%=lib%_shared$(EXT_DLL))
 
-INSTALL_INCDIR=$(INSTALL_LIBDIR)/caml
 .PHONY: install
 
 ifeq "$(SUFFIXING)" "true"
@@ -207,8 +206,8 @@ $(foreach shared_runtime, $(BYTECODE_SHARED_LIBRARIES), \
   $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),BYTECODE)))
 
 install::
-	mkdir -p "$(INSTALL_INCDIR)"
-	$(INSTALL_DATA) caml/domain_state.tbl caml/*.h "$(INSTALL_INCDIR)"
+	mkdir -p "$(INSTALL_LIBDIR_CAML)"
+	$(INSTALL_DATA) caml/domain_state.tbl caml/*.h "$(INSTALL_LIBDIR_CAML)"
 
 .PHONY: installopt
 installopt::
