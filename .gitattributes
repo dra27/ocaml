@@ -47,9 +47,18 @@
 Makefile                 export-subst
 
 # Files and directories excluded from git-generated tarballs.
+.github                  export-ignore
 manual                   export-ignore
 ocamltest                export-ignore
+release-info             export-ignore
 testsuite                export-ignore
+tools/ci                 export-ignore
+.gitattributes           export-ignore
+.gitignore               export-ignore
+.gitmodules              export-ignore
+.mailmap                 export-ignore
+ocaml-variants.install   export-ignore
+ocaml-variants.opam      export-ignore
 
 # No header for text and META files (would be too obtrusive).
 *.md                     typo.missing-header
