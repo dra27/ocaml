@@ -127,16 +127,16 @@ install:
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 	$(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"
 endif
-	mkdir -p "$(INSTALL_LIBDIR)/vmthreads"
-	$(INSTALL_DATA) libvmthreads.a "$(INSTALL_LIBDIR)/vmthreads"
+	mkdir -p "$(INSTALL_LIBDIR_VMTHREADS)"
+	$(INSTALL_DATA) libvmthreads.a "$(INSTALL_LIBDIR_VMTHREADS)"
 	$(INSTALL_DATA) \
 	  $(CMIFILES) \
 	  threads.cma stdlib.cma unix.cma \
-	  "$(INSTALL_LIBDIR)/vmthreads"
+	  "$(INSTALL_LIBDIR_VMTHREADS)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(CMIFILES:.cmi=.mli) $(CMIFILES:.cmi=.cmti) \
-	  "$(INSTALL_LIBDIR)/vmthreads"
+	  "$(INSTALL_LIBDIR_VMTHREADS)"
 endif
 
 installopt:

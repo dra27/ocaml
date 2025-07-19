@@ -282,8 +282,6 @@ PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
 LIBFILES=stdlib.cma std_exit.cmo *.cmi $(HEADER_NAME)
 
-COMPLIBDIR=$(LIBDIR)/compiler-libs
-
 TOPINCLUDES=$(addprefix -I otherlibs/,$(filter-out %threads,$(OTHERLIBRARIES)))
 RUNTOP=./runtime/ocamlrun ./ocaml \
   -nostdlib -I stdlib \
@@ -563,8 +561,6 @@ partialclean::
 	rm -f flexlink.opt$(EXE)
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
-INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
-INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
 FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
 
 # COMPILER_ARTEFACT_DIRS adds the common compiler-libs directories as prefixes
@@ -589,7 +585,7 @@ install::
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 	$(MKDIR) "$(INSTALL_STUBLIBDIR)"
 endif
-	$(MKDIR) "$(INSTALL_COMPLIBDIR)"
+	$(MKDIR) "$(INSTALL_LIBDIR_COMPILERLIBS)"
 	$(INSTALL_DATA) \
 	  VERSION \
 	  "$(INSTALL_LIBDIR)"
@@ -605,16 +601,16 @@ endif
 	$(INSTALL_PROG) yacc/ocamlyacc$(EXE) "$(INSTALL_BINDIR)/ocamlyacc$(EXE)"
 	$(INSTALL_DATA) \
 	  $(call COMPILER_ARTEFACT_DIRS, *.cmi, toplevel) \
-	  "$(INSTALL_COMPLIBDIR)"
+	  "$(INSTALL_LIBDIR_COMPILERLIBS)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(call COMPILER_ARTEFACT_DIRS, *.cmt *.cmti *.mli, toplevel) \
-	  "$(INSTALL_COMPLIBDIR)"
+	  "$(INSTALL_LIBDIR_COMPILERLIBS)"
 endif
 	$(INSTALL_DATA) \
 	   compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
 	   compilerlibs/ocamltoplevel.cma $(BYTESTART) $(TOPLEVELSTART) \
-	   "$(INSTALL_COMPLIBDIR)"
+	   "$(INSTALL_LIBDIR_COMPILERLIBS)"
 	$(INSTALL_PROG) expunge "$(INSTALL_LIBDIR)/expunge$(EXE)"
 	$(INSTALL_DATA) \
 	   toplevel/topdirs.cmi \
@@ -652,9 +648,9 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(INSTALL_PROG) \
 	  boot/flexlink.byte$(EXE) "$(INSTALL_BINDIR)/flexlink.byte$(EXE)"
 endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(MKDIR) "$(INSTALL_FLEXDLLDIR)"
+	$(MKDIR) "$(INSTALL_LIBDIR_FLEXDLL)"
 	$(INSTALL_DATA) $(addprefix stdlib/flexdll/, $(FLEXDLL_OBJECTS)) \
-    "$(INSTALL_FLEXDLLDIR)"
+    "$(INSTALL_LIBDIR_FLEXDLL)"
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(INSTALL_DATA) Makefile.config "$(INSTALL_LIBDIR)"
 	$(MAKE) install$(if $(wildcard ocamlopt),opt,-mklinks)
@@ -681,27 +677,27 @@ endif
 	$(MAKE) -C stdlib installopt
 	$(INSTALL_DATA) \
 	    middle_end/*.cmi \
-	    "$(INSTALL_COMPLIBDIR)"
+	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
 	$(INSTALL_DATA) \
 	    middle_end/base_types/*.cmi \
-	    "$(INSTALL_COMPLIBDIR)"
+	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
 	$(INSTALL_DATA) \
 	    asmcomp/*.cmi \
-	    "$(INSTALL_COMPLIBDIR)"
+	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	    $(addprefix middle_end/, *.cmt *.cmti *.mli) \
-	    "$(INSTALL_COMPLIBDIR)"
+	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
 	$(INSTALL_DATA) \
 	    $(addprefix middle_end/base_types/, *.cmt *.cmti *.mli) \
-	    "$(INSTALL_COMPLIBDIR)"
+	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
 	$(INSTALL_DATA) \
 	    $(addprefix asmcomp/, *.cmt *.cmti *.mli) \
-	    "$(INSTALL_COMPLIBDIR)"
+	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
 endif
 	$(INSTALL_DATA) \
 	    compilerlibs/ocamloptcomp.cma $(OPTSTART) \
-	    "$(INSTALL_COMPLIBDIR)"
+	    "$(INSTALL_LIBDIR_COMPILERLIBS)"
 	if test -n "$(WITH_OCAMLDOC)"; then \
 	  $(MAKE) -C ocamldoc installopt; \
 	fi
@@ -741,14 +737,14 @@ ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 endif
 	$(INSTALL_DATA) \
 	  $(call COMPILER_ARTEFACT_DIRS, *.cmx, $(NATIVE_ARTEFACT_DIRS)) \
-    "$(INSTALL_COMPLIBDIR)"
+    "$(INSTALL_LIBDIR_COMPILERLIBS)"
 	$(INSTALL_DATA) \
            compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlcommon.$(A) \
 	   compilerlibs/ocamlbytecomp.cmxa compilerlibs/ocamlbytecomp.$(A) \
 	   compilerlibs/ocamloptcomp.cmxa  compilerlibs/ocamloptcomp.$(A) \
 	   $(BYTESTART:.cmo=.$(O)) \
 	   $(OPTSTART:.cmo=.$(O)) \
-	   "$(INSTALL_COMPLIBDIR)"
+	   "$(INSTALL_LIBDIR_COMPILERLIBS)"
 	$(if $(wildcard ocamlnat$(EXE)), \
 	  $(INSTALL_PROG) ocamlnat$(EXE) "$(INSTALL_BINDIR)")
 	$(if $(wildcard ocamlnat$(EXE)), \
@@ -760,7 +756,7 @@ endif
 	     compilerlibs/ocamlopttoplevel.cmxa \
 	     compilerlibs/ocamlopttoplevel.$(A) \
 	     $(OPTTOPLEVELSTART:.cmo=.cmx) $(OPTTOPLEVELSTART:.cmo=.$(O)) \
-	     "$(INSTALL_COMPLIBDIR)")
+	     "$(INSTALL_LIBDIR_COMPILERLIBS)")
 
 # Installation of the *.ml sources of compiler-libs
 .PHONY: install-compiler-sources
@@ -769,7 +765,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(call COMPILER_ARTEFACT_DIRS, *.ml, $(NATIVE_ARTEFACT_DIRS)) \
 	  toplevel/*.ml \
-	  "$(INSTALL_COMPLIBDIR)"
+	  "$(INSTALL_LIBDIR_COMPILERLIBS)"
 endif
 
 # Run all tests
