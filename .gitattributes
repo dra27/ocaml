@@ -44,6 +44,8 @@
 # the lines involved in the conflict, which is arguably worse
 #/Changes                 merge=union
 
+Makefile                 export-subst
+
 # No header for text and META files (would be too obtrusive).
 *.md                     typo.missing-header
 README*                  typo.missing-header

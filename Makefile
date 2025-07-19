@@ -2987,6 +2987,11 @@ config.status:
 	@echo "should work."
 	@false
 
+# When an archive is created by git-archive, this is expanded to the SHA of the
+# commit. The filter-out causes this to be blank if it's run when the Format
+# tag has not been expanded
+GIT_ARCHIVE_SHA = $(filter-out ormat%, $Format:%H$ )
+
 # We need to express that all the CMX files depend on the native compiler,
 # so that they get invalidated and rebuilt when the compiler is updated
 # This dependency must appear after all the definitions of the
