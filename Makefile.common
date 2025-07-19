@@ -317,6 +317,67 @@ INSTALL_DESPATCH_opam_END = \
     rm -f opam-links; \
   } > $(OPAM_PACKAGE_NAME)-fixup.sh
 
+INSTALL_DESPATCH_clone_MKDIR =
+
+ifeq "$(firstword $(LN))" "ln"
+MKLINK_clone = \
+  echo $(call QUOTE_SINGLE,$\
+    $(subst libexec,lib,$(2))$(addprefix /,$(3)) \
+    $(if $(4),$(4),$(notdir $(1))) $(5)) >> $(ROOTDIR)/clone-symlinks
+else
+# Symlinks aren't available, so copy the file again using the target name
+MKLINK_clone = $(call INSTALL_DESPATCH_clone_ITEM2,$(1),$(2),$(3),$(5))
+endif
+
+INSTALL_DESPATCH_clone_ITEM2 = \
+  echo $(call QUOTE_SINGLE,$\
+    $(2)$(addprefix /,$(3))/$(if $(4),$(4),$(notdir $(1)))) \
+      >> $(ROOTDIR)/clone-links-$(2)$(addprefix @,$(subst /,@,$(3))) \
+  $(foreach link, $(5), && \
+    $(call MKLINK_clone,$(1),$(2),$(3),$(4),$(link)))
+
+INSTALL_DESPATCH_clone_ITEM = \
+  $(if $(filter stublibs,$(2)),\
+    $(call INSTALL_DESPATCH_clone_ITEM,$\
+      $(1),libexec,stublibs$(addprefix /,$(3)),$(4),$(5)),\
+    $(if $(filter libexec,$(2)),\
+      $(call INSTALL_DESPATCH_clone_ITEM,$\
+        $(1),lib,$(3),$(4),$(5)),\
+      $(if $(filter doc lib,$(2)),\
+        $(call INSTALL_DESPATCH_clone_ITEM2,$\
+               $(1),$(2),ocaml$(addprefix /,$(3)),$(4),$(5)),\
+        $(call INSTALL_DESPATCH_clone_ITEM2,$\
+               $(1),$(2),$(3),$(4),$(5)))))
+
+INSTALL_DESPATCH_clone_ITEMS = \
+  $(foreach file, $(wildcard $(1)), \
+    $(call INSTALL_DESPATCH_clone_ITEM,$(file),$(2),$(3));) \
+  true
+
+INSTALL_DESPATCH_clone_BEGIN = \
+  rm -f clone-symlinks clone-links-*
+
+INSTALL_DESPATCH_clone_END = \
+  { echo '\#!/bin/sh'; \
+    echo 'set -e'; \
+    echo 'cat > dummy-ln <<"EOF"'; \
+    echo 'ln -f "$$@" "$$dest/"'; \
+    echo 'EOF'; \
+    for linkset in clone-links-*; do \
+      dir="$$(echo "$${linkset\#clone-links-}" | sed -e 's|@|/|g')"; \
+      echo "mkdir -p \"\$$1/$$dir\""; \
+      echo "dest=\"\$$1/$$dir\" xargs sh ./dummy-ln <<"EOF""; \
+      cat $$linkset; \
+      echo 'EOF'; \
+    done; \
+    echo 'rm -f dummy-ln'; \
+    rm -f clone-links-*; \
+    test ! -f clone-symlinks || sed -e \
+      's|\(.*\) \(.*\) \(.*\)|( cd "$$1/\1" \&\& $(call DO_LN,\2,\3) )|' \
+        clone-symlinks; \
+    rm -f clone-symlinks; \
+  } > $(OPAM_PACKAGE_NAME)-clone.sh
+
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 
 IN_COREBOOT_CYCLE ?= false
