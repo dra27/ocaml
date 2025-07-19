@@ -14,6 +14,7 @@
 #**************************************************************************
 
 ROOTDIR = ..
+SUBDIR_NAME = man
 include $(ROOTDIR)/Makefile.config
 include $(ROOTDIR)/Makefile.common
 
