@@ -16,6 +16,7 @@
 # FIXME reduce redundancy by including ../Makefile
 
 ROOTDIR = ../..
+SUBDIR_NAME = otherlibs/threads
 
 include $(ROOTDIR)/Makefile.config
 include $(ROOTDIR)/Makefile.common
