@@ -48,9 +48,6 @@ DEPFLAGS=-slash
 
 OC_CPPFLAGS += -I$(ROOTDIR)/runtime
 
-# At present, only META is installed to the package directory
-LIBNAME = stdlib
-
 include StdlibModules
 
 OBJS=$(addsuffix .cmo,$(STDLIB_MODULES))
