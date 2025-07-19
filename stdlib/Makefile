@@ -14,6 +14,7 @@
 #**************************************************************************
 
 ROOTDIR = ..
+SUBDIR_NAME = stdlib
 
 include $(ROOTDIR)/Makefile.common
 
