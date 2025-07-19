@@ -272,7 +272,6 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_FILES([manual/src/version.tex])
 AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
-AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 AC_CONFIG_FILES([otherlibs/dynlink/dynlink_config.ml])
 AC_CONFIG_FILES([utils/config.common.ml])
 AC_CONFIG_FILES([utils/config.generated.ml])
@@ -2628,6 +2627,7 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
 AS_IF([$build_ocamltest],
   [optional_libraries="$optional_libraries testsuite/lib/testing"
   ocamltest_unix_mod="ocamltest/ocamltest_unix_${ocamltest_unix_impl}.ml"
+  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
   AC_CONFIG_LINKS([
     ocamltest/ocamltest_unix.ml:${ocamltest_unix_mod}
   ])
