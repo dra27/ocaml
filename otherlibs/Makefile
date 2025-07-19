@@ -14,6 +14,7 @@
 #**************************************************************************
 
 ROOTDIR=..
+SUBDIR_NAME=otherlibs
 -include $(ROOTDIR)/Makefile.config
 -include $(ROOTDIR)/Makefile.common
 
