@@ -181,11 +181,10 @@ $(ALL_PAGED_DOC:%=build/%.3o.stamp):build/%.3o.stamp:build/%.odocl | build/
 	touch $@
 
 # Man pages are the only installed documentation
-INSTALL_MANODIR=$(INSTALL_MANDIR)/man3
 .PHONY:install
 install:
-	$(MKDIR) "$(INSTALL_MANODIR)"
+	$(MKDIR) "$(INSTALL_MANDIR_LIBRARIES)"
 	$(if $(wildcard build/man/libref), \
-	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANODIR)")
+	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANDIR_LIBRARIES)")
 	$(if $(wildcard build/man/compilerlibref), \
-	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANODIR)")
+	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANDIR_LIBRARIES)")
