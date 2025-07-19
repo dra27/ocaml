@@ -4062,6 +4062,8 @@ fi
 if test ${enable_ocamltest+y}
 then :
   enableval=$enable_ocamltest;
+else $as_nop
+  enable_ocamltest=auto
 fi
 
 
@@ -23185,8 +23187,21 @@ else $as_nop
   build_ocamlobjinfo=false
 fi
 
+if test x"$enable_ocamltest" != 'xno'
+then :
+  if test ! -d ocamltest
+then :
+  if test x"$enable_ocamltest" = 'xyes'
+then :
+  as_fn_error $? "ocamltest sources not found. Run \`make ocamltest\` for more information" "$LINENO" 5
+else $as_nop
+  enable_ocamltest=no
+fi
+fi
+fi
+
 case $enable_ocamltest,false in #(
-  yes,*|,true) :
+  yes,*|auto,true) :
     build_ocamltest=true
     ocamltest_target=ocamltest
     ocamltest_opt_target=ocamltest.opt

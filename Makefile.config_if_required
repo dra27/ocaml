@@ -17,6 +17,10 @@ MAKECMDGOALS ?= defaultentry
 
 CLEAN_TARGET_NAMES=clean partialclean distclean
 
+ifeq "$(wildcard ocamltest)" ""
+CLEAN_TARGET_NAMES += ocamltest
+endif
+
 # Some special targets ('*clean' and 'configure') do not require configuration.
 # REQUIRES_CONFIGURATION is empty if only those targets are requested,
 # and non-empty if configuration is required.

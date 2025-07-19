@@ -488,7 +488,9 @@ AC_ARG_ENABLE([ocamlobjinfo],
 
 AC_ARG_ENABLE([ocamltest],
   [AS_HELP_STRING([--disable-ocamltest],
-    [do not build ocamltest])])
+    [do not build ocamltest])],
+  [],
+  [enable_ocamltest=auto])
 
 AC_ARG_ENABLE([native-toplevel],
   [AS_HELP_STRING([--enable-native-toplevel],
@@ -2613,8 +2615,15 @@ AS_IF([test x"$enable_ocamlobjinfo" != 'xno'],
   [build_ocamlobjinfo=true],
   [build_ocamlobjinfo=false])
 
+AS_IF([test x"$enable_ocamltest" != 'xno' ],
+  [AS_IF([test ! -d ocamltest],
+    [AS_IF([test x"$enable_ocamltest" = 'xyes'],
+      [AC_MSG_ERROR(m4_normalize([ocamltest sources not found.
+                                  Run `make ocamltest` for more information]))],
+      [enable_ocamltest=no])])])
+
 AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
-  [yes,*|,true],
+  [yes,*|auto,true],
     [build_ocamltest=true
     ocamltest_target=ocamltest
     ocamltest_opt_target=ocamltest.opt
