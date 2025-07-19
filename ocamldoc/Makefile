@@ -220,15 +220,15 @@ DEPEND_PREREQS = $(LEXERS:.mll=.ml) \
 .PHONY: install
 install:
 	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
+	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
 	$(INSTALL_PROG) ocamldoc$(EXE) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) \
 	  ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) META \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 endif
 
 # Note: at the moment, $(INSTALL_MANODIR) is created even if the doc has
@@ -241,11 +241,11 @@ installopt:
 .PHONY: installopt_really
 installopt_really:
 	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
+	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
 	$(INSTALL_PROG) ocamldoc.opt$(EXE) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) \
 	  *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 
 # TODO: also split into several rules
 
