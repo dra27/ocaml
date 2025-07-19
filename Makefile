@@ -952,7 +952,7 @@ ocamlc_BYTECODE_LINKFLAGS += -set-runtime-default standard_library_default=.
 endif
 
 partialclean::
-	rm -f ocamlc ocamlc.exe ocamlc.opt ocamlc.opt.exe
+	rm -f ocamlc ocamlc.exe ocamlc.opt ocamlc.opt.exe ocamlc*.stripped
 
 # The native-code compiler
 
@@ -963,7 +963,7 @@ ocamlopt_SOURCES = driver/optmain.mli driver/optmain.ml
 ocamlopt$(EXE): OC_BYTECODE_LINKFLAGS += -g
 
 partialclean::
-	rm -f ocamlopt ocamlopt.exe ocamlopt.opt ocamlopt.opt.exe
+	rm -f ocamlopt ocamlopt.exe ocamlopt.opt ocamlopt.opt.exe ocamlopt*.stripped
 
 # The toplevel
 
@@ -2609,8 +2609,8 @@ install::
 	  "$(INSTALL_INCDIR)"
 	$(INSTALL_PROG) ocaml$(EXE) "$(INSTALL_BINDIR)"
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(call INSTALL_STRIPPED_BYTE_PROG,\
-               ocamlc$(EXE),"$(INSTALL_BINDIR)/ocamlc.byte$(EXE)")
+	$(call STRIP_BYTE_PROG, ocamlc$(EXE))
+	$(INSTALL_PROG) ocamlc$(EXE).stripped "$(INSTALL_BINDIR)/ocamlc.byte$(EXE)"
 endif
 	$(MAKE) -C stdlib install
 
@@ -2736,8 +2736,9 @@ $(foreach shared_runtime, $(runtime_NATIVE_SHARED_LIBRARIES), \
 
 installopt::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(call INSTALL_STRIPPED_BYTE_PROG,\
-               ocamlopt$(EXE),"$(INSTALL_BINDIR)/ocamlopt.byte$(EXE)")
+	$(call STRIP_BYTE_PROG, ocamlopt$(EXE))
+	$(INSTALL_PROG) \
+	  ocamlopt$(EXE).stripped "$(INSTALL_BINDIR)/ocamlopt.byte$(EXE)"
 endif
 	$(MAKE) -C stdlib installopt
 	$(INSTALL_DATA) \
