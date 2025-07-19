@@ -16,6 +16,7 @@
 # Common Makefile for otherlibs
 
 ROOTDIR=../..
+SUBDIR_NAME?=otherlibs/$(LIBNAME)
 -include $(ROOTDIR)/Makefile.config
 -include $(ROOTDIR)/Makefile.common
 
