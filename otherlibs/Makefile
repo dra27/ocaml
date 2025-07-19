@@ -14,6 +14,7 @@
 #**************************************************************************
 
 ROOTDIR=..
+SUBDIR_NAME=otherlibs
 include $(ROOTDIR)/Makefile.common
 
 # Also the OTHERLIBRARIES variable is defined in ../Makefile.config,
