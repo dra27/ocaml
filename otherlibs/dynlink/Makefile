@@ -258,8 +258,6 @@ dynlink.cmxa: $(NATOBJS)
 dynlink_platform_intf.mli: dynlink_platform_intf.ml
 	cp $< $@
 
-INSTALL_LIBDIR_DYNLINK = $(INSTALL_LIBDIR)/dynlink
-
 install:
 # If installing over a previous OCaml version, ensure dynlink is removed from
 # the previous installation.
