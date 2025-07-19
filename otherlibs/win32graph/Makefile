@@ -13,6 +13,8 @@
 #*                                                                        *
 #**************************************************************************
 
+SUBDIR_NAME = otherlibs/win32graph
+
 LIBNAME=graphics
 COBJS=open.$(O) draw.$(O) events.$(O)
 CAMLOBJS=graphics.cmo

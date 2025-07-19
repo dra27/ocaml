@@ -15,6 +15,8 @@
 
 # Makefile for the portable graphics library
 
+SUBDIR_NAME = otherlibs/graph
+
 LIBNAME=graphics
 COBJS=open.o draw.o fill.o color.o text.o \
   image.o make_img.o dump_img.o point_col.o sound.o events.o \
