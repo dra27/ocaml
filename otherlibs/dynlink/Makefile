@@ -245,8 +245,6 @@ $(eval $(call PROGRAM_SYNONYM,extract_crc))
 $(extract_crc): dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
 	$(OCAMLC) -o $@ $^
 
-INSTALL_LIBDIR_DYNLINK = $(INSTALL_LIBDIR)/dynlink
-
 install:
 # If installing over a previous OCaml version, ensure dynlink is removed from
 # the previous installation.
