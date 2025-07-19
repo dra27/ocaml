@@ -47,6 +47,7 @@
 Makefile                 export-subst
 
 # Files and directories excluded from git-generated tarballs.
+manual                   export-ignore
 ocamltest                export-ignore
 testsuite                export-ignore
 

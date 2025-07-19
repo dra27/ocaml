@@ -939,11 +939,14 @@ endif
 # Build the manual latex files from the etex source files
 # (see manual/README.md)
 .PHONY: manual-pregen
-manual-pregen: opt.opt
-	cd manual; $(MAKE) clean && $(MAKE) pregen-etex
+manual-pregen: opt.opt | manual
+	$(MAKE) -C manual clean
+	$(MAKE) -C manual pregen-etex
 
+ifneq "$(wildcard manual)" ""
 clean::
 	$(MAKE) -C manual clean
+endif
 
 # The clean target
 clean:: partialclean
@@ -2643,7 +2646,9 @@ distclean: clean
 ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
 	$(MAKE) -C flexdll distclean MSVC_DETECT=0
 endif
+ifneq "$(wildcard manual)" ""
 	$(MAKE) -C manual distclean
+endif
 	rm -f ocamldoc/META
 ifneq "$(wildcard ocamltest)" ""
 	rm -f $(addprefix ocamltest/,ocamltest_config.ml ocamltest_unix.ml)
@@ -3010,7 +3015,7 @@ config.status:
 # tag has not been expanded
 GIT_ARCHIVE_SHA = $(filter-out ormat%, $Format:%H$ )
 
-OPTIONAL_DIRECTORIES = ocamltest testsuite
+OPTIONAL_DIRECTORIES = manual ocamltest testsuite
 
 $(filter-out $(wildcard $(OPTIONAL_DIRECTORIES)), $(OPTIONAL_DIRECTORIES)):
 	@echo "Sources not found in $@"
