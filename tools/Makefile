@@ -15,6 +15,7 @@
 
 MAKEFLAGS := -r -R
 ROOTDIR = ..
+SUBDIR_NAME = tools
 
 -include $(ROOTDIR)/Makefile.config
 -include $(ROOTDIR)/Makefile.common
