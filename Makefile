@@ -16,6 +16,8 @@
 # The main Makefile
 
 ROOTDIR = .
+SUBDIR_NAME =
+
 # NOTE: it is important that OCAMLLEX is defined *before* Makefile.common
 # gets included, so that its definition here takes precedence
 # over the one there.
