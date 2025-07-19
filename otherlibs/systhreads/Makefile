@@ -110,30 +110,28 @@ partialclean:
 clean: partialclean
 	rm -f dllthreads*.so dllthreads*.dll *.a *.lib *.o *.obj
 
-INSTALL_THREADSLIBDIR=$(INSTALL_LIBDIR)/$(LIBNAME)
-
 install:
 	if $(SUPPORTS_SHARED_LIBRARIES) && test -f $(DLLTHREADS); then \
 	  $(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"; \
 	fi
 	$(INSTALL_DATA) libthreads.$(A) "$(INSTALL_LIBDIR)"
-	mkdir -p "$(INSTALL_THREADSLIBDIR)"
+	$(MKDIR) "$(INSTALL_LIBDIR_SYSTHREADS)"
 	$(INSTALL_DATA) \
 	  $(CMIFILES) threads.cma \
-	  "$(INSTALL_THREADSLIBDIR)"
+	  "$(INSTALL_LIBDIR_SYSTHREADS)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(CMIFILES:.cmi=.cmti) \
-	  "$(INSTALL_THREADSLIBDIR)"
-	$(INSTALL_DATA) $(MLIFILES) "$(INSTALL_THREADSLIBDIR)"
+	  "$(INSTALL_LIBDIR_SYSTHREADS)"
+	$(INSTALL_DATA) $(MLIFILES) "$(INSTALL_LIBDIR_SYSTHREADS)"
 endif
-	$(INSTALL_DATA) threads.h "$(INSTALL_LIBDIR)/caml"
+	$(INSTALL_DATA) threads.h "$(INSTALL_LIBDIR_CAML)"
 
 installopt:
 	$(INSTALL_DATA) libthreadsnat.$(A) "$(INSTALL_LIBDIR)"
 	$(INSTALL_DATA) \
 	  $(THREADS_NCOBJS) threads.cmxa threads.$(A) \
-	  "$(INSTALL_THREADSLIBDIR)"
+	  "$(INSTALL_LIBDIR_SYSTHREADS)"
 
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
