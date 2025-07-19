@@ -113,8 +113,6 @@ ocamloptp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamloptp.cmo)
 
 opt:: profiling.cmx
 
-INSTALL_LIBDIR_PROFILING = $(INSTALL_LIBDIR)/profiling
-
 install::
 # If installing over a previous OCaml version, ensure the module is removed
 # from the previous installation.
@@ -150,7 +148,6 @@ ocamlmktop$(EXE): $(OCAMLMKTOP)
 ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
 # othertools means "after the toplevel has been built" here
 othertools: ocamlmktop_init.cmo
-INSTALL_LIBDIR_OCAMLMKTOP = $(INSTALL_LIBDIR)/ocamlmktop
 install::
 	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLMKTOP)"
 	$(INSTALL_DATA) \
