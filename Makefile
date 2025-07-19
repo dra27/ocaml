@@ -16,6 +16,7 @@
 # The main Makefile
 
 ROOTDIR = .
+SUBDIR_NAME =
 
 # The configure and *clean targets can all be run without running ./configure
 # first.
