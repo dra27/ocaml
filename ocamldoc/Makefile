@@ -316,28 +316,26 @@ odoc_see_lexer.ml: odoc_see_lexer.mll
 # TODO: it may be good to split the following rule in several ones, e.g.
 # install-programs, install-doc, install-libs
 
-INSTALL_MANODIR=$(INSTALL_MANDIR)/man3
-
 .PHONY: install
 install:
 	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
-	$(MKDIR) "$(INSTALL_MANODIR)"
+	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
+	$(MKDIR) "$(INSTALL_MANDIR_LIBRARIES)"
 	$(INSTALL_PROG) $(OCAMLDOC) "$(INSTALL_BINDIR)/$(OCAMLDOC)$(EXE)"
 	$(INSTALL_DATA) \
 	  ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 endif
 	if test -d stdlib_man; then \
-	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANODIR)"; \
+	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANDIR_LIBRARIES)"; \
 	else : ; fi
 
-# Note: at the moment, $(INSTALL_MANODIR) is created even if the doc has
-# not been built. This is not clean and should be changed.
+# Note: at the moment, $(INSTALL_MANDIR_LIBRARIES) is created even if the doc
+# has not been built. This is not clean and should be changed.
 
 .PHONY: installopt
 installopt:
@@ -346,12 +344,12 @@ installopt:
 .PHONY: installopt_really
 installopt_really:
 	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
+	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
 	$(INSTALL_PROG) \
 	   $(OCAMLDOC_OPT) "$(INSTALL_BINDIR)/$(OCAMLDOC_OPT)$(EXE)"
 	$(INSTALL_DATA) \
 	  *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 
 # TODO: also split into several rules
 
