@@ -132,7 +132,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  "$(INSTALL_LIBDIR_LIBNAME)/"
 endif
 	if test -n "$(HEADERS)"; then \
-	  $(INSTALL_DATA) $(HEADERS) "$(INSTALL_INCDIR)/"; \
+	  $(INSTALL_DATA) $(HEADERS) "$(INSTALL_LIBDIR_CAML)/"; \
 	fi
 
 installopt:
