@@ -21,8 +21,6 @@ MANPAGES = \
   ocaml ocamlc ocamlcp ocamldebug ocamldep ocamldoc ocamllex ocamlmktop \
   ocamlopt ocamlprof ocamlrun ocamlyacc
 
-INSTALL_MANDIR_PROGRAMS = man$(PROGRAMS_MAN_SECTION)
-
 INSTALL_DIR = $(call QUOTE_SINGLE,$(INSTALL_MANDIR)/$(INSTALL_MANDIR_PROGRAMS))
 
 ocamlc.opt.link: ocamlc.m
