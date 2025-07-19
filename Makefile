@@ -637,8 +637,9 @@ clean::
 # Build the manual latex files from the etex source files
 # (see manual/README.md)
 .PHONY: manual-pregen
-manual-pregen: opt.opt
-	cd manual; $(MAKE) clean && $(MAKE) pregen-etex
+manual-pregen: opt.opt | manual
+	$(MAKE) -C manual clean
+	$(MAKE) -C manual pregen-etex
 
 # The clean target
 clean:: partialclean
