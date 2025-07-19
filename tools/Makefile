@@ -14,6 +14,7 @@
 #**************************************************************************
 
 ROOTDIR = ..
+SUBDIR_NAME = tools
 # NOTE: it is important that OCAMLLEX is defined *before* Makefile.common
 # gets included, so that its definition here takes precedence
 # over the one there.
