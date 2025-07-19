@@ -206,23 +206,23 @@ ADD_LINE = $(call INVOKE, echo, $(2)) >> $(1)
 #   $4 = name to install $1 (must be specified)
 #   $5 = single name of symlink
 # If symlinks are supported, $1 is ignored and the three pieces of information
-# are recorded in opam-symlinks: the directory, implicitly relative to the
-# prefix, in which the symlink is to be created, the source file and name of
-# the symlink.
+# are recorded in $(INSTALL_MODE)-symlinks: the directory, implicitly relative
+# to the prefix, in which the symlink is to be created, the source file and name
+# of the symlink.
 # These can then be munged to a cd + ln combination in the fixup script.
 # If symlinks are not supported, $1 is instead used to create an additional copy
 # of the file, using the .install file.
 ifeq "$(firstword $(LN))" "ln"
 RECORD_SYMLINK_TO_INSTALL = \
-  $(call ADD_LINE, $(ROOTDIR)/opam-symlinks, \
+  $(call ADD_LINE, $(ROOTDIR)/$(INSTALL_MODE)-symlinks, \
     $(patsubst lib%,lib,$(2))$(addprefix /,$(3)) $(4) $(5))
 else
 # Symlinks aren't available, so copy the file again using the target name
 RECORD_SYMLINK_TO_INSTALL = \
-  $(call RECORD_opam_ITEM_TO_INSTALL,$(1),$(2),$(3),$(5))
+  $(call RECORD_$(INSTALL_MODE)_ITEM_TO_INSTALL,$(1),$(2),$(3),$(5))
 endif
 
-# Process the arguments to pass to RECORD_opam_ITEM_TO_INSTALL:
+# Process the arguments to pass to RECORD_$(INSTALL_MODE)_ITEM_TO_INSTALL:
 # - Items installed to the stublibs section need to be remapped to the stublibs
 #   subdirectory of libexec (since we install to lib/ocaml/stublibs rather than
 #   opam's default lib/stublibs)
@@ -236,7 +236,7 @@ RECORD_ITEM_TO_INSTALL = \
   $(if $(filter stublibs,$(2)),\
     $(call RECORD_ITEM_TO_INSTALL,$\
       $(1),libexec,stublibs$(addprefix /,$(3)),$(4),$(5)),\
-    $(call RECORD_opam_ITEM_TO_INSTALL,$\
+    $(call RECORD_$(INSTALL_MODE)_ITEM_TO_INSTALL,$\
       $(addsuffix /,$(SUBDIR_NAME))$(1),$\
       $(2),$\
       $(if $(filter doc lib%,$(2)),ocaml$(addprefix /,$(3)),$(3)),$\
@@ -257,17 +257,17 @@ DO_LN = $(LN) $(1) $(2)
 endif
 
 INSTALL_CREATE_SYMLINKS = \
-  if test -f opam-symlinks; then \
+  if test -f $(INSTALL_MODE)-symlinks; then \
     echo 'cd "$$1"'; \
-    cut -f 1 -d ' ' opam-symlinks \
+    cut -f 1 -d ' ' $(INSTALL_MODE)-symlinks \
       | sort -u \
       | sed -ne "s|.*/.*|mkdir -p '&'|p"; \
     sed -e 's|\(.*\) \(.*\) \(.*\)|$(call DO_LN,\2,\1/\3)|$\
             $(if $(filter win32, $(UNIX_OR_WIN32)),$\
               ;s|/|\\\\|g;s|.*|cmd /c "&"|g)' \
-      opam-symlinks; \
+      $(INSTALL_MODE)-symlinks; \
   fi; \
-  rm -f opam-symlinks
+  rm -f $(INSTALL_MODE)-symlinks
 
 # RECORD_FILE_TO_INSTALL
 #   $1 = file to install, implicitly relative to $(ROOTDIR)
@@ -342,6 +342,65 @@ INSTALL_DESPATCH_opam_END = \
     rm -f opam-clone-*; \
     $(INSTALL_CREATE_SYMLINKS); \
   } > $(OPAM_PACKAGE_NAME)-fixup.sh
+
+# Generate $(OPAM_PACKAGE_NAME)-clone.sh (INSTALL_MODE=clone)
+
+# ld.conf is explicitly copied, rather than cloned, to allow (in principle, if
+# not in practice) the cloning installation to edit it.
+RECORD_clone_ITEM_TO_INSTALL = \
+  $(if $(filter runtime/ld.conf Makefile.config, $(1)), true, \
+    $(if $(filter libexec,$(2)), \
+      $(call RECORD_clone_ITEM_TO_INSTALL,$(1),lib,$(3),$(4),$(5)), \
+      $(call ADD_LINE, \
+        $(ROOTDIR)/clone-clone-$(2)$(addprefix @,$(subst /,@,$(3))), \
+        $(2)$(addprefix /,$(3))/$(if $(4),$(4),$(notdir $(1)))) \
+      $(foreach link, $(5), && \
+        $(call RECORD_SYMLINK_TO_INSTALL,$(1),$(2),$(3),$(4),$(link)))))
+
+INSTALL_DESPATCH_clone_ITEM = $(RECORD_ITEM_TO_INSTALL)
+
+INSTALL_DESPATCH_clone_ITEMS = $(INSTALL_EVALUATE_GLOBS)
+
+# INSTALL_MKDIR is ignored - INSTALL_DESPATCH_clone_END automatically creates
+# directories for each cp file.
+INSTALL_DESPATCH_clone_MKDIR =
+
+INSTALL_DESPATCH_clone_BEGIN = rm -f clone-clone-* clone-symlinks
+
+INSTALL_DESPATCH_clone_END = \
+  { test ! -e config.cache \
+      || echo 'share/ocaml/config.cache' > clone-clone-share@ocaml; }; \
+  { echo '\#!/bin/sh'; \
+    echo 'set -e'; \
+    echo 'mkdir -p "$$1"'; \
+    echo 'echo '\''ln -f "$$@" "$$dest/"'\'' > "$$1/clone-files"'; \
+    echo 'cat > "$$1/prefix.awk" <<"EOF"'; \
+    echo '{'; \
+    echo '  rest = $$0'; \
+    echo '  while ((p = index(rest, ENVIRON["O"]))) {'; \
+    echo '    printf "%s%s", substr(rest, 1, p-1), ENVIRON["N"]'; \
+    echo '    rest = substr(rest, p + length(ENVIRON["O"]))'; \
+    echo '  }'; \
+    echo '  print rest'; \
+    echo '}'; \
+    echo 'EOF'; \
+    for linkset in clone-clone-*; do \
+      dir="$$(echo "$${linkset\#clone-clone-}" | sed -e 's|@|/|g')"; \
+      echo "mkdir -p \"\$$1/$$dir\""; \
+      echo "dest=\"\$$1/$$dir\" xargs sh "\$$1/clone-files" <<"EOF""; \
+      cat $$linkset; \
+      echo 'EOF'; \
+    done; \
+    echo 'cp lib/ocaml/ld.conf "$$1/lib/ocaml/ld.conf"'; \
+    echo 'prefix="$$(sed -ne "s/^prefix *= *//p" lib/ocaml/Makefile.config)"'; \
+    echo 'O="$$prefix" N="$$1" awk -f "$$1/prefix.awk" \
+            lib/ocaml/Makefile.config > "$$1/lib/ocaml/Makefile.config"'; \
+    echo 'O="$$prefix" N="$$1" awk -f "$$1/prefix.awk" \
+            share/ocaml/config.status > "$$1/share/ocaml/config.status"'; \
+    echo 'rm -f "$$1/clone-files" "$$1/prefix.awk"'; \
+    rm -f clone-clone-*; \
+    $(INSTALL_CREATE_SYMLINKS); \
+  } > $(OPAM_PACKAGE_NAME)-clone.sh
 
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 
