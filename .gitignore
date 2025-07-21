@@ -26,6 +26,7 @@
 *.cmx[as]
 *.cmti
 *.annot
+*.stripped
 *.exe
 *.exe.manifest
 .DS_Store
@@ -127,6 +128,7 @@ META
 /ocamltest/ocamltest
 /ocamltest/ocamltest.opt
 /ocamltest/ocamltest_config.ml
+/ocamltest/ocamltest_config.mlp
 /ocamltest/ocamltest_unix.ml
 /ocamltest/tsl_lexer.ml
 /ocamltest/tsl_parser.ml
@@ -176,9 +178,7 @@ META
 /runtime/domain_state64.inc
 
 /stdlib/camlheader
-/stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
+/stdlib/target_camlheader*
 /stdlib/camlheader_ur
 /stdlib/labelled-*
 /stdlib/caml
@@ -201,6 +201,9 @@ META
 /testsuite/tools/lexcmm.ml
 /testsuite/tools/parsecmm.ml
 /testsuite/tools/parsecmm.mli
+/testsuite/tools/test_in_prefix
+/testsuite/tools/test_in_prefix.opt
+/testsuite/tools/toolchain.ml
 
 /tools/ocamldep
 /tools/ocamldep.opt
