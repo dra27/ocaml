@@ -14987,8 +14987,9 @@ otherlibraries="dynlink runtime_events"
 otherlibs="runtime_events"
 optional_libraries="$optional_libraries otherlibs/dynlink/dynlink"
 lib_dynlink=true
-dldir=otherlibs/dynlink
-ac_config_links="$ac_config_links $dldir/dynlink_cmo_format.mli:file_formats/cmo_format.mli $dldir/dynlink_cmxs_format.mli:file_formats/cmxs_format.mli $dldir/dynlink_platform_intf.mli:$dldir/dynlink_platform_intf.ml"
+
+ac_config_links="$ac_config_links otherlibs/dynlink/dynlink_cmo_format.mli:file_formats/cmo_format.mli otherlibs/dynlink/dynlink_cmxs_format.mli:file_formats/cmxs_format.mli otherlibs/dynlink/dynlink_platform_intf.mli:otherlibs/dynlink/dynlink_platform_intf.ml"
+
 
 lib_runtime_events=true
 if test x"$enable_unix_lib" != "xno"
@@ -23210,7 +23211,7 @@ ocamltest_unix_mod="ocamltest/ocamltest_unix_${ocamltest_unix_impl}.ml"
 if $build_ocamltest
 then :
   optional_libraries="$optional_libraries testsuite/lib/testing"
-  ac_config_links="$ac_config_links ocamltest/ocamltest_unix.ml:$ocamltest_unix_mod"
+  ac_config_links="$ac_config_links ocamltest/ocamltest_unix.ml:${ocamltest_unix_mod}"
 
   for ac_prog in patdiff diff
 do
@@ -24739,16 +24740,16 @@ do
     "native-symlinks") CONFIG_COMMANDS="$CONFIG_COMMANDS native-symlinks" ;;
     "ocamldoc/META") CONFIG_FILES="$CONFIG_FILES ocamldoc/META" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
-    "$dldir/dynlink_cmo_format.mli") CONFIG_LINKS="$CONFIG_LINKS $dldir/dynlink_cmo_format.mli:file_formats/cmo_format.mli" ;;
-    "$dldir/dynlink_cmxs_format.mli") CONFIG_LINKS="$CONFIG_LINKS $dldir/dynlink_cmxs_format.mli:file_formats/cmxs_format.mli" ;;
-    "$dldir/dynlink_platform_intf.mli") CONFIG_LINKS="$CONFIG_LINKS $dldir/dynlink_platform_intf.mli:$dldir/dynlink_platform_intf.ml" ;;
+    "otherlibs/dynlink/dynlink_cmo_format.mli") CONFIG_LINKS="$CONFIG_LINKS otherlibs/dynlink/dynlink_cmo_format.mli:file_formats/cmo_format.mli" ;;
+    "otherlibs/dynlink/dynlink_cmxs_format.mli") CONFIG_LINKS="$CONFIG_LINKS otherlibs/dynlink/dynlink_cmxs_format.mli:file_formats/cmxs_format.mli" ;;
+    "otherlibs/dynlink/dynlink_platform_intf.mli") CONFIG_LINKS="$CONFIG_LINKS otherlibs/dynlink/dynlink_platform_intf.mli:otherlibs/dynlink/dynlink_platform_intf.ml" ;;
     "otherlibs/unix/META") CONFIG_FILES="$CONFIG_FILES otherlibs/unix/META" ;;
     "otherlibs/unix/unix.ml") CONFIG_LINKS="$CONFIG_LINKS otherlibs/unix/unix.ml:otherlibs/unix/unix_${unix_or_win32}.ml" ;;
     "otherlibs/str/META") CONFIG_FILES="$CONFIG_FILES otherlibs/str/META" ;;
     "shebang") CONFIG_COMMANDS="$CONFIG_COMMANDS shebang" ;;
     "otherlibs/systhreads/META") CONFIG_FILES="$CONFIG_FILES otherlibs/systhreads/META" ;;
     "links") CONFIG_COMMANDS="$CONFIG_COMMANDS links" ;;
-    "ocamltest/ocamltest_unix.ml") CONFIG_LINKS="$CONFIG_LINKS ocamltest/ocamltest_unix.ml:$ocamltest_unix_mod" ;;
+    "ocamltest/ocamltest_unix.ml") CONFIG_LINKS="$CONFIG_LINKS ocamltest/ocamltest_unix.ml:${ocamltest_unix_mod}" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
