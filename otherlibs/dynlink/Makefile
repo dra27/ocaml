@@ -252,8 +252,7 @@ installopt:
 	if $(NATDYNLINK); then \
 	  $(INSTALL_DATA) \
 	    $(NATOBJS) dynlink.cmxa dynlink.$(A) \
-	    "$(INSTALL_LIBDIR)" && \
-	  cd "$(INSTALL_LIBDIR)" && $(RANLIB) dynlink.$(A); \
+	    "$(INSTALL_LIBDIR)"; \
 	fi
 
 partialclean:
