@@ -105,6 +105,9 @@ OCaml 4.13 maintenance branch
   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
   (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
 
+- #11184: Stop calling ranlib on installed libraries
+  (Sébastien Hinderer, review by Xavier Leroy)
+
 * #12751: --with-target-bindir configure option implemented. This option
   refers to the location of the runtime binaries on the target system for a
   cross-compiler and is embedded in executables produced by ocamlc. It does
