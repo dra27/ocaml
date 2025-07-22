@@ -123,7 +123,6 @@ install:
 	fi
 	mkdir -p "$(INSTALL_LIBDIR)/vmthreads"
 	$(INSTALL_DATA) libvmthreads.a "$(INSTALL_LIBDIR)/vmthreads"
-	cd "$(INSTALL_LIBDIR)/vmthreads"; $(RANLIB) libvmthreads.a
 	$(INSTALL_DATA) \
 	  $(CMIFILES) \
 	  threads.cma stdlib.cma unix.cma \
