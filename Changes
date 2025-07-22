@@ -182,6 +182,9 @@ OCaml 4.08 maintenance branch:
 - #11675: Stop installing ocamloptp when the native compiler is not built.
   (Sébastien Hinderer, review by David Allsopp and Florian Angeletti)
 
+- #11184: Stop calling ranlib on installed libraries
+  (Sébastien Hinderer, review by Xavier Leroy)
+
 - #12372, #14572: Pass option -no-execute-only to the linker for OpenBSD >= 7.3
   so that code sections remain readable, as needed for closure marshaling.
   (Xavier Leroy and Anil Madhavapeddy, review by Anil Madhavapeddy and
