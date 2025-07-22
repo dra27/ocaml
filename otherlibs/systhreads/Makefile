@@ -118,7 +118,6 @@ install:
 	  $(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"; \
 	fi
 	$(INSTALL_DATA) libthreads.$(A) "$(INSTALL_LIBDIR)"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) libthreads.$(A)
 	mkdir -p "$(INSTALL_THREADSLIBDIR)"
 	$(INSTALL_DATA) \
 	  $(CMIFILES) threads.cma \
@@ -133,11 +132,9 @@ endif
 
 installopt:
 	$(INSTALL_DATA) libthreadsnat.$(A) "$(INSTALL_LIBDIR)"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) libthreadsnat.$(A)
 	$(INSTALL_DATA) \
 	  $(THREADS_NCOBJS) threads.cmxa threads.$(A) \
 	  "$(INSTALL_THREADSLIBDIR)"
-	cd "$(INSTALL_THREADSLIBDIR)" && $(RANLIB) threads.$(A)
 
 %.cmi: %.mli
 	$(CAMLC) -c $(COMPFLAGS) $<
