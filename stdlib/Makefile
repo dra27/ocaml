@@ -146,7 +146,6 @@ installopt-default:
 	$(INSTALL_DATA) \
 	  stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx \
 	  "$(INSTALL_LIBDIR)"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) stdlib.$(A)
 
 .PHONY: installopt-noprof
 installopt-noprof:
@@ -156,7 +155,6 @@ installopt-prof:
 	$(INSTALL_DATA) \
 	  stdlib.p.cmxa stdlib.p.$(A) std_exit.p.cmx std_exit.p.$(O) \
 	  "$(INSTALL_LIBDIR)"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) stdlib.p.$(A)
 
 ifeq "$(HASHBANGSCRIPTS)" "true"
 
