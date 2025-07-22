@@ -27,16 +27,44 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
+$(SPACE) :=
+HASH := \#
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+DIR_SEP := \$ # There must a space following the $
+CONVERT_PATH = $(subst /,$(DIR_SEP),$(strip $(1)))
+else
+DIR_SEP = /
+CONVERT_PATH = $(strip $(1))
+endif
+
+QUOTE_SINGLE = '$(subst ','\'',$(1))'
 
 DESTDIR ?=
-INSTALL_BINDIR := $(DESTDIR)$(BINDIR)
-INSTALL_LIBDIR := $(DESTDIR)$(LIBDIR)
-INSTALL_INCDIR=$(INSTALL_LIBDIR)/caml
-INSTALL_STUBLIBDIR := $(DESTDIR)$(STUBLIBDIR)
-INSTALL_MANDIR := $(DESTDIR)$(MANDIR)
-INSTALL_PROGRAMS_MAN_DIR := $(DESTDIR)$(PROGRAMS_MAN_DIR)
-INSTALL_LIBRARIES_MAN_DIR := $(DESTDIR)$(LIBRARIES_MAN_DIR)
-INSTALL_DOCDIR := $(DESTDIR)$(DOCDIR)
+
+# Augment directories from Makefile.config / Makefile.build_config with
+# $(DESTDIR). i.e. each of these 5 directories may be overridden by the user,
+# and the compiler distribution makes no assumptions about where they are
+# relative to each other.
+INSTALL_BINDIR = $(DESTDIR)$(BINDIR)
+INSTALL_DOCDIR = $(DESTDIR)$(DOCDIR)
+INSTALL_LIBDIR = $(DESTDIR)$(LIBDIR)
+INSTALL_MANDIR = $(DESTDIR)$(MANDIR)
+INSTALL_STUBLIBDIR = $(DESTDIR)$(STUBLIBDIR)
+
+# Library subdirectories. The compiler distribution does make assumptions about
+# these, and they cannot be freely overridden by the user.
+INSTALL_LIBDIR_CAML = $(INSTALL_LIBDIR)/caml
+INSTALL_LIBDIR_COMPILERLIBS = $(INSTALL_LIBDIR)/compiler-libs
+INSTALL_LIBDIR_DYNLINK = $(INSTALL_LIBDIR)/dynlink
+INSTALL_LIBDIR_FLEXDLL = $(INSTALL_LIBDIR)/flexdll
+INSTALL_LIBDIR_OCAMLDOC = $(INSTALL_LIBDIR)/ocamldoc
+INSTALL_LIBDIR_PROFILING = $(INSTALL_LIBDIR)/profiling
+INSTALL_LIBDIR_STDLIB = $(INSTALL_LIBDIR)/stdlib
+INSTALL_LIBDIR_SYSTHREADS = $(INSTALL_LIBDIR)/threads
+
+INSTALL_MANDIR_PROGRAMS = $(INSTALL_MANDIR)/man1
+INSTALL_MANDIR_LIBRARIES = $(INSTALL_MANDIR)/man3
 
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 
@@ -132,6 +160,22 @@ SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 # in config.mlp.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
 
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+  SRCDIR_ENCODED = $(subst =,%+,$(subst :,%.,$(subst %,%$(HASH),$(SRCDIR_ABS))))
+  SRCDIR_ABS_REAL := $(shell realpath $(SRCDIR_ABS) 2>/dev/null)
+  SRCDIR_REAL_ENCODED = \
+    $(subst =,%+,$(subst :,%.,$(subst %,%$(HASH),$(SRCDIR_ABS_REAL))))
+  BUILD_PATH_PREFIX_MAP ?=
+  export BUILD_PATH_PREFIX_MAP := \
+    $(BUILD_PATH_PREFIX_MAP)$\
+      :.=$(SRCDIR_ENCODED)$\
+      $(if $(SRCDIR_REAL_ENCODED),:.=$(SRCDIR_REAL_ENCODED))
+OC_COMMON_LINKFLAGS += \
+-set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
+else
+OC_COMMON_LINKFLAGS =
+endif # ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
@@ -201,18 +245,40 @@ OCAMLYACCFLAGS ?=
 
 SAK = $(ROOTDIR)/runtime/sak$(EXE)
 
-# stdlib/StdlibModules cannot be include'd unless $(SAK) has been built. These
-# two rules add that dependency. They have to be pattern rules since
-# Makefile.common is included before default targets.
-$(ROOTDIR)/%/sak$(EXE):
-	$(MAKE) -C $(ROOTDIR)/$* sak$(EXE)
-
-ifneq "$(REQUIRES_CONFIGURATION)" ""
-$(ROOTDIR)/%/StdlibModules: $(SAK) ;
-endif
-
 # Used with the Microsoft toolchain to merge generated manifest files into
 # executables
 if_file_exists = ( test ! -f $(1) || $(2) && rm -f $(1) )
 MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
   mt -nologo -outputresource:$(1) -manifest $(1).manifest)
+
+ifeq "$(SUFFIXING)" "true"
+RUNTIME_NAME =
+else
+RUNTIME_NAME = ocamlrun
+endif
+
+BYTECODE_RUNTIME_FLAGS = \
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
+  -launch-method $(LAUNCH_METHOD) \
+  -runtime-search $(if $(RUNTIME_SEARCH),$(RUNTIME_SEARCH),disable)
+
+ADD_BYTECODE_RUNTIME = \
+  $(if $(filter -custom, $(1)),,\
+    -use-prims $(ROOTDIR)/runtime/primitives $(BYTECODE_RUNTIME_FLAGS))
+
+# ocamlc has several mechanisms for linking a bytecode image to the runtime
+# which executes it. The exact mechanism depends on the platform and the precise
+# location of the runtime. The boot compiler (boot/ocamlc) therefore needs this
+# additional information, which comes from the stdlib build and is copied into
+# boot/ as part of coldstart. See read_runtime_launch_info in
+# bytecomp/bytelink.ml for further details.
+HEADER_NAME = camlheader
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+# Ensure that no command can create Cygwin symbolic links by ensuring that
+# symlink(2) will fail if native NTFS symlinks aren't available.
+export CYGWIN := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(CYGWIN)) winsymlinks:nativestrict)
+export MSYS := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(MSYS)) winsymlinks:nativestrict)
+endif
