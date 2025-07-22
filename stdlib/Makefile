@@ -119,7 +119,6 @@ installopt-default::
 	$(INSTALL_DATA) \
 	  stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx \
 	  "$(INSTALL_LIBDIR)"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) stdlib.$(A)
 
 ifeq "$(SHEBANGSCRIPTS)" "true"
 
