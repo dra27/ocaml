@@ -812,8 +812,6 @@ endif
 	     $(OPTTOPLEVELSTART:.cmo=.cmx) $(OPTTOPLEVELSTART:.cmo=.$(O)) \
 	     "$(INSTALL_COMPLIBDIR)"; \
 	fi
-	cd "$(INSTALL_COMPLIBDIR)" && \
-	   $(RANLIB) ocamlcommon.$(A) ocamlbytecomp.$(A) ocamloptcomp.$(A)
 
 # Installation of the *.ml sources of compiler-libs
 .PHONY: install-compiler-sources
