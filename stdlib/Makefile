@@ -80,13 +80,17 @@ install::
     exit 1; \
   fi
 
+# bigarray.mli is only installed if the legacy bigarray library is _not_ being
+# compiled (since its bigarray.mli will override ours)
 install::
 	$(INSTALL_DATA) \
 	  stdlib.cma std_exit.cmo *.cmi camlheader_ur \
 	  "$(INSTALL_LIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	  *.cmt *.cmti *.mli *.ml \
+	  *.cmt *.cmti *.ml \
+	  $(if $(filter bigarray, $(OTHERLIBRARIES)), \
+	    $(filter-out bigarray.mli, $(wildcard *.mli)), *.mli) \
 	  "$(INSTALL_LIBDIR)"
 endif
 	$(INSTALL_DATA) $(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
