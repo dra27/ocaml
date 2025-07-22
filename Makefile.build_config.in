@@ -19,7 +19,7 @@
 # Makefile.common and therefore assumes that Makefile.config has already been
 # included.
 
-INSTALL ?= @INSTALL@
+INSTALL ?= @INSTALL@ -p
 
 SRCDIR_ABS = @ocamlsrcdir@
 
