@@ -175,6 +175,9 @@ OCaml 4.09 maintenance branch
   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
   (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
 
+- #11184: Stop calling ranlib on installed libraries
+  (Sébastien Hinderer, review by Xavier Leroy)
+
 - #12372, #14572: Pass option -no-execute-only to the linker for OpenBSD >= 7.3
   so that code sections remain readable, as needed for closure marshaling.
   (Xavier Leroy and Anil Madhavapeddy, review by Anil Madhavapeddy and
