@@ -20,6 +20,7 @@
 # FIXME reduce redundancy by including ../Makefile
 
 ROOTDIR = ../..
+SUBDIR_NAME = otherlibs/dynlink
 
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
@@ -242,13 +243,9 @@ $(extract_crc): dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
 	                  $(OC_COMMON_LINKFLAGS)) $(OC_COMMON_LINKFLAGS) $^
 
 install:
-	$(INSTALL_DATA) \
-	  dynlink.cmi dynlink.cma \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmi dynlink.cma, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  dynlink.cmti dynlink.mli \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmti dynlink.mli, lib)
 endif
 	$(INSTALL_PROG) $(extract_crc) "$(INSTALL_LIBDIR)"
 
