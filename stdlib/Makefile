@@ -110,6 +110,9 @@ allopt-prof: stdlib.p.cmxa std_exit.p.cmx
 LEGACY_OBJS=$(patsubst stdlib__%,"$(INSTALL_LIBDIR)/%", \
                                   $(filter stdlib__%,$(OBJS)))
 .PHONY: install
+
+# bigarray.mli is only installed if the legacy bigarray library is _not_ being
+# compiled (since its bigarray.mli will override ours)
 install::
 # Transitional: when upgrading from 4.06 -> 4.07, module M is in stdlib__m.cm*,
 # while previously it was in m.cm*, which confuses the compiler.
@@ -123,7 +126,9 @@ install::
 	  "$(INSTALL_LIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	  *.cmt *.cmti *.mli *.ml \
+	  *.cmt *.cmti *.ml \
+	  $(if $(filter bigarray, $(OTHERLIBRARIES)), \
+	    $(filter-out bigarray.mli, $(wildcard *.mli)), *.mli) \
 	  "$(INSTALL_LIBDIR)"
 endif
 	$(INSTALL_DATA) $(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
