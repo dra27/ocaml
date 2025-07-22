@@ -13,6 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 ROOTDIR = ..
+SUBDIR_NAME = api_docgen
 -include $(ROOTDIR)/Makefile.build_config
 
 ifeq ($(DOCUMENTATION_TOOL),odoc)
