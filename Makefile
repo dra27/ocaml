@@ -3077,7 +3077,6 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	   middle_end/*.ml middle_end/closure/*.ml \
      middle_end/flambda/*.ml middle_end/flambda/base_types/*.ml \
 	   asmcomp/*.ml \
-	   asmcmp/debug/*.ml \
 	   "$(INSTALL_COMPLIBDIR)"
 endif
 
