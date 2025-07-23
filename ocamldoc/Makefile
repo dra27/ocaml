@@ -305,16 +305,16 @@ INSTALL_MANODIR=$(INSTALL_MANDIR)/man3
 .PHONY: install
 install:
 	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
+	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
 	$(MKDIR) "$(INSTALL_MANODIR)"
 	$(INSTALL_PROG) $(OCAMLDOC) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) \
 	  ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 endif
 	$(if $(wildcard stdlib_man), \
 	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANODIR)")
@@ -329,11 +329,11 @@ installopt:
 .PHONY: installopt_really
 installopt_really:
 	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
+	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
 	$(INSTALL_PROG) $(OCAMLDOC_OPT) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) \
 	  *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 
 # TODO: also split into several rules
 
