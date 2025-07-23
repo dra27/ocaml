@@ -383,7 +383,7 @@ COMPILER_ARTEFACT_DIRS = \
       $(if $(filter-out undefined, $(origin 2)), $(2)), \
     $(addprefix $(dir)/, $(1)))
 NATIVE_ARTEFACT_DIRS = \
-  asmcomp \
+  asmcomp asmcomp/debug \
   middle_end middle_end/closure middle_end/flambda middle_end/flambda/base_types
 
 # Installation
@@ -514,8 +514,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	    $(addprefix asmcomp/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	    asmcomp/debug/*.cmt asmcomp/debug/*.cmti \
-	    asmcomp/debug/*.mli \
+	    $(addprefix asmcomp/debug/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 endif
 	$(INSTALL_DATA) \
