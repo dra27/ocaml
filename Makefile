@@ -273,14 +273,14 @@ coreboot:
 	$(MAKE) promote-cross
 # Rebuild ocamlc and ocamllex (run on runtime/ocamlrun)
 	$(MAKE) partialclean
-	$(MAKE) ocamlc ocamllex ocamltools
+	$(MAKE) IN_COREBOOT_CYCLE=true ocamlc ocamllex ocamltools
 # Rebuild the library (using runtime/ocamlrun ./ocamlc)
 	$(MAKE) library-cross
 # Promote the new compiler and the new runtime
 	$(MAKE) OCAMLRUN=runtime/ocamlrun$(EXE) promote
 # Rebuild the core system
 	$(MAKE) partialclean
-	$(MAKE) core
+	$(MAKE) IN_COREBOOT_CYCLE=true core
 # Check if fixpoint reached
 	$(MAKE) compare
 
@@ -300,6 +300,7 @@ endif
 # Never mind, just do make bootstrap to reach fixpoint again.
 .PHONY: bootstrap
 bootstrap: coreboot
+	rm -f utils/config.ml
 	$(MAKE) all
 
 # Compile everything the first time
@@ -372,10 +373,25 @@ INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
 INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
 FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
 
+# COMPILER_ARTEFACT_DIRS adds the common compiler-libs directories as prefixes
+# to a sequence of patterns in the first argument, e.g.
+# $(call COMPILER_ARTEFACT_DIRS, *.cmi) expands to utils/*.cmi, parsing/*.cmi,
+# and so forth. Multiple wildcard patterns may be supplied. An optional second
+# argument includes additional directories beyond the common ones (e.g. asmcomp,
+# etc.)
+COMPILER_ARTEFACT_DIRS = \
+  $(foreach dir, \
+      utils parsing typing bytecomp file_formats lambda driver \
+      $(if $(filter-out undefined, $(origin 2)), $(2)), \
+    $(addprefix $(dir)/, $(1)))
+NATIVE_ARTEFACT_DIRS = \
+  asmcomp \
+  middle_end middle_end/closure middle_end/flambda middle_end/flambda/base_types
+
 # Installation
 
 .PHONY: install
-install::
+install:
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
@@ -394,26 +410,12 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 endif
 	$(INSTALL_PROG) yacc/ocamlyacc$(EXE) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) \
-	   utils/*.cmi \
-	   parsing/*.cmi \
-	   typing/*.cmi \
-	   bytecomp/*.cmi \
-	   file_formats/*.cmi \
-	   lambda/*.cmi \
-	   driver/*.cmi \
-	   toplevel/*.cmi \
-	   "$(INSTALL_COMPLIBDIR)"
+	  $(call COMPILER_ARTEFACT_DIRS, *.cmi, toplevel) \
+	  "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	   utils/*.cmt utils/*.cmti utils/*.mli \
-	   parsing/*.cmt parsing/*.cmti parsing/*.mli \
-	   typing/*.cmt typing/*.cmti typing/*.mli \
-	   file_formats/*.cmt file_formats/*.cmti file_formats/*.mli \
-	   lambda/*.cmt lambda/*.cmti lambda/*.mli \
-	   bytecomp/*.cmt bytecomp/*.cmti bytecomp/*.mli \
-	   driver/*.cmt driver/*.cmti driver/*.mli \
-	   toplevel/*.cmt toplevel/*.cmti toplevel/*.mli \
-	   "$(INSTALL_COMPLIBDIR)"
+	  $(call COMPILER_ARTEFACT_DIRS, *.cmt *.cmti *.mli, toplevel) \
+	  "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
 	   toplevel/byte/*.cmt \
 	   "$(INSTALL_COMPLIBDIR)"
@@ -502,25 +504,19 @@ endif
 	    "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	    middle_end/*.cmt middle_end/*.cmti \
-	    middle_end/*.mli \
+	    $(addprefix middle_end/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	    middle_end/closure/*.cmt middle_end/closure/*.cmti \
-	    middle_end/closure/*.mli \
+	    $(addprefix middle_end/closure/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	    middle_end/flambda/*.cmt middle_end/flambda/*.cmti \
-	    middle_end/flambda/*.mli \
+	    $(addprefix middle_end/flambda/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	    middle_end/flambda/base_types/*.cmt \
-            middle_end/flambda/base_types/*.cmti \
-	    middle_end/flambda/base_types/*.mli \
+	    $(addprefix middle_end/flambda/base_types/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	    asmcomp/*.cmt asmcomp/*.cmti \
-	    asmcomp/*.mli \
+	    $(addprefix asmcomp/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 endif
 	$(INSTALL_DATA) \
@@ -561,14 +557,8 @@ ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	  $(LN) flexlink.opt$(EXE) flexlink$(EXE)
 endif
 	$(INSTALL_DATA) \
-	   utils/*.cmx parsing/*.cmx typing/*.cmx bytecomp/*.cmx \
-	   file_formats/*.cmx \
-	   lambda/*.cmx \
-	   driver/*.cmx asmcomp/*.cmx middle_end/*.cmx \
-           middle_end/closure/*.cmx \
-           middle_end/flambda/*.cmx \
-           middle_end/flambda/base_types/*.cmx \
-          "$(INSTALL_COMPLIBDIR)"
+	  $(call COMPILER_ARTEFACT_DIRS, *.cmx, $(NATIVE_ARTEFACT_DIRS)) \
+    "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
 	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
 	   "$(INSTALL_COMPLIBDIR)"
@@ -590,14 +580,9 @@ endif
 install-compiler-sources:
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	   utils/*.ml parsing/*.ml typing/*.ml bytecomp/*.ml driver/*.ml \
-           file_formats/*.ml \
-           lambda/*.ml \
-	   toplevel/*.ml toplevel/byte/*.ml \
-	   middle_end/*.ml middle_end/closure/*.ml \
-     middle_end/flambda/*.ml middle_end/flambda/base_types/*.ml \
-	   asmcomp/*.ml \
-	   "$(INSTALL_COMPLIBDIR)"
+	  $(call COMPILER_ARTEFACT_DIRS, *.ml, $(NATIVE_ARTEFACT_DIRS)) \
+	  toplevel/*.ml toplevel/byte/*.ml \
+	  "$(INSTALL_COMPLIBDIR)"
 endif
 
 # Run all tests
@@ -615,8 +600,9 @@ clean::
 # Build the manual latex files from the etex source files
 # (see manual/README.md)
 .PHONY: manual-pregen
-manual-pregen: opt.opt
-	cd manual; $(MAKE) clean && $(MAKE) pregen-etex
+manual-pregen: opt.opt | manual
+	$(MAKE) -C manual clean
+	$(MAKE) -C manual pregen-etex
 
 # The clean target
 clean:: partialclean
