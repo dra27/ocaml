@@ -1,0 +1,303 @@
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*            Gabriel Scherer, projet Parsifal, INRIA Saclay              *
+#*                                                                        *
+#*   Copyright 2018 Institut National de Recherche en Informatique et     *
+#*     en Automatique.                                                    *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+# This makefile contains common definitions and rules shared by
+# other Makefiles
+# We assume that Makefile.config has already been included
+
+-include $(ROOTDIR)/Makefile.build_config
+
+INSTALL_DATA ?= $(INSTALL) -m u=rw,g=rw,o=r
+INSTALL_PROG ?= $(INSTALL) -m u=rwx,g=rwx,o=rx
+
+# $(EMPTY) is defined in Makefile.config, but may not have been loaded
+EMPTY :=
+# $(SPACE) contains a single space
+SPACE := $(EMPTY) $(EMPTY)
+$(SPACE) :=
+HASH := \#
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+DIR_SEP := \$ # There must a space following the $
+CONVERT_PATH = $(subst /,$(DIR_SEP),$(strip $(1)))
+else
+DIR_SEP = /
+CONVERT_PATH = $(strip $(1))
+endif
+
+QUOTE_SINGLE = '$(subst ','\'',$(1))'
+
+# note: these are defined by lazy expansions
+# as some parts of the makefiles change BINDIR, etc.
+# and expect INSTALL_BINDIR, etc. to stay in synch
+# (see `shellquote` in tools/Makefile)
+
+DESTDIR ?=
+
+# Augment directories from Makefile.config / Makefile.build_config with
+# $(DESTDIR). i.e. each of these 5 directories may be overridden by the user,
+# and the compiler distribution makes no assumptions about where they are
+# relative to each other.
+INSTALL_BINDIR = $(DESTDIR)$(BINDIR)
+INSTALL_LIBDIR = $(DESTDIR)$(LIBDIR)
+INSTALL_MANDIR = $(DESTDIR)$(MANDIR)
+INSTALL_STUBLIBDIR = $(DESTDIR)$(STUBLIBDIR)
+
+# Library subdirectories. The compiler distribution does make assumptions about
+# these, and they cannot be freely overridden by the user.
+INSTALL_LIBDIR_CAML = caml
+INSTALL_LIBDIR_COMPILERLIBS = compiler-libs
+INSTALL_LIBDIR_DYNLINK = dynlink
+INSTALL_LIBDIR_FLEXDLL = flexdll
+INSTALL_LIBDIR_OCAMLDOC = ocamldoc
+INSTALL_LIBDIR_SYSTHREADS = threads
+
+INSTALL_MANDIR_PROGRAMS = man$(PROGRAMS_MAN_SECTION)
+INSTALL_MANDIR_LIBRARIES = man3
+
+INSTALL_MODE ?= install
+
+# INSTALL_ITEM installs a single file, possibly with a different name and
+# possibly creating additional symlinks/copies
+#   $1 = source file (may include directories)
+#   $2 = section (bin, doc, lib, libexec, man, stublibs)
+#   $3 = directory within section (may be empty)
+#   $4 = target basename (may be empty)
+#   $5 = additional basenames (either symlinked or copied, depending on what the
+#        platform supports)
+# The $(origin n) dance is necessary to suppress warnings about undefined
+# variables.
+INSTALL_ITEM = \
+  $(INSTALL_$(INSTALL_MODE)_PREFIX)$(call INSTALL_ENSURE_DIR,$\
+    $(strip $(2)),$(if $(filter-out undefined,$(origin 3)),$(strip $(3))))$\
+  $(call INSTALL_DESPATCH_$(INSTALL_MODE)_ITEM,$\
+    $(strip $(1)),$\
+    $(strip $(2)),$\
+    $(if $(filter-out undefined,$(origin 3)),$(strip $(3))),$\
+    $(if $(filter-out undefined,$(origin 4)),$(strip $(4))),$\
+    $(if $(filter-out undefined,$(origin 5)),$(strip $(5))))
+
+# INSTALL_ITEMS installs a series of files to a single directory
+#   $1 = source file(s) (may include directories and glob patterns)
+#   $2 = section (as for INSTALL_ITEM)
+#   $3 = directory within section (may be omitted)
+# INSTALL_ITEMS is sometimes an alias for INSTALL_ITEM. For simplicity with
+# undefined variable warnings, INSTALL_DESPATCH_foo_ITEMS is passed 5 parameters
+# but $4 and $5 are always empty.
+INSTALL_ITEMS = \
+  $(INSTALL_$(INSTALL_MODE)_PREFIX)$(call INSTALL_ENSURE_DIR,$\
+    $(strip $(2)),$(if $(filter-out undefined,$(origin 3)),$(strip $(3))))$\
+  $(call INSTALL_DESPATCH_$(INSTALL_MODE)_ITEMS,$\
+    $(strip $(1)),$\
+    $(strip $(2)),$\
+    $(if $(filter-out undefined,$(origin 3)),$(strip $(3))),,)
+
+# INSTALL_ITEMS_OPT is INSTALL_ITEMS, but does nothing if the source file(s) do
+# not exist
+INSTALL_ITEMS_OPT = \
+  $(if $(wildcard $(1)),$(call INSTALL_ITEMS, \
+    $(1), $(2), $(if $(filter-out undefined,$(origin 3)), $(3))))
+
+INSTALL_ENSURE_DIR = \
+  $(if $(filter undefined,$(origin DIR_CREATED_$(subst exec,,$(1))_$(2))),$\
+    $(eval DIR_CREATED_$(1)_$(2):=)$\
+    $(call INSTALL_DESPATCH_$(INSTALL_MODE)_MKDIR,$\
+      $(subst exec,,$(1)),$(2)))
+
+# INSTALL_RM takes a single argument which may include glob patterns of files to
+# be removed when performing a physical install.
+INSTALL_RM = $(call INSTALL_DESPATCH_$(INSTALL_MODE)_RM,$(strip $(1)))
+
+# INSTALL_BEGIN and INSTALL_END are used in the root Makefile's install target
+INSTALL_BEGIN = $(INSTALL_DESPATCH_$(INSTALL_MODE)_BEGIN)
+INSTALL_END = $(INSTALL_DESPATCH_$(INSTALL_MODE)_END)
+
+# Normal installation
+INSTALL_CMD_bin = $(INSTALL_PROG)
+INSTALL_CMD_doc = $(INSTALL_DATA)
+INSTALL_CMD_lib = $(INSTALL_DATA)
+INSTALL_CMD_libexec = $(INSTALL_PROG)
+INSTALL_CMD_man = $(INSTALL_DATA)
+INSTALL_CMD_stublibs = $(INSTALL_PROG)
+
+INSTALL_SECTION_bin = $(INSTALL_BINDIR)
+INSTALL_SECTION_doc = $(INSTALL_DOCDIR)
+INSTALL_SECTION_lib = $(INSTALL_LIBDIR)
+INSTALL_SECTION_libexec = $(INSTALL_LIBDIR)
+INSTALL_SECTION_man = $(INSTALL_MANDIR)
+INSTALL_SECTION_stublibs = $(INSTALL_STUBLIBDIR)
+
+QUOTE_SINGLE = '$(subst ','\'',$(1))'
+
+define NEWLINE
+
+
+endef
+SH_AND = && \$(NEWLINE)
+
+INSTALL_install_PREFIX =
+
+INSTALL_DESPATCH_install_RM = rm -f $(1)
+
+INSTALL_DESPATCH_install_MKDIR = \
+  $(MKDIR) $(call QUOTE_SINGLE,$(INSTALL_SECTION_$(1))$(addprefix /,$(2))) \
+    $(SH_AND)
+
+MK_LINK = \
+  (cd "$(INSTALL_SECTION_$(2))$(addprefix /,$(3))" && \
+    $(LN) $(call QUOTE_SINGLE,$(1)) $(call QUOTE_SINGLE,$(4)))
+
+INSTALL_DESPATCH_install_ITEM = \
+  $(INSTALL_CMD_$(2)) $(1) \
+    $(call QUOTE_SINGLE,$\
+      $(INSTALL_SECTION_$(2))$(addprefix /,$(3))$(addprefix /,$(4))) \
+  $(foreach link, $(5),$(SH_AND)$\
+    $(call MK_LINK,$(if $(4),$(4),$(notdir $(1))),$(2),$(3),$(link)))
+
+INSTALL_DESPATCH_install_ITEMS = $(INSTALL_DESPATCH_install_ITEM)
+
+INSTALL_DESPATCH_install_BEGIN = @
+INSTALL_DESPATCH_install_END = @
+
+FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
+
+# Standard library flags
+STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/stdlib
+
+# Use boot/ocamlc.opt if available
+CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
+ifeq (0,$(shell \
+  test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
+  echo $$?))
+  BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
+else
+  BOOT_OCAMLC = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc
+endif
+
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
+  FLEXLINK_ENV =
+  CAMLOPT_CMD = $(CAMLOPT)
+  OCAMLOPT_CMD = $(OCAMLOPT)
+  MKLIB_CMD = $(MKLIB)
+  ocamlc_cmd = $(ocamlc)
+  ocamlopt_cmd = $(ocamlopt)
+else
+ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
+  FLEXLINK_ENV = \
+    OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun$(EXE) \
+                    $(ROOTDIR)/boot/flexlink.byte$(EXE)"
+else
+  FLEXLINK_ENV = \
+    OCAML_FLEXLINK="$(ROOTDIR)/flexlink.opt$(EXE) -I $(ROOTDIR)/stdlib/flexdll"
+endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
+  CAMLOPT_CMD = $(FLEXLINK_ENV) $(CAMLOPT)
+  OCAMLOPT_CMD = $(FLEXLINK_ENV) $(OCAMLOPT)
+  MKLIB_CMD = $(FLEXLINK_ENV) $(MKLIB)
+  ocamlc_cmd = $(FLEXLINK_ENV) $(ocamlc)
+  ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
+
+OPTCOMPFLAGS=
+ifeq "$(FUNCTION_SECTIONS)" "true"
+OPTCOMPFLAGS += -function-sections
+endif
+# By default, request ocamllex to be quiet
+OCAMLLEX_FLAGS ?= -q
+
+# Escape special characters in the argument string.
+# There are four characters that need escaping:
+# - backslash and ampersand, which are special in the replacement text
+#   of sed's "s" command
+# - exclamation mark, which is the delimiter we use for sed's "s" command
+# - single quote, which interferes with shell quoting.  We are inside
+#   single quotes already, so the proper escape is '\''
+#   (close single quotation, insert single quote character,
+#    reopen single quotation).
+SED_ESCAPE=$(subst ','\'',$(subst !,\!,$(subst &,\&,$(subst \,\\,$1))))
+
+# Escape special characters in an OCaml string literal "..."
+# There are two: backslash and double quote.
+OCAML_ESCAPE=$(subst ",\",$(subst \,\\,$1))
+
+# SUBST generates the sed substitution for the variable *named* in $1
+SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
+
+# SUBST_STRING does the same, for a variable that occurs between "..."
+# in config.mlp.  Thus, backslashes and double quotes must be escaped.
+SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
+
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+  SRCDIR_ENCODED = $(subst =,%+,$(subst :,%.,$(subst %,%$(HASH),$(SRCDIR_ABS))))
+  SRCDIR_ABS_REAL := $(shell realpath $(SRCDIR_ABS) 2>/dev/null)
+  SRCDIR_REAL_ENCODED = \
+    $(subst =,%+,$(subst :,%.,$(subst %,%$(HASH),$(SRCDIR_ABS_REAL))))
+  BUILD_PATH_PREFIX_MAP ?=
+  export BUILD_PATH_PREFIX_MAP := \
+    $(BUILD_PATH_PREFIX_MAP)$\
+      :.=$(SRCDIR_ENCODED)$\
+      $(if $(SRCDIR_REAL_ENCODED),:.=$(SRCDIR_REAL_ENCODED))
+  PRIVATE_CFLAGS = $(OC_MAP_CFLAGS)
+else
+  PRIVATE_CFLAGS =
+endif # ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+
+# Allow Makefile.cross to override the Standard Library default for the compiler
+# itself.
+HOST_LIBDIR ?= $(TARGET_LIBDIR)
+
+OC_COMMON_LINKFLAGS ?=
+OC_COMMON_LINKFLAGS += \
+  -set-runtime-default \
+    $(call QUOTE_SINGLE,standard_library_default=$(HOST_LIBDIR))
+
+# The rule to compile C files
+
+# This rule is similar to GNU make's implicit rule, except that it is more
+# general (it supports both .o and .obj)
+
+%.$(O): %.c
+	$(CC) -c $(OC_CFLAGS) $(PRIVATE_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
+
+# $(ROOTDIR)/ocamlc needs -launch-method to be given explicitly as its default
+# values are those for the target (cf. --with-target-sh and TARGET_BINDIR).
+BYTECODE_LAUNCHER_FLAGS = \
+  -launch-method $(call QUOTE_SINGLE,$(LAUNCH_METHOD) $(BINDIR)) \
+  -runtime-search $(if $(RUNTIME_SEARCH),$(RUNTIME_SEARCH),disable)
+
+MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS = \
+  $(if $(filter -custom, $(1)),,\
+    -use-prims $(ROOTDIR)/runtime/primitives $(BYTECODE_LAUNCHER_FLAGS))
+
+LINK_BYTECODE_PROGRAM =\
+  $(CAMLC) $(OC_COMMON_LINKFLAGS) \
+    $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, \
+      $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)) $(OC_BYTECODE_LINKFLAGS)
+
+# ocamlc has several mechanisms for linking a bytecode image to the runtime
+# which executes it. The exact mechanism depends on the platform and the precise
+# location of the runtime. The boot compiler (boot/ocamlc) therefore needs this
+# additional information, which comes from the stdlib build and is copied into
+# boot/ as part of coldstart. See read_runtime_launch_info in
+# bytecomp/bytelink.ml for further details.
+HEADER_NAME = camlheader
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+# Ensure that no command can create Cygwin symbolic links by ensuring that
+# symlink(2) will fail if native NTFS symlinks aren't available.
+export CYGWIN := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(CYGWIN)) winsymlinks:nativestrict)
+export MSYS := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(MSYS)) winsymlinks:nativestrict)
+endif
