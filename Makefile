@@ -567,6 +567,19 @@ INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
 INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
 FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
 
+# COMPILER_ARTEFACT_DIRS adds the common compiler-libs directories as prefixes
+# to a sequence of patterns in the first argument, e.g.
+# $(call COMPILER_ARTEFACT_DIRS, *.cmi) expands to utils/*.cmi, parsing/*.cmi,
+# and so forth. Multiple wildcard patterns may be supplied. An optional second
+# argument includes additional directories beyond the common ones (e.g. asmcomp,
+# etc.)
+COMPILER_ARTEFACT_DIRS = \
+  $(foreach dir, \
+      utils parsing typing bytecomp driver \
+      $(if $(filter-out undefined, $(origin 2)), $(2)), \
+    $(addprefix $(dir)/, $(1)))
+NATIVE_ARTEFACT_DIRS = asmcomp middle_end middle_end/base_types
+
 # Installation
 
 .PHONY: install
@@ -591,22 +604,12 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 endif
 	$(INSTALL_PROG) yacc/ocamlyacc$(EXE) "$(INSTALL_BINDIR)/ocamlyacc$(EXE)"
 	$(INSTALL_DATA) \
-	   utils/*.cmi \
-	   parsing/*.cmi \
-	   typing/*.cmi \
-	   bytecomp/*.cmi \
-	   driver/*.cmi \
-	   toplevel/*.cmi \
-	   "$(INSTALL_COMPLIBDIR)"
+	  $(call COMPILER_ARTEFACT_DIRS, *.cmi, toplevel) \
+	  "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	   utils/*.cmt utils/*.cmti utils/*.mli \
-	   parsing/*.cmt parsing/*.cmti parsing/*.mli \
-	   typing/*.cmt typing/*.cmti typing/*.mli \
-	   bytecomp/*.cmt bytecomp/*.cmti bytecomp/*.mli \
-	   driver/*.cmt driver/*.cmti driver/*.mli \
-	   toplevel/*.cmt toplevel/*.cmti toplevel/*.mli \
-	   "$(INSTALL_COMPLIBDIR)"
+	  $(call COMPILER_ARTEFACT_DIRS, *.cmt *.cmti *.mli, toplevel) \
+	  "$(INSTALL_COMPLIBDIR)"
 endif
 	$(INSTALL_DATA) \
 	   compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
@@ -687,16 +690,13 @@ endif
 	    "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	    middle_end/*.cmt middle_end/*.cmti \
-	    middle_end/*.mli \
+	    $(addprefix middle_end/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	    middle_end/base_types/*.cmt middle_end/base_types/*.cmti \
-	    middle_end/base_types/*.mli \
+	    $(addprefix middle_end/base_types/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	    asmcomp/*.cmt asmcomp/*.cmti \
-	    asmcomp/*.mli \
+	    $(addprefix asmcomp/, *.cmt *.cmti *.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 endif
 	$(INSTALL_DATA) \
@@ -740,9 +740,8 @@ ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	  $(LN) flexlink.opt$(EXE) flexlink$(EXE)
 endif
 	$(INSTALL_DATA) \
-	   utils/*.cmx parsing/*.cmx typing/*.cmx bytecomp/*.cmx \
-	   driver/*.cmx asmcomp/*.cmx middle_end/*.cmx \
-	   middle_end/base_types/*.cmx "$(INSTALL_COMPLIBDIR)"
+	  $(call COMPILER_ARTEFACT_DIRS, *.cmx, $(NATIVE_ARTEFACT_DIRS)) \
+    "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
            compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlcommon.$(A) \
 	   compilerlibs/ocamlbytecomp.cmxa compilerlibs/ocamlbytecomp.$(A) \
@@ -768,10 +767,9 @@ endif
 install-compiler-sources:
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	   utils/*.ml parsing/*.ml typing/*.ml bytecomp/*.ml driver/*.ml \
-	   toplevel/*.ml middle_end/*.ml middle_end/base_types/*.ml \
-	   asmcomp/*.ml \
-	   "$(INSTALL_COMPLIBDIR)"
+	  $(call COMPILER_ARTEFACT_DIRS, *.ml, $(NATIVE_ARTEFACT_DIRS)) \
+	  toplevel/*.ml \
+	  "$(INSTALL_COMPLIBDIR)"
 endif
 
 # Run all tests
