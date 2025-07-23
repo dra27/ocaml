@@ -102,7 +102,8 @@ INCLUDES_NODEP=\
   -I $(ROOTDIR)/otherlibs/str \
   -I $(ROOTDIR)/otherlibs/dynlink \
   -I $(ROOTDIR)/otherlibs/dynlink/native \
-  -I $(ROOTDIR)/otherlibs/$(UNIXLIB)
+  -I $(ROOTDIR)/otherlibs/$(UNIXLIB) \
+  -I $(ROOTDIR)/runtime
 
 DEPINCLUDES=$(INCLUDES_DEP)
 INCLUDES=$(INCLUDES_DEP) $(INCLUDES_NODEP)
@@ -110,7 +111,8 @@ INCLUDES=$(INCLUDES_DEP) $(INCLUDES_NODEP)
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48 -warn-error A \
   -safe-string -strict-sequence -strict-formats -bin-annot -principal
 
-LINKFLAGS=$(INCLUDES) -nostdlib
+LINKFLAGS=$(INCLUDES) -nostdlib \
+  -set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
 
 CMOFILES=\
   odoc_config.cmo \
@@ -206,6 +208,21 @@ OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 
 $(eval $(call PROGRAM_SYNONYM,ocamldoc))
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+$(OCAMLDOC): LINKFLAGS += \
+  -use-prims $(ROOTDIR)/runtime/primitives \
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
+  -launch-method $(LAUNCH_METHOD) \
+  -runtime-search $(if $(RUNTIME_SEARCH),$(RUNTIME_SEARCH),disable)
+else
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+  # ocamldebug is linked with -g which will result in a -custom executable when
+  # shared libraries are not available. Ensure that the primitives object is
+  # compiled with the correct flags
+$(OCAMLDOC): LINKFLAGS += $(addprefix -ccopt$(SPACE), $(OC_MAP_CFLAGS))
+endif
+endif
+
 $(OCAMLDOC): $(EXECMOFILES)
 	$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_BCLIBRARIES) $^
 
@@ -292,19 +309,16 @@ INSTALL_MANODIR=$(INSTALL_MANDIR)/man3
 .PHONY: install
 install:
 	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
+	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
 	$(MKDIR) "$(INSTALL_MANODIR)"
 	$(INSTALL_PROG) $(OCAMLDOC) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) \
 	  ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBCMIS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 endif
 	if test -d stdlib_man; then \
 	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANODIR)"; \
@@ -320,19 +334,11 @@ installopt:
 .PHONY: installopt_really
 installopt_really:
 	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
+	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLDOC)"
 	$(INSTALL_PROG) $(OCAMLDOC_OPT) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBCMIS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-endif
-	$(INSTALL_DATA) \
-	  ocamldoc.hva *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	  *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
+	  "$(INSTALL_LIBDIR_OCAMLDOC)"
 
 # TODO: also split into several rules
 
