@@ -378,11 +378,11 @@ FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
 # etc.)
 COMPILER_ARTEFACT_DIRS = \
   $(foreach dir, \
-      utils parsing typing bytecomp file_formats lambda driver toplevel \
+      utils parsing typing bytecomp file_formats lambda driver \
       $(if $(filter-out undefined, $(origin 2)), $(2)), \
     $(addprefix $(dir)/, $(1)))
 NATIVE_ARTEFACT_DIRS = \
-  asmcomp toplevel/native \
+  asmcomp \
   middle_end middle_end/closure middle_end/flambda middle_end/flambda/base_types
 
 # Installation
@@ -407,11 +407,11 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 endif
 	$(INSTALL_PROG) yacc/ocamlyacc$(EXE) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) \
-	  $(call COMPILER_ARTEFACT_DIRS, *.cmi) \
+	  $(call COMPILER_ARTEFACT_DIRS, *.cmi, toplevel) \
 	  "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	  $(call COMPILER_ARTEFACT_DIRS, *.cmt *.cmti *.mli) \
+	  $(call COMPILER_ARTEFACT_DIRS, *.cmt *.cmti *.mli, toplevel) \
 	  "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
 	   toplevel/byte/*.cmt \
@@ -578,7 +578,7 @@ install-compiler-sources:
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(call COMPILER_ARTEFACT_DIRS, *.ml, $(NATIVE_ARTEFACT_DIRS)) \
-	  toplevel/byte/*.ml \
+	  toplevel/*.ml toplevel/byte/*.ml \
 	  "$(INSTALL_COMPLIBDIR)"
 endif
 
