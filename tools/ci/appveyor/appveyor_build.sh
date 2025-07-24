@@ -204,10 +204,10 @@ case "$1" in
       opam switch create "$OPAMSWITCH" --empty
       opam pin add --no-action --kind=path ocaml-variants .
       opam pin add --no-action flexdll flexdll
-      opam install --yes flexdll winpthreads
+      opam install --yes flexdll
       opam install --yes --assume-built ocaml-variants
-      git checkout -- ocaml-variants.install
-      rm -f config.cache ocaml-variants-fixup.sh ocaml-compiler-clone.sh
+      rm -f config.cache ocaml-variants.install ocaml-variants-fixup.sh \
+            ocaml-compiler-clone.sh
       opam exec -- ocamlc -v
     )
     run "test $PORT in prefix" \
