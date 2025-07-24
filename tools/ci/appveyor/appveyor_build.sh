@@ -145,12 +145,13 @@ case "$1" in
       cd "$FULL_BUILD_PREFIX-$PORT"
       export PATH="$FLEXDLLROOT:$PATH"
       opam init --bare --yes --disable-sandboxing --auto-setup \
-                --cygwin-local-install
+                --no-cygwin-setup --no-git-location --bypass-checks
       opam switch create "$OPAMSWITCH" --empty
       opam pin add --no-action --kind=path ocaml-variants .
       opam pin add --no-action flexdll flexdll
       opam install --yes flexdll
       opam install --yes --assume-built ocaml-variants
+      rm -f config.cache ocaml-variants.install ocaml-variants-fixup.sh
       opam exec -- ocamlc -v
     )
     run "test $PORT in prefix" \

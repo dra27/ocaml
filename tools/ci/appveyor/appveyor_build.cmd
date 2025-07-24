@@ -125,8 +125,8 @@ rem in the list just so that the Cygwin version is always displayed on the log).
 rem CYGWIN_COMMANDS is a corresponding command to run with --version to test
 rem whether the package works. This is used to verify whether the installation
 rem needs upgrading.
-set CYGWIN_PACKAGES=cygwin make diffutils unzip
-set CYGWIN_COMMANDS=cygcheck make diff unzip
+set CYGWIN_PACKAGES=cygwin make diffutils
+set CYGWIN_COMMANDS=cygcheck make diff
 if "%PORT%" equ "mingw32" (
   rem mingw64-i686-runtime does not need explicitly installing, but it's useful
   rem to have the version reported.
