@@ -42,7 +42,8 @@ $(and $(filter-out 1,$(words $1)),$(error \
 $(call PROGRAM_SYNONYM, $1)
 
 $1$(EXE): $3 $2
-	$$(CAMLC) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
+	$$(CAMLC) $$(call ADD_BYTECODE_RUNTIME, $$(LINKFLAGS)) $$(LINKFLAGS) \
+	          -I $$(ROOTDIR) -o $$@ $2
 
 $(call PROGRAM_SYNONYM, $1.opt)
 
@@ -78,7 +79,7 @@ INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
                        file_formats lambda)
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -strict-sequence -warn-error A \
  -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
-LINKFLAGS = $(INCLUDES)
+LINKFLAGS = $(INCLUDES) $(OC_COMMON_LINKFLAGS)
 VPATH := $(filter-out -I,$(INCLUDES))
 
 .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
@@ -109,7 +110,7 @@ CSLPROF_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
   pprintast.cmo \
   lexer.cmo parse.cmo
 
-$(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) profiling.cmo $(CSLPROF),)
+$(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) $(CSLPROF),profiling.cmo)
 
 ocamlcp_cmos = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
                warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
@@ -144,7 +145,7 @@ $(call byte_and_opt,ocamlmklib,ocamlmklibconfig.cmo config.cmo \
 
 
 ocamlmklibconfig.ml: $(ROOTDIR)/Makefile.config Makefile
-	(echo 'let bindir = "$(BINDIR)"'; \
+	(echo 'let bindir = {|$(OCAML_BINDIR)|}'; \
          echo 'let supports_shared_libraries = $(SUPPORTS_SHARED_LIBRARIES)';\
          echo 'let default_rpath = "$(RPATH)"'; \
          echo 'let mksharedlibrpath = "$(MKSHAREDLIBRPATH)"'; \
@@ -169,33 +170,26 @@ $(call byte_and_opt,ocamlmktop,$(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP),)
 
 LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
 
-ifeq ($(UNIX_OR_WIN32),unix)
-LN := ln -sf
-else
-LN := cp -pf
-endif
-
+define INSTALL_ONE_TOOL
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	for i in $(install_files); \
-	do \
-	  $(INSTALL_PROG) "$$i$(EXE)" "$(INSTALL_BINDIR)/$$i.byte$(EXE)"; \
-	  if test -f "$$i".opt$(EXE); then \
-	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)" && \
-	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
-	  else \
-	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.byte$(EXE)" "$$i$(EXE)"); \
-	  fi; \
-	done
+	$(INSTALL_PROG) "$(1)$(EXE)" "$(INSTALL_BINDIR)/$(1).byte$(EXE)"; \
+	if test -f "$(1)".opt$(EXE); then \
+	  $(INSTALL_PROG) "$(1).opt$(EXE)" "$(INSTALL_BINDIR)" && \
+	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
+	else \
+	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).byte$(EXE)" "$(1)$(EXE)"); \
+	fi
 else
-	for i in $(install_files); \
-	do \
-	  if test -f "$$i".opt$(EXE); then \
-	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)"; \
-	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
-	  fi; \
-	done
+	if test -f "$(1)".opt$(EXE); then \
+	  $(INSTALL_PROG) "$(1).opt$(EXE)" "$(INSTALL_BINDIR)"; \
+	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
+	fi
 endif
+endef
+
+$(foreach tool, $(install_files), \
+  $(eval $(call INSTALL_ONE_TOOL,$(tool))))
 
 # The preprocessor for asm generators
 
@@ -325,11 +319,28 @@ caml_tex_files := \
   $(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.cma \
   caml_tex.ml
 
+# checkstack tool
+
+checkstack$(EXE): checkstack.$(O)
+	$(MKEXE) $(OUTPUTEXE)$@ $<
+
 #Scan latex files, and run ocaml code examples
 
 caml_tex := caml-tex$(EXE)
 
-$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+$(caml_tex): LINKFLAGS += \
+  -use-prims $(ROOTDIR)/runtime/primitives \
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
+  -launch-method $(LAUNCH_METHOD)
+endif
+
+# caml-tex uses str.cma and unix.cma and so must be compiled with
+# $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
+# compiler does not necessarily have the correct shared library
+# configuration.
+$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
+                         -I $(ROOTDIR)/runtime
 $(caml_tex): $(caml_tex_files)
 	$(ROOTDIR)/runtime/ocamlrun$(EXE) $(ROOTDIR)/ocamlc$(EXE) -nostdlib \
 	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
