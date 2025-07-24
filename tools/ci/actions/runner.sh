@@ -16,7 +16,8 @@
 
 set -xe
 
-PREFIX=~/local
+# The prefix is designed to be usable as an opam local switch
+PREFIX=~/local/_opam
 
 MAKE="make $MAKE_ARG"
 SHELL=dash
@@ -56,11 +57,12 @@ EOF
   # $CONFIG_ARG also appears last to allow settings specified here to be
   # overridden by the workflows.
   call-configure --prefix="$PREFIX" \
+                 --docdir="$PREFIX/doc/ocaml" \
                  --enable-flambda-invariants \
                  --enable-ocamltest \
                  --enable-native-toplevel \
                  --disable-dependency-generation \
-                 $CONFIG_ARG
+                 -C $CONFIG_ARG
 }
 
 Build () {
@@ -225,7 +227,7 @@ Checks () {
   # we would need to redo (small parts of) world.opt afterwards to
   # use the compiler again
   $MAKE check_all_arches
-  # Ensure that .gitignore is up-to-date - this will fail if any untreacked or
+  # Ensure that .gitignore is up-to-date - this will fail if any untracked or
   # altered files exist.
   test -z "$(git status --porcelain)"
   # check that the 'clean' target also works
@@ -234,7 +236,9 @@ Checks () {
   $MAKE -C manual distclean
   # check that the `distclean` target definitely cleans the tree
   $MAKE distclean
-  # Check the working tree is clean
+  # Check the working tree is clean - config.cache is intentionally not deleted
+  # by any of the clean targets
+  rm config.cache
   test -z "$(git status --porcelain)"
   # Check that there are no ignored files
   test -z "$(git ls-files --others -i --exclude-standard)"
@@ -298,6 +302,23 @@ BasicCompiler () {
   ReportBuildStatus 0
 }
 
+CreateSwitch () {
+  # This can be switched to use the Ubuntu package when Ubuntu 26.04 is deployed
+  # (opam 2.1.5 in Ubuntu 24.04 is too old)
+  curl -Lo opam \
+ 'https://github.com/ocaml/opam/releases/download/2.4.1/opam-2.4.1-x86_64-linux'
+  chmod +x opam
+  ./opam init --bare --disable-sandboxing --yes --auto-setup
+  # This is intentionally done before the switch is created - if the install
+  # target creates _opam then the switch creation will fail.
+  $MAKE INSTALL_MODE=opam OPAM_PACKAGE_NAME=ocaml-variants install
+  ./opam switch create ~/local --empty
+  ./opam switch --switch ~/local set-invariant --no-action ocaml-option-flambda
+  ./opam pin add --switch ~/local --no-action --kind=path ocaml-variants .
+  ./opam install --switch ~/local --yes --assume-built ocaml-variants
+  ./opam exec --switch ~/local -- ocamlopt -v
+}
+
 case $1 in
 configure) Configure;;
 build) Build;;
@@ -311,6 +332,7 @@ re-test-in-prefix) Re-Test-In-Prefix;;
 manual) BuildManual;;
 other-checks) Checks;;
 basic-compiler) BasicCompiler;;
+opam) CreateSwitch;;
 *) echo "Unknown CI instruction: $1"
    exit 1;;
 esac
