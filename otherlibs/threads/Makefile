@@ -27,6 +27,12 @@ OC_CPPFLAGS += -I$(ROOTDIR)/runtime
 CAMLC=$(CAMLRUN) $(ROOTDIR)/ocamlc -nostdlib \
       -I $(ROOTDIR)/stdlib -I $(ROOTDIR)/otherlibs/unix
 MKLIB=$(CAMLRUN) $(ROOTDIR)/tools/ocamlmklib
+ifeq "$(SUFFIXING)" "true"
+MKLIB += -suffixed
+DLLTHREADS = dllvmthreads-$(TARGET)-$(BYTECODE_RUNTIME_ID)$(EXT_DLL)
+else
+DLLTHREADS = dllvmthreads.so
+endif
 COMPFLAGS=-w +33..39 -warn-error A -bin-annot -g -safe-string
 
 C_OBJS=scheduler.o
@@ -68,16 +74,16 @@ all: libvmthreads.a threads.cma stdlib.cma unix.cma
 allopt:
 
 libvmthreads.a: $(C_OBJS)
-	$(MKLIB) -o threads -oc vmthreads $(C_OBJS)
+	$(MKLIB_CMD) -o threads -oc vmthreads $(C_OBJS)
 
 threads.cma: $(CAML_OBJS)
-	$(MKLIB) -ocamlc '$(CAMLC)' -o threads -oc vmthreads $^
+	$(MKLIB_CMD) -ocamlc '$(CAMLC)' -o threads -oc vmthreads $^
 
 stdlib.cma: $(LIB_OBJS)
 	$(CAMLC) -a -o $@ $^
 
 unix.cma: $(UNIXLIB_OBJS)
-	$(MKLIB) -ocamlc '$(CAMLC)' -o unix -linkall $^
+	$(MKLIB_CMD) -ocamlc '$(CAMLC)' -o unix -linkall $^
 
 stdlib.cmo: stdlib.mli stdlib.cmi stdlib.ml
 	$(CAMLC) ${COMPFLAGS} -nopervasives \
@@ -118,12 +124,11 @@ clean: partialclean
 CMIFILES=thread.cmi mutex.cmi condition.cmi event.cmi threadUnix.cmi
 
 install:
-	if test -f dllvmthreads.so; then \
-	  $(INSTALL_PROG) dllvmthreads.so "$(INSTALL_STUBLIBDIR)"; \
+	if test -f $(DLLTHREADS); then \
+	  $(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"; \
 	fi
 	mkdir -p "$(INSTALL_LIBDIR)/vmthreads"
 	$(INSTALL_DATA) libvmthreads.a "$(INSTALL_LIBDIR)/vmthreads"
-	cd "$(INSTALL_LIBDIR)/vmthreads"; $(RANLIB) libvmthreads.a
 	$(INSTALL_DATA) \
 	  $(CMIFILES) \
 	  threads.cma stdlib.cma unix.cma \
@@ -148,7 +153,7 @@ installopt:
 	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
 .PHONY: depend
-depend:
+depend: stdlib.mli unix.mli
 ifeq "$(TOOLCHAIN)" "msvc"
 	$(error Dependencies cannot be regenerated using the MSVC ports)
 else
