@@ -71,7 +71,9 @@ function set_configuration {
   CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
   CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
 
-  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2")
+  args=('--cache-file' "$CACHE_FILE" \
+        '--prefix' "$2/_opam" \
+        '--docdir' "$2/_opam/doc/ocaml")
 
   case "$1" in
     mingw32)
@@ -103,14 +105,18 @@ function set_configuration {
     if ((failed)) ; then cat config.log ; exit $failed ; fi
   fi
 
+  cp "$CACHE_FILE" config.cache
+
   FILE=$(pwd | cygpath -f - -m)/Makefile.config
   echo "Edit $FILE to turn C compiler warnings into errors"
   sed -i -e '/^ *OC_CFLAGS *=/s/\r\?$/ '"$3"'\0/' "$FILE"
+
 #  run "Content of $FILE" cat Makefile.config
 }
 
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 FLEXDLLROOT="$PROGRAMFILES/flexdll"
+export OPAMSWITCH="$OCAMLROOT"
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
@@ -175,6 +181,40 @@ case "$1" in
       run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    make -C "$FULL_BUILD_PREFIX-$PORT" INSTALL_MODE=clone install
+    (
+      cd "$OCAMLROOT"
+      mv _opam destdir
+      #ret="$PWD"
+      #script="$PWD/ocaml-compiler-clone.sh"
+      #cd "$(find $PWD/install -name _opam -type d)"
+      mkdir -p "destdir/share/ocaml"
+      cp "$FULL_BUILD_PREFIX-$PORT/config."{cache,status} 'destdir/share/ocaml/'
+      cp "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" \
+           'destdir/share/ocaml/clone'
+      cd destdir
+      sh "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" "$OCAMLROOT/_opam"
+    )
+    rm -rf "$OCAMLROOT"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" OPAM_PACKAGE_NAME=ocaml-variants \
+      INSTALL_MODE=opam install
+    (
+      cd "$FULL_BUILD_PREFIX-$PORT"
+      export PATH="$FLEXDLLROOT:$PATH"
+      opam init --cli=2.4 --bare --yes --disable-sandboxing --auto-setup \
+                --no-cygwin-setup --no-git-location --bypass-checks
+      opam repository add --cli=2.4 --all --set-default dra27 \
+        git+https://github.com/dra27/opam-repository.git#a987c4995d15d9ff825ca65fcf4d41ee61c50a94
+      # These commands intentionally run using opam's "default" CLI
+      opam switch create "$OPAMSWITCH" --empty
+      opam pin add --no-action --kind=path ocaml-variants .
+      opam pin add --no-action flexdll flexdll
+      opam install --yes flexdll
+      opam install --yes --assume-built ocaml-variants
+      rm -f config.cache ocaml-variants.install ocaml-variants-fixup.sh \
+            ocaml-compiler-clone.sh
+      opam exec -- ocamlc -v
+    )
     run "test $PORT in prefix" \
       $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
             test-in-prefix
