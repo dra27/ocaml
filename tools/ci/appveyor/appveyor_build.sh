@@ -47,7 +47,8 @@ function run {
 # $3: C compiler flags to use to turn warnings into errors
 function set_configuration {
   args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
-        '--prefix' "$2")
+        '--prefix' "$2/_opam" \
+        '--docdir' "$2/_opam/doc/ocaml")
 
   case "$1" in
     cygwin*)
@@ -78,14 +79,18 @@ function set_configuration {
     ./configure "${args[@]}"
   fi
 
+  cp "$CACHE_DIRECTORY/config.cache-$1" config.cache
+
   FILE=$(pwd | cygpath -f - -m)/Makefile.config
   echo "Edit $FILE to turn C compiler warnings into errors"
   sed -i -e '/^ *OC_CFLAGS *=/s/\r\?$/ '"$3"'\0/' "$FILE"
+
 #  run "Content of $FILE" cat Makefile.config
 }
 
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 FLEXDLLROOT="$PROGRAMFILES/flexdll"
+export OPAMSWITCH="$OCAMLROOT"
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
@@ -135,6 +140,24 @@ case "$1" in
       run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    rm -rf "$OCAMLROOT"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" OPAM_PACKAGE_NAME=ocaml-variants \
+      INSTALL_MODE=opam install
+    (
+      cd "$FULL_BUILD_PREFIX-$PORT"
+      export PATH="$FLEXDLLROOT:$PATH"
+      opam init --bare --yes --disable-sandboxing --auto-setup \
+                --no-cygwin-setup --no-git-location --bypass-checks
+      opam repository add --all --set-default dra27 \
+        git+https://github.com/dra27/opam-repository.git#a987c4995d15d9ff825ca65fcf4d41ee61c50a94
+      opam switch create "$OPAMSWITCH" --empty
+      opam pin add --no-action --kind=path ocaml-variants .
+      opam pin add --no-action flexdll flexdll
+      opam install --yes flexdll
+      opam install --yes --assume-built ocaml-variants
+      rm -f config.cache ocaml-variants.install ocaml-variants-fixup.sh
+      opam exec -- ocamlc -v
+    )
     run "test $PORT in prefix" \
       $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
             test-in-prefix
