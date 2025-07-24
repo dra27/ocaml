@@ -14,15 +14,31 @@
 #**************************************************************************
 
 ROOTDIR = ..
+SUBDIR_NAME = stdlib
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
-TARGET_BINDIR ?= $(BINDIR)
 
-COMPILER=$(ROOTDIR)/ocamlc
-CAMLC=$(CAMLRUN) $(COMPILER)
+# There are three ways the Standard Library is compiled in bytecode:
+# 1. During coldstart
+#      - using ../boot/ocamlc which runs on ../boot/ocamlrun
+# 2. During coreall (via library),
+#      - using ../ocamlc which runs on ../boot/ocamlrun
+# 3. During coreboot (via library-cross),
+#      - using ../ocamlc which at that point runs on ../runtime/ocamlrun
+# If $(USE_BOOT_OCAMLC) is non-empty, we select case 1 and use $(BOOT_OCAMLC).
+# Otherwise, we use $(CAMLRUN) ../ocamlc, with $(CAMLRUN) being
+# ../boot/ocamlrun by default, but able to overridden by library-cross to
+# ../runtime/ocamlrun.
+USE_BOOT_OCAMLC ?=
+
+ifeq "$(USE_BOOT_OCAMLC)" ""
+CAMLC = $(CAMLRUN) $(ROOTDIR)/ocamlc
+else
+CAMLC = $(BOOT_OCAMLC)
+endif
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
           -g -warn-error A -bin-annot -nostdlib \
           -safe-string -strict-formats
@@ -65,14 +81,14 @@ PREFIXED_OBJS=$(filter stdlib__%.cmo,$(OBJS))
 UNPREFIXED_OBJS=$(PREFIXED_OBJS:stdlib__%.cmo=%)
 
 .PHONY: all
-all: stdlib.cma std_exit.cmo camlheader target_camlheader camlheader_ur
+all: stdlib.cma std_exit.cmo $(HEADER_NAME) target_$(HEADER_NAME) camlheader_ur
 
 ifeq "$(RUNTIMED)" "true"
-all: camlheaderd target_camlheaderd
+all: target_camlheaderd
 endif
 
 ifeq "$(RUNTIMEI)" "true"
-all: camlheaderi target_camlheaderi
+all: target_camlheaderi
 endif
 
 ifeq "$(PROFILING)" "true"
@@ -95,6 +111,9 @@ allopt-prof: stdlib.p.cmxa std_exit.p.cmx
 LEGACY_OBJS=$(patsubst stdlib__%,"$(INSTALL_LIBDIR)/%", \
                                   $(filter stdlib__%,$(OBJS)))
 .PHONY: install
+
+# bigarray.mli is only installed if the legacy bigarray library is _not_ being
+# compiled (since its bigarray.mli will override ours)
 install::
 # Transitional: when upgrading from 4.06 -> 4.07, module M is in stdlib__m.cm*,
 # while previously it was in m.cm*, which confuses the compiler.
@@ -103,24 +122,22 @@ install::
 # Stdlib versions.
 	rm -f "$(INSTALL_LIBDIR)/pervasives.*" "$(INSTALL_LIBDIR)/bigarray.*"
 # End transitional
-	$(INSTALL_DATA) \
-	  stdlib.cma std_exit.cmo *.cmi camlheader_ur \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, stdlib.cma std_exit.cmo *.cmi camlheader_ur, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  *.cmt *.cmti *.mli *.ml \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, *.cmt *.cmti *.ml \
+	  $(if $(filter bigarray, $(OTHERLIBRARIES)), \
+	    $(filter-out bigarray.mli, $(wildcard *.mli)), *.mli), lib)
 endif
-	$(INSTALL_DATA) target_camlheader "$(INSTALL_LIBDIR)/camlheader"
+	$(call INSTALL_ITEMS, $(HEADER_NAME), lib)
 
 ifeq "$(RUNTIMED)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderd "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEM, target_camlheaderd, lib, , camlheaderd)
 endif
 
 ifeq "$(RUNTIMEI)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderi "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEM, target_camlheaderi, lib, , camlheaderi)
 endif
 
 .PHONY: installopt
@@ -128,10 +145,7 @@ installopt: installopt-default installopt-$(PROFILINGTARGET)
 
 .PHONY: installopt-default
 installopt-default:
-	$(INSTALL_DATA) \
-	  stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx \
-	  "$(INSTALL_LIBDIR)"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) stdlib.$(A)
+	$(call INSTALL_ITEMS, stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx, lib)
 
 .PHONY: installopt-noprof
 installopt-noprof:
@@ -139,90 +153,77 @@ installopt-noprof:
 .PHONY: installopt-prof
 installopt-prof:
 	$(INSTALL_DATA) \
-	  stdlib.p.cmxa stdlib.p.$(A) std_exit.p.cmx std_exit.p.$(O) \
+	  stdlib.p.cmxa stdlib.p.$(A) std_exit.p.$(O) \
 	  "$(INSTALL_LIBDIR)"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) stdlib.p.$(A)
-
-ifeq "$(UNIX_OR_WIN32)" "unix"
-HEADERPROGRAM = header.c
-else # Windows
-HEADERPROGRAM = headernt.c
-endif
-
-CAMLHEADERS =\
-  camlheader target_camlheader camlheader_ur \
-  camlheaderd target_camlheaderd \
-  camlheaderi target_camlheaderi
 
 ifeq "$(HASHBANGSCRIPTS)" "true"
-$(CAMLHEADERS): $(ROOTDIR)/Makefile.config
-	for suff in '' d i; do \
-	  echo '#!$(BINDIR)/ocamlrun'$$suff > camlheader$$suff && \
-	  echo '#!$(TARGET_BINDIR)/ocamlrun'$$suff >target_camlheader$$suff; \
-	done && \
-	echo '#!' | tr -d '\012' > camlheader_ur;
+
+camlheader_ur: Makefile
+	echo '#!' | tr -d '\012' > $@
+
+target_camlheader%: Makefile
+	echo '#!/usr/bin/false' > $@
+
 else # Hashbang scripts not supported
 
-$(CAMLHEADERS): $(HEADERPROGRAM) $(ROOTDIR)/Makefile.config
+camlheader_ur: tmpheader.exe
+	rm -f $@.exe
+	cp $< $@
 
-ifeq "$(UNIX_OR_WIN32)" "unix"
-$(CAMLHEADERS):
-	for suff in '' d i; do \
-	  $(CC) $(OC_CFLAGS) $(OC_CPPFLAGS) $(OC_LDFLAGS) \
-	            -DRUNTIME_NAME='"$(BINDIR)/ocamlrun'$$suff'"' \
-	            header.c $(OUTPUTEXE)tmpheader$(EXE) && \
-	  strip tmpheader$(EXE) && \
-	  mv tmpheader$(EXE) camlheader$$suff && \
-	  $(CC) $(OC_CFLAGS) $(OC_CPPFLAGS) $(OC_LDFLAGS) \
-	            -DRUNTIME_NAME='"$(TARGET_BINDIR)/ocamlrun'$$suff'"' \
-	            header.c $(OUTPUTEXE)tmpheader$(EXE) && \
-	  strip tmpheader$(EXE) && \
-	  mv tmpheader$(EXE) target_camlheader$$suff; \
-	done && \
-	cp camlheader camlheader_ur
+target_camlheader%: tmpheader.exe
+	rm -f $@.exe
+	cp $< $@
 
-else # Windows
+endif
 
-# TODO: see whether there is a way to further merge the rules below
-# with those above
+target_$(HEADER_NAME): tmpheader.exe
+	@cat $^ > $@
 
-camlheader: headernt.c
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) \
-	          -DRUNTIME_NAME='"ocamlrun"' $(OUTPUTOBJ)headernt.$(O) $<
-	$(MKEXE) -o tmpheader.exe headernt.$(O) $(EXTRALIBS)
-	rm -f camlheader.exe
-	mv tmpheader.exe camlheader
+$(HEADER_NAME): tmpheader.exe
+	@cat $^ > $@
 
-target_camlheader: camlheader
-	cp camlheader target_camlheader
+# The mingw-w64 and MSVC versions of tmpheader.exe are linked with special flags
+# to reduce their size (considerably). In particular, the entry point is
+# overridden, which prevents the linking of crt0.
+ifeq "$(TOOLCHAIN)" "mingw"
+# mingw-w64: optimise header.o for space and remove all unused sections during
+# linking.
+header.o: OC_CFLAGS += -Os
+ifeq "$(SYSTEM)" "mingw"
+  ENTRYPOINT = _wmainCRTStartup
+else
+  ENTRYPOINT = wmainCRTStartup
+endif
+# Certainly for GCC, -nostdlib automatically adds -nostartfiles (clang's
+# documentation is not explicit on this point, but it would be unusual for clang
+# and GCC to differ). --gc-sections removes unreferenced code and data sections.
+tmpheader.exe: OC_LDFLAGS += \
+  -nostdlib -nostartfiles -Wl,--gc-sections -Wl,-e,$(ENTRYPOINT)
+HEADERLIBS = -lkernel32
+else ifeq "$(TOOLCHAIN)" "msvc"
+# MSVC: Optimise header.obj for space. cl doesn't have an equivalent of
+# -nostdlib, however it also doesn't have default libraries in the same way as
+# GCC - the equivalent of crt0.o is linked because it provides the entry point
+# symbol, rather than by being explicitly added to the linking command line.
+# /GS- disables compilation of runtime security checks and /NOCOFFGRPINFO is an
+# undocumented linker flag which removes the debug directory from the PE+ image.
+header.obj: OC_CFLAGS += /GS- /Os
+tmpheader.exe: OC_LDFLAGS += /NOCOFFGRPINFO /subsystem:console
+HEADERLIBS = kernel32.lib
+else
+HEADERLIBS =
+endif
 
-camlheader_ur: camlheader
-	cp camlheader camlheader_ur
+.INTERMEDIATE: tmpheader.exe
+tmpheader.exe: header.$(O)
+	$(call MKEXE_BOOT,$@,$^ $(HEADERLIBS))
+# FIXME This is wrong - mingw could invoke strip; MSVC equivalent?
+ifneq "$(UNIX_OR_WIN32)" "win32"
+	strip $@
+endif
 
-camlheaderd: headernt.c
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) \
-	          -DRUNTIME_NAME='"ocamlrund"' $(OUTPUTOBJ)headerntd.$(O) $<
-	$(MKEXE) -o tmpheaderd.exe headerntd.$(O) $(EXTRALIBS)
-	mv tmpheaderd.exe camlheaderd
-
-target_camlheaderd: camlheaderd
-	cp camlheaderd target_camlheaderd
-
-camlheaderi: headernt.c
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) \
-	          -DRUNTIME_NAME='"ocamlruni"' $(OUTPUTOBJ)headernti.$(O) $<
-	$(MKEXE) -o tmpheaderi.exe headernti.$(O) $(EXTRALIBS)
-	mv tmpheaderi.exe camlheaderi
-
-target_camlheaderi: camlheaderi
-	cp camlheaderi target_camlheaderi
-
-# TODO: do not call flexlink to build tmpheader.exe (we don't need
-# the export table)
-
-endif # ifeq "$(UNIX_OR_WIN32)" "unix"
-
-endif # ifeq "$(HASHBANGSCRIPTS)" "true"
+header.$(O): header.c
+	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $^
 
 stdlib.cma: $(OBJS)
 	$(CAMLC) -a -o $@ $^
@@ -240,8 +241,13 @@ sys.ml: $(ROOTDIR)/VERSION sys.mlp
 clean::
 	rm -f sys.ml
 
+.PHONY: distclean
+distclean: clean
+	rm -f sys.ml runtime.info target_runtime.info
+
+.PHONY: clean
 clean::
-	rm -f $(CAMLHEADERS)
+	rm -f $(HEADER_NAME) target_$(HEADER_NAME)* camlheader_ur
 
 .SUFFIXES: .mli .ml .cmi .cmo .cmx .p.cmx
 
@@ -275,7 +281,7 @@ stdlib__%.p.cmx: %.ml
 	           -p -c -o $@ $<
 
 # Dependencies on the compiler
-COMPILER_DEPS=$(filter-out -use-prims, $(COMPILER))
+COMPILER_DEPS=$(filter-out $(CAMLRUN), $(CAMLC))
 $(OBJS) std_exit.cmo: $(COMPILER_DEPS)
 $(OBJS:.cmo=.cmi) std_exit.cmi: $(COMPILER_DEPS)
 $(OBJS:.cmo=.cmx) std_exit.cmx: $(OPTCOMPILER)
@@ -291,9 +297,10 @@ $(OTHERS:.cmo=.cmx) std_exit.cmx: stdlib.cmx
 $(OTHERS:.cmo=.p.cmx) std_exit.p.cmx: stdlib.cmx
 
 clean::
-	rm -f *.cm* *.$(O) *.$(A) *.odoc
+	rm -f *.cm* *.o *.obj *.a *.lib *.odoc
 	rm -f *~
 	rm -f camlheader*
+	rm -rf flexdll
 
 include .depend
 
