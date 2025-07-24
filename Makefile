@@ -764,7 +764,6 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	   utils/*.ml parsing/*.ml typing/*.ml bytecomp/*.ml driver/*.ml \
 	   toplevel/*.ml middle_end/*.ml middle_end/base_types/*.ml \
 	   asmcomp/*.ml \
-	   MARKERasmcomp/debug/*.ml \
 	   "$(INSTALL_COMPLIBDIR)"
 endif
 
