@@ -155,6 +155,8 @@ case "$1" in
       opam init --cli=2.4 --bare --yes --disable-sandboxing --auto-setup \
                 --cygwin-local-install
                 --no-cygwin-setup --no-git-location --bypass-checks
+      opam repository add --cli=2.4 --all --set-default dra27 \
+        git+https://github.com/dra27/opam-repository.git#a987c4995d15d9ff825ca65fcf4d41ee61c50a94
       # These commands intentionally run using opam's "default" CLI
       opam switch create "$OPAMSWITCH" --empty
       opam pin add --no-action --kind=path ocaml-variants .
