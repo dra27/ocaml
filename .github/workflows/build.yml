@@ -72,6 +72,7 @@ jobs:
 # "extra" testsuite runs, reusing the previously built compiler tree.
 # debug: running the full testsuite with the
 #        debug runtime and minor heap verification.
+# opam: constructs an opam local switch from the compiler.
   normal:
     name: ${{ matrix.name }}
     needs: [build, config]
@@ -82,6 +83,8 @@ jobs:
           - id: normal
             name: normal
             dependencies: texlive-latex-extra texlive-fonts-recommended hevea sass
+          - id: opam
+            name: opam installation
           - id: debug
             name: extra (debug)
       fail-fast: false
@@ -117,15 +120,19 @@ jobs:
       - name: Install
         if: matrix.id == 'normal'
         run: |
-         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
-      - name: Test in prefix
-        if: matrix.id == 'normal'
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
+      - name: Create opam switch
+        if: matrix.id == 'opam'
         run: |
-         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh opam
+      - name: Test in prefix
+        if: matrix.id == 'normal' || matrix.id == 'opam'
+        run: |
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
       - name: Test in prefix (alternate configuration)
         if: matrix.id == 'normal' && needs.config.outputs.full-matrix == 'true'
         run: |
-         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh re-test-in-prefix
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh re-test-in-prefix
       - name: Build the manual
         if: matrix.id == 'normal' && needs.build.outputs.manual_changed == 'true'
         run: |
