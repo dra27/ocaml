@@ -22,7 +22,7 @@
 
 chcp 65001 > nul
 set BUILD_PREFIX=🐫реализация
-set OCAMLROOT=%PROGRAMFILES%\Бактріан🐫
+set OCAMLROOT=C:\Бактріан🐫
 
 if "%1" neq "install" goto %1
 setlocal enabledelayedexpansion
@@ -76,7 +76,13 @@ if "%CYGWIN_INSTALL_PACKAGES%" neq "" (
   )
   "C:\projects\cache\setup-%CURRENT_SETUP_VERSION%-x86_64.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" %CYGWIN_FLAGS%--packages %CYGWIN_INSTALL_PACKAGES:~1%
 )
-for %%P in (%CYGWIN_COMMANDS%) do "%CYG_ROOT%\bin\%%P.exe" --version 2> nul > nul || set CYGWIN_UPGRADE_REQUIRED=1
+for %%P in (%CYGWIN_COMMANDS%) do (
+  if %%P equ unzip (
+    "%CYG_ROOT%\bin\%%P.exe" -v 2> nul > nul || set CYGWIN_UPGRADE_REQUIRED=1
+  ) else (
+    "%CYG_ROOT%\bin\%%P.exe" --version 2> nul > nul || set CYGWIN_UPGRADE_REQUIRED=1
+  )
+)
 "%CYG_ROOT%\bin\bash.exe" -lc "cygcheck -dc %CYGWIN_PACKAGES%"
 if %CYGWIN_UPGRADE_REQUIRED% equ 1 (
   echo Cygwin package upgrade required - please go and drink coffee
@@ -104,6 +110,9 @@ if "%BOOTSTRAP_FLEXDLL%" equ "true" (
 cd "%APPVEYOR_BUILD_FOLDER%"
 appveyor DownloadFile "https://github.com/alainfrisch/flexdll/archive/%FLEXDLL_VERSION%.tar.gz" -FileName "flexdll.tar.gz" || exit /b 1
 appveyor DownloadFile "https://github.com/alainfrisch/flexdll/releases/download/%FLEXDLL_VERSION%/flexdll-bin-%FLEXDLL_VERSION%.zip" -FileName "flexdll.zip" || exit /b 1
+appveyor DownloadFile "https://github.com/ocaml/opam/releases/download/2.4.1/opam-2.4.1-x86_64-windows.exe" -FileName "opam.exe" || exit /b 1
+md "%PROGRAMFILES%\flexdll"
+move opam.exe "%PROGRAMFILES%\flexdll"
 rem flexdll.zip is processed here, rather than in appveyor_build.sh because the
 rem unzip command comes from MSYS2 (via Git for Windows) and it has to be
 rem invoked via cmd /c in a bash script which is weird(er).
