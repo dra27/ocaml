@@ -1,7 +1,7 @@
 opam-version: "2.0"
-version: "5.2.2+trunk"
+version: "5.2.2+relocatable"
 license: "LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception"
-synopsis: "OCaml 5.2 development version"
+synopsis: "Relocatable OCaml 5.2 branch"
 maintainer: "caml-list@inria.fr"
 authors: [
   "Xavier Leroy"
@@ -47,6 +47,7 @@ depends: [
   # i686 mingw-w64 only
    ("arch-x86_32" {os = "win32"} & "ocaml-option-bytecode-only" {os = "win32"} &
      "system-mingw" & "mingw-w64-shims" {os-distribution = "cygwin" & build}) |
+MARKER
   # Non-Windows systems
    "host-system-other" {os != "win32" & post})
 
@@ -70,6 +71,8 @@ build: [
     "--host=i686-w64-mingw32"   {os-distribution = "cygwin" & system-mingw:installed & arch-x86_32:installed}
     "--prefix=%{prefix}%"
     "--docdir=%{doc}%/ocaml"
+    "--with-stublibs=../stublibs" {os != "win32"}
+    "--with-stublibs=..\\stublibs" {os = "win32"}
     "--with-flexdll=%{flexdll:share}%" {os = "win32" & flexdll:installed}
     "-C"
     "--with-afl" {ocaml-option-afl:installed}
@@ -96,8 +99,9 @@ build: [
     "--disable-warn-error"
   ]
   [make "-j%{jobs}%"]
+  [make "INSTALL_MODE=opam" "install"]
 ]
-install: [make "install"]
+install: ["sh" "./%{name}%-fixup.sh" prefix]
 conflicts: [
   "system-msvc"
 ]
