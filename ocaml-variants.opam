@@ -7,7 +7,6 @@ depends: [
   "base-bigarray" {post}
   "base-threads" {post}
 ]
-MARKER
 conflict-class: "ocaml-core-compiler"
 flags: compiler
 setenv: CAML_LD_LIBRARY_PATH = "%{lib}%/stublibs"
