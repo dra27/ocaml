@@ -157,7 +157,7 @@ case "$1" in
       cd "$FULL_BUILD_PREFIX-$PORT"
       export PATH="$FLEXDLLROOT:$PATH"
       opam init --bare --yes --disable-sandboxing --auto-setup \
-                --cygwin-local-install
+                --no-cygwin-setup --no-git-location --bypass-checks
       opam switch create "$OPAMSWITCH" --empty
       opam pin add --no-action --kind=path ocaml-variants .
       opam pin add --no-action flexdll flexdll
