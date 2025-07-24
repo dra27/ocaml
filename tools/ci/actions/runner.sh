@@ -318,7 +318,7 @@ CreateSwitch () {
   chmod +x opam
   ./opam init --bare --disable-sandboxing --yes --auto-setup
   ./opam switch create ~/local --empty
-  ./opam switch --switch ~/local set-invariant --no-action ocaml-option-flambda
+  #./opam switch --switch ~/local set-invariant --no-action ocaml-option-flambda
   ./opam pin add --switch ~/local --no-action --kind=path ocaml-variants .
   $MAKE INSTALL_MODE=opam OPAM_PACKAGE_NAME=ocaml-variants install
   ./opam install --switch ~/local --yes --assume-built ocaml-variants
