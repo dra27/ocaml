@@ -1,0 +1,32 @@
+opam-version: "2.0"
+version: "4.09.2+relocatable"
+synopsis: "Relocatable OCaml 4.09 branch"
+depends: [
+  "ocaml" {= "4.09.2" & post}
+  "base-unix" {post}
+  "base-bigarray" {post}
+  "base-threads" {post}
+]
+conflict-class: "ocaml-core-compiler"
+flags: compiler
+setenv: CAML_LD_LIBRARY_PATH = "%{lib}%/stublibs"
+build: [
+  ["./configure" "--prefix=%{prefix}%"
+   "--with-stublibs=../stublibs" {os != "win32"}
+   "--with-stublibs=..\\stublibs" {os = "win32"}]
+  [make "-j%{jobs}%" "world"]
+  [make "-j%{jobs}%" "world.opt"]
+  [make "INSTALL_MODE=opam" "install"]
+]
+install: ["sh" "./%{name}%-fixup.sh" prefix]
+maintainer: "caml-list@inria.fr"
+homepage: "https://github.com/ocaml/ocaml/"
+bug-reports: "https://github.com/ocaml/ocaml/issues"
+authors: [
+  "Xavier Leroy"
+  "Damien Doligez"
+  "Alain Frisch"
+  "Jacques Garrigue"
+  "Didier Rémy"
+  "Jérôme Vouillon"
+]

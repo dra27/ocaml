@@ -378,7 +378,7 @@ DOC_FILES=\
 # Installation
 
 .PHONY: install
-install::
+install:
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
