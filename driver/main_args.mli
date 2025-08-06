@@ -165,6 +165,8 @@ module type Bytecomp_options = sig
   val _make_runtime : unit -> unit
   val _vmthread : unit -> unit
   val _use_runtime : string -> unit
+  val _suffixed : unit -> unit
+  val _unsuffixed : unit -> unit
   val _launch_method : string -> unit
   val _search_method : string -> unit
   val _output_complete_exe : unit -> unit

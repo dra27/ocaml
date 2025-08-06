@@ -87,6 +87,7 @@ and noinit = ref false                  (* -noinit *)
 and open_modules = ref []               (* -open *)
 and use_prims = ref ""                  (* -use-prims ... *)
 and use_runtime = ref ""                (* -use-runtime ... *)
+and suffixing = ref Config.suffixing
 and launch_method =                     (* -launch-method ... *)
   ref (Config.launch_method, Config.target_bindir)
 and search_method =                     (* -search-method ... *)

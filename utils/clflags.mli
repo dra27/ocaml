@@ -113,6 +113,7 @@ val noinit : bool ref
 val noversion : bool ref
 val use_prims : string ref
 val use_runtime : string ref
+val suffixing : bool ref
 val launch_method : (Config.launch_method * string) ref
 val search_method : Config.search_method ref
 val plugin : bool ref

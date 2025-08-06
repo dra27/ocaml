@@ -358,7 +358,7 @@ let write_sh_header outchan bin_sh bindir search runtime =
   in
   let z = if last = '\'' then {|"'"|} else "'" ^ String.make 1 last ^ "'" in
   let suffix, quints =
-    if Config.suffixing then
+    if !Clflags.suffixing then
       "[01234567]", String.make 9 '*'
     else
       z, z
@@ -477,7 +477,7 @@ let write_header outchan =
         runtime, Config.Absolute
     else
       let runtime =
-        if Config.suffixing then
+        if !Clflags.suffixing then
           Misc.RuntimeID.ocamlrun !Clflags.runtime_variant
         else
           "ocamlrun" ^ !Clflags.runtime_variant
@@ -557,7 +557,7 @@ let write_header outchan =
           else
             output_string outchan runtime;
           output_char outchan '\000';
-          if Config.suffixing then begin
+          if !Clflags.suffixing then begin
             let zinc_pos = Out_channel.pos outchan in
             output_string outchan (String.make 9 '*');
             update_zinc outchan '\000' zinc_pos
@@ -876,7 +876,7 @@ value caml_startup_pooled_exn(char_os ** argv)
     output_cds_file ((Filename.chop_extension outfile) ^ ".cds")
 
 let runtime_library_name runtime_variant =
-  if runtime_variant = "_shared" && Config.suffixing then
+  if runtime_variant = "_shared" && !Clflags.suffixing then
     Misc.RuntimeID.shared_runtime Sys.Bytecode
   else
     "-lcamlrun" ^ runtime_variant

@@ -525,6 +525,12 @@ let mk_unsafe_string =
  in
  "-unsafe-string", Arg.Unit err, " (option not available)"
 
+let mk_suffixed f =
+  "-suffixed", Arg.Unit f, "Temporary option to turn on suffixing"
+
+let mk_unsuffixed f =
+  "-unsuffixed", Arg.Unit f, "Temporary option to turn off suffixing"
+
 let mk_launch_method f =
   "-launch-method", Arg.String f,
   "<method>  Specify the mechanism for the bytecode launcher:\n\
@@ -961,6 +967,8 @@ module type Bytecomp_options = sig
   val _make_runtime : unit -> unit
   val _vmthread : unit -> unit
   val _use_runtime : string -> unit
+  val _suffixed : unit -> unit
+  val _unsuffixed : unit -> unit
   val _launch_method : string -> unit
   val _search_method : string -> unit
   val _output_complete_exe : unit -> unit
@@ -1160,6 +1168,8 @@ struct
     mk_unsafe_string;
     mk_use_runtime F._use_runtime;
     mk_use_runtime_2 F._use_runtime;
+    mk_suffixed F._suffixed;
+    mk_unsuffixed F._unsuffixed;
     mk_launch_method F._launch_method;
     mk_search_method F._search_method;
     mk_v F._v;
@@ -2013,6 +2023,8 @@ third-party libraries such as Lwt, but with a different API."
     let _output_obj () = output_c_object := true; custom_runtime := true
     let _use_prims s = use_prims := s
     let _use_runtime s = use_runtime := s
+    let _suffixed = set suffixing
+    let _unsuffixed = clear suffixing
     let _launch_method s =
       let s, bindir =
         try Misc.cut_at s ' '
