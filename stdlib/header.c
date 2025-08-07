@@ -64,6 +64,37 @@ static BOOL WINAPI ctrl_handler(DWORD event)
     return FALSE;
 }
 
+static void exec_file(wchar_t *file, wchar_t *cmdline)
+{
+  wchar_t truename[MAX_PATH];
+  STARTUPINFO stinfo;
+  PROCESS_INFORMATION procinfo;
+  DWORD retcode;
+
+  if (SearchPath(NULL, file, L".exe", sizeof(truename)/sizeof(wchar_t),
+                 truename, NULL)) {
+    /* Need to ignore ctrl-C and ctrl-break, otherwise we'll die and take the
+       underlying OCaml program with us! */
+    SetConsoleCtrlHandler(ctrl_handler, TRUE);
+
+    stinfo.cb = sizeof(stinfo);
+    stinfo.lpReserved = NULL;
+    stinfo.lpDesktop = NULL;
+    stinfo.lpTitle = NULL;
+    stinfo.dwFlags = 0;
+    stinfo.cbReserved2 = 0;
+    stinfo.lpReserved2 = NULL;
+    if (CreateProcess(truename, cmdline, NULL, NULL, TRUE, 0, NULL, NULL,
+                      &stinfo, &procinfo)) {
+      CloseHandle(procinfo.hThread);
+      WaitForSingleObject(procinfo.hProcess, INFINITE);
+      GetExitCodeProcess(procinfo.hProcess, &retcode);
+      CloseHandle(procinfo.hProcess);
+      ExitProcess(retcode);
+    }
+  }
+}
+
 static void write_error(const wchar_t *wstr, HANDLE hOut)
 {
   DWORD consoleMode, numwritten, len;
@@ -202,6 +233,11 @@ NORETURN static void exit_with_error(const char *str1,
   exit(2);
 }
 
+static void exec_file(const char *file, char * const argv[])
+{
+  execvp(file, argv);
+}
+
 #endif /* defined(_WIN32) */
 
 #define CAML_INTERNALS
@@ -253,9 +289,6 @@ NORETURN void __cdecl wmainCRTStartup(void)
   char *runtime_path;
   wchar_t wruntime_path[MAX_PATH];
   HANDLE h;
-  STARTUPINFO stinfo;
-  PROCESS_INFORMATION procinfo;
-  DWORD retcode;
 
   if (GetModuleFileName(NULL, truename, sizeof(truename)/sizeof(wchar_t)) == 0)
     exit_with_error(L"Out of memory", NULL, NULL);
@@ -269,28 +302,7 @@ NORETURN void __cdecl wmainCRTStartup(void)
     exit_with_error(NULL, truename,
                     L" not found or is not a bytecode executable file");
   CloseHandle(h);
-  if (SearchPath(NULL, wruntime_path, L".exe", sizeof(truename)/sizeof(wchar_t),
-                 truename, NULL)) {
-    /* Need to ignore ctrl-C and ctrl-break, otherwise we'll die and take
-       the underlying OCaml program with us! */
-    SetConsoleCtrlHandler(ctrl_handler, TRUE);
-
-    stinfo.cb = sizeof(stinfo);
-    stinfo.lpReserved = NULL;
-    stinfo.lpDesktop = NULL;
-    stinfo.lpTitle = NULL;
-    stinfo.dwFlags = 0;
-    stinfo.cbReserved2 = 0;
-    stinfo.lpReserved2 = NULL;
-    if (CreateProcess(truename, GetCommandLine(), NULL, NULL, TRUE, 0,
-                      NULL, NULL, &stinfo, &procinfo)) {
-      CloseHandle(procinfo.hThread);
-      WaitForSingleObject(procinfo.hProcess, INFINITE);
-      GetExitCodeProcess(procinfo.hProcess, &retcode);
-      CloseHandle(procinfo.hProcess);
-      ExitProcess(retcode);
-    }
-  }
+  exec_file(wruntime_path, GetCommandLine());
 
   exit_with_error(L"Cannot exec ", wruntime_path, NULL);
 }
@@ -310,7 +322,7 @@ int main(int argc, char *argv[])
   close(fd);
 
   argv[0] = truename;
-  execvp(runtime_path, argv);
+  exec_file(runtime_path, argv);
 
   exit_with_error("Cannot exec ", runtime_path, NULL);
 }
