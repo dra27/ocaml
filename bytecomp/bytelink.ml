@@ -233,21 +233,14 @@ let link_compunit output_fun currpos_fun inchan file_name compunit =
 (* Link in a .cmo file *)
 
 let link_object output_fun currpos_fun file_name compunit =
-  let inchan = open_in_bin file_name in
-  try
-    link_compunit output_fun currpos_fun inchan file_name compunit;
-    close_in inchan
-  with
-    Symtable.Error msg ->
-      close_in inchan; raise(Error(Symbol_error(file_name, msg)))
-  | x ->
-      close_in inchan; raise x
+  In_channel.with_open_bin file_name @@ fun inchan ->
+    try link_compunit output_fun currpos_fun inchan file_name compunit
+    with Symtable.Error msg -> raise(Error(Symbol_error(file_name, msg)))
 
 (* Link in a .cma file *)
 
 let link_archive output_fun currpos_fun file_name units_required =
-  let inchan = open_in_bin file_name in
-  try
+  In_channel.with_open_bin file_name @@ fun inchan ->
     List.iter
       (fun cu ->
          let n = Compunit.name cu.cu_name in
@@ -256,9 +249,7 @@ let link_archive output_fun currpos_fun file_name units_required =
            link_compunit output_fun currpos_fun inchan name cu
          with Symtable.Error msg ->
            raise(Error(Symbol_error(name, msg))))
-      units_required;
-    close_in inchan
-  with x -> close_in inchan; raise x
+      units_required
 
 (* Link in a .cmo or .cma file *)
 
@@ -267,6 +258,9 @@ let link_file output_fun currpos_fun = function
       link_object output_fun currpos_fun file_name unit
   | Link_archive(file_name, units) ->
       link_archive output_fun currpos_fun file_name units
+
+let link_files output_fun currpos_fun =
+  List.iter (link_file output_fun currpos_fun)
 
 (* Output the debugging information *)
 (* Format is:
@@ -496,7 +490,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
        let output_fun buf =
          Out_channel.output_bigarray outchan buf 0 (Bigarray.Array1.dim buf)
        and currpos_fun () = pos_out outchan - start_code in
-       List.iter (link_file output_fun currpos_fun) tolink;
+       link_files output_fun currpos_fun tolink;
        if check_dlls then Dll.close_all_dlls();
        (* The final STOP instruction *)
        output_byte outchan Opcodes.opSTOP;
@@ -622,7 +616,7 @@ static int caml_code[] = {
          output_code_string outchan code;
          currpos := !currpos + (Bigarray.Array1.dim code)
        and currpos_fun () = !currpos in
-       List.iter (link_file output_fun currpos_fun) tolink;
+       link_files output_fun currpos_fun tolink;
        (* The final STOP instruction *)
        Printf.fprintf outchan "\n0x%x};\n" Opcodes.opSTOP;
        (* The table of global data *)
