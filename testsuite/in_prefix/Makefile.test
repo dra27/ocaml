@@ -41,9 +41,6 @@ endif
 test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O)
 	@$< $(DRIVER_ARGS)
 
-SCRUB_ENV = \
-  CAML_LD_LIBRARY_PATH OCAMLLIB CAMLLIB OCAMLPARAM OCAMLRUNPARAM CAMLRUNPARAM
-
 # Generates --without-$(1) if $(2) = false or --with-$(1) otherwise
 bool_to_with = --with$(if $(filter false,$(2)),out)-$(strip $(1))
 
