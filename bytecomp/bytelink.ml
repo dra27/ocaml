@@ -201,7 +201,7 @@ let debug_info = ref ([] : (int * Instruct.debug_event list * string list) list)
 
 (* Link in a compilation unit *)
 
-let link_compunit output_fun currpos_fun inchan file_name compunit =
+let link_compunit accu output_fun currpos_fun inchan file_name compunit =
   check_consistency file_name compunit;
   seek_in inchan compunit.cu_pos;
   let code_block =
@@ -227,40 +227,44 @@ let link_compunit output_fun currpos_fun inchan file_name compunit =
     debug_info := (currpos_fun(), debug_event_list, debug_dirs) :: !debug_info
   end;
   output_fun code_block;
-  if !Clflags.link_everything then
-    List.iter Symtable.require_primitive compunit.cu_primitives
+  let fold_primitive uses_dynlink name =
+    if !Clflags.link_everything then
+      Symtable.require_primitive name;
+    (uses_dynlink || name = "caml_reify_bytecode")
+  in
+  List.fold_left fold_primitive accu compunit.cu_primitives
 
 (* Link in a .cmo file *)
 
-let link_object output_fun currpos_fun file_name compunit =
+let link_object accu output_fun currpos_fun file_name compunit =
   In_channel.with_open_bin file_name @@ fun inchan ->
-    try link_compunit output_fun currpos_fun inchan file_name compunit
+    try link_compunit accu output_fun currpos_fun inchan file_name compunit
     with Symtable.Error msg -> raise(Error(Symbol_error(file_name, msg)))
 
 (* Link in a .cma file *)
 
-let link_archive output_fun currpos_fun file_name units_required =
+let link_archive accu output_fun currpos_fun file_name units_required =
   In_channel.with_open_bin file_name @@ fun inchan ->
-    List.iter
-      (fun cu ->
+    List.fold_left
+      (fun accu cu ->
          let n = Compunit.name cu.cu_name in
          let name = file_name ^ "(" ^ n ^ ")" in
          try
-           link_compunit output_fun currpos_fun inchan name cu
+           link_compunit accu output_fun currpos_fun inchan name cu
          with Symtable.Error msg ->
            raise(Error(Symbol_error(name, msg))))
-      units_required
+      accu units_required
 
 (* Link in a .cmo or .cma file *)
 
-let link_file output_fun currpos_fun = function
+let link_file output_fun currpos_fun accu = function
     Link_object(file_name, unit) ->
-      link_object output_fun currpos_fun file_name unit
+      link_object accu output_fun currpos_fun file_name unit
   | Link_archive(file_name, units) ->
-      link_archive output_fun currpos_fun file_name units
+      link_archive accu output_fun currpos_fun file_name units
 
 let link_files output_fun currpos_fun =
-  List.iter (link_file output_fun currpos_fun)
+  List.fold_left (link_file output_fun currpos_fun) false
 
 (* Output the debugging information *)
 (* Format is:
@@ -490,7 +494,10 @@ let link_bytecode ?final_name tolink exec_name standalone =
        let output_fun buf =
          Out_channel.output_bigarray outchan buf 0 (Bigarray.Array1.dim buf)
        and currpos_fun () = pos_out outchan - start_code in
-       link_files output_fun currpos_fun tolink;
+       (* link_files returns true if any module refers to caml_reify_bytecode,
+          which is used solely by the toplevel and dynlink libraries and is used
+          to control whether we included the CRCS section. *)
+       let uses_dynlink = link_files output_fun currpos_fun tolink in
        if check_dlls then Dll.close_all_dlls();
        (* The final STOP instruction *)
        output_byte outchan Opcodes.opSTOP;
@@ -517,8 +524,10 @@ let link_bytecode ?final_name tolink exec_name standalone =
        Symtable.output_global_map outchan;
        Bytesections.record toc_writer SYMB;
        (* CRCs for modules *)
-       output_value outchan (extract_crc_interfaces());
-       Bytesections.record toc_writer CRCS;
+       if uses_dynlink then begin
+         output_value outchan (extract_crc_interfaces());
+         Bytesections.record toc_writer CRCS
+       end;
        (* Debug info *)
        if !Clflags.debug then begin
          output_debug_info outchan;
@@ -616,7 +625,7 @@ static int caml_code[] = {
          output_code_string outchan code;
          currpos := !currpos + (Bigarray.Array1.dim code)
        and currpos_fun () = !currpos in
-       link_files output_fun currpos_fun tolink;
+       let uses_dynlink = link_files output_fun currpos_fun tolink in
        (* The final STOP instruction *)
        Printf.fprintf outchan "\n0x%x};\n" Opcodes.opSTOP;
        (* The table of global data *)
@@ -629,17 +638,19 @@ static char caml_data[] = {
 };
 |};
        (* The sections *)
-       let sections : (string * Obj.t) array =
-         [| Bytesections.Name.to_string SYMB,
-            Symtable.data_global_map();
-            Bytesections.Name.to_string CRCS,
-            Obj.repr(extract_crc_interfaces()) |]
+       let sections : (string * Obj.t) list =
+         (Bytesections.Name.to_string SYMB, Symtable.data_global_map()) ::
+         if uses_dynlink then
+           [ Bytesections.Name.to_string CRCS,
+             Obj.repr(extract_crc_interfaces()) ]
+         else
+           []
        in
        output_string outchan {|
 static char caml_sections[] = {
 |};
        output_data_string outchan
-         (Marshal.to_string sections []);
+         (Marshal.to_string (Array.of_list sections) []);
        output_string outchan {|
 };
 
