@@ -713,13 +713,6 @@ CMPCMD ?= $(OCAMLRUN) tools/cmpbyt$(EXE)
 
 .PHONY: compare
 compare:
-# The core system has to be rebuilt after bootstrap anyway, so strip ocamlc
-# and ocamllex, which means the artefacts should be identical.
-	mv ocamlc$(EXE) ocamlc.tmp
-	$(OCAMLRUN) tools/stripdebug$(EXE) -all ocamlc.tmp ocamlc$(EXE)
-	mv lex/ocamllex$(EXE) ocamllex.tmp
-	$(OCAMLRUN) tools/stripdebug$(EXE) -all ocamllex.tmp lex/ocamllex$(EXE)
-	rm -f ocamllex.tmp ocamlc.tmp
 	@if $(CMPCMD) boot/ocamlc ocamlc$(EXE) \
          && $(CMPCMD) boot/ocamllex lex/ocamllex$(EXE); \
 	then echo "Fixpoint reached, bootstrap succeeded."; \
@@ -730,12 +723,10 @@ compare:
 
 # Promote a compiler
 
-PROMOTE ?= cp
-
 .PHONY: promote-common
 promote-common:
-	$(PROMOTE) ocamlc$(EXE) boot/ocamlc
-	$(PROMOTE) lex/ocamllex$(EXE) boot/ocamllex
+	cp ocamlc$(EXE) boot/ocamlc
+	cp lex/ocamllex$(EXE) boot/ocamllex
 	cd stdlib; cp $(LIBFILES) ../boot
 
 # Promote the newly compiled system to the rank of cross compiler
@@ -746,7 +737,6 @@ promote-cross: promote-common
 # Promote the newly compiled system to the rank of bootstrap compiler
 # (Runs on the new runtime, produces code for the new runtime)
 .PHONY: promote
-promote: PROMOTE = $(OCAMLRUN) tools/stripdebug$(EXE) -all
 promote: promote-common
 	rm -f boot/ocamlrun$(EXE)
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
@@ -957,6 +947,10 @@ ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
 ocamlc_SOURCES = driver/main.mli driver/main.ml
 
 ocamlc$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32 -g
+
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamlc_BYTECODE_LINKFLAGS += -no-g -without-runtime
+endif
 
 partialclean::
 	rm -f ocamlc ocamlc.exe ocamlc.opt ocamlc.opt.exe
@@ -1694,6 +1688,10 @@ ocamllex.opt: ocamlopt
 	$(MAKE) lex-allopt
 
 lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
+
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamllex_BYTECODE_LINKFLAGS += -no-g -without-runtime
+endif
 
 partialclean::
 	rm -f lex/*.cm* lex/*.o lex/*.obj \
