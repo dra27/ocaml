@@ -115,16 +115,14 @@ let () =
     in
     List.map add_dependencies libraries
   in
-  let runtime_launch_info =
-    let file = Filename.concat libdir "runtime-launch-info" in
-    Bytelink.read_runtime_launch_info file in
   let header_size =
-    let {Bytelink.buffer; executable_offset; _} = runtime_launch_info in
-    String.length buffer - executable_offset in
+    (Unix.stat (Filename.concat libdir "runtime-launch-info")).Unix.st_size in
   let bytecode_shebangs_by_default =
-    runtime_launch_info.launcher <> Bytelink.Executable in
-  let launcher_searches_for_ocamlrun = Sys.win32 in
-  let target_launcher_searches_for_ocamlrun = Sys.win32 in
+    Config.launch_method <> Config.Executable in
+  let launcher_searches_for_ocamlrun =
+    (config.has_runtime_search <> Config.Absolute) in
+  let target_launcher_searches_for_ocamlrun =
+    (Config.search_method <> Config.Absolute) in
   let config =
     {config with libraries;
                  launcher_searches_for_ocamlrun;
@@ -157,7 +155,7 @@ let () =
     && (not Toolchain.c_compiler_always_embeds_build_path
         || not Toolchain.c_compiler_debug_paths_can_be_absolute)
   in
-  let target_relocatable = false in
+  let target_relocatable = (Config.search_method <> Config.Absolute) in
   (* Use Harness.pp_path unless --verbose was specified *)
   let pp_path =
     if verbose then
