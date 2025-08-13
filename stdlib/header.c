@@ -22,11 +22,22 @@
   #define NORETURN _Noreturn
 #endif
 
+#include <errno.h>
+
 #ifdef _WIN32
 
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
+/* The header is written to be able to cope with paths greater than MAX_PATH,
+   so undefine it to stop it being used in error. */
+#undef MAX_PATH
+
+#if defined(__MINGW32__) && defined(PATH_MAX)
+/* mingw-w64 has a limits.h which defines PATH_MAX as an alias for MAX_PATH */
+#undef PATH_MAX
+#endif
 
 #if WINDOWS_UNICODE
 #define CP CP_UTF8
@@ -34,10 +45,15 @@
 #define CP CP_ACP
 #endif
 
-/* mingw-w64 has a limits.h which defines PATH_MAX as an alias for MAX_PATH */
-#if !defined(PATH_MAX)
-#define PATH_MAX MAX_PATH
-#endif
+/* The maximum representable path for any API function, after internal expansion
+   of \\?\ etc. is 32767 characters. PATH_MAX includes the terminator. */
+#define PATH_MAX 0x8000
+
+/* Initialised as the first statement of wmainCRTStartup */
+static HANDLE hProcessHeap;
+
+#define malloc(size) HeapAlloc(hProcessHeap, 0, (size))
+#define free(memblock) HeapFree(hProcessHeap, 0, (memblock))
 
 #define SEEK_END FILE_END
 
@@ -62,13 +78,12 @@ static BOOL WINAPI ctrl_handler(DWORD event)
 
 static void exec_file(wchar_t *file, wchar_t *cmdline)
 {
-  wchar_t truename[MAX_PATH];
+  LPWSTR truename = (LPWSTR)malloc(PATH_MAX * sizeof(WCHAR));
   STARTUPINFO stinfo;
   PROCESS_INFORMATION procinfo;
   DWORD retcode;
 
-  if (SearchPath(NULL, file, L".exe", sizeof(truename)/sizeof(wchar_t),
-                 truename, NULL)) {
+  if (truename && SearchPath(NULL, file, L".exe", PATH_MAX, truename, NULL)) {
     /* Need to ignore ctrl-C and ctrl-break, otherwise we'll die and take the
        underlying OCaml program with us! */
     SetConsoleCtrlHandler(ctrl_handler, TRUE);
@@ -82,6 +97,7 @@ static void exec_file(wchar_t *file, wchar_t *cmdline)
     stinfo.lpReserved2 = NULL;
     if (CreateProcess(truename, cmdline, NULL, NULL, TRUE, 0, NULL, NULL,
                       &stinfo, &procinfo)) {
+      free(truename);
       CloseHandle(procinfo.hThread);
       WaitForSingleObject(procinfo.hProcess, INFINITE);
       GetExitCodeProcess(procinfo.hProcess, &retcode);
@@ -89,21 +105,24 @@ static void exec_file(wchar_t *file, wchar_t *cmdline)
       ExitProcess(retcode);
     }
   }
+
+  free(truename);
 }
 
 static void write_error(const wchar_t *wstr, HANDLE hOut)
 {
   DWORD consoleMode, numwritten, len;
-  char str[MAX_PATH];
+  char *str;
 
   if (GetConsoleMode(hOut, &consoleMode) != 0) {
     /* The output stream is a Console */
     WriteConsole(hOut, wstr, lstrlen(wstr), &numwritten, NULL);
   } else { /* The output stream is redirected */
-    len =
-      WideCharToMultiByte(CP, 0, wstr, lstrlen(wstr), str, sizeof(str),
-                          NULL, NULL);
-    WriteFile(hOut, str, len, &numwritten, NULL);
+    len = WideCharToMultiByte(CP, 0, wstr, -1, NULL, 0, NULL, NULL);
+    str = (char *)malloc(len);
+    WideCharToMultiByte(CP, 0, wstr, -1, str, len, NULL, NULL);
+    /* len includes the terminator */
+    WriteFile(hOut, str, len - 1, &numwritten, NULL);
   }
 }
 
@@ -246,12 +265,11 @@ static uint32_t read_size(const char *ptr)
          ((uint32_t) p[2] << 8) | p[3];
 }
 
-static char * read_runtime_path(file_descriptor fd)
+static char * read_runtime_path(file_descriptor fd, uint32_t *rntm_strlen)
 {
   char buffer[TRAILER_SIZE];
-  static char runtime_path[PATH_MAX];
+  char *runtime_path;
   int num_sections;
-  uint32_t path_size;
   long ofs;
 
   if (lseek(fd, -TRAILER_SIZE, SEEK_END) == -1) return NULL;
@@ -259,20 +277,22 @@ static char * read_runtime_path(file_descriptor fd)
   num_sections = read_size(buffer);
   ofs = TRAILER_SIZE + num_sections * 8;
   if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
-  path_size = 0;
+  *rntm_strlen = 0;
   for (int i = 0; i < num_sections; i++) {
     if (read(fd, buffer, 8) < 8) return NULL;
     if (buffer[0] == 'R' && buffer[1] == 'N' &&
         buffer[2] == 'T' && buffer[3] == 'M') {
-      path_size = read_size(buffer + 4);
-      ofs += path_size;
-    } else if (path_size > 0)
+      *rntm_strlen = read_size(buffer + 4);
+      ofs += *rntm_strlen;
+    } else if (*rntm_strlen > 0)
       ofs += read_size(buffer + 4);
   }
-  if (path_size == 0) return NULL;
-  if (path_size >= PATH_MAX) return NULL;
+  if (*rntm_strlen == 0) return NULL;
+  if (*rntm_strlen >= PATH_MAX) return NULL;
   if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
-  if (read(fd, runtime_path, path_size) != path_size) return NULL;
+  if ((runtime_path = (char *)malloc(*rntm_strlen + 1)) == NULL) return NULL;
+  if (read(fd, runtime_path, *rntm_strlen) != *rntm_strlen) return NULL;
+  runtime_path[*rntm_strlen] = 0;
   return runtime_path;
 }
 
@@ -280,23 +300,32 @@ static char * read_runtime_path(file_descriptor fd)
 
 NORETURN void __cdecl wmainCRTStartup(void)
 {
-  wchar_t truename[MAX_PATH];
+  LPWSTR truename;
+  uint32_t rntm_strlen = 0;
   char *runtime_path;
-  wchar_t wruntime_path[MAX_PATH];
+  wchar_t *wruntime_path;
   HANDLE h;
 
-  if (GetModuleFileName(NULL, truename, sizeof(truename)/sizeof(wchar_t)) == 0)
+  hProcessHeap = GetProcessHeap();
+
+  truename = (LPWSTR)malloc(PATH_MAX * sizeof(WCHAR));
+
+  if (truename == NULL || GetModuleFileName(NULL, truename, PATH_MAX) == 0)
     exit_with_error(L"Out of memory", NULL, NULL);
 
   h = CreateFile(truename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                  NULL, OPEN_EXISTING, 0, NULL);
   if (h == INVALID_HANDLE_VALUE ||
-      (runtime_path = read_runtime_path(h)) == NULL ||
-      !MultiByteToWideChar(CP, 0, runtime_path, -1, wruntime_path,
-                           sizeof(wruntime_path)/sizeof(wchar_t)))
+      (runtime_path = read_runtime_path(h, &rntm_strlen)) == NULL ||
+      (wruntime_path =
+         (wchar_t *)malloc((rntm_strlen + 1) * sizeof(wchar_t))) == NULL ||
+      !MultiByteToWideChar(CP, 0, runtime_path, rntm_strlen + 1,
+                           wruntime_path, rntm_strlen + 1))
     exit_with_error(NULL, truename,
                     L" not found or is not a bytecode executable file");
   CloseHandle(h);
+  free(runtime_path);
+  free(truename);
   exec_file(wruntime_path, GetCommandLine());
 
   exit_with_error(L"Cannot exec ", wruntime_path, NULL);
@@ -307,11 +336,12 @@ NORETURN void __cdecl wmainCRTStartup(void)
 int main(int argc, char *argv[])
 {
   char *truename, *runtime_path;
+  uint32_t rntm_strlen = 0;
   int fd;
 
   truename = searchpath(argv[0]);
   fd = open(truename, O_RDONLY | O_BINARY);
-  if (fd == -1 || (runtime_path = read_runtime_path(fd)) == NULL)
+  if (fd == -1 || (runtime_path = read_runtime_path(fd, &rntm_strlen)) == NULL)
     exit_with_error(NULL, truename,
                     " not found or is not a bytecode executable file");
   close(fd);
