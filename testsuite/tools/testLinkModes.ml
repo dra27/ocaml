@@ -125,7 +125,7 @@ let () =
    around some problems with shared runtimes on s390x and riscv which don't
    reliably fail.
 *)
-let run_program env _config =
+let run_program env config =
   let prefix = Environment.prefix env in
   let libdir_suffix = Environment.libdir_suffix env in
   let prefix, libdir_suffix =
@@ -142,7 +142,7 @@ let run_program env _config =
       if Environment.is_renamed env then
         stdlib_exists_when_renamed
       else
-        true in
+        config.has_relative_libdir <> None in
     let args = [string_of_bool stdlib_exists; prefix; libdir_suffix] in
     let argv0 =
       if argv0 = test_program then
@@ -259,7 +259,7 @@ type outcome =
    - Sys.argv.(0) doesn't equal Sys.argv.(3)
    - Config.standard_library exists when it shouldn't (or vice versa) *)
 let test_runs usr_bin_sh test_program_path test_program
-              _config env ~via_ocamlrun =
+              config env ~via_ocamlrun =
   let tests =
     let test_program_relative =
       Filename.concat Filename.current_dir_name test_program
@@ -315,6 +315,12 @@ let test_runs usr_bin_sh test_program_path test_program
             else if Sys.win32 then
               (* stdlib/header.c correctly preserves argv[0] for Windows *)
               Success {executable_name = test_program_path; argv0}
+            else if Harness.no_caml_executable_name
+                    && config.has_relative_libdir <> None then
+              (* Without caml_executable_name, ocamlrun will be forced to
+                 interpret the relative standard library relative to argv[0],
+                 which will fail. *)
+              Fail 134
             else
               (* stdlib/header.c does not preserve argv[0] for Unix *)
               Success {executable_name = argv0_resolved;
@@ -329,12 +335,8 @@ let test_runs usr_bin_sh test_program_path test_program
               else
                 Success {executable_name = argv0_resolved; argv0}
             else
-              if Sys.win32 || argv0_not_ocaml then
-                (* SearchPath will resolve the relative/implicit arguments to
-                   absolute paths *)
-                Success {executable_name = test_program_path; argv0}
-              else
-                Success {executable_name = argv0_resolved; argv0}
+              (* -custom executables use caml_executable_name *)
+              Success {executable_name = test_program_path; argv0}
         | Vanilla ->
             if Harness.no_caml_executable_name then
               Success {executable_name = argv0_resolved; argv0}
@@ -355,11 +357,12 @@ let test_runs usr_bin_sh test_program_path test_program
    run in the Renamed phase for other reasons. *)
 let make_test_runner ~stdlib_exists_when_renamed ~may_segfault ~with_unix
                      ~tendered ~target_launcher_searches_for_ocamlrun usr_bin_sh
-                     test_program_path test_program config _env =
-  (* Bytecode executables with absolute headers will need to be
-     invoked via ocamlrun after the prefix has been renamed. *)
+                     test_program_path test_program config env =
+  (* Bytecode executables with absolute headers will need to be invoked via
+     ocamlrun after the prefix has been renamed. *)
   let via_ocamlrun =
     tendered && not target_launcher_searches_for_ocamlrun
+    && (config.has_relative_libdir = None || not (Environment.is_renamed env))
   in
   let rec run env =
     let runs =
@@ -371,7 +374,7 @@ let make_test_runner ~stdlib_exists_when_renamed ~may_segfault ~with_unix
         | Fail code -> "", code, ""
         | Success {executable_name; argv0} -> executable_name, 0, argv0
       in
-      let stubs = tendered && with_unix in
+      let stubs = tendered && with_unix && config.has_relative_libdir = None in
       run_program
         env config ~runtime:via_ocamlrun ~stubs
         test_program_path ~prefix_path_with_cwd expected_executable_name
@@ -459,8 +462,20 @@ let compile_test usr_bin_sh config env test test_program description =
           0
       in
       match test with
-      | Default_ocamlc _launch_method ->
-          f ~tendered:true []
+      | Default_ocamlc Header_exe ->
+          let args =
+            if config.bytecode_shebangs_by_default then
+              ["-launch-method"; "exe"]
+            else
+              [] in
+          f ~tendered:true args
+      | Default_ocamlc Header_shebang ->
+          let args =
+            if config.bytecode_shebangs_by_default then
+              []
+            else
+              ["-launch-method"; "sh"] in
+          f ~tendered:true args
       | Default_ocamlopt ->
           f ~mode:Native []
       | Custom_runtime Static ->
@@ -566,6 +581,21 @@ let compile_test usr_bin_sh config env test test_program description =
         else
           options
       in
+      let options =
+        if Environment.is_renamed env || config.has_relative_libdir <> None then
+          options
+        else
+          let new_libdir =
+            Filename.concat (Environment.prefix env ^ ".new")
+                            (Environment.libdir_suffix env) in
+          let stdlib_default = "standard_library_default=" ^ new_libdir in
+          let options = "-set-runtime-default" :: stdlib_default :: options in
+          if tendered then
+            let libdir = Environment.libdir env in
+            "-dllpath" :: (Filename.concat libdir "stublibs") :: options
+          else
+            options
+      in
       let args =
         "-o" :: output ::
         "test_install_script.ml" :: options
@@ -592,14 +622,11 @@ let compile_test usr_bin_sh config env test test_program description =
              need to be invoked via ocamlrun in the Renamed phase *)
           let runtime =
             mode = Bytecode && Harness.ocamlc_fails_after_rename config in
-          (* If shared libraries are being used, ocamlc will need to be able to
-             load the stub libraries to check the primitives table *)
-          let stubs = with_unix && tendered in
           (* In the Renamed phase, Config.standard_library will still point to
-             the Original location *)
-          let stdlib = true in
-          Environment.run_process
-            ~fails ~runtime ~stubs ~stdlib env compiler args
+             the Original location, unless the compiler has been configured
+             with a relative libdir *)
+          let stdlib = (config.has_relative_libdir = None) in
+          Environment.run_process ~fails ~runtime ~stdlib env compiler args
         in
         Environment.display_output output;
         exit_code
@@ -626,9 +653,21 @@ let compile_test usr_bin_sh config env test test_program description =
           `None
         else
           let stdlib_exists_when_renamed =
-            (* Config.standard_library is an absolute path, and therefore will
-               always point to the Original location in the Renamed phase. *)
-            false
+            if config.has_relative_libdir = None then
+              (* In the Original phase, for a compiler with an absolute libdir,
+                 -set-runtime-default is used to set standard_library_default to
+                 the Renamed phase's location. When the tests are recompiled in
+                 the Renamed phase, this is not done. The effect is that if any
+                 test is being run in the Renamed phase, Config.standard_library
+                 will be correct. *)
+              not (Environment.is_renamed env)
+            else
+              (* When the compiler has a relative libdir, -set-runtime-default
+                 is implicitly being tested by the build process, and we wish to
+                 test the opposite in the harness - thus the test programs
+                 compiled in the Original phase will _not_ be able to find the
+                 Standard Library in the Renamed phase. *)
+              Environment.is_renamed env
           in
           make_test_runner ~stdlib_exists_when_renamed ~may_segfault ~with_unix
                            ~tendered ~target_launcher_searches_for_ocamlrun
@@ -660,15 +699,9 @@ let run ~sh config env =
   Format.printf "ocamlc -where: %a\nocamlopt -where: %a\n%!"
                 pp_path ocamlc_where pp_path ocamlopt_where;
   let compile_test = compile_test sh config env in
-  let launch_method =
-    if config.bytecode_shebangs_by_default then
-      Header_shebang
-    else
-      Header_exe
-  in
   let tests = [
-    compile_test (Default_ocamlc launch_method)
-      "byt_default" "with tender";
+    compile_test (Default_ocamlc Header_exe)
+      "byt_default_exe" "with tender";
     compile_test (Custom_runtime Static)
       "custom_static" "-custom static runtime";
     compile_test (Custom_runtime Shared)
@@ -696,5 +729,11 @@ let run ~sh config env =
     compile_test (Output_complete_obj(C_ocamlopt, Shared))
       "nat_complete_obj_shared" "-output-complete-obj shared runtime";
   ] in
+  let tests =
+    if Config.shebangscripts then
+      (compile_test (Default_ocamlc Header_shebang) "byt_default_sh" "with #!")
+        :: tests
+    else
+      tests in
   Printf.printf "Running programs\n%!";
   List.map (function `Some f -> f env | `None -> `None) tests
