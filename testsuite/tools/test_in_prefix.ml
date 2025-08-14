@@ -49,13 +49,13 @@ let print_summary config header_size ~prefix ~bindir_suffix ~libdir_suffix
     \    @{<hint>libdir@} = [$prefix/]%s\n\
     \  - C compiler is %s [%s] for %s\n\
     \  - OCaml is %a%a; target binaries by default are %a\n\
-    \  - Executable header size is %.2fKiB (%d bytes)\n\
+    \  - Executable header size is %.2fKiB (%Ld bytes)\n\
     \  - Testing %s\n@?"
        prefix bindir_suffix libdir_suffix
        Config.c_compiler Toolchain.c_compiler_vendor Config.target
        pp_relocatable relocatable pp_reproducible reproducible
        pp_relocatable target_relocatable
-       (float_of_int header_size /. 1024.0) header_size summary
+       (Int64.to_float header_size /. 1024.0) header_size summary
 
 let run_tests ~sh config env =
   TestDynlink.run config env Bytecode;
@@ -67,6 +67,10 @@ let run_tests ~sh config env =
   Test_ld_conf.run config env;
   TestBytecodeBinaries.run config env;
   TestLinkModes.run ~sh config env
+
+let rename_exe_in_test_root env from_base to_base =
+  Sys.rename (Environment.in_test_root env (Harness.exe from_base))
+             (Environment.in_test_root env (Harness.exe to_base))
 
 let () =
   let config, pwd, prefix, _, bindir_suffix, libdir, libdir_suffix,
@@ -115,8 +119,11 @@ let () =
     in
     List.map add_dependencies libraries
   in
-  let header_size =
-    (Unix.stat (Filename.concat libdir "camlheader")).Unix.st_size in
+  let header_size, filename_mangling =
+    let file = Filename.concat libdir "camlheader" in
+    In_channel.with_open_bin file @@ fun ic ->
+      In_channel.length ic, (input_char ic <> '\000')
+  in
   let bytecode_shebangs_by_default =
     Config.launch_method <> Config.Executable in
   let launcher_searches_for_ocamlrun = Sys.win32 in
@@ -125,7 +132,8 @@ let () =
     {config with libraries;
                  launcher_searches_for_ocamlrun;
                  target_launcher_searches_for_ocamlrun;
-                 bytecode_shebangs_by_default}
+                 bytecode_shebangs_by_default;
+                 filename_mangling}
   in
   (* A compiler distribution is _Relocatable_ if its build, for a given system,
      satisfies the following three properties:
@@ -219,11 +227,26 @@ let () =
                                          pp_path prefix;
     Sys.rename new_prefix prefix);
   let env =
-    make_env ~phase:Renamed ~prefix:new_prefix ~bindir_suffix ~libdir_suffix in
+    make_env ~phase:Execution ~prefix:new_prefix ~bindir_suffix ~libdir_suffix
+  in
   (* 3. Re-run the test programs compiled with the normal prefix *)
   Printf.printf "Re-running test programs\n%!";
-  List.iter
-    (function `Some f -> assert (f env = `None) | `None -> ()) programs;
+  (* Verify that the searching runtimes are searching the directory containing
+     the program itself first. *)
+  let runtime =
+    if config.filename_mangling then
+      Misc.RuntimeID.(ocamlrun "" (make_zinc ()))
+    else
+      "ocamlrun"
+  in
+  rename_exe_in_test_root env ("test-" ^ runtime) runtime;
+  Fun.protect
+    ~finally:(fun () -> rename_exe_in_test_root env runtime ("test-" ^ runtime))
+    (fun () ->
+      List.iter
+        (function `Some f -> assert (f env = `None) | `None -> ()) programs);
+  let env =
+    make_env ~phase:Renamed ~prefix:new_prefix ~bindir_suffix ~libdir_suffix in
   (* 4. Finally re-run the main test battery in the new prefix *)
   Compmisc.reinit_path ~standard_library:libdir ();
   let programs = run_tests env in
