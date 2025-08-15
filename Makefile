@@ -372,8 +372,9 @@ INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
 FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
 
 # Installation
+
 .PHONY: install
-install:
+install::
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
@@ -946,7 +947,7 @@ testsuite/tools/%.cmx: \
   OPTCOMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
 
 testsuite/tools/test_in_prefix$(EXE): \
-  CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
+  CAMLC = $(CAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
 
 testsuite/tools/test_in_prefix$(EXE): \
   $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmo, $(filter-out %.mli, \
