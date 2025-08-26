@@ -150,8 +150,10 @@ boot/ocamlruns$(EXE): runtime/ocamlruns$(EXE)
 boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) \
-	                                                    $(USE_STDLIB)) \
+	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) \
+	                                 $(USE_RUNTIME_PRIMS) \
+	                                 $(BYTECODE_LAUNCHER_FLAGS) \
+	                                 $(USE_STDLIB)) \
 	  -B flexlink.exe support
 	cp $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
 	cp $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
@@ -432,6 +434,10 @@ ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 	$(CAMLC) $(BYTECODE_LINKFLAGS) -compat-32 -o $@ $^
 
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamlc_BYTECODE_LINKFLAGS += -set-runtime-default standard_library_default=.
+endif
+
 partialclean::
 	rm -rf ocamlc$(EXE)
 
@@ -489,12 +495,12 @@ natruntop:
 otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/native/dynlink.ml
 	$(MAKE) -C otherlibs/dynlink allopt
 
-# Cleanup the lexer
+# Cleanup the lexers
 
 partialclean::
-	rm -f parsing/lexer.ml
+	rm -f bytecomp/byterntm.ml parsing/lexer.ml
 
-beforedepend:: parsing/lexer.ml
+beforedepend:: bytecomp/byterntm.ml parsing/lexer.ml
 
 # The bytecode compiler compiled with the native-code compiler
 
@@ -1106,6 +1112,10 @@ ocamllex: ocamlyacc
 ocamllex.opt: ocamlopt
 	$(MAKE) -C lex allopt
 
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamllex_BYTECODE_LINKFLAGS += -set-runtime-default standard_library_default=.
+endif
+
 partialclean::
 	$(MAKE) -C lex clean
 
@@ -1241,10 +1251,14 @@ else
 TEST_IN_PREFIX_STDLIB =
 endif
 
+testsuite/tools/dummy$(EXE): testsuite/tools/dummy.$(O)
+	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
+
 $(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
 $(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
 
 partialclean::
+	rm -f testsuite/tools/dummy testsuite/tools/dummy.exe
 	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
 	rm -f testsuite/tools/test_in_prefix.opt \
         testsuite/tools/test_in_prefix.opt.exe
