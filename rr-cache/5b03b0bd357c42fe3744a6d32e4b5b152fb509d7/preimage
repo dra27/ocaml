@@ -801,7 +801,8 @@ runtime_search
 suffixing
 native_runtime_id
 bytecode_runtime_id
-zinc_runtime_id
+zinc_runtime_id_hi
+zinc_runtime_id_lo
 target_libdir_is_relative
 ar_supports_response_files
 QS
@@ -3604,7 +3605,6 @@ LINEAR_MAGIC_NUMBER=Caml1999L037
 
 
 
-
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -4416,6 +4416,13 @@ then :
   *) :
     as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
 esac
+else $as_nop
+  case $host in #(
+      *-w64-mingw32*|*-pc-windows) :
+    runtime_search='always' ;; #(
+  *) :
+     ;;
+esac
 fi
 
 
@@ -4431,6 +4438,13 @@ then :
     runtime_search_target='always' ;; #(
   *) :
     as_fn_error $? "valid values are yes, no or always for --enable-runtime-search-target" "$LINENO" 5 ;;
+esac
+else $as_nop
+  case $host in #(
+      *-w64-mingw32*|*-pc-windows) :
+    runtime_search_target='always' ;; #(
+  *) :
+     ;;
 esac
 fi
 
@@ -24011,66 +24025,75 @@ alphabet='0123456789abcdefghijklmnopqrstuv'
 
 # Bits 5-6 (high 2 bits of release)
 
-# Bit 7 (no-flat-float-array)
+
+# Bits 7-9 (low 3 bits of reserved)
+quintet1="1 + $(expr \( $reserved_header_bits \* 4 \) % 32)"
+quintet1="$(echo "$alphabet" | cut -c $(expr $quintet1 + 1))"
+
+# Bits 10-11 (high 2 bits of reserved)
+quintet2_byte=\
+"$(echo "$alphabet" | cut -c $(expr \( $reserved_header_bits / 8 \) + 1))"
+
+# Bit 12 (no-flat-float-array)
 if $flat_float_array
-then :
-  quintet1_byte='1'
-else $as_nop
-  quintet1_byte='5'
-fi
-# Bit 8 (fp)
-if $frame_pointers
-then :
-  quintet1_native="8 + $quintet1_byte"
-else $as_nop
-  quintet1_native="$quintet1_byte"
-fi
-# Bit 9 (tsan)
-if $tsan
-then :
-  quintet1_native="16 + $quintet1_native"
-fi
-
-quintet1_byte="$(echo "$alphabet" | cut -c $(expr $quintet1_byte + 1))"
-quintet1_native="$(echo "$alphabet" | cut -c $(expr $quintet1_native + 1))"
-
-# Bit 10 (int31)
-if $arch64
 then :
   quintet2_zinc='0'
 else $as_nop
-  quintet2_zinc='1'
+  quintet2_byte="4 + $quintet2_byte"
+  quintet2_zinc='4'
 fi
-# Bit 11 (static)
-if ! $supports_shared_libraries
+# Bit 13 (fp)
+if $frame_pointers
 then :
-  quintet2_zinc="2 + $quintet2_zinc"
+  quintet2_native="8 + $quintet2_byte"
+else $as_nop
+  quintet2_native="$quintet2_byte"
 fi
-# Bit 12 (no-compression)
-if test x"$zstd_status" != 'xok'
+# Bit 14 (tsan)
+if $tsan
 then :
-  quintet2_zinc="4 + $quintet2_zinc"
+  quintet2_native="16 + $quintet2_native"
 fi
-# Bit 13 (mutable-string) cannot be set since OCaml 5.0
-# Bit 14 (ansi)
-case $target,$windows_unicode in #(
-  *-*-mingw32,0|*-pc-windows,0) :
-    quintet2="16 + $quintet2_zinc" ;; #(
-  *) :
-    quintet2="$quintet2_zinc" ;;
-esac
 
 quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
-quintet2="$(echo "$alphabet" | cut -c $(expr $quintet2 + 1))"
+quintet2_byte="$(echo "$alphabet" | cut -c $(expr $quintet2_byte + 1))"
+quintet2_native="$(echo "$alphabet" | cut -c $(expr $quintet2_native + 1))"
 
-# Bits 15-19 (reserved)
-quintet3="$(echo "$alphabet" | cut -c $(expr $reserved_header_bits + 1))"
+# Bit 15 (int31)
+if $arch64
+then :
+  quintet3_zinc='0'
+else $as_nop
+  quintet3_zinc='1'
+fi
+# Bit 16 (static)
+if ! $supports_shared_libraries
+then :
+  quintet3_zinc="2 + $quintet3_zinc"
+fi
+# Bit 17 (no-compression)
+if test x"$zstd_status" != 'xok'
+then :
+  quintet3_zinc="4 + $quintet3_zinc"
+fi
+# Bit 18 (ansi)
+case $target,$windows_unicode in #(
+  *-*-mingw32,0|*-pc-windows,0) :
+    quintet3="8 + $quintet3_zinc" ;; #(
+  *) :
+    quintet3="$quintet3_zinc" ;;
+esac
+# Bit 19 (mutable-string) cannot be set since OCaml 5.0
 
-zinc_runtime_id="0${quintet2_zinc}1b"
-bytecode_runtime_id="${quintet3}${quintet2}${quintet1_byte}b"
-native_runtime_id="${quintet3}${quintet2}${quintet1_native}b"
+quintet3_zinc="$(echo "$alphabet" | cut -c $(expr $quintet3_zinc + 1))"
+quintet3="$(echo "$alphabet" | cut -c $(expr $quintet3 + 1))"
 
-# Update the values for is_release, release_number and zinc_runtime_id in
+zinc_runtime_id_lo="b1"
+zinc_runtime_id_hi="${quintet2_zinc}${quintet3_zinc}"
+bytecode_runtime_id="b${quintet1}${quintet2_byte}${quintet3}"
+native_runtime_id="b${quintet1}${quintet2_native}${quintet3}"
+
+# Update the values for is_release and release_number in
 # utils/config.common.ml.in (this is done when tools/autogen is run, not each
 # time configure is run!)
 
