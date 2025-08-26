@@ -150,8 +150,10 @@ boot/ocamlruns$(EXE): runtime/ocamlruns$(EXE)
 boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) \
-	                                                    $(USE_STDLIB)) \
+	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) \
+	                                 $(USE_RUNTIME_PRIMS) \
+	                                 $(BYTECODE_LAUNCHER_FLAGS) \
+	                                 $(USE_STDLIB)) \
 	  -B flexlink.exe support
 	cp $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
 	cp $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
@@ -383,8 +385,8 @@ endif
 flexlink.opt$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
     OCAML_FLEXLINK='$(value OCAMLRUN) $$(ROOTDIR)/boot/flexlink.byte$(EXE)' \
-	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib \
-$(SET_RELATIVE_STDLIB)" -B flexlink.exe
+	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) $(USE_STDLIB) $(SET_RELATIVE_STDLIB)" \
+-B flexlink.exe
 	cp $(FLEXDLL_SOURCES)/flexlink.exe $@
 
 partialclean::
@@ -431,6 +433,10 @@ clean:: partialclean
 ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 	$(CAMLC) $(BYTECODE_LINKFLAGS) -compat-32 -o $@ $^
+
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamlc_BYTECODE_LINKFLAGS += -set-runtime-default standard_library_default=.
+endif
 
 partialclean::
 	rm -rf ocamlc$(EXE)
@@ -489,12 +495,12 @@ natruntop:
 otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/native/dynlink.ml
 	$(MAKE) -C otherlibs/dynlink allopt
 
-# Cleanup the lexer
+# Cleanup the lexers
 
 partialclean::
-	rm -f parsing/lexer.ml
+	rm -f bytecomp/byterntm.ml parsing/lexer.ml
 
-beforedepend:: parsing/lexer.ml
+beforedepend:: bytecomp/byterntm.ml parsing/lexer.ml
 
 # The bytecode compiler compiled with the native-code compiler
 
@@ -1106,6 +1112,10 @@ ocamllex: ocamlyacc
 ocamllex.opt: ocamlopt
 	$(MAKE) -C lex allopt
 
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamllex_BYTECODE_LINKFLAGS += -set-runtime-default standard_library_default=.
+endif
+
 partialclean::
 	$(MAKE) -C lex clean
 
@@ -1195,10 +1205,16 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
 ocamltest: ocamlc ocamlyacc ocamllex otherlibraries
 	$(MAKE) -C ocamltest all
 
+ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
+	$(MAKE) -C ocamltest allopt
+
+partialclean::
+	$(MAKE) -C ocamltest clean
+
 test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
   stubs.c \
-  toolchain.mli toolchain.ml \
   harness.mli harness.ml \
+  toolchain.mli toolchain.ml \
   environment.mli environment.ml \
   cmdline.mli cmdline.ml \
   testBytecodeBinaries.mli testBytecodeBinaries.ml \
@@ -1213,6 +1229,17 @@ test_in_prefix_LIBRARIES = \
 
 testsuite/tools/%.cmo: DIRS += otherlibs/unix testsuite/tools
 testsuite/tools/%.cmx: DIRS += otherlibs/unix testsuite/tools
+
+# Needed for the additional stubs.c (since caml_sys_proc_self_exe is 5.5+)
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
+
+testsuite/tools/dump_load_path$(EXE): \
+  testsuite/tools/dump_load_path.$(O) runtime/prims.$(O) runtime/libcamlrun.$(A)
+	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
+
+testsuite/tools/poisonedruntime$(EXE): testsuite/tools/poisonedruntime.$(O)
+	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
 
 testsuite/tools/test_in_prefix$(EXE): \
   CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
@@ -1241,19 +1268,12 @@ else
 TEST_IN_PREFIX_STDLIB =
 endif
 
-$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
-$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
-
 partialclean::
+	rm -f testsuite/tools/dump_load_path testsuite/tools/dump_load_path.exe
+	rm -f testsuite/tools/poisonedruntime testsuite/tools/poisonedruntime.exe
 	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
 	rm -f testsuite/tools/test_in_prefix.opt \
         testsuite/tools/test_in_prefix.opt.exe
-
-ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
-	$(MAKE) -C ocamltest allopt
-
-partialclean::
-	$(MAKE) -C ocamltest clean
 
 # Documentation
 
