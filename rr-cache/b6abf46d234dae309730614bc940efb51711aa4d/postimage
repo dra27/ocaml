@@ -107,7 +107,7 @@ static int exec_file(wchar_t *file, wchar_t *cmdline, STARTUPINFO *stinfo)
 {
   LPWSTR truename = (LPWSTR)malloc(PATH_MAX * sizeof(WCHAR));
   PROCESS_INFORMATION procinfo;
-  DWORD retcode;
+  DWORD retcode = ENOMEM;
 
   if (truename && SearchPath(NULL, file, L".exe", PATH_MAX, truename, NULL)) {
     /* Need to ignore ctrl-C and ctrl-break, otherwise we'll die and take the
@@ -123,13 +123,15 @@ static int exec_file(wchar_t *file, wchar_t *cmdline, STARTUPINFO *stinfo)
       CloseHandle(procinfo.hProcess);
       ExitProcess(retcode);
     } else {
-      return ENOEXEC;
+      retcode = ENOEXEC;
     }
   } else {
-    return ENOENT;
+    retcode = ENOENT;
   }
 
   free(truename);
+
+  return retcode;
 }
 
 static void write_error(const wchar_t *wstr, HANDLE hOut)
@@ -201,7 +203,8 @@ typedef char ** argv_t;
 #define unsafe_copy(dst, src, dstsize) strcpy(dst, src)
 #endif
 
-/* caml_search_in_system_path uses caml_stat_alloc */
+/* caml_search_in_system_path uses caml_stat_alloc and caml_executable_name also
+   uses caml_stat_free */
 void *caml_stat_alloc(size_t size)
 {
   return malloc(size);
@@ -348,7 +351,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
   /* If we get here, we've failed... */
   exit_with_error(T("This program requires OCaml ") SHORT_VERSION T("\n")
                   T("Interpreter ("), (rntm_bindir_end + 1),
-                  T(" ) not found with the program or in " PATH_NAME));
+                  T(") not found with the program or in " PATH_NAME));
 }
 
 #ifdef _WIN32
@@ -411,11 +414,11 @@ NORETURN void __cdecl wmainCRTStartup(void)
      since the very beginning of Windows NT.
      It is a relatively well-documented "trick" to be able to pass up to 64KiB
      of information to a new process using lpReserved2, on condition that the
-     data respects the CRTs requirements. The CRT processes lpReserved2 if it is
-     not NULL and if cbReserved2 is non-zero - it performs no further checking
-     beyond that. Applications can therefore embed additional data by setting
-     cbReserved2 to the actual size of lpReserved2 and simply ensuring that the
-     first 4 bytes pointed to by lpReserved2 are zero.
+     data respects the CRT's requirements. The CRT processes lpReserved2 if it
+     is not NULL and if cbReserved2 is non-zero - it performs no further
+     checking beyond that. Applications can therefore embed additional data by
+     setting cbReserved2 to the actual size of lpReserved2 and simply ensuring
+     that the first 4 bytes pointed to by lpReserved2 are zero.
      Cygwin uses this mechanism when invoking processes to allow the Cygwin DLL
      to pick up the required information about the caller, amongst other things
      to implement fork (it's also used as part of argument passing).
@@ -436,7 +439,7 @@ NORETURN void __cdecl wmainCRTStartup(void)
      Nemo nunc te poteste servare. */
   WCHAR fd[2] = {0, 0};
 
-  /* Match the CRTs check - ignore the existing values if either cbReserved2 is
+  /* Match the CRT's check - ignore the existing values if either cbReserved2 is
      zero _or_ lpReserved2 is NULL */
   if (stinfo.cbReserved2 > 0 && stinfo.lpReserved2 == NULL)
     stinfo.cbReserved2 = 0;

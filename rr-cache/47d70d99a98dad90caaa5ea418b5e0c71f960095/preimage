@@ -84,19 +84,22 @@ Working version
 
 - #14???: Change semantics of the internal caml_attempt_open bytecode runtime
   function to require the caller to perform PATH-resolution prior to calling the
-  function. Addresses a small memory leak in the bytecode runtime, but also
-  affects the resolution of CAML_DEBUG_FILE, which is still searched in PATH,
-  but at program startup instead of when the debug information is first loaded.
+  function. Affects the resolution of CAML_DEBUG_FILE, which is still searched
+  in PATH, but at program startup instead of when the debug information is first
+  loaded.
   (David Allsopp, review by ???)
 
 - #14???: The CAML_DEBUG_FILE environment variable is now ignored if it set to
   the empty string.
   (David Allsopp, review by ???)
 
-- #14???: CAML_LD_LIBRARY_PATH now ignores empty segments (instead of
-  interpreting them as being ".") which also means that CAML_LD_LIBRARY_PATH is
-  ignored if it is just set to the empty string. Blank lines in ld.conf are also
-  now ignored.
+* #14???: When set to the empty string, OCAMLRUNPARAM, OCAMLLIB and CAMLLIB are
+  now ignored (i.e. treated as if they were unset). In particular, this means
+  that a blank value for OCAMLLIB no longer prevents the compiler's default
+  Standard Library from being used. CAML_LD_LIBRARY_PATH now ignores empty
+  segments (instead of interpreting them as being ".") which also means that
+  CAML_LD_LIBRARY_PATH is ignored if it is just set to the empty string. Blank
+  lines in ld.conf are now likewise ignored.
   (David Allsopp, review by ???)
 
 * #14???: Windows and Unix. When configured with --disable-shared, the runtime
@@ -105,6 +108,10 @@ Working version
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
+
+- #14???: Add -set-runtime-default option to both compilers, allowing runtime
+  parameters to be added to the binary with the given value.
+  (David Allsopp and Antonin Décimo, review by ???)
 
 ### Standard library:
 
@@ -198,6 +205,13 @@ Working version
   confusingly included the name of a non-existent DLL. The entire process is now
   skipped, with a general message that dynamic loading is needed and is
   unavailable.
+  (David Allsopp, review by ???)
+
+- #14???: Remove duplicated linker options from unix.cma and unix.cmxa on
+  Windows.
+  (David Allsopp, review by ???)
+
+- #14???: Build and install threads.cmxs.
   (David Allsopp, review by ???)
 
 ### Tools:
@@ -348,8 +362,15 @@ Working version
 - #14198 Constraints on module unpacking are not ghost
   (Thomas Refis, review by Nicolás Ojeda Bär)
 
+<<<<<<<
+- #14???: `-l` libraries are no longer given to the partial linker (for
+  `-output-complete-obj`) if `ocamlc`/`ocamlopt` cannot resolve them in the
+  current search path. Allows system libraries (e.g. `-lzstd`) to be specified
+  in .cma or .cmxa files without breaking `-output-complete-obj`.
+=======
 - #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
   C primitive), eliminating some highly obscure corner cases.
+>>>>>>>
   (David Allsopp, review by ???)
 
 ### Build system:
@@ -400,6 +421,11 @@ Working version
 - #13658, #14181: Fix handling of recursive function types that can result
   in an unbounded number of labeled or optional arguments.
   (Stefan Muenzel, report by Samuel Vivien, review by Florian Angeletti)
+
+- #14???: Fix the hand-off of the bytecode image to the runtime from the
+  executable header. In particular, running `ocamlc.byte` rather than
+  `ocamlc.byte.exe` now invokes the compiler instead of ocamlrun itself!
+  (David Allsopp, review by ???)
 
 OCaml 5.4.0
 ---------------

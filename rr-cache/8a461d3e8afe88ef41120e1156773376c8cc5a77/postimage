@@ -48,7 +48,6 @@ Working version
   (Tim McGilchrist, review by Nick Barnes, Sadiq Jaffer and
   Gabriel Scherer)
 
-<<<<<<<
 * #14???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
   "../<path...>") are interpreted as being relative to the directory ld.conf
   was loaded from, and the default ld.conf now uses relative paths, rather than
@@ -85,24 +84,19 @@ Working version
 
 - #14???: Change semantics of the internal caml_attempt_open bytecode runtime
   function to require the caller to perform PATH-resolution prior to calling the
-  function. Addresses a small memory leak in the bytecode runtime, but also
-  affects the resolution of CAML_DEBUG_FILE, which is still searched in PATH,
-  but at program startup instead of when the debug information is first loaded.
+  function. Affects the resolution of CAML_DEBUG_FILE, which is still searched
+  in PATH, but at program startup instead of when the debug information is first
+  loaded.
   (David Allsopp, review by ???)
 
 - #14???: The CAML_DEBUG_FILE environment variable is now ignored if it set to
   the empty string.
   (David Allsopp, review by ???)
 
-- #14???: CAML_LD_LIBRARY_PATH now ignores empty segments (instead of
-  interpreting them as being ".") which also means that CAML_LD_LIBRARY_PATH is
-  ignored if it is just set to the empty string. Blank lines in ld.conf are also
-  now ignored.
-=======
-* #14???: Windows and Unix. When configured with --disable-shared, the runtime
-  now rejects bytecode executables which require DLLs to be loaded earlier, and
-  with a less unclear error message.
->>>>>>>
+* #14???: When set to the empty string, OCAMLRUNPARAM, OCAMLLIB and CAMLLIB are
+  now ignored (i.e. treated as if they were unset). In particular, this means
+  that a blank value for OCAMLLIB no longer prevents the compiler's default
+  Standard Library from being used.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
@@ -193,14 +187,6 @@ Working version
   instead of ENOENT if the command string is not a valid C string.
   (Antonin Décimo, review by Gabriel Scherer and Nicolás Ojeda Bär)
 
-- #14???: Improved the error message when bytecode Dynlink is asked to load an
-  archive which needs dynamic loading on a runtime which doesn't support it.
-  Previously, the full machinery to search for DLLs was invoked, and the error
-  confusingly included the name of a non-existent DLL. The entire process is now
-  skipped, with a general message that dynamic loading is needed and is
-  unavailable.
-  (David Allsopp, review by ???)
-
 ### Tools:
 
 - #14055: Invert BUILD_PATH_PREFIX_MAP in directories loaded at startup
@@ -240,13 +226,6 @@ Working version
 
 - #14???: ocamlyacc treats TMPDIR='' (i.e. set, but to the empty string) as
   TMPDIR=/tmp (as it already does if TMPDIR is not set at all).
-  (David Allsopp, review by ???)
-
-### Toplevel:
-
-- #14???: Empty segments in OCAMLTOP_INCLUDE_PATH are no longer interpreted as
-  adding the current working directory to the search path. The current working
-  directory can of course still be included in the search path by adding ".".
   (David Allsopp, review by ???)
 
 ### Manual and documentation:
@@ -401,6 +380,11 @@ Working version
 - #13658, #14181: Fix handling of recursive function types that can result
   in an unbounded number of labeled or optional arguments.
   (Stefan Muenzel, report by Samuel Vivien, review by Florian Angeletti)
+
+- #14???: Fix the hand-off of the bytecode image to the runtime from the
+  executable header. In particular, running `ocamlc.byte` rather than
+  `ocamlc.byte.exe` now invokes the compiler instead of ocamlrun itself!
+  (David Allsopp, review by ???)
 
 OCaml 5.4.0
 ---------------
