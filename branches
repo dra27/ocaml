@@ -26,6 +26,7 @@ apple-arm64-4.08-fixes@fixup 2c3c07ce9cc869dd02ab6a845bf94a6019cca0dc
 apple-arm64-4.11@4.11 423961ea019f3a8fe3f0295d652bd84a0ef1673d
 apple-arm64-4.11-4.10@fixup a82b436662b14fc405adbcb7750b824152548410
 merge-headers@4.08 497ea09ee406adba342de58b23362cb72d95ee97
+win32graph-fcommon@4.08 43f7fdb54d27f2e9819432ba9a394bef875496a6
 static-libgcc@4.11 c9020b2a8129ad3290111fbe16dc0da6dab70673
 fix-flexdll-bootstrap@4.11 06639b3e0ce945b67fdb9a311772f0b88933a409
 fix-mingw-lld@4.11 c5fdb47365f05f8abfffa4dc2b77651bfbe318cf
