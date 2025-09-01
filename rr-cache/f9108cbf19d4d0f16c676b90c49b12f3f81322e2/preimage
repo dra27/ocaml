@@ -1,0 +1,59 @@
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*            Xavier Leroy, projet Cristal, INRIA Rocquencourt            *
+#*                                                                        *
+#*   Copyright 1999 Institut National de Recherche en Informatique et     *
+#*     en Automatique.                                                    *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+ROOTDIR = ..
+<<<<<<<
+SUBDIR_NAME = man
+=======
+include $(ROOTDIR)/Makefile.config
+>>>>>>>
+include $(ROOTDIR)/Makefile.common
+
+MANPAGES = \
+  ocaml ocamlc ocamlcp ocamldebug ocamldep ocamldoc ocamllex ocamlmktop \
+  ocamlopt ocamlprof ocamlrun ocamlyacc
+
+INSTALL_DIR = $(call QUOTE_SINGLE,$(INSTALL_MANDIR)/$(INSTALL_MANDIR_PROGRAMS))
+
+ocamlc.opt.link: ocamlc.m
+ocamlopt.opt.link: ocamlopt.m
+ocamloptp.link: ocamlcp.m
+
+%.link: $(ROOTDIR)/Makefile.config
+	echo '.so $(INSTALL_MANDIR_PROGRAMS)/'\
+'$(basename $(filter %.m,$^)).$(PROGRAMS_MAN_SECTION)' > $@
+
+define INSTALL_MAN
+install::
+	$(INSTALL_DATA) \
+	  $(1).m $(INSTALL_DIR)/$(1).$(PROGRAMS_MAN_SECTION)
+endef
+
+$(foreach page, $(MANPAGES), \
+  $(eval $(call INSTALL_MAN,$(page))))
+
+.PHONY: install
+
+install:: ocamlc.opt.link ocamlopt.opt.link ocamloptp.link
+	$(INSTALL_DATA) ocamlc.opt.link \
+	     $(INSTALL_DIR)/ocamlc.opt.$(PROGRAMS_MAN_SECTION)
+	$(INSTALL_DATA) ocamlopt.opt.link \
+	     $(INSTALL_DIR)/ocamlopt.opt.$(PROGRAMS_MAN_SECTION)
+	$(INSTALL_DATA) ocamloptp.link \
+	     $(INSTALL_DIR)/ocamloptp.$(PROGRAMS_MAN_SECTION)
+
+.PHONY: clean
+clean:
+	rm -f *.link
