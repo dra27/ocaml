@@ -106,8 +106,29 @@ let () =
       let separator = if Sys.os_type = "Win32" then ";" else ":" in
       let ic = open_in ld_conf in
       let rec input_lines acc =
-        try input_lines (input_line ic::acc)
-        with End_of_file -> close_in ic; List.rev acc
+        try
+          let line = input_line ic in
+          let line =
+            if line = Filename.current_dir_name then
+              libdir
+            else if line = Filename.parent_dir_name then
+              Filename.concat libdir line
+            else
+              Scanf.sscanf line "%[.]%1[/\\]" (fun prefix separator ->
+                if separator <> "" then
+                  if prefix = Filename.current_dir_name then
+                    let line = String.sub line 2 (String.length line - 2) in
+                    Filename.concat libdir line
+                  else if prefix = Filename.parent_dir_name then
+                    Filename.concat libdir line
+                  else
+                    line
+                else
+                  line)
+          in
+          input_lines (line::acc)
+        with End_of_file ->
+          close_in ic; List.rev acc
       in
       String.concat separator (input_lines [])
     else
