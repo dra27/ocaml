@@ -13,6 +13,24 @@
 /*                                                                        */
 /**************************************************************************/
 
+/* These macros must be defined before any winpthreads headers are included for
+   any reason. In mingw-w64 runtime 13, a subtle change meant that time.h causes
+   pthread_compat.h to be read. For this reason, this next block should be the
+   very first thing in this file. */
+#if defined(_WIN32) && !defined(NATIVE_CODE) && !defined(_MSC_VER)
+/* Ensure that pthread.h marks symbols __declspec(dllimport) so that they can be
+   picked up from the runtime (which will have linked winpthreads statically).
+   mingw-w64 11.0.0 introduced WINPTHREADS_USE_DLLIMPORT to do this explicitly;
+   prior versions co-opted this on the internal DLL_EXPORT, but this is ignored
+   in 11.0 and later unless IN_WINPTHREAD is also defined, so we can safely
+   define both to support both versions.
+   When compiling with MSVC, we currently link directly the winpthreads objects
+   into our runtime, so we do not want to mark its symbols with
+   __declspec(dllimport). */
+#define WINPTHREADS_USE_DLLIMPORT
+#define DLL_EXPORT
+#endif
+
 #define CAML_INTERNALS
 
 #define _GNU_SOURCE /* helps to find pthread_setname_np() */
@@ -41,20 +59,6 @@ SetThreadDescription(HANDLE hThread, PCWSTR lpThreadDescription);
 #endif
 
 #include "caml/misc.h"
-
-#if defined(_WIN32) && !defined(NATIVE_CODE) && !defined(_MSC_VER)
-/* Ensure that pthread.h marks symbols __declspec(dllimport) so that they can be
-   picked up from the runtime (which will have linked winpthreads statically).
-   mingw-w64 11.0.0 introduced WINPTHREADS_USE_DLLIMPORT to do this explicitly;
-   prior versions co-opted this on the internal DLL_EXPORT, but this is ignored
-   in 11.0 and later unless IN_WINPTHREAD is also defined, so we can safely
-   define both to support both versions.
-   When compiling with MSVC, we currently link directly the winpthreads objects
-   into our runtime, so we do not want to mark its symbols with
-   __declspec(dllimport). */
-#define WINPTHREADS_USE_DLLIMPORT
-#define DLL_EXPORT
-#endif
 
 #include <stdbool.h>
 
