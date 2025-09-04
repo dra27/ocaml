@@ -22,7 +22,7 @@
 
 chcp 65001 > nul
 set BUILD_PREFIX=🐫реализация
-set OCAMLROOT=%PROGRAMFILES%\Бактріан🐫
+set OCAMLROOT=C:\Бактріан🐫
 
 if "%1" neq "install" goto %1
 setlocal enabledelayedexpansion
@@ -61,12 +61,32 @@ if %ERRORLEVEL% equ 1 (
 goto :EOF
 
 :UpgradeCygwin
-if "%CYGWIN_INSTALL_PACKAGES%" neq "" "%CYG_ROOT%\setup-x86_64.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages %CYGWIN_INSTALL_PACKAGES:~1% > nul
-for %%P in (%CYGWIN_COMMANDS%) do "%CYG_ROOT%\bin\%%P.exe" --version 2> nul > nul || set CYGWIN_UPGRADE_REQUIRED=1
+if %CYGWIN_UPGRADE_REQUIRED% equ 1 (
+  set CYGWIN_FLAGS=--upgrade-also
+  set CYGWIN_UPGRADE_REQUIRED=0
+) else (
+  set CYGWIN_FLAGS=
+)
+set CURRENT_SETUP_VERSION=2.934
+if "%CYGWIN_INSTALL_PACKAGES%" neq "" (
+  if not exist C:\projects\cache md C:\projects\cache
+  if not exist C:\projects\cache\setup-%CURRENT_SETUP_VERSION%-x86_64.exe (
+    appveyor DownloadFile "https://cygwin.com/setup/setup-%CURRENT_SETUP_VERSION%.x86_64.exe" -FileName "setup-%CURRENT_SETUP_VERSION%-x86_64.exe" || exit /b 1
+    move setup-%CURRENT_SETUP_VERSION%-x86_64.exe C:\projects\cache\
+  )
+  "C:\projects\cache\setup-%CURRENT_SETUP_VERSION%-x86_64.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" %CYGWIN_FLAGS%--packages %CYGWIN_INSTALL_PACKAGES:~1%
+)
+for %%P in (%CYGWIN_COMMANDS%) do (
+  if %%P equ unzip (
+    "%CYG_ROOT%\bin\%%P.exe" -v 2> nul > nul || set CYGWIN_UPGRADE_REQUIRED=1
+  ) else (
+    "%CYG_ROOT%\bin\%%P.exe" --version 2> nul > nul || set CYGWIN_UPGRADE_REQUIRED=1
+  )
+)
 "%CYG_ROOT%\bin\bash.exe" -lc "cygcheck -dc %CYGWIN_PACKAGES%"
 if %CYGWIN_UPGRADE_REQUIRED% equ 1 (
   echo Cygwin package upgrade required - please go and drink coffee
-  "%CYG_ROOT%\setup-x86_64.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --upgrade-also > nul
+  "C:\projects\cache\setup-%CURRENT_SETUP_VERSION%-x86_64.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --upgrade-also
   "%CYG_ROOT%\bin\bash.exe" -lc "cygcheck -dc %CYGWIN_PACKAGES%"
 )
 goto :EOF
@@ -90,6 +110,9 @@ if "%BOOTSTRAP_FLEXDLL%" equ "true" (
 cd "%APPVEYOR_BUILD_FOLDER%"
 appveyor DownloadFile "https://github.com/alainfrisch/flexdll/archive/%FLEXDLL_VERSION%.tar.gz" -FileName "flexdll.tar.gz" || exit /b 1
 appveyor DownloadFile "https://github.com/alainfrisch/flexdll/releases/download/%FLEXDLL_VERSION%/flexdll-bin-%FLEXDLL_VERSION%.zip" -FileName "flexdll.zip" || exit /b 1
+appveyor DownloadFile "https://github.com/ocaml/opam/releases/download/2.4.1/opam-2.4.1-x86_64-windows.exe" -FileName "opam.exe" || exit /b 1
+md "%PROGRAMFILES%\flexdll"
+move opam.exe "%PROGRAMFILES%\flexdll"
 rem flexdll.zip is processed here, rather than in appveyor_build.sh because the
 rem unzip command comes from MSYS2 (via Git for Windows) and it has to be
 rem invoked via cmd /c in a bash script which is weird(er).
@@ -102,8 +125,8 @@ rem in the list just so that the Cygwin version is always displayed on the log).
 rem CYGWIN_COMMANDS is a corresponding command to run with --version to test
 rem whether the package works. This is used to verify whether the installation
 rem needs upgrading.
-set CYGWIN_PACKAGES=cygwin make diffutils
-set CYGWIN_COMMANDS=cygcheck make diff
+set CYGWIN_PACKAGES=cygwin make diffutils unzip
+set CYGWIN_COMMANDS=cygcheck make diff unzip
 if "%PORT%" equ "mingw32" (
   rem mingw64-i686-runtime does not need explicitly installing, but it's useful
   rem to have the version reported.
@@ -128,7 +151,6 @@ set CYGWIN_INSTALL_PACKAGES=
 set CYGWIN_UPGRADE_REQUIRED=%FORCE_CYGWIN_UPGRADE%
 
 for %%P in (%CYGWIN_PACKAGES%) do call :CheckPackage %%P
-set CYGWIN_INSTALL_PACKAGES=%CYGWIN_INSTALL_PACKAGES%,cygwin=3.6.1-1
 call :UpgradeCygwin
 
 "%CYG_ROOT%\bin\bash.exe" -lc "$APPVEYOR_BUILD_FOLDER/tools/ci/appveyor/appveyor_build.sh install" || exit /b 1
