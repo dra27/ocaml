@@ -57,6 +57,7 @@ conflict-class: "ocaml-core-compiler"
 flags: compiler
 build-env: MSYS2_ARG_CONV_EXCL = "*"
 build: [
+  ["sed" "-ib" "-e" "s/ -Werror//" "configure"]
   [
     "./configure"
     "--host=x86_64-pc-windows"  {system-msvc:installed & arch-x86_64:installed}
@@ -67,6 +68,7 @@ build: [
     "--with-flexdll=%{flexdll:share}%" {os = "win32" & flexdll:installed}
     "-C"
     "--with-afl" {ocaml-option-afl:installed}
+    "--enable-spacetime" {ocaml-option-spacetime:installed}
     "--disable-native-compiler" {ocaml-option-bytecode-only:installed}
     "--disable-force-safe-string" {ocaml-option-default-unsafe-string:installed}
     "DEFAULT_STRING=unsafe" {ocaml-option-default-unsafe-string:installed}
@@ -74,7 +76,6 @@ build: [
     "--enable-flambda" {ocaml-option-flambda:installed}
     "--enable-frame-pointers" {ocaml-option-fp:installed}
     "--disable-naked-pointers" {ocaml-option-nnp:installed}
-    "--enable-naked-pointers-checker" {ocaml-option-nnpchecker:installed}
     "CC=cc" {!ocaml-option-32bit:installed & !ocaml-option-musl:installed & (os="openbsd"|os="macos")}
     "CC=musl-gcc" {ocaml-option-musl:installed & os-distribution!="alpine"}
     "CFLAGS=-Os" {ocaml-option-musl:installed}
@@ -90,7 +91,6 @@ build: [
     "--host=i386-apple-darwin13.2.0" {ocaml-option-32bit:installed & os="macos"}
     "PARTIALLD=ld -r -melf_i386" {ocaml-option-32bit:installed & os="linux"}
     "LIBS=-static" {ocaml-option-static:installed}
-    "--disable-warn-error"
   ]
   [make "-j%{jobs}%"]
 ]
@@ -104,7 +104,7 @@ depopts: [
   "ocaml-option-flambda"
   "ocaml-option-fp"
   "ocaml-option-musl"
+  "ocaml-option-spacetime"
   "ocaml-option-static"
   "ocaml-option-nnp"
-  "ocaml-option-nnpchecker"
 ]
