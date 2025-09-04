@@ -20,21 +20,10 @@ BUILD_PID=0
 # This must correspond with the entry in appveyor.yml
 CACHE_DIRECTORY=/cygdrive/c/projects/cache
 
-MAKE=make
-
-# The environment is too large for xargs!
-unset ORIGINAL_PATH
-unset __VSCMD_PREINIT_PATH
-
-# There are some utilities on the AppVeyor runner which include mingw-w64
-# runtime DLLs which we don't want to be available in the build.
-export PATH="$(tr ':' '\n' <<<"$PATH" |
-               grep -vxFf <(which -a libwinpthread-1.dll |
-               xargs -r dirname) |
-               paste -sd:)"
-if which 'libwinpthread-1.dll' 2>/dev/null; then
-  echo 'Failed to remove libwinpthread-1.dll from PATH'
-  exit 1
+if [[ -z $APPVEYOR_PULL_REQUEST_HEAD_COMMIT ]] ; then
+  MAKE="make -j$NUMBER_OF_PROCESSORS"
+else
+  MAKE=make
 fi
 
 git config --global --add safe.directory '*'
@@ -70,22 +59,35 @@ function set_configuration {
   CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
   CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
 
-  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2" '--enable-ocamltest')
+  args=('--cache-file' "$CACHE_FILE" \
+        '--prefix' "$2/_opam" \
+        '--docdir' "$2/_opam/doc/ocaml" \
+        '--enable-ocamltest')
 
   case "$1" in
     cygwin*)
-      args+=('--disable-dependency-generation');;
+      args+=('--disable-dependency-generation' '--enable-native-toplevel');;
     mingw32)
       args+=('--host=i686-w64-mingw32' '--disable-dependency-generation');;
     mingw64)
       args+=('--host=x86_64-w64-mingw32' '--disable-dependency-generation' \
-             '--disable-stdlib-manpages');;
+             '--disable-stdlib-manpages' '--enable-native-toplevel');;
     msvc32)
       args+=('--host=i686-pc-windows' '--disable-dependency-generation');;
     msvc64)
       # Explicitly test dependency generation on msvc64
-      args+=('--host=x86_64-pc-windows' '--enable-dependency-generation');;
+      args+=('--host=x86_64-pc-windows' '--enable-dependency-generation' \
+             '--enable-native-toplevel');;
   esac
+  case "$RELOCATABLE,$1" in
+    true,cygwin*)
+      args+=('--with-relative-libdir=../lib/ocaml');;
+    true,*)
+      args+=('--with-relative-libdir=..\lib\ocaml');;
+  esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--enable-runtime-search=always' '--enable-runtime-search-target')
+  fi
 
   # Remove old configure cache if the configure script or the OS
   # have changed
@@ -102,14 +104,17 @@ function set_configuration {
     if ((failed)) ; then cat config.log ; exit $failed ; fi
   fi
 
+  cp "$CACHE_FILE" config.cache
+
 #  FILE=$(pwd | cygpath -f - -m)/Makefile.config
 #  run "Content of $FILE" cat Makefile.config
 }
 
-PARALLEL_URL='https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel'
+PARALLEL_URL=\
+'https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel?h=20241222'
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 FLEXDLLROOT="$PROGRAMFILES/flexdll"
-OCAMLROOT=$(echo "$OCAMLROOT" | cygpath -f - -m)
+export OPAMSWITCH="$OCAMLROOT"
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
@@ -125,14 +130,7 @@ fi
 
 case "$1" in
   install)
-    mkdir -p "$CACHE_DIRECTORY"
-    if [ ! -e "$CACHE_DIRECTORY/parallel-source" ] || \
-       [ "$PARALLEL_URL" != "$(cat "$CACHE_DIRECTORY/parallel-source")" ] ; then
-      # Download latest version directly from the repo
-      curl -Ls $PARALLEL_URL -o "$CACHE_DIRECTORY/parallel"
-      echo "$PARALLEL_URL" > "$CACHE_DIRECTORY/parallel-source"
-    fi
-    cp "$CACHE_DIRECTORY/parallel" /usr/bin
+    cp "$APPVEYOR_BUILD_FOLDER/tools/ci/appveyor/parallel" /usr/bin
     chmod +x /usr/bin/parallel
     parallel --version
     if [[ $install_flexdll = 'true' ]] ; then
@@ -152,23 +150,13 @@ case "$1" in
     ;;
   test)
     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+    #run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
     if [[ $PORT =~ mingw* ]] ; then
       run "Check runtime symbols" \
           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
     fi
-    # Check that libwinpthread-1.dll is not linked
-    cd "$FULL_BUILD_PREFIX-$PORT"
-    find . -name \*.exe | xargs ldd > results
-    winpthreads='^[[:blank:]]libwinpthread-[^.]\+\.dll =>'
-    if grep -q "$winpthreads" results; then
-      echo 'winpthreads is not being linked statically:'
-      grep ':$\|'"$winpthreads" results | grep -B 1 "$winpthreads"
-      exit 1
-    fi
-    rm -f results
     run_testsuite=true
     if [[ -n $APPVEYOR_PULL_REQUEST_NUMBER ]]; then
       API_URL="https://api.github.com/repos/$APPVEYOR_REPO_NAME/issues/$APPVEYOR_PULL_REQUEST_NUMBER"
@@ -179,21 +167,52 @@ case "$1" in
     if $run_testsuite; then
       # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
       # tests now (to include natdynlink)
-      # GNU Parallel 20250122 introduced a somewhat dubious check on the
-      # characters in $PWD and $OLDPWD - --unsafe disables these "checks"
-      # (as would sed -i -e 's/PWD OLDPWD//' /usr/bin/parallel)
-      export PARALLEL='--unsafe'
       run "test dynlink $PORT" \
           $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-      # Now reconfigure ocamltest to run in bytecode-only mode
-      sed -i '/native_/s/true/false/' \
-             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+      case "$PORT" in
+        *64)
+          # Now reconfigure ocamltest to run in bytecode-only mode
+          sed -i '/native_/s/true/false/' \
+                 "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+          $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt;;
+      esac
       # And run the entire testsuite, skipping all the native-code tests
       run "test $PORT" \
           make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    make -C "$FULL_BUILD_PREFIX-$PORT" INSTALL_MODE=clone install
+    (
+      cd "$OCAMLROOT"
+      mv _opam destdir
+      #ret="$PWD"
+      #script="$PWD/ocaml-compiler-clone.sh"
+      #cd "$(find $PWD/install -name _opam -type d)"
+      mkdir -p "destdir/share/ocaml"
+      cp "$FULL_BUILD_PREFIX-$PORT/config."{cache,status} 'destdir/share/ocaml/'
+      cd destdir
+      sh "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" "$OCAMLROOT/_opam"
+    )
+    rm -rf "$OCAMLROOT"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" OPAM_PACKAGE_NAME=ocaml-variants \
+      INSTALL_MODE=opam install
+    (
+      cd "$FULL_BUILD_PREFIX-$PORT"
+      export PATH="$FLEXDLLROOT:$PATH"
+      opam init --bare --yes --disable-sandboxing --auto-setup \
+                --cygwin-local-install
+      opam switch create "$OPAMSWITCH" --empty
+      opam pin add --no-action --kind=path ocaml-variants .
+      opam pin add --no-action flexdll flexdll
+      opam install --yes flexdll winpthreads
+      opam install --yes --assume-built ocaml-variants
+      git checkout -- ocaml-variants.install
+      rm -f config.cache ocaml-variants-fixup.sh ocaml-compiler-clone.sh
+      opam exec -- ocamlc -v
+    )
+    run "test $PORT in prefix" \
+      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
+            test-in-prefix
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
@@ -240,12 +259,10 @@ case "$1" in
         set -o pipefail
         # For an explanation of the sed command, see
         # https://github.com/appveyor/ci/issues/1824
-        build="-C ../$BUILD_PREFIX-$PORT"
         script --quiet --return --command \
-          "if ! $MAKE -j $build; then $MAKE $build; exit 1; fi" \
+          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
           "../$BUILD_PREFIX-$PORT/build.log" |
-            sed --unbuffered \
-                -e 's/\d027\[K//g' \
+            sed -e 's/\d027\[K//g' \
                 -e 's/\d027\[m/\d027[0m/g' \
                 -e 's/\d027\[01\([m;]\)/\d027[1\1/g'
         rm -f build.log;;
@@ -275,8 +292,6 @@ case "$1" in
     esac
     find "../$BUILD_PREFIX-$PORT" -type f \( -name \*.dll -o -name \*.so \) | \
       xargs rebase -i "$ARG"
-    find "../$BUILD_PREFIX-$PORT" -type f \( -name \*.dll -o -name \*.so \) | \
-      xargs ldd
 
     ;;
 esac
