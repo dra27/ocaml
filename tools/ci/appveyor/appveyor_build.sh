@@ -20,29 +20,25 @@ BUILD_PID=0
 # This must correspond with the entry in appveyor.yml
 CACHE_DIRECTORY=/cygdrive/c/projects/cache
 
-if [[ -z $APPVEYOR_PULL_REQUEST_HEAD_COMMIT ]] ; then
-  MAKE="make -j$NUMBER_OF_PROCESSORS"
-else
-  MAKE=make
-fi
+MAKE="make -j$NUMBER_OF_PROCESSORS"
 
 function run {
-    if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
-    NAME=$1
-    shift
-    echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    if [[ -n $SHOW_CMD ]]; then (set -x; "$@"); else "$@"; fi
-    CODE=$?
-    if [[ $CODE -ne 0 ]] ; then
-        echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-        if [[ $BUILD_PID -ne 0 ]] ; then
-          kill -KILL $BUILD_PID 2>/dev/null
-          wait $BUILD_PID 2>/dev/null
-        fi
-        exit $CODE
-    else
-        echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
+  NAME=$1
+  shift
+  echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ -n $SHOW_CMD ]]; then (set -x; "$@"); else "$@"; fi
+  CODE=$?
+  if [[ $CODE -ne 0 ]] ; then
+    echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    if [[ $BUILD_PID -ne 0 ]] ; then
+      kill -KILL $BUILD_PID 2>/dev/null
+      wait $BUILD_PID 2>/dev/null
     fi
+    exit $CODE
+  else
+    echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  fi
 }
 
 # Function: set_configuration
@@ -50,47 +46,49 @@ function run {
 # $1:the Windows port. Recognized values: mingw, msvc and msvc64
 # $2: the prefix to use to install
 function set_configuration {
-    case "$1" in
-        cygwin*)
-            dep='--disable-dependency-generation'
-        ;;
-        mingw32)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-w64-mingw32'
-            dep='--disable-dependency-generation'
-        ;;
-        mingw64)
-            build='--build=i686-pc-cygwin'
-            host='--host=x86_64-w64-mingw32'
-            dep='--disable-dependency-generation'
-        ;;
-        msvc32)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-pc-windows'
-            dep='--disable-dependency-generation'
-        ;;
-        msvc64)
-            build='--build=x86_64-pc-cygwin'
-            host='--host=x86_64-pc-windows'
-            # Explicitly test dependency generation on msvc64
-            dep='--enable-dependency-generation'
-        ;;
-    esac
+  args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
+        '--prefix' "$2/_opam" \
+        '--docdir' "$2/_opam/doc/ocaml" \
+        '--disable-dependency-generation' \
+        '--enable-native-toplevel' \
+        '--enable-ocamltest')
 
-    mkdir -p "$CACHE_DIRECTORY"
-    ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                $dep $build $host --prefix="$2" --enable-ocamltest || ( \
-      rm -f "$CACHE_DIRECTORY/config.cache-$1" ; \
-      ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                  $dep $build $host --prefix="$2" --enable-ocamltest )
+  case "$1" in
+    mingw32)
+      args+=('--host=i686-w64-mingw32');;
+    mingw64)
+      args+=('--host=x86_64-w64-mingw32');;
+    msvc32)
+      args+=('--host=i686-pc-windows');;
+    msvc64)
+      args+=('--host=x86_64-pc-windows');;
+  esac
+  case "$RELOCATABLE,$1" in
+    true,cygwin*)
+      args+=('--with-relative-libdir=../lib/ocaml');;
+    true,*)
+      args+=('--with-relative-libdir=..\lib\ocaml');;
+  esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--enable-runtime-search=always' '--enable-runtime-search-target')
+  fi
 
-#    FILE=$(pwd | cygpath -f - -m)/Makefile.config
-#    run "Content of $FILE" cat Makefile.config
+  mkdir -p "$CACHE_DIRECTORY"
+  echo './configure' "${args[@]@Q}"
+  if ! ./configure "${args[@]}"; then
+    rm -f "$CACHE_DIRECTORY/config.cache-$1"
+    ./configure "${args[@]}"
+  fi
+
+  cp "$CACHE_DIRECTORY/config.cache-$1" config.cache
+
+#  FILE=$(pwd | cygpath -f - -m)/Makefile.config
+#  run "Content of $FILE" cat Makefile.config
 }
 
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 FLEXDLLROOT="$PROGRAMFILES/flexdll"
-OCAMLROOT=$(echo "$OCAMLROOT" | cygpath -f - -m)
+export OPAMSWITCH="$OCAMLROOT"
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
@@ -129,10 +127,35 @@ case "$1" in
     elif [[ $PORT = 'mingw32' ]] ; then
       export PATH="$PATH:/usr/i686-w64-mingw32/sys-root/mingw/bin"
     fi
+    run_testsuite=$TESTSUITE
+    if [[ -n $APPVEYOR_PULL_REQUEST_NUMBER ]]; then
+      API_URL="https://api.github.com/repos/$APPVEYOR_REPO_NAME/issues/$APPVEYOR_PULL_REQUEST_NUMBER"
+      if curl --silent "$API_URL/labels" | grep -q 'CI: Skip testsuite'; then
+        run_testsuite=false
+      fi
+    fi
     if $run_testsuite; then
       run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    rm -rf "$OCAMLROOT"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" OPAM_PACKAGE_NAME=ocaml-variants \
+      INSTALL_MODE=opam install
+    (
+      cd "$FULL_BUILD_PREFIX-$PORT"
+      export PATH="$FLEXDLLROOT:$PATH"
+      opam init --bare --yes --disable-sandboxing --auto-setup \
+                --cygwin-local-install
+      opam switch create "$OPAMSWITCH" --empty
+      opam pin add --no-action --kind=path ocaml-variants .
+      opam pin add --no-action flexdll flexdll
+      opam install --yes flexdll
+      opam install --yes --assume-built ocaml-variants
+      opam exec -- ocamlc -v
+    )
+    run "test $PORT in prefix" \
+      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
+            test-in-prefix
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
