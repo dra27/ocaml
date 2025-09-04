@@ -70,7 +70,7 @@ build: [
     "--with-afl" {ocaml-option-afl:installed}
     "--enable-spacetime" {ocaml-option-spacetime:installed}
     "--disable-native-compiler" {ocaml-option-bytecode-only:installed}
-    "--disable-force-safe-string" {ocaml-option-default-unsafe-string:installed}
+    "--enable-force-safe-string" {ocaml-option-force-safe-string:installed}
     "DEFAULT_STRING=unsafe" {ocaml-option-default-unsafe-string:installed}
     "--disable-flat-float-array" {ocaml-option-no-flat-float-array:installed}
     "--enable-flambda" {ocaml-option-flambda:installed}
@@ -92,7 +92,7 @@ build: [
     "PARTIALLD=ld -r -melf_i386" {ocaml-option-32bit:installed & os="linux"}
     "LIBS=-static" {ocaml-option-static:installed}
   ]
-  [make "-j%{jobs}%"]
+  [make "-j%{jobs}%" "world%{ocaml-option-bytecode-only:installed?:.opt}%"]
 ]
 install: [make "install"]
 depopts: [
@@ -100,6 +100,7 @@ depopts: [
   "ocaml-option-afl"
   "ocaml-option-bytecode-only"
   "ocaml-option-default-unsafe-string"
+  "ocaml-option-force-safe-string"
   "ocaml-option-no-flat-float-array"
   "ocaml-option-flambda"
   "ocaml-option-fp"
