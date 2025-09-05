@@ -372,6 +372,12 @@ endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
 FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
 
+DOC_FILES=\
+  Changes \
+  README.adoc \
+  README.win32.adoc \
+  LICENSE
+
 # COMPILER_ARTEFACT_DIRS adds the common compiler-libs directories as prefixes
 # to a sequence of patterns in the first argument, e.g.
 # $(call COMPILER_ARTEFACT_DIRS, *.cmi) expands to utils/*.cmi, parsing/*.cmi,
@@ -398,6 +404,7 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 	$(call INSTALL_MKDIR, stublibs)
 endif
 	$(call INSTALL_MKDIR, lib, $(INSTALL_LIBDIR_COMPILERLIBS))
+	$(call INSTALL_MKDIR, doc)
 	$(MAKE) -C runtime install
 	$(call INSTALL_ITEMS, ocaml$(EXE), bin)
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
@@ -474,6 +481,7 @@ endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	  lib, $(INSTALL_LIBDIR_FLEXDLL))
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(call INSTALL_ITEMS, Makefile.config, lib)
+	$(call INSTALL_ITEMS, $(DOC_FILES), doc)
 	if test -f ocamlopt$(EXE); then $(MAKE) installopt; fi
 	$(call INSTALL_END)
 
