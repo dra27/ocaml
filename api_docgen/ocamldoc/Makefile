@@ -121,6 +121,5 @@ INSTALL_MANODIR=$(INSTALL_MANDIR)/man3
 .PHONY:install
 install:
 	$(MKDIR) "$(INSTALL_MANODIR)"
-	if test -d build/man; then \
-	  $(INSTALL_DATA) build/man/*.3o "$(INSTALL_MANODIR)"; \
-	else : ; fi
+	$(if $(wildcard build/man), \
+	  $(INSTALL_DATA) build/man/*.3o "$(INSTALL_MANODIR)")
