@@ -124,9 +124,9 @@ clean: partialclean
 CMIFILES=thread.cmi mutex.cmi condition.cmi event.cmi threadUnix.cmi
 
 install:
-	if test -f $(DLLTHREADS); then \
-	  $(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"; \
-	fi
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+	$(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"
+endif
 	mkdir -p "$(INSTALL_LIBDIR)/vmthreads"
 	$(INSTALL_DATA) libvmthreads.a "$(INSTALL_LIBDIR)/vmthreads"
 	$(INSTALL_DATA) \
