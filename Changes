@@ -1,6 +1,14 @@
 OCaml 4.13 maintenance branch
 -----------------------------
 
+### Manual and documentation:
+
+- #10668, #10669: the changelog (this file), LICENSE and README files are now
+  installed as part of the distribution. The destination directory can be
+  customized using the `--docdir` argument to `./configure`.
+  (Nicolás Ojeda Bär, report by Daniel Bünzli, review by David Allsopp,
+  Sébastien Hinderer, and Daniel Bünzli)
+
 ### Bug fixes:
 
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
