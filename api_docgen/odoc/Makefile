@@ -185,9 +185,7 @@ INSTALL_MANODIR=$(INSTALL_MANDIR)/man3
 .PHONY:install
 install:
 	$(MKDIR) "$(INSTALL_MANODIR)"
-	if test -d build/man/libref ; then \
-	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANODIR)"; \
-	else : ; fi
-	if test -d build/man/compilerlibref ; then \
-	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANODIR)"; \
-	else : ; fi
+	$(if $(wildcard build/man/libref), \
+	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANODIR)")
+	$(if $(wildcard build/man/compilerlibref), \
+	  $(INSTALL_DATA) build/man/libref/* "$(INSTALL_MANODIR)")
