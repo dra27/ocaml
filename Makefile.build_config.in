@@ -78,3 +78,8 @@ ZINC_RUNTIME_ID = @zinc_runtime_id_lo@$(ZINC_RUNTIME_ID_HI)
 LN = @ln@
 
 RUNTIME_SEARCH = @runtime_search@
+
+### Where to install documentation
+PACKAGE_TARNAME = @PACKAGE_TARNAME@
+datarootdir = @datarootdir@
+DOCDIR=@docdir@
