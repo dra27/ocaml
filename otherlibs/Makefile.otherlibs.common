@@ -117,17 +117,17 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
           $(CMIFILES:.cmi=.cmti) \
 	  "$(INSTALL_LIBDIR)/"
 endif
-	if test -n "$(HEADERS)"; then \
-	  $(INSTALL_DATA) $(HEADERS) "$(INSTALL_LIBDIR)/caml/"; \
-	fi
+ifneq "$(HEADERS)" ""
+	$(INSTALL_DATA) $(HEADERS) "$(INSTALL_LIBDIR)/caml/"
+endif
 
 installopt:
 	$(INSTALL_DATA) \
 	   $(CAMLOBJS_NAT) $(LIBNAME).cmxa $(LIBNAME).$(A) \
 	   "$(INSTALL_LIBDIR)/"
-	if test -f $(LIBNAME).cmxs; then \
-	  $(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_LIBDIR)/"; \
-	fi
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+	  $(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_LIBDIR)"
+endif
 
 partialclean:
 	rm -f *.cm*
