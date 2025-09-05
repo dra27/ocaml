@@ -161,19 +161,13 @@ LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
 define INSTALL_ONE_TOOL
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	$(INSTALL_PROG) "$(1)$(EXE)" "$(INSTALL_BINDIR)/$(1).byte$(EXE)"; \
-	if test -f "$(1)".opt$(EXE); then \
-	  $(INSTALL_PROG) "$(1).opt$(EXE)" "$(INSTALL_BINDIR)" && \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
-	else \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).byte$(EXE)" "$(1)$(EXE)"); \
-	fi
-else
-	if test -f "$(1)".opt$(EXE); then \
-	  $(INSTALL_PROG) "$(1).opt$(EXE)" "$(INSTALL_BINDIR)"; \
-	  (cd "$(INSTALL_BINDIR)" && $(LN) "$(1).opt$(EXE)" "$(1)$(EXE)"); \
-	fi
+	$(INSTALL_PROG) "$(1)$(EXE)" "$(INSTALL_BINDIR)/$(1).byte$(EXE)"
 endif
+	$(if $(wildcard $(1).opt$(EXE)), \
+	  $(INSTALL_PROG) "$(1).opt$(EXE)" "$(INSTALL_BINDIR)")
+	(cd "$(INSTALL_BINDIR)" && \
+	  $(LN) "$(1).$(if $(wildcard $(1).opt$(EXE)),opt,byte)$(EXE)" \
+	        "$(1)$(EXE)")
 endef
 
 $(foreach tool, $(install_files), \
@@ -204,12 +198,9 @@ ocamlcmt$(EXE): $(OCAMLCMT)
 ocamlcmt.opt$(EXE): $(call byte2native, $(OCAMLCMT))
 
 install::
-	if test -f ocamlcmt.opt$(EXE); then \
-	  $(INSTALL_PROG)\
-	    ocamlcmt.opt$(EXE) "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"; \
-	else \
-	  $(INSTALL_PROG) ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
-	fi
+	$(INSTALL_PROG) \
+	  ocamlcmt$(if $(wildcard ocamlcmt.opt$(EXE)),.opt)$(EXE) \
+	  "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"
 
 # The bytecode disassembler
 
