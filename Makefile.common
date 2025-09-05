@@ -50,6 +50,7 @@ DESTDIR ?=
 # and the compiler distribution makes no assumptions about where they are
 # relative to each other.
 INSTALL_BINDIR = $(DESTDIR)$(BINDIR)
+INSTALL_DOCDIR = $(DESTDIR)$(DOCDIR)
 INSTALL_LIBDIR = $(DESTDIR)$(LIBDIR)
 INSTALL_MANDIR = $(DESTDIR)$(MANDIR)
 INSTALL_STUBLIBDIR = $(DESTDIR)$(STUBLIBDIR)
