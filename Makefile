@@ -448,9 +448,9 @@ endif
 ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) -C api_docgen install
 endif
-	if test -n "$(WITH_DEBUGGER)"; then \
-	  $(MAKE) -C debugger install; \
-	fi
+ifneq "$(WITH_DEBUGGER)" ""
+	$(MAKE) -C debugger install
+endif
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 ifeq "$(TOOLCHAIN)" "msvc"
 	$(INSTALL_DATA) $(FLEXDLL_SOURCES)/$(FLEXDLL_MANIFEST) \
@@ -465,16 +465,18 @@ endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
     "$(INSTALL_FLEXDLLDIR)"
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(INSTALL_DATA) Makefile.config "$(INSTALL_LIBDIR)"
+	$(MAKE) install$(if $(wildcard ocamlopt$(EXE)),opt,-mklinks)
+
+# Ensure the symlinks are created if the user configures for the native
+# compiler but then doesn't build opt (legacy installation only)
+.PHONY: install-mklinks
+install-mklinks:
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	if test -f ocamlopt$(EXE); then $(MAKE) installopt; else \
-	   cd "$(INSTALL_BINDIR)"; \
-	   $(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
-	   $(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
-	   (test -f flexlink.byte$(EXE) && \
-	      $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true; \
-	fi
-else
-	if test -f ocamlopt$(EXE); then $(MAKE) installopt; fi
+	cd "$(INSTALL_BINDIR)"; \
+	$(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
+	$(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
+	(test -f flexlink.byte$(EXE) && \
+	  $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true
 endif
 
 # Installation of the native-code compiler
@@ -532,19 +534,21 @@ endif
 	for i in $(OTHERLIBRARIES); do \
 	  $(MAKE) -C otherlibs/$$i installopt || exit $$?; \
 	done
-ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	if test -f ocamlopt.opt$(EXE); then $(MAKE) installoptopt; else \
-	   cd "$(INSTALL_BINDIR)"; \
-	   $(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
-	   $(LN) ocamlopt.byte$(EXE) ocamlopt$(EXE); \
-	   $(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
-	   (test -f flexlink.byte$(EXE) && \
-	     $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true; \
-	fi
-else
-	if test -f ocamlopt.opt$(EXE); then $(MAKE) installoptopt; fi
-endif
 	$(MAKE) -C tools installopt
+	$(MAKE) installopt$(if $(wildcard ocamlopt.opt$(EXE)),opt,-mklinks)
+
+# Ensure the symlinks are created if the user configures for the native
+# compiler but then doesn't build opt.opt (legacy installation only)
+.PHONY: install-mklinks
+installopt-mklinks:
+ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
+	cd "$(INSTALL_BINDIR)"; \
+	$(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
+	$(LN) ocamlopt.byte$(EXE) ocamlopt$(EXE); \
+	$(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
+	(test -f flexlink.byte$(EXE) && \
+	  $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true
+endif
 
 .PHONY: installoptopt
 installoptopt:
@@ -576,14 +580,14 @@ endif
 	   $(BYTESTART:.cmo=.$(O)) \
 	   $(OPTSTART:.cmo=.$(O)) \
 	   "$(INSTALL_COMPLIBDIR)"
-	if test -f ocamlnat$(EXE) ; then \
-	  $(INSTALL_PROG) ocamlnat$(EXE) "$(INSTALL_BINDIR)"; \
+	$(if $(wildcard ocamlnat$(EXE)), \
+	  $(INSTALL_PROG) ocamlnat$(EXE) "$(INSTALL_BINDIR)")
+	$(if $(wildcard ocamlnat$(EXE)), \
 	  $(INSTALL_DATA) \
 	     toplevel/*.cmx \
 	     toplevel/native/*.cmx \
 	     $(TOPLEVELSTART:.cmo=.$(O)) \
-	     "$(INSTALL_COMPLIBDIR)"; \
-	fi
+	     "$(INSTALL_COMPLIBDIR)")
 
 # Installation of the *.ml sources of compiler-libs
 .PHONY: install-compiler-sources
