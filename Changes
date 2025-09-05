@@ -73,6 +73,14 @@ OCaml 4.10 maintenance branch
   executable (either from the RNTM section or by analysing the shebang lines)
   (David Allsopp, review by ???)
 
+### Manual and documentation:
+
+- #10668, #10669: the changelog (this file), LICENSE and README files are now
+  installed as part of the distribution. The destination directory can be
+  customized using the `--docdir` argument to `./configure`.
+  (Nicolás Ojeda Bär, report by Daniel Bünzli, review by David Allsopp,
+  Sébastien Hinderer, and Daniel Bünzli)
+
 ### Compiler user-interface and warnings:
 
 - #10046: Link all DLLs with -static-libgcc on mingw32 to prevent dependency
