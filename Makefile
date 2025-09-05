@@ -370,6 +370,12 @@ endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
 FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
 
+DOC_FILES=\
+  Changes \
+  README.adoc \
+  README.win32.adoc \
+  LICENSE
+
 # COMPILER_ARTEFACT_DIRS adds the common compiler-libs directories as prefixes
 # to a sequence of patterns in the first argument, e.g.
 # $(call COMPILER_ARTEFACT_DIRS, *.cmi) expands to utils/*.cmi, parsing/*.cmi,
@@ -510,6 +516,7 @@ endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	  lib, $(INSTALL_LIBDIR_FLEXDLL))
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(call INSTALL_ITEMS, Makefile.config, lib)
+	$(call INSTALL_ITEMS, $(DOC_FILES), doc)
 
 # Installation of the native-code compiler
 .PHONY: full-installopt native-install
