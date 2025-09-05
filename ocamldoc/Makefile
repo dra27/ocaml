@@ -328,9 +328,8 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
 	  "$(INSTALL_LIBDIR)/ocamldoc"
 endif
-	if test -d stdlib_man; then \
-	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANODIR)"; \
-	else : ; fi
+	$(if $(wildcard stdlib_man), \
+	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANODIR)")
 
 # Note: at the moment, $(INSTALL_MANODIR) is created even if the doc has
 # not been built. This is not clean and should be changed.
