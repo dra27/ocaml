@@ -580,14 +580,14 @@ endif
 	   $(BYTESTART:.cmo=.$(O)) \
 	   $(OPTSTART:.cmo=.$(O)) \
 	   "$(INSTALL_COMPLIBDIR)"
-	if test -f ocamlnat$(EXE) ; then \
-	  $(INSTALL_PROG) ocamlnat$(EXE) "$(INSTALL_BINDIR)"; \
+	$(if $(wildcard ocamlnat$(EXE)), \
+	  $(INSTALL_PROG) ocamlnat$(EXE) "$(INSTALL_BINDIR)")
+	$(if $(wildcard ocamlnat$(EXE)), \
 	  $(INSTALL_DATA) \
 	     toplevel/*.cmx \
 	     toplevel/native/*.cmx \
 	     $(TOPLEVELSTART:.cmo=.$(O)) \
-	     "$(INSTALL_COMPLIBDIR)"; \
-	fi
+	     "$(INSTALL_COMPLIBDIR)")
 
 # Installation of the *.ml sources of compiler-libs
 .PHONY: install-compiler-sources
