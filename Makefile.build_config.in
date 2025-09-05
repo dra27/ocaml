@@ -56,6 +56,11 @@ DOCUMENTATION_TOOL_CMD=@documentation_tool_cmd@
 FLEXDLL_SOURCES=@flexdir@
 BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 
+### Where to install documentation
+PACKAGE_TARNAME = @PACKAGE_TARNAME@
+datarootdir = @datarootdir@
+DOCDIR=@docdir@
+
 ### Where to look for the standard library on target
 TARGET_LIBDIR=@TARGET_LIBDIR@
 TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
