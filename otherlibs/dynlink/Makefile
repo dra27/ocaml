@@ -246,11 +246,11 @@ endif
 	  extract_crc "$(INSTALL_LIBDIR)/extract_crc$(EXE)"
 
 installopt:
-	if $(NATDYNLINK); then \
-	  $(INSTALL_DATA) \
-	    $(NATOBJS) dynlink.cmxa dynlink.$(A) \
-	    "$(INSTALL_LIBDIR)"; \
-	fi
+ifeq "$(NATDYNLINK)" "true"
+	$(INSTALL_DATA) \
+	  $(NATOBJS) dynlink.cmxa dynlink.$(A) \
+	  "$(INSTALL_LIBDIR)"
+endif
 
 partialclean:
 	rm -f extract_crc *.cm[ioaxt] *.cmti *.cmxa \
