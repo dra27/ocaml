@@ -34,6 +34,15 @@ let ln_command = Sys.argv.(3)
 
 let output_endline oc = Printf.kfprintf (fun oc -> output_char oc '\n') oc
 
+module In_channel = struct
+  include In_channel
+
+  let rec fold_lines f accu ic =
+    match Stdlib.input_line ic with
+    | line -> fold_lines f (f accu line) ic
+    | exception End_of_file -> accu
+end
+
 let write_install_lines oc file =
   In_channel.with_open_text file @@
     In_channel.fold_lines (fun _ -> output_endline oc "  %s") ()
