@@ -390,9 +390,49 @@ NATIVE_ARTEFACT_DIRS = \
   middle_end middle_end/closure middle_end/flambda middle_end/flambda/base_types
 
 # Installation
+# Historically, the install target dynamically installed what had been built,
+# for example, if only world had been built then make install simply didn't
+# install the native tools. That infrastructure is potentially convenient when
+# working on the compiler, but potentially masks bugs. It is better to have the
+# installation targets require everything configure mandated to have built.
+# There are three entry points to installation:
+#   install - installs everything
+#   installopt - installs the native code compiler _and_ the extra .opt tools
+#   installoptopt - intalls just the extra .opt tools
+# The installopt targets have been maintained for now, but may be removed in the
+# future.
 
-.PHONY: install
-install::
+ifeq "$(NATIVE_COMPILER)" "true"
+install: full-installoptopt ;
+else
+install: common-install ;
+endif
+
+# These three targets are the slightly esoteric special sauce that avoid
+# recursive make invocations in the install targets.
+# There are three basic install recipies:
+# - The old install target is available to common-install, but never recurses to
+# - The old installopt target is available as both full-installopt and
+#   native-install
+# - The old installoptopt target is also available as full-installoptopt and
+#   installopt
+# These sets of recipies are then welded together by these three dependency
+# specifications
+# - When configured with --disable-native-compiler, the install target simply
+#   depends on common-install (see above)
+# - Otherwise, install depends on full-installoptopt (see above)
+# - The recipe for full-installoptopt installs the .opt versions of the tools,
+#   but it _depends on_ full-installopt.
+# - full-installopt installs the native compiler, but it _depends on_
+#   common-install
+installopt: native-install
+
+full-installopt: common-install
+
+full-installoptopt: full-installopt
+
+.PHONY: common-install
+common-install::
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
@@ -469,13 +509,7 @@ endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(INSTALL_DATA) Makefile.config "$(INSTALL_LIBDIR)"
 	$(INSTALL_DATA) $(DOC_FILES) "$(INSTALL_DOCDIR)"
-	$(MAKE) install$(if $(wildcard ocamlopt$(EXE)),opt,-mklinks)
-
-# Ensure the symlinks are created if the user configures for the native
-# compiler but then doesn't build opt (legacy installation only)
-.PHONY: install-mklinks
-install-mklinks:
-ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
+ifeq "$(NATIVE_COMPILER)-$(INSTALL_BYTECODE_PROGRAMS)" "false-true"
 	cd "$(INSTALL_BINDIR)"; \
 	$(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
 	$(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
@@ -484,8 +518,8 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 endif
 
 # Installation of the native-code compiler
-.PHONY: installopt
-installopt:
+.PHONY: full-installopt native-install
+full-installopt native-install:
 	$(MAKE) -C runtime installopt
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(INSTALL_PROG) ocamlopt$(EXE) "$(INSTALL_BINDIR)/ocamlopt.byte$(EXE)"
@@ -533,23 +567,9 @@ endif
 	  $(MAKE) -C otherlibs/$$i installopt || exit $$?; \
 	done
 	$(MAKE) -C tools installopt
-	$(MAKE) installopt$(if $(wildcard ocamlopt.opt$(EXE)),opt,-mklinks)
 
-# Ensure the symlinks are created if the user configures for the native
-# compiler but then doesn't build opt.opt (legacy installation only)
-.PHONY: install-mklinks
-installopt-mklinks:
-ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	cd "$(INSTALL_BINDIR)"; \
-	$(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
-	$(LN) ocamlopt.byte$(EXE) ocamlopt$(EXE); \
-	$(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
-	(test -f flexlink.byte$(EXE) && \
-	  $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true
-endif
-
-.PHONY: installoptopt
-installoptopt:
+.PHONY: full-installoptopt installopt installoptopt
+full-installoptopt installopt installoptopt:
 	$(INSTALL_PROG) ocamlc.opt$(EXE) "$(INSTALL_BINDIR)"
 	$(INSTALL_PROG) ocamlopt.opt$(EXE) "$(INSTALL_BINDIR)"
 	$(INSTALL_PROG) lex/ocamllex.opt$(EXE) "$(INSTALL_BINDIR)"
