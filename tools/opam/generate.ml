@@ -35,12 +35,31 @@ let ln_command = Sys.argv.(3)
 let output_endline oc = Printf.kfprintf (fun oc -> output_char oc '\n') oc
 
 module In_channel = struct
-  include In_channel
+  let with_open openfun s f =
+    let ic = openfun s in
+    Fun.protect ~finally:(fun () -> close_in_noerr ic)
+      (fun () -> f ic)
+
+  let with_open_text s f =
+    with_open open_in s f
 
   let rec fold_lines f accu ic =
     match Stdlib.input_line ic with
     | line -> fold_lines f (f accu line) ic
     | exception End_of_file -> accu
+end
+
+module Out_channel = struct
+  let with_open openfun s f =
+    let oc = openfun s in
+    Fun.protect ~finally:(fun () -> Stdlib.close_out_noerr oc)
+      (fun () -> f oc)
+
+  let with_open_bin s f =
+    with_open Stdlib.open_out_bin s f
+
+  let with_open_text s f =
+    with_open Stdlib.open_out s f
 end
 
 (* [generate_file file] processes then erases opam-bin, opam-lib opam-libexec
