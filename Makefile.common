@@ -334,7 +334,7 @@ INSTALL_DESPATCH_opam_BEGIN = \
 # Munge opam-bin, opam-lib, opam-libexec and opam-man into a .install file and
 # then munge clone-* and create-symlinks into the fixup script.
 INSTALL_DESPATCH_opam_END = \
-  $(OCAMLRUN) ./ocaml$(EXE) $(STDLIBFLAGS) \
+  $(CAMLRUN) ./ocaml$(EXE) $(STDLIBFLAGS) \
     tools/opam/generate.ml $(INSTALL_MODE) $(OPAM_PACKAGE_NAME) '$(LN)'
 
 # Generate $(OPAM_PACKAGE_NAME)-clone.sh (INSTALL_MODE=clone)

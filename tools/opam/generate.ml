@@ -96,7 +96,7 @@ let generate_install file =
    after processing. *)
 let process_clone oc process =
   let process_file file =
-    if String.starts_with ~prefix:"clone-" file then begin
+    if String.length file >= 6 && String.sub file 0 6 = "clone-" then begin
       let dir =
         String.map (function '@' -> '/' | c -> c)
                    (String.sub file 6 (String.length file - 6))
