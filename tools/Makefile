@@ -61,8 +61,8 @@ $(foreach program, $(programs_byte) $(programs_opt),\
   $(eval $(call PROGRAM_SYNONYM,$(program))))
 
 $(programs_byte:%=%$(EXE)):
-	$(CAMLC) $(call ADD_BYTECODE_RUNTIME, $(LINKFLAGS)) $(LINKFLAGS) \
-	         -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
+	$(CAMLC) $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, $(LINKFLAGS)) \
+	         $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
 
 $(programs_opt:%=%$(EXE)):
 	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
@@ -313,10 +313,7 @@ checkstack$(EXE): checkstack.$(O)
 caml_tex := caml-tex$(EXE)
 
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-$(caml_tex): LINKFLAGS += \
-  -use-prims $(ROOTDIR)/runtime/primitives \
-  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
-  -launch-method $(LAUNCH_METHOD)
+$(caml_tex): LINKFLAGS += $(BYTECODE_LAUNCHER_FLAGS)
 endif
 
 # caml-tex uses str.cma and unix.cma and so must be compiled with
