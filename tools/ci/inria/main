@@ -292,8 +292,9 @@ case $NODE_NAME in
     # Native compilation not supported
     ;;
   *)
-    # Include ocamlnat in the in-prefix tests
-    confoptions="$confoptions --enable-native-toplevel";;
+    # Include ocamlnat (for the in-prefix tests) unless explicitly disabled:
+    # a later --disable-native-toplevel will take precedence if present.
+    confoptions="--enable-native-toplevel $confoptions";;
 esac
 
 main_build() {
@@ -320,6 +321,7 @@ main_build() {
     $make --warn-undefined-variables alldepend
   fi
 
+<<<<<<< HEAD
   $make --warn-undefined-variables install
   $make -f Makefile.test -C testsuite/in_prefix test-in-prefix
   rm -rf "$instdir"
@@ -330,6 +332,16 @@ main_build() {
 CLEAN_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vF '/homebrew/' | paste -sd: -)
 
 PATH="$CLEAN_PATH" main_build
+=======
+$make --warn-undefined-variables install
+case $confoptions in
+  *--disable-unix-lib*) ;;         # test-in-prefix needs Unix lib
+  *)
+    $make -f Makefile.test -C testsuite/in_prefix test-in-prefix
+    ;;
+esac
+rm -rf "$instdir"
+>>>>>>> 53bb5a854ee
 
 cd testsuite
 if test -n "$jobs" && test -x /usr/bin/parallel
