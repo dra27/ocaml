@@ -957,7 +957,7 @@ ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
 
 ocamlc_SOURCES = driver/main.mli driver/main.ml
 
-ocamlc$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32 -g
+ocamlc_BYTECODE_LINKFLAGS = -compat-32 -g
 
 partialclean::
 	rm -f ocamlc ocamlc.exe ocamlc.opt ocamlc.opt.exe
@@ -968,7 +968,7 @@ ocamlopt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamloptcomp)
 
 ocamlopt_SOURCES = driver/optmain.mli driver/optmain.ml
 
-ocamlopt$(EXE): OC_BYTECODE_LINKFLAGS += -g
+ocamlopt_BYTECODE_LINKFLAGS = -g
 
 partialclean::
 	rm -f ocamlopt ocamlopt.exe ocamlopt.opt ocamlopt.opt.exe
@@ -1694,7 +1694,7 @@ ocamllex: ocamlyacc
 ocamllex.opt: ocamlopt
 	$(MAKE) lex-allopt
 
-lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
+ocamllex_BYTECODE_LINKFLAGS = -compat-32
 
 partialclean::
 	rm -f lex/*.cm* lex/*.o lex/*.obj \
@@ -1963,7 +1963,7 @@ expect_SOURCES = $(addprefix testsuite/tools/,expect.mli expect.ml)
 expect_LIBRARIES = $(addprefix compilerlibs/,\
   ocamlcommon ocamlbytecomp ocamltoplevel)
 
-testsuite/tools/expect$(EXE): OC_BYTECODE_LINKFLAGS += -linkall
+expect_BYTECODE_LINKFLAGS += -linkall
 
 codegen_SOURCES = $(addprefix testsuite/tools/,\
   parsecmmaux.mli parsecmmaux.ml \
@@ -2002,11 +2002,11 @@ test_in_prefix_LIBRARIES = \
 # test_in_prefix% would only match test_in_prefix.opt, hence the missing 'x'!
 testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 
-testsuite/tools/test_in_prefix$(EXE): OC_BYTECODE_LINKFLAGS += -custom
+test_in_prefix_BYTECODE_LINKFLAGS += -custom
 
 testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 
-ocamltest/ocamltest$(EXE): OC_BYTECODE_LINKFLAGS += -custom -g
+ocamltest_BYTECODE_LINKFLAGS = -custom -g
 
 ocamltest.opt: ocamltest/ocamltest.opt$(EXE) \
   testsuite/lib/testing.cmxa $(asmgen_OBJECT) testsuite/tools/codegen$(EXE) \
@@ -2319,7 +2319,7 @@ partialclean::
 ocamldep_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
 ocamldep_SOURCES = tools/ocamldep.mli tools/ocamldep.ml
 
-tools/ocamldep$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
+ocamldep_BYTECODE_LINKFLAGS = -compat-32
 
 # The profiler
 
@@ -2516,7 +2516,7 @@ ocamlnat_LIBRARIES = \
 
 ocamlnat_SOURCES = $(ocaml_SOURCES)
 
-ocamlnat$(EXE): OC_NATIVE_LINKFLAGS += -linkall -I toplevel/native
+ocamlnat_NATIVE_LINKFLAGS = -linkall -I toplevel/native
 
 COMPILE_NATIVE_MODULE = \
   $(CAMLOPT) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) \
