@@ -45,7 +45,8 @@ COMPFLAGS=-strict-sequence -principal -absname \
           -warn-error +a \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
 LINKFLAGS=$(OC_COMMON_LINKFLAGS)
-BYTECODE_LINKFLAGS = $(call ADD_BYTECODE_RUNTIME, $(LINKFLAGS)) $(LINKFLAGS)
+BYTECODE_LINKFLAGS = \
+  $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, $(LINKFLAGS)) $(LINKFLAGS)
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -150,8 +151,10 @@ boot/ocamlruns$(EXE): runtime/ocamlruns$(EXE)
 boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) \
-	                                                    $(USE_STDLIB)) \
+	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) \
+	                                 $(USE_RUNTIME_PRIMS) \
+	                                 $(BYTECODE_LAUNCHER_FLAGS) \
+	                                 $(USE_STDLIB)) \
 	  -B flexlink.exe support
 	cp $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
 	cp $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
@@ -416,11 +419,14 @@ clean::
 # Build the manual latex files from the etex source files
 # (see manual/README.md)
 .PHONY: manual-pregen
-manual-pregen: opt.opt
-	cd manual; $(MAKE) clean && $(MAKE) pregen-etex
+manual-pregen: opt.opt | manual
+	$(MAKE) -C manual clean
+	$(MAKE) -C manual pregen-etex
 
+ifneq "$(wildcard manual)" ""
 clean::
 	$(MAKE) -C manual clean
+endif
 
 # The clean target
 clean:: partialclean
@@ -685,9 +691,9 @@ endif
 ifeq "$(UNIX_OR_WIN32)" "unix"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 runtime_BYTECODE_STATIC_LIBRARIES += runtime/libcamlrun_pic.$(A)
-runtime_BYTECODE_SHARED_LIBRARIES += runtime/libcamlrun_shared.$(SO)
+runtime_BYTECODE_SHARED_LIBRARIES += camlrun
 runtime_NATIVE_STATIC_LIBRARIES += runtime/libasmrun_pic.$(A)
-runtime_NATIVE_SHARED_LIBRARIES += runtime/libasmrun_shared.$(SO)
+runtime_NATIVE_SHARED_LIBRARIES += asmrun
 endif
 endif
 
@@ -728,13 +734,15 @@ ocamlruni_CPPFLAGS = -DCAML_INSTR
 
 .PHONY: runtime-all
 runtime-all: \
-  $(runtime_BYTECODE_STATIC_LIBRARIES) $(runtime_BYTECODE_SHARED_LIBRARIES) \
+  $(runtime_BYTECODE_STATIC_LIBRARIES) \
+  $(runtime_BYTECODE_SHARED_LIBRARIES:%=runtime/lib%_shared$(EXT_DLL)) \
   $(runtime_PROGRAMS:%=runtime/%$(EXE)) $(SAK)
 
 .PHONY: runtime-allopt
 ifneq "$(NATIVE_COMPILER)" "false"
 runtime-allopt: \
-  $(runtime_NATIVE_STATIC_LIBRARIES) $(runtime_NATIVE_SHARED_LIBRARIES)
+  $(runtime_NATIVE_STATIC_LIBRARIES) \
+  $(runtime_NATIVE_SHARED_LIBRARIES:%=runtime/lib%_shared$(EXT_DLL))
 else
 runtime-allopt:
 	$(error The build has been configured with --disable-native-compiler)
@@ -1223,6 +1231,10 @@ test_in_prefix_LIBRARIES = \
 testsuite/tools/%.cmo: DIRS += otherlibs/unix testsuite/tools
 testsuite/tools/%.cmx: DIRS += otherlibs/unix testsuite/tools
 
+# Needed for the additional stubs.c (since caml_sys_proc_self_exe is 5.5+)
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
+
 testsuite/tools/test_in_prefix$(EXE): \
   CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
 
@@ -1251,10 +1263,7 @@ TEST_IN_PREFIX_STDLIB =
 endif
 
 testsuite/tools/dummy$(EXE): testsuite/tools/dummy.$(O)
-	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
-
-$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
-$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
+	$(call MKEXE_VIA_CC,$@,$^)
 
 partialclean::
 	rm -f testsuite/tools/dummy testsuite/tools/dummy.exe
@@ -1490,7 +1499,9 @@ depend: beforedepend
 distclean: clean
 	$(MAKE) -C debugger distclean
 	$(MAKE) -C lex distclean
+ifneq "$(wildcard manual)" ""
 	$(MAKE) -C manual distclean
+endif
 	$(MAKE) -C ocamldoc distclean
 	$(MAKE) -C ocamltest distclean
 	rm -f testsuite/tools/toolchain.ml
@@ -1521,11 +1532,14 @@ endif
 	$(MKDIR) "$(INSTALL_COMPLIBDIR)"
 	$(MKDIR) "$(INSTALL_DOCDIR)"
 	$(MKDIR) "$(INSTALL_INCDIR)"
+	$(INSTALL_PROG) $(runtime_PROGRAMS) "$(INSTALL_BINDIR)"
 
 ifeq "$(SUFFIXING)" "true"
 MANGLE_RUNTIME_NAME = $(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)
+MANGLE_RUNTIME_DLL_NAME = lib$(1)-$(TARGET)-$($(2)_RUNTIME_ID)$(EXT_DLL)
 else
 MANGLE_RUNTIME_NAME = $(1)$(EXE)
+MANGLE_RUNTIME_DLL_NAME = lib$(1)_shared$(EXT_DLL)
 endif
 
 define INSTALL_RUNTIME
@@ -1541,6 +1555,21 @@ ifeq "$(SUFFIXING)" "true"
 	    "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
 endif
 endef
+define INSTALL_RUNTIME_LIB
+ifeq "$(2)" "BYTECODE"
+install::
+else
+installopt::
+endif
+	$(INSTALL_PROG) \
+    runtime/lib$(1)_shared$(EXT_DLL) \
+	    "$(INSTALL_LIBDIR)/$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))"
+ifeq "$(SUFFIXING)" "true"
+	cd "$(INSTALL_LIBDIR)" && \
+    $(LN) "$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))" \
+    "lib$(1)_shared$(EXT_DLL)"
+endif
+endef
 
 $(foreach runtime, $(runtime_PROGRAMS), \
   $(eval $(call INSTALL_RUNTIME,$(runtime))))
@@ -1548,10 +1577,11 @@ $(foreach runtime, $(runtime_PROGRAMS), \
 install::
 	$(INSTALL_DATA) runtime/ld.conf $(runtime_BYTECODE_STATIC_LIBRARIES) \
 	  "$(INSTALL_LIBDIR)"
-ifneq "$(runtime_BYTECODE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(runtime_BYTECODE_SHARED_LIBRARIES) \
-	  "$(INSTALL_LIBDIR)"
-endif
+
+$(foreach shared_runtime, $(runtime_BYTECODE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),BYTECODE)))
+
+install::
 	$(INSTALL_DATA) runtime/caml/domain_state.tbl runtime/caml/*.h \
 	  "$(INSTALL_INCDIR)"
 	$(INSTALL_PROG) ocaml$(EXE) "$(INSTALL_BINDIR)"
@@ -1573,9 +1603,6 @@ endif
 	   lambda/*.cmi \
 	   driver/*.cmi \
 	   toplevel/*.cmi \
-	   "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	   toplevel/byte/*.cmi \
 	   "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
@@ -1615,9 +1642,9 @@ endif
 ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) -C api_docgen install
 endif
-	if test -n "$(WITH_DEBUGGER)"; then \
-	  $(MAKE) -C debugger install; \
-	fi
+ifneq "$(WITH_DEBUGGER)" ""
+	$(MAKE) -C debugger install
+endif
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 ifeq "$(TOOLCHAIN)" "msvc"
 	$(INSTALL_DATA) $(FLEXDLL_SOURCES)/$(FLEXDLL_MANIFEST) \
@@ -1633,25 +1660,29 @@ endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(INSTALL_DATA) Makefile.config "$(INSTALL_LIBDIR)"
 	$(INSTALL_DATA) $(DOC_FILES) "$(INSTALL_DOCDIR)"
+	$(MAKE) install$(if $(wildcard ocamlopt$(EXE)),opt,-mklinks)
+
+# Ensure the symlinks are created if the user configures for the native
+# compiler but then doesn't build opt (legacy installation only)
+.PHONY: install-mklinks
+install-mklinks:
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	if test -f ocamlopt$(EXE); then $(MAKE) installopt; else \
-	   cd "$(INSTALL_BINDIR)"; \
-	   $(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
-	   $(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
-	   (test -f flexlink.byte$(EXE) && \
-	      $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true; \
-	fi
-else
-	if test -f ocamlopt$(EXE); then $(MAKE) installopt; fi
+	cd "$(INSTALL_BINDIR)"; \
+	$(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
+	$(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
+	(test -f flexlink.byte$(EXE) && \
+	  $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true
 endif
 
 # Installation of the native-code compiler
 .PHONY: installopt
-installopt:
+installopt::
 	$(INSTALL_DATA) $(runtime_NATIVE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
-ifneq "$(runtime_NATIVE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(runtime_NATIVE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
-endif
+
+$(foreach shared_runtime, $(runtime_NATIVE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),NATIVE)))
+
+installopt::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(INSTALL_PROG) ocamlopt$(EXE) "$(INSTALL_BINDIR)/ocamlopt.byte$(EXE)"
 endif
@@ -1703,19 +1734,21 @@ endif
 	for i in $(OTHERLIBRARIES); do \
 	  $(MAKE) -C otherlibs/$$i installopt || exit $$?; \
 	done
-ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	if test -f ocamlopt.opt$(EXE); then $(MAKE) installoptopt; else \
-	   cd "$(INSTALL_BINDIR)"; \
-	   $(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
-	   $(LN) ocamlopt.byte$(EXE) ocamlopt$(EXE); \
-	   $(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
-	   (test -f flexlink.byte$(EXE) && \
-	     $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true; \
-	fi
-else
-	if test -f ocamlopt.opt$(EXE); then $(MAKE) installoptopt; fi
-endif
 	$(MAKE) -C tools installopt
+	$(MAKE) installopt$(if $(wildcard ocamlopt.opt$(EXE)),opt,-mklinks)
+
+# Ensure the symlinks are created if the user configures for the native
+# compiler but then doesn't build opt.opt (legacy installation only)
+.PHONY: install-mklinks
+installopt-mklinks:
+ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
+	cd "$(INSTALL_BINDIR)"; \
+	$(LN) ocamlc.byte$(EXE) ocamlc$(EXE); \
+	$(LN) ocamlopt.byte$(EXE) ocamlopt$(EXE); \
+	$(LN) ocamllex.byte$(EXE) ocamllex$(EXE); \
+	(test -f flexlink.byte$(EXE) && \
+	  $(LN) flexlink.byte$(EXE) flexlink$(EXE)) || true
+endif
 
 .PHONY: installoptopt
 installoptopt:
@@ -1746,8 +1779,8 @@ endif
 	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
 	   "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	   $(BYTESTART:.cmo=.cmx) $(BYTESTART:.cmo=.$(O)) \
-	   $(OPTSTART:.cmo=.cmx) $(OPTSTART:.cmo=.$(O)) \
+	   $(BYTESTART:.cmo=.$(O)) \
+	   $(OPTSTART:.cmo=.$(O)) \
 	   $(TOPLEVELSTART:.cmo=.$(O)) \
 	   "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_OCAMLNAT)" "true"
