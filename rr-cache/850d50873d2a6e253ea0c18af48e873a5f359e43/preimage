@@ -82,11 +82,8 @@ Working version
 - #14???: The Windows version of the executable launcher (stdlib/header.c) no
   longer assumes that paths are limited to 260 (MAX_PATH) characters.
 =======
-- #14???: Change semantics of the internal caml_attempt_open bytecode runtime
-  function to require the caller to perform PATH-resolution prior to calling the
-  function. Affects the resolution of CAML_DEBUG_FILE, which is still searched
-  in PATH, but at program startup instead of when the debug information is first
-  loaded.
+- #14???: Executables linked with `ocamlc -custom` now always attempt to load
+  bytecode from the executable itself, rather than first trying `argv[0]`.
 >>>>>>>
   (David Allsopp, review by ???)
 
