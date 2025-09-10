@@ -59,6 +59,65 @@ Working version
   (Tim McGilchrist, review by Nick Barnes, Sadiq Jaffer and
   Gabriel Scherer)
 
+* #14???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
+  "../<path...>") are interpreted as being relative to the directory ld.conf
+  was loaded from, and the default ld.conf now uses relative paths, rather than
+  embedding the absolute path to the Standard Library. The brave may continue to
+  put implicit paths in ld.conf. The interpretation of CAML_LD_LIBRARY_PATH is
+  unaltered. Additionally, ld.conf is loaded from all of $OCAMLLIB/ld.conf,
+  $CAMLLIB/ld.conf and standard_library_default/ld.conf rather than just the
+  first one found. ld.conf files with CRLF line endings are now consistently on
+  both Windows and Unix.
+  (David Allsopp, review by ???)
+
+- #14???: Added --with-relative-bindir which allows the runtime and the
+  compilers to locate the Standard Library relative to where the binaries
+  themselves are installed, removing the absolute path previously embedded in
+  caml_standard_library_default. Executables linked with `ocamlc -custom` now
+  always attempt to load bytecode from the executable itself, rather than first
+  trying `argv[0]`.
+  (David Allsopp, review by ???)
+
+- #14???: Introduce Runtime IDs for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system. The IDs are used, along with the host
+  triplet, to provide mangled names for the ocamlrun executable and its variants
+  and the DLL versions of both the bytecode and native runtimes, with symlinks
+  created for the original names. They are also used to mangle the names of stub
+  libraries so that stub libraries compiled for a given configuration of the
+  runtime will only be sought by that runtime. The behaviour is disabled by
+  configuring with --disable-suffixing.
+  (David Allsopp, review by ???)
+
+- #14???: The Windows version of the executable launcher (stdlib/header.c) no
+  longer assumes that paths are limited to 260 (MAX_PATH) characters.
+  (David Allsopp, review by ???)
+
+- #14???: Change semantics of the internal caml_attempt_open bytecode runtime
+  function to require the caller to perform PATH-resolution prior to calling the
+  function. Affects the resolution of CAML_DEBUG_FILE, which is still searched
+  in PATH, but at program startup instead of when the debug information is first
+  loaded.
+  (David Allsopp, review by ???)
+
+- #14???: The CAML_DEBUG_FILE environment variable is now ignored if it set to
+  the empty string.
+  (David Allsopp, review by ???)
+
+* #14???: When set to the empty string, OCAMLRUNPARAM, OCAMLLIB and CAMLLIB are
+  now ignored (i.e. treated as if they were unset). In particular, this means
+  that a blank value for OCAMLLIB no longer prevents the compiler's default
+  Standard Library from being used. CAML_LD_LIBRARY_PATH now ignores empty
+  segments (instead of interpreting them as being ".") which also means that
+  CAML_LD_LIBRARY_PATH is ignored if it is just set to the empty string. Blank
+  lines in ld.conf are now likewise ignored.
+  (David Allsopp, review by ???)
+
+* #14???: Windows and Unix. When configured with --disable-shared, the runtime
+  now rejects bytecode executables which require DLLs to be loaded earlier, and
+  with a less unclear error message.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 ### Standard library:
@@ -95,6 +154,11 @@ Working version
 
 - #14060: Add Hashtbl.find_and_replace and Hashtbl.find_and_remove.
   (Sacha-Élie Ayoun, review by Nicolás Ojeda Bär and Gabriel Scherer)
+
+- #14???: On Unix, the Filename module now treats TMPDIR='' (i.e. TMPDIR set,
+  but to an empty string) as TMPDIR=/tmp (as it already does if TMPDIR is not
+  set at all).
+  (David Allsopp, review by ???)
 
 ### Type system:
 
@@ -145,6 +209,14 @@ Working version
   instead of ENOENT if the command string is not a valid C string.
   (Antonin Décimo, review by Gabriel Scherer and Nicolás Ojeda Bär)
 
+- #14???: Improved the error message when bytecode Dynlink is asked to load an
+  archive which needs dynamic loading on a runtime which doesn't support it.
+  Previously, the full machinery to search for DLLs was invoked, and the error
+  confusingly included the name of a non-existent DLL. The entire process is now
+  skipped, with a general message that dynamic loading is needed and is
+  unavailable.
+  (David Allsopp, review by ???)
+
 ### Tools:
 
 - #14055: Invert BUILD_PATH_PREFIX_MAP in directories loaded at startup
@@ -173,6 +245,21 @@ Working version
   loadpath" when seeking source files. It improves hit rate for
   sources of installed packages.
   (Pierre Boutillier, review by Gabriel Scherer)
+
+- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by ???)
+
+- #14???: ocamlyacc treats TMPDIR='' (i.e. set, but to the empty string) as
+  TMPDIR=/tmp (as it already does if TMPDIR is not set at all).
+  (David Allsopp, review by ???)
+
+### Toplevel:
+
+- #14???: Empty segments in OCAMLTOP_INCLUDE_PATH are no longer interpreted as
+  adding the current working directory to the search path. The current working
+  directory can of course still be included in the search path by adding ".".
+  (David Allsopp, review by ???)
 
 ### Manual and documentation:
 
@@ -224,7 +311,22 @@ Working version
   e.g. `< foo : int; .. as $0>` when $0 is introduced by a GADT constructor
   (Stefan Muenzel, review by Jacques Garrigue and Florian Angeletti)
 
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
 
+- #14???: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix. New option -runtime-search extends the bytecode executable
+  header to be able to search for the runtime interpreter in the directory
+  containing the executable and in PATH rather than relying on a single
+  hard-coded path.
+  (David Allsopp, review by ???)
+
+- #14???: Add -set-runtime-default option to both compilers, allowing runtime
+  parameters to be added to the binary with the given value.
+  (David Allsopp and Antonin Décimo, review by ???)
 
 ### Internal/compiler-libs changes:
 
@@ -271,10 +373,33 @@ Working version
 - #14198 Constraints on module unpacking are not ghost
   (Thomas Refis, review by Nicolás Ojeda Bär)
 
+- #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #13810: Support build of cross compilers to native freestanding targets
   (Samuel Hym, review by Antonin Décimo and Romain Calascibetta)
+
+- #14???: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf. Additionally, the stublibs subdirectory
+  is no longer created, nor added to ld.conf, when building OCaml with
+  --disable-shared.
+  (David Allsopp, review by ???)
+
+- #14???: When targeting native Windows on Cygwin or MSYS2, preserve
+  backslashes in the supplied `--prefix` (in particular, backslashes instead of
+  slashes will then be displayed by `ocamlopt -config-var standard_library`).
+  If the supplied prefix contains a slash, then it is normalised, as
+  previously.
+  (David Allsopp, review by ???)
+
+- #14???: New --enable-runtime-search configure option controls the
+  -runtime-search option used to build the bytecode binaries in the compiler
+  distribution. --enable-runtime-search-target controls the default value of
+  -runtime-search used for bytecode executables produced by the compiler.
+  (David Allsopp, review by ???)
 
 ### Bug fixes:
 
@@ -307,6 +432,11 @@ Working version
 
 - #14230 : ocamltest fails to link test program with -custom in some cases
   (Damien Doligez, review by David Allsopp)
+
+- #14???: Fix the hand-off of the bytecode image to the runtime from the
+  executable header. In particular, running `ocamlc.byte` rather than
+  `ocamlc.byte.exe` now invokes the compiler instead of ocamlrun itself!
+  (David Allsopp, review by ???)
 
 OCaml 5.4.0
 ---------------
