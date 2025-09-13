@@ -1,65 +1,24 @@
-<<<<<<<
-=======
-Working version
-----------------
-
-(Changes that can break existing programs are marked with a "*")
-
-### Language features:
-
-* #14009: infix extension points/attributes appearing in local structure items,
-  eg `let module%foo[@bar] ... in ...` are attached to the AST node of the
-  corresponding structure item (similar to their global counterparts) and no
-  longer to the enclosing `let` expression.  Extension points/attributes that
-  are to be attached to the enclosing `let` expression are to be written next to
-  the `let` keyword, eg `let%foo[@bar] module ... in ...`. The same holds for
-  `let exception` and `let open`.
-  (Nicolás Ojeda Bär, review by Gabriel Scherer)
-
-- #14029: Recognize `%identity` as nonexpansive
-  (Stephen Dolan and Olivier Nicole, review by Hugo Heuzard, Jacques Guarrigue,
-  Jeremy Yallop,  and Gabriel Scherer)
-
-* #13712: Introduce a new kind `Type_external` and syntax
-  `type t = external "name"` to discriminate external types from other types
-  and each other.  This PR turns primitive types into external and removes the
-  past behavior of discriminating abstract types defined in the current module.
-  (Takafumi Saikawa, Jacques Garrigue, review by Richard Eisenberg)
+OCaml 5.4 maintenance version
+-----------------------------
 
 ### Runtime system:
 
-- #13580: Introduce sweep-only phase at start of major GC cycle,
-  to reduce latent-garbage delay and therefore improve GC performance.
-  (Stephen Dolan and Nick Barnes, review by KC Sivaramakrishnan)
+* #14???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
+  "../<path...>") are interpreted as being relative to the directory ld.conf
+  was loaded from, and the default ld.conf now uses relative paths, rather than
+  embedding the absolute path to the Standard Library. The brave may continue to
+  put implicit paths in ld.conf. The interpretation of CAML_LD_LIBRARY_PATH is
+  unaltered. Additionally, ld.conf is loaded from all of $OCAMLLIB/ld.conf,
+  $CAMLLIB/ld.conf and standard_library_default/ld.conf rather than just the
+  first one found. ld.conf files with CRLF line endings are now consistently on
+  both Windows and Unix.
+  (David Allsopp, review by ???)
 
-- #14123: Fix integer-overflow problems in heap compaction.
-  (Nick Barnes, review by Antonin Décimo).
-
-- #14035: Fix the alignment of _Atomic long long unsigned int fields
-  before GCC 11.1 on i686. Silence GCC note on newer versions.
-  (Antonin Décimo, review by Sadiq Jaffer)
-
-- #13574, #13594: Generational scanning of stack frames for ARM 64 bits, POWER,
-  and RISC-V.  This reduces minor GC work in the presence of deep call stacks.
-  (Xavier Leroy, review by Miod Vallat, Gabriel Scherer and Olivier Nicole)
-
-- #14053: Statmemprof: it is now possible to replace a profile in the
-  current domain without stopping it in all domains.
-  Added the function [Gc.Memprof.is_sampling].
-  (Guillaume Munch-Maccagnoni, review by Gabriel Scherer)
-
-- #14168: restore the stack size statistic in `Gc.stat` and adds a new
-  `live_stacks_words` field tracking the total size in words of live stacks.
-  (Florian Angeletti, review by Gabriel Scherer)
-
-- #14189: Add runtime counters EV_C_MINOR_PROMOTED_WORDS and
-  EV_C_MINOR_ALLOCATED_WORDS. EV_C_MINOR_PROMOTED_WORDS reports words promoted
-  by minor GC and EV_C_MINOR_ALLOCATED_WORDS reports words allocated by minor
-  GC. Both have equivalent bytes counters. Also updated the documentation for
-  EV_C_MINOR_PROMOTED and EV_C_MINOR_ALLOCATED to qualify scope of the values
-  reported as being per-domain.
-  (Tim McGilchrist, review by Nick Barnes, Sadiq Jaffer and
-  Gabriel Scherer)
+<<<<<<<
+=======
+- #14???: Executables linked with `ocamlc -custom` now always attempt to load
+  bytecode from the executable itself, rather than first trying `argv[0]`.
+  (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
 
@@ -214,6 +173,10 @@ Working version
   universal variables and universal quantifications.
   (Florian Angeletti, review by Gabriel Scherer)
 
+- #14126: Document the `-i-variance` option and `+-`, `-+` variance indicators
+  in the reference manual.
+  (Takafumi Saikawa, review by Florian Angeletti)
+
 - #14146: add an error message for external declaration with
   a non-syntactic arity
   ```
@@ -226,95 +189,37 @@ Working version
   e.g. `< foo : int; .. as $0>` when $0 is introduced by a GADT constructor
   (Stefan Muenzel, review by Jacques Garrigue and Florian Angeletti)
 
+- #14225: do not raise unused-constructor warning on private
+  constructor in type implementations, for example
+  `type safe = private Safe`, which are typically used to
+  create new fresh/generative types (here `safe`) to be used
+  as GADT indices.
+  (Gabriel Scherer, review by Nicolás Ojeda Bär and Florian Angeletti,
+   report by Kate Deplaix)
 
 
+>>>>>>>
 ### Internal/compiler-libs changes:
 
-- #13839, #14008: Reimplement `let open`, `let module` and `let exception` in
-  terms of a single construct.
-  (Nicolás Ojeda Bär, review by Gabriel Scherer, Samuel Vivien, Ulysse Gérard
-  and Vincent Laviron)
-
-- #13911, #14117, #14127: Refactor the merging of signature constraints, by
-  splitting the monolithic merge function into separate, specialized functions
-  (for merging types, modules and module types) - sharing only the recursive
-  part for handling deep constraints.
-  (Clement Blaudeau, review by Florian Angeletti and Samuel Vivien, fix by Ryan
-  Tjoa)
-
-- #13980 Refactor `type-approx` and improve some errors' locations.
-  (Leo White, Ulysse Gérard, review by Samuel Vivien and Florian Angeletti)
-
-- #14024: Fix unterminated-string-initialization warnings from the C compiler.
-  (Antonin Décimo, review by David Allsopp and Miod Vallat)
-
-- #14094: toplevel, simplify check on installed printer types
-  (Florian Angeletti, review by Gabriel Scherer)
-
-- #13656, #14114: Use C99 stdint.h/inttypes.h fixed-width integer types and
-  macros to define OCaml integers.
-  (Antonin Décimo, review by Nick Barnes)
-
-- #14148: Remove an unused field from package_type in typedtree
-  (Samuel Vivien, review by Gabriel Scherer)
-
-- #14141: Rename cstrs to constraints when it refers to constraints to avoid
-  confusing it with constructors.
-  (Stefan Muenzel, review by Nicolás Ojeda Bär)
-
-- #14149: Distinguish `(module M : S)` from `(module M) : (module S)` in
-  patterns.
-  (Samuel Vivien, review by Gabriel Scherer)
-
-- #14161: refactor the STW-participants machinery to add an intermediate
-  category of 'parked' domain structures.
-  (Gabriel Scherer, review by Sivaramakrishnan)
-
-- #14198 Constraints on module unpacking are not ghost
-  (Thomas Refis, review by Nicolás Ojeda Bär)
+- #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by ???)
 
 ### Build system:
 
-- #13810: Support build of cross compilers to native freestanding targets
-  (Samuel Hym, review by Antonin Décimo and Romain Calascibetta)
-
 - #14???: New configure option --with-stublibs allows an additional directory
-  to be added to the start of ld.conf.
+  to be added to the start of ld.conf. Additionally, the stublibs subdirectory
+  is no longer created, nor added to ld.conf, when building OCaml with
+  --disable-shared.
   (David Allsopp, review by ???)
 
-### Bug fixes:
+- #14???: When targeting native Windows on Cygwin or MSYS2, preserve
+  backslashes in the supplied `--prefix` (in particular, backslashes instead of
+  slashes will then be displayed by `ocamlopt -config-var standard_library`).
+  If the supplied prefix contains a slash, then it is normalised, as
+  previously.
+  (David Allsopp, review by ???)
 
-- #14071: Fix exception name in Dynlink.Error printer.
-  (Etienne Millon, review by Nicolás Ojeda Bär)
-
-- #13853: Format breaks some line too early when there
-  is a break hint at the end.
-  (Florian Angeletti, review by Gabriel Scherer)
-
-- #10570: Fix handling of caml_sys_argv when exposed directly as an
-  external
-  (Keryan Didier, review by Vincent Laviron and Gabriel Scherer)
-
-- #14155: Audit unexecuted phrases in compiler expect tests and
-  fix all occurences
-  (Stefan Muenzel, review by Gabriel Scherer)
-
-- #14163, #14176: add a filename location to the deprecation alert for implicit
-  uses of libraries bundled with the compiler (unix,re,threads,dynlink)
-  (Florian Angeletti, report by Ali Caglayan, review by Gabriel Scherer)
-
-- #13658, #14181: Fix handling of recursive function types that can result
-  in an unbounded number of labeled or optional arguments.
-  (Stefan Muenzel, report by Samuel Vivien, review by Florian Angeletti)
-
-- #14061, #14209: fix a memory-ordering bug in Weak.set that could
-  result in uninitialized memory seen by Weak.get on another domain.
-  (Damien Doligez, review by Gabriel Scherer)
-
-- #14230 : ocamltest fails to link test program with -custom in some cases
-  (Damien Doligez, review by David Allsopp)
-
->>>>>>>
 OCaml 5.4.0
 ---------------
 

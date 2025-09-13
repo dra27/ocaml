@@ -1,6 +1,8 @@
-Working version
-----------------
+OCaml 5.4 maintenance version
+-----------------------------
 
+<<<<<<<
+=======
 (Changes that can break existing programs are marked with a "*")
 
 ### Language features:
@@ -61,21 +63,8 @@ Working version
 
 * #14???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
   "../<path...>") are interpreted as being relative to the directory ld.conf
-  was loaded from, and the default ld.conf now uses relative paths, rather than
-  embedding the absolute path to the Standard Library. The brave may continue to
-  put implicit paths in ld.conf. The interpretation of CAML_LD_LIBRARY_PATH is
-  unaltered. Additionally, ld.conf is loaded from all of $OCAMLLIB/ld.conf,
-  $CAMLLIB/ld.conf and standard_library_default/ld.conf rather than just the
-  first one found. ld.conf files with CRLF line endings are now consistently on
-  both Windows and Unix.
-  (David Allsopp, review by ???)
-
-- #14???: Added --with-relative-bindir which allows the runtime and the
-  compilers to locate the Standard Library relative to where the binaries
-  themselves are installed, removing the absolute path previously embedded in
-  caml_standard_library_default. Executables linked with `ocamlc -custom` now
-  always attempt to load bytecode from the executable itself, rather than first
-  trying `argv[0]`.
+  was loaded from. The brave may continue to put implicit paths in ld.conf. The
+  interpretation of CAML_LD_LIBRARY_PATH is unaltered.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
@@ -193,10 +182,6 @@ Working version
   sources of installed packages.
   (Pierre Boutillier, review by Gabriel Scherer)
 
-- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
-  executable (either from the RNTM section or by analysing the shebang lines)
-  (David Allsopp, review by ???)
-
 ### Manual and documentation:
 
 * #13975: documented the `[@remove_aliases]` built-in attribute for signatures
@@ -235,6 +220,10 @@ Working version
   universal variables and universal quantifications.
   (Florian Angeletti, review by Gabriel Scherer)
 
+- #14126: Document the `-i-variance` option and `+-`, `-+` variance indicators
+  in the reference manual.
+  (Takafumi Saikawa, review by Florian Angeletti)
+
 - #14146: add an error message for external declaration with
   a non-syntactic arity
   ```
@@ -247,15 +236,14 @@ Working version
   e.g. `< foo : int; .. as $0>` when $0 is introduced by a GADT constructor
   (Stefan Muenzel, review by Jacques Garrigue and Florian Angeletti)
 
-- #14???: Add -set-runtime-default option to the compiler, allowing the default
-  value of the Standard Library location used by the runtime to be overridden.
-  (Antonin Décimo, review by David Allsopp)
+- #14225: do not raise unused-constructor warning on private
+  constructor in type implementations, for example
+  `type safe = private Safe`, which are typically used to
+  create new fresh/generative types (here `safe`) to be used
+  as GADT indices.
+  (Gabriel Scherer, review by Nicolás Ojeda Bär and Florian Angeletti,
+   report by Kate Deplaix)
 
-- #14???: New option -launch-method for ocamlc allows the method used by a
-  tendered bytecode executable to locate the interpreter to be given explicitly.
-  In particular, it makes it easier to specify the use of the executable
-  launcher on Unix.
-  (David Allsopp, review by ???)
 
 ### Internal/compiler-libs changes:
 
@@ -301,60 +289,13 @@ Working version
 
 - #14198 Constraints on module unpacking are not ghost
   (Thomas Refis, review by Nicolás Ojeda Bär)
-
-- #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
-  C primitive), eliminating some highly obscure corner cases.
-  (David Allsopp, review by ???)
+>>>>>>>
 
 ### Build system:
 
-- #13810: Support build of cross compilers to native freestanding targets
-  (Samuel Hym, review by Antonin Décimo and Romain Calascibetta)
-
 - #14???: New configure option --with-stublibs allows an additional directory
-  to be added to the start of ld.conf. Additionally, the stublibs subdirectory
-  is no longer created, nor added to ld.conf, when building OCaml with
-  --disable-shared.
+  to be added to the start of ld.conf.
   (David Allsopp, review by ???)
-
-- #14???: When targeting native Windows on Cygwin or MSYS2, preserve
-  backslashes in the supplied `--prefix` (in particular, backslashes instead of
-  slashes will then be displayed by `ocamlopt -config-var standard_library`).
-  If the supplied prefix contains a slash, then it is normalised, as
-  previously.
-  (David Allsopp, review by ???)
-
-### Bug fixes:
-
-- #14071: Fix exception name in Dynlink.Error printer.
-  (Etienne Millon, review by Nicolás Ojeda Bär)
-
-- #13853: Format breaks some line too early when there
-  is a break hint at the end.
-  (Florian Angeletti, review by Gabriel Scherer)
-
-- #10570: Fix handling of caml_sys_argv when exposed directly as an
-  external
-  (Keryan Didier, review by Vincent Laviron and Gabriel Scherer)
-
-- #14155: Audit unexecuted phrases in compiler expect tests and
-  fix all occurences
-  (Stefan Muenzel, review by Gabriel Scherer)
-
-- #14163, #14176: add a filename location to the deprecation alert for implicit
-  uses of libraries bundled with the compiler (unix,re,threads,dynlink)
-  (Florian Angeletti, report by Ali Caglayan, review by Gabriel Scherer)
-
-- #13658, #14181: Fix handling of recursive function types that can result
-  in an unbounded number of labeled or optional arguments.
-  (Stefan Muenzel, report by Samuel Vivien, review by Florian Angeletti)
-
-- #14061, #14209: fix a memory-ordering bug in Weak.set that could
-  result in uninitialized memory seen by Weak.get on another domain.
-  (Damien Doligez, review by Gabriel Scherer)
-
-- #14230 : ocamltest fails to link test program with -custom in some cases
-  (Damien Doligez, review by David Allsopp)
 
 OCaml 5.4.0
 ---------------
@@ -385,10 +326,6 @@ OCaml 5.4.0
     `Atomic.Loc.fetch_and_add [%atomic.loc data.readers] 1`
   (Clément Allain and Gabriel Scherer, review by KC Sivaramakrishnan,
    Basile Clément and Olivier Nicole)
-
-- #13806 Enable the use of function parameters with polymorphic types.
-  (Ulysse Gérard, Leo White, review by Florian Angeletti, Samuel Vivien, Gabriel
-  Scherer and Jacques Garrigue)
 
 ### Standard library:
 
@@ -549,9 +486,6 @@ OCaml 5.4.0
   returning of NULL (the behaviour of caml_stat_strdup_to_os was inconsistent
   between Unix/Windows).
   (David Allsopp, review by Nick Barnes, Antonin Décimo and Miod Vallat)
-
-- #13616: Change free list representation in shared heap
-  (Sadiq Jaffer, review by Damien Doligez)
 
 - #13352: Concurrency refactors and cleanups.
   (Antonin Décimo, review by Gabriel Scherer, David Allsopp, and Miod Vallat)
@@ -768,10 +702,6 @@ OCaml 5.4.0
   Before, it was succeeding with `module N : sig module type T end`, now it
   fails. Similarly for anonymous functor calls (of the form `F(struct ... end))
   (Clement Blaudeau, review by Gabriel Scherer)
-
-- #13747: Document support for native debugging with GDB and LLDB.
-   (Tim McGilchrist, review by Daniel Bünzli, Samuel Hym, Olivier Nicole
-   and Antonin Décimo)
 
 ### Compiler user-interface and warnings:
 
@@ -1103,6 +1033,10 @@ OCaml 5.4.0
 
 - #14200, #14202 : bad variance check with private aliases
   (Jacques Garrigue, report and review by Stephen Dolan)
+
+- #14061, #14209: fix a memory-ordering bug in Weak.set that could
+  result in uninitialized memory seen by Weak.get on another domain.
+  (Damien Doligez, review by Gabriel Scherer)
 
 - #14214, #14221: fix a confused error message for module inclusions,
   functor error messages were missing some type equalities potentially leading
@@ -2503,13 +2437,6 @@ OCaml 5.2.0 (13 May 2024)
   (Antonin Décimo, review by Miod Vallat and Sébastien Hinderer)
 
 ### Bug fixes:
-
-- #14065: Fix function signature mismatch of `__tsan_func_exit` with GCC 15.
-  Check in the configure step if the TSan provided internal builtins are the
-  same as what we expect, introduce `caml_tsan_*` wrappers for the `__tsan_*`
-  functions we use.
-  (Hari Hara Naveen S, report by Hari Hara Naveen S,
-  review by Gabriel Scherer, Antonin Décimo, Olivier Nicole)
 
 - #10652, #12720: fix evaluation order in presence of optional arguments
   (Jacques Garrigue, report by Leo White, review by Vincent Laviron)
