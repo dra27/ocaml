@@ -176,6 +176,7 @@ AC_SUBST([PACKLD])
 AC_SUBST([stdlib_manpages])
 AC_SUBST([ocaml_prefix])
 AC_SUBST([ocaml_bindir])
+AC_SUBST([naked_pointers])
 AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
 AC_SUBST([target_bindir])
@@ -497,6 +498,8 @@ AC_CHECK_TOOLS([LD],[ld link])
 # libtool expects host_os=mingw for native Windows
 old_host_os=$host_os
 AS_IF([test x"$host_os" = "xwindows"],[host_os=mingw])
+# LT_INIT alters CFLAGS - back up the pristine copy
+pristine_CFLAGS="$CFLAGS"
 LT_INIT
 host_os=$old_host_os
 
@@ -1256,9 +1259,14 @@ AS_IF([test -n "$host_alias"], [toolpref="${host_alias}-"], [toolpref=""])
 # One may want to check whether the user provided values first
 # and only compute values if none has been provided
 
+<<<<<<<
+=======
+AC_CHECK_TOOL([SYSTEM_AS],[as])
+
 as_is_cc=false
 default_as=''
 
+>>>>>>>
 AS_CASE(["$arch,$system"],
   [i386,win32],
     [default_as="ml -nologo -coff -Cp -c -Fo"],
@@ -1273,11 +1281,27 @@ AS_CASE(["$arch,$system"],
       [default_as="${toolpref}as -arch x86_64"
       default_aspp="${toolpref}gcc -arch x86_64 -c"])],
   [amd64,solaris],
+<<<<<<<
+    [AS_CASE([$ocaml_cv_cc_vendor],
+      [sunc-*],
+        [AS_IF([test x"$SYSTEM_AS" = "x"],
+          [AC_MSG_ERROR([GNU as assembler is required.])],
+          [default_as="${toolpref}as --64"
+          default_aspp="${toolpref}cc -m64 -c"])],
+      [gcc-*],
+        [AS_IF([test x"$SYSTEM_AS" = "x"],
+          [default_as="${toolpref}gcc -m64 -c"
+          default_aspp="${toolpref}gcc -m64 -c"
+          as_is_cc=true],
+          [default_as="${toolpref}as --64"
+          default_aspp="${toolpref}gcc -m64 -c"])])],
+=======
     [default_as="${toolpref}as --64"
     default_aspp="${toolpref}gcc -m64 -c"],
   [i386,solaris],
     [default_as="${toolpref}as"
     default_aspp="${toolpref}gcc -c"],
+>>>>>>>
   [power,elf],
     [AS_CASE([$model],
       [ppc64le],
@@ -1693,8 +1717,12 @@ AC_CHECK_HEADER([sys/mman.h],
 AC_CHECK_FUNC([pwrite], [AC_DEFINE([HAS_PWRITE])])
 
 ## -fdebug-prefix-map support by the C compiler
+<<<<<<<
 AS_CASE([$CC,$host],
+=======
+AS_CASE([$ocaml_cv_cc_vendor,$host],
   [*,*-*-mingw32], [cc_has_debug_prefix_map=false],
+>>>>>>>
   [*,*-pc-windows], [cc_has_debug_prefix_map=false],
   [xlc*,powerpc-ibm-aix*], [cc_has_debug_prefix_map=false],
   [OCAML_CC_HAS_DEBUG_PREFIX_MAP])
@@ -1937,7 +1965,9 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 ## No naked pointers
 
 AS_IF([test x"$enable_naked_pointers" = "xno" ],
-  [AC_DEFINE([NO_NAKED_POINTERS])])
+  [naked_pointers=false
+  AC_DEFINE([NO_NAKED_POINTERS])],
+  [naked_pointers=true])
 
 ## Check for mmap support for huge pages and contiguous heap
 OCAML_MMAP_SUPPORTS_HUGE_PAGES

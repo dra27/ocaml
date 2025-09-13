@@ -17434,6 +17434,47 @@ then :
 then :
   srcdir_abs_real="$srcdir_abs"
 fi
+  as_CACHEVAR=`printf "%s\n" "ax_cv_check_cflags_$warn_error_flag_-Wa,--debug-prefix-map=old=new" | $as_tr_sh`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the C compiler accepts -Wa,--debug-prefix-map=old=new" >&5
+printf %s "checking whether the C compiler accepts -Wa,--debug-prefix-map=old=new... " >&6; }
+if eval test \${$as_CACHEVAR+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS $warn_error_flag -Wa,--debug-prefix-map=old=new"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  eval "$as_CACHEVAR=yes"
+else $as_nop
+  eval "$as_CACHEVAR=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+eval ac_res=\$$as_CACHEVAR
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_CACHEVAR"\" = x"yes"
+then :
+  internal_cflags="$internal_cflags \
+-Wa,--debug-prefix-map=$srcdir_abs=+build"
+else $as_nop
+  :
+fi
+
   as_CACHEVAR=`printf "%s\n" "ax_cv_check_cflags_$warn_error_flag_-ffile-prefix-map=old=new" | $as_tr_sh`
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the C compiler accepts -ffile-prefix-map=old=new" >&5
 printf %s "checking whether the C compiler accepts -ffile-prefix-map=old=new... " >&6; }
