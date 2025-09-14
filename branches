@@ -152,7 +152,7 @@ opam-install-file-4.08@4.08@fixup 1c804cf1e2e3abaa44cad0882348c02afb313bd6
 install_changes@4.13 33d24b01446f315ea9155cadd734863502ffe612
 no-flambda-4.08@4.08 04ab34dc23641a85035162bb2eaec7d4f73667aa
 stop-backporting
-ocaml-config a635399d62c98ac9a1ba63ec8a610d33532cccc7
+ocaml-config 977f2d05a98a5aeec260b5ba200f72c4e79e4fdc
 PATH_MAX 288c04142af8f56a2a10d7fc2a834cb52612ac72
 refactor-caml_search_dll_in_path df32f02d62d534ff95388340d97f69c0a6a6115a
 cygwin-path-search 81013b716ec3d8b636da41c11ecfb88f4fffeb97
