@@ -285,8 +285,8 @@ void caml_stash_backtrace(value exn, value * sp, int reraise)
    updates *sp to point to the following one, and *trap_spoff to the next
    trap frame, which we will skip when we reach it  */
 
-code_t caml_next_frame_pointer(value* stack_high, value ** sp,
-                          intnat * trap_spoff)
+static code_t caml_next_frame_pointer(value* stack_high, value ** sp,
+                                 intnat * trap_spoff)
 {
   while (*sp < stack_high) {
     value *spv = (*sp)++;
