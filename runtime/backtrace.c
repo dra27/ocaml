@@ -374,3 +374,17 @@ CAMLprim value caml_get_exception_backtrace(value unit)
 
   CAMLreturn(res);
 }
+
+int caml_alloc_backtrace_buffer(void)
+{
+  CAMLassert(Caml_state->backtrace_pos == 0);
+  Caml_state->backtrace_buffer =
+    caml_stat_alloc_noexc(BACKTRACE_BUFFER_SIZE * sizeof(backtrace_slot));
+  if (Caml_state->backtrace_buffer == NULL) return -1;
+  return 0;
+}
+
+void caml_free_backtrace_buffer(backtrace_slot *backtrace_buffer) {
+  if (backtrace_buffer != NULL)
+    caml_stat_free(backtrace_buffer);
+}

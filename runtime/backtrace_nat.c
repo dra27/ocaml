@@ -69,18 +69,6 @@ frame_descr * caml_next_frame_descriptor
   }
 }
 
-int caml_alloc_backtrace_buffer(void){
-  CAMLassert(Caml_state->backtrace_pos == 0);
-  Caml_state->backtrace_buffer =
-    caml_stat_alloc_noexc(BACKTRACE_BUFFER_SIZE * sizeof(backtrace_slot));
-  if (Caml_state->backtrace_buffer == NULL) return -1;
-  return 0;
-}
-
-void caml_free_backtrace_buffer(backtrace_slot *backtrace_buffer) {
-  if (backtrace_buffer != NULL)
-    caml_stat_free(backtrace_buffer);
-}
 
 /* A backtrace_slot is either a debuginfo or a frame_descr* */
 #define Slot_is_debuginfo(s) ((uintnat)(s) & 2)
