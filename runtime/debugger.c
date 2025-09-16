@@ -470,7 +470,7 @@ void caml_debugger(enum event_kind event, value param)
 
   /* Reset current frame */
   frame_block = Caml_state->current_stack;
-  frame = frame_block->sp + 1;
+  frame = (value*)frame_block->sp + 1;
 
   /* Report the event to the debugger */
   switch(event) {
@@ -578,7 +578,7 @@ void caml_debugger(enum event_kind event, value param)
       break;
     case REQ_INITIAL_FRAME:
       frame_block = Caml_state->current_stack;
-      frame = frame_block->sp + 1;
+      frame = (value*)frame_block->sp + 1;
       fallthrough;
     case REQ_GET_FRAME:
       caml_putword(dbg_out, frame_block_number (frame_block));
@@ -607,7 +607,7 @@ void caml_debugger(enum event_kind event, value param)
         if (new_frame_block == NULL){
           newframe = NULL;
         }else{
-          newframe = new_frame_block->sp + 2;
+          newframe = (value*)new_frame_block->sp + 2;
         }
       }else{
         new_frame_block = frame_block;
@@ -652,7 +652,7 @@ void caml_debugger(enum event_kind event, value param)
       caml_flush(dbg_out);
       break;
     case REQ_GET_ACCU:
-      putval(dbg_out, *Caml_state->current_stack->sp);
+      putval(dbg_out, *((value*)Caml_state->current_stack->sp));
       caml_flush(dbg_out);
       break;
     case REQ_GET_HEADER:

@@ -1241,6 +1241,7 @@ runtime_COMMON_C_SOURCES = \
 
 runtime_BYTECODE_ONLY_C_SOURCES = \
   backtrace_byt \
+  byte_shims \
   fail_byt \
   fix_code \
   interp \
@@ -1258,7 +1259,8 @@ runtime_NATIVE_ONLY_C_SOURCES = \
   fail_nat \
   frame_descriptors \
   startup_nat \
-  signals_nat
+  signals_nat \
+  native_shims
 runtime_NATIVE_C_SOURCES = \
   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
   $(runtime_NATIVE_ONLY_C_SOURCES:%=runtime/%.c)
@@ -1306,20 +1308,20 @@ endif
 
 
 libcamlrun_OBJECTS = \
-  $(runtime_BYTECODE_C_SOURCES:.c=.b.$(O)) $(winpthreads_OBJECTS)
+  $(runtime_BYTECODE_C_SOURCES:.c=.b.$(O)) $(runtime_ASM_OBJECTS) $(winpthreads_OBJECTS)
 
 libcamlrun_non_shared_OBJECTS = \
   $(subst $(UNIX_OR_WIN32).b.$(O),$(UNIX_OR_WIN32)_non_shared.b.$(O), \
           $(libcamlrun_OBJECTS))
 
 libcamlrund_OBJECTS = $(runtime_BYTECODE_C_SOURCES:.c=.bd.$(O)) \
-  $(winpthreads_OBJECTS) runtime/instrtrace.bd.$(O)
+  $(runtime_ASM_OBJECTS:.$(O)=.d.$(O)) $(winpthreads_OBJECTS) runtime/instrtrace.bd.$(O)
 
 libcamlruni_OBJECTS = \
-  $(runtime_BYTECODE_C_SOURCES:.c=.bi.$(O)) $(winpthreads_OBJECTS)
+  $(runtime_BYTECODE_C_SOURCES:.c=.bi.$(O)) $(runtime_ASM_OBJECTS:.$(O)=.i.$(O)) $(winpthreads_OBJECTS)
 
 libcamlrunpic_OBJECTS = \
-  $(runtime_BYTECODE_C_SOURCES:.c=.bpic.$(O)) $(winpthreads_OBJECTS)
+  $(runtime_BYTECODE_C_SOURCES:.c=.bpic.$(O)) $(runtime_ASM_OBJECTS) $(winpthreads_OBJECTS)
 
 libasmrun_OBJECTS = \
   $(runtime_NATIVE_C_SOURCES:.c=.n.$(O)) $(runtime_ASM_OBJECTS) \

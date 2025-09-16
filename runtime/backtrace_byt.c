@@ -330,7 +330,7 @@ static size_t get_callstack(value* sp, intnat trap_spoff,
     code_t p = caml_next_frame_pointer(stack_high, &sp, &trap_spoff);
     if (!p) {
       if (!parent) break;
-      sp = parent->sp;
+      sp = (value*)parent->sp;
       trap_spoff = Long_val(sp[0]);
       stack_high = Stack_high(parent);
       parent = Stack_parent(parent);
@@ -383,7 +383,7 @@ size_t caml_get_callstack(size_t max_slots,
                           ptrdiff_t alloc_idx)
 {
   CAMLassert(alloc_idx < 1); /* allocation indexes not used in bytecode */
-  return get_callstack(Caml_state->current_stack->sp,
+  return get_callstack((value*)Caml_state->current_stack->sp,
                        Caml_state->trap_sp_off,
                        Caml_state->current_stack,
                        max_slots,
@@ -394,7 +394,7 @@ CAMLprim value caml_get_current_callstack (value max_frames_value)
 {
   backtrace_slot *backtrace = NULL;
   size_t trace_size = 0;
-  size_t slots = get_callstack(Caml_state->current_stack->sp,
+  size_t slots = get_callstack((value*)Caml_state->current_stack->sp,
                                Caml_state->trap_sp_off,
                                Caml_state->current_stack,
                                Long_val(max_frames_value),
@@ -413,7 +413,7 @@ CAMLprim value caml_get_continuation_callstack (value cont, value max_frames)
   stack = Ptr_val(caml_continuation_use(cont));
   {
     CAMLnoalloc; /* GC must not see the stack outside the cont */
-    sp = stack->sp;
+    sp = (value*)stack->sp;
     slots = get_callstack(sp, Long_val(sp[0]),
                           stack, Long_val(max_frames),
                           &backtrace, &trace_size);

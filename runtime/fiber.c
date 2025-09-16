@@ -36,8 +36,8 @@
 #include "caml/major_gc.h"
 #include "caml/memory.h"
 #include "caml/startup_aux.h"
-#ifdef NATIVE_CODE
 #include "caml/stack.h"
+#ifdef NATIVE_CODE
 #include "caml/frame_descriptors.h"
 #endif
 #ifdef USE_MMAP_MAP_STACK
@@ -331,28 +331,6 @@ void caml_scan_stack(
   }
 }
 
-void caml_maybe_expand_stack (void)
-{
-  struct stack_info* stk = Caml_state->current_stack;
-  uintnat stack_available =
-    (value*)stk->sp - Stack_base(stk);
-  uintnat stack_needed =
-    Stack_threshold / sizeof(value)
-    + 8 /* for words pushed by caml_start_program */;
-
-  if (stack_available < stack_needed)
-    if (!caml_try_realloc_stack (stack_needed))
-      caml_raise_stack_overflow();
-
-  if (Caml_state->gc_regs_buckets == NULL) {
-    /* Ensure there is at least one gc_regs bucket available before
-       running any OCaml code. See fiber.h for documentation. */
-    value* bucket = caml_stat_alloc(sizeof(value) * Wosize_gc_regs);
-    bucket[0] = 0; /* no next bucket */
-    Caml_state->gc_regs_buckets = bucket;
-  }
-}
-
 #else /* End NATIVE_CODE, begin BYTE_CODE */
 
 value caml_global_data = Val_unit;
@@ -379,7 +357,7 @@ CAMLprim value caml_alloc_stack(value hval, value hexn, value heff)
 CAMLprim value caml_ensure_stack_capacity(value required_space)
 {
   asize_t req = Long_val(required_space);
-  if (Caml_state->current_stack->sp - req <
+  if ((value*)Caml_state->current_stack->sp - req <
       Stack_base(Caml_state->current_stack))
     if (!caml_try_realloc_stack(req))
       caml_raise_stack_overflow();
@@ -432,6 +410,29 @@ void caml_scan_stack(
 }
 
 #endif /* end BYTE_CODE */
+
+/* Function needed by both bytecode and native code */
+void caml_maybe_expand_stack (void)
+{
+  struct stack_info* stk = Caml_state->current_stack;
+  uintnat stack_available =
+    (value*)stk->sp - Stack_base(stk);
+  uintnat stack_needed =
+    Stack_threshold / sizeof(value)
+    + 8 /* for words pushed by caml_start_program */;
+
+  if (stack_available < stack_needed)
+    if (!caml_try_realloc_stack (stack_needed))
+      caml_raise_stack_overflow();
+
+  if (Caml_state->gc_regs_buckets == NULL) {
+    /* Ensure there is at least one gc_regs bucket available before
+       running any OCaml code. See fiber.h for documentation. */
+    value* bucket = caml_stat_alloc(sizeof(value) * Wosize_gc_regs);
+    bucket[0] = 0; /* no next bucket */
+    Caml_state->gc_regs_buckets = bucket;
+  }
+}
 
 /*
   Stack management.

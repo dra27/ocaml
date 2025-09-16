@@ -23698,7 +23698,8 @@ oc_cflags="$common_cflags $internal_cflags"
 oc_cppflags="$common_cppflags $internal_cppflags"
 
 oc_bytecode_cflags="$oc_cflags"
-oc_bytecode_cppflags="$oc_cppflags"
+oc_bytecode_cppflags="$oc_cppflags\
+ -DTARGET_${arch} -DMODEL_${model} -DSYS_${system}"
 
 oc_native_cflags="$oc_cflags $oc_native_cflags"
 oc_native_cppflags="$oc_cppflags $oc_native_cppflags"

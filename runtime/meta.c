@@ -155,7 +155,7 @@ CAMLprim value caml_realloc_global(value size)
 
 CAMLprim value caml_get_current_environment(value unit)
 {
-  return *Caml_state->current_stack->sp;
+  return *((value*)Caml_state->current_stack->sp);
 }
 
 CAMLprim value caml_invoke_traced_function(value codeptr, value env, value arg)
@@ -187,9 +187,9 @@ CAMLprim value caml_invoke_traced_function(value codeptr, value env, value arg)
 
   value * osp, * nsp;
 
-  osp = Caml_state->current_stack->sp;
-  Caml_state->current_stack->sp -= 4;
-  nsp = Caml_state->current_stack->sp;
+  osp = (value*)Caml_state->current_stack->sp;
+  Caml_state->current_stack->sp = osp - 4;
+  nsp = (value*)Caml_state->current_stack->sp;
   for (int i = 0; i < 7; i++) nsp[i] = osp[i];
   nsp[7] = (value) Nativeint_val(codeptr);
   nsp[8] = env;

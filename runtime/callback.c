@@ -27,6 +27,11 @@
 #include "caml/mlvalues.h"
 #include "caml/platform.h"
 
+/* Always include bytecode headers for unified implementation */
+#include "caml/interp.h"
+#include "caml/instruct.h"
+#include "caml/fix_code.h"
+
 /* A note about callbacks and GC.  For best performance, a callback such as
      [caml_callback_exn(value closure, value arg)]
    should not extend the lifetime of the values [closure]
@@ -74,14 +79,7 @@ Caml_inline void restore_stack_parent(caml_domain_state* domain_state,
   }
 }
 
-#ifndef NATIVE_CODE
-
 /* Bytecode callbacks */
-
-#include "caml/interp.h"
-#include "caml/instruct.h"
-#include "caml/fix_code.h"
-#include "caml/fiber.h"
 
 static opcode_t callback_code[] = { STOP };
 
@@ -95,7 +93,11 @@ void caml_init_callbacks(void)
 #endif
 }
 
+#ifdef BYTECODE_ONLY
 CAMLexport value caml_callbackN_exn(value closure, int narg, value args[])
+#else
+static value bytecode_callbackN_exn(value closure, int narg, value args[])
+#endif
 {
   CAMLparam1(closure); /* no need to register args as roots, see below */
   CAMLlocal1(cont);
@@ -107,21 +109,22 @@ CAMLexport value caml_callbackN_exn(value closure, int narg, value args[])
 
   /* Ensure there's enough stack space */
   intnat req = narg + 3 + Stack_threshold_words;
-  if (domain_state->current_stack->sp - req <
+  if ((value*)domain_state->current_stack->sp - req <
       Stack_base(domain_state->current_stack))
     if (!caml_try_realloc_stack(req))
       caml_raise_stack_overflow();
 
   /* Push the arguments on the stack */
-  domain_state->current_stack->sp -= narg + 3;
+  value* sp = (value*)domain_state->current_stack->sp;
+  sp -= narg + 3;
+  domain_state->current_stack->sp = sp;
   for (int i = 0; i < narg; i++)
-    domain_state->current_stack->sp[i] = args[i]; /* arguments */
+    sp[i] = args[i]; /* arguments */
 
   /* Push a return frame */
-  domain_state->current_stack->sp[narg] =
-                     (value)callback_code; /* return address */
-  domain_state->current_stack->sp[narg + 1] = Val_unit;    /* environment */
-  domain_state->current_stack->sp[narg + 2] = Val_long(0); /* extra args */
+  sp[narg] = (value)callback_code; /* return address */
+  sp[narg + 1] = Val_unit;    /* environment */
+  sp[narg + 2] = Val_long(0); /* extra args */
 
   cont = alloc_and_clear_stack_parent(domain_state);
   /* This can call the GC and invalidate the values [args].
@@ -132,47 +135,69 @@ CAMLexport value caml_callbackN_exn(value closure, int narg, value args[])
   res = caml_bytecode_interpreter(Code_val(closure), 0 /* unknown size */,
                                   closure, /* environment */
                                   narg - 1 /* extra args beyond the 1st */);
-  if (Is_exception_result(res))
-    domain_state->current_stack->sp += narg + 3; /* PR#3419 */
+  if (Is_exception_result(res)) {
+    value* sp = (value*)domain_state->current_stack->sp;
+    domain_state->current_stack->sp = sp + narg + 3; /* PR#3419 */
+  }
 
   restore_stack_parent(domain_state, cont);
 
   CAMLreturn (res);
 }
 
+#ifdef BYTECODE_ONLY
 CAMLexport value caml_callback_exn(value closure, value arg1)
+#else
+static value bytecode_callback_exn(value closure, value arg1)
+#endif
 {
   value arg[1];
   arg[0] = arg1;
+#ifdef BYTECODE_ONLY
   return caml_callbackN_exn(closure, 1, arg);
+#else
+  return bytecode_callbackN_exn(closure, 1, arg);
+#endif
 }
 
+#ifdef BYTECODE_ONLY
 CAMLexport value caml_callback2_exn(value closure, value arg1, value arg2)
+#else
+static value bytecode_callback2_exn(value closure, value arg1, value arg2)
+#endif
 {
   value arg[2];
   arg[0] = arg1;
   arg[1] = arg2;
+#ifdef BYTECODE_ONLY
   return caml_callbackN_exn(closure, 2, arg);
+#else
+  return bytecode_callbackN_exn(closure, 2, arg);
+#endif
 }
 
+#ifdef BYTECODE_ONLY
 CAMLexport value caml_callback3_exn(value closure,
-                               value arg1, value arg2, value arg3)
+                                    value arg1, value arg2, value arg3)
+#else
+static value bytecode_callback3_exn(value closure,
+                                    value arg1, value arg2, value arg3)
+#endif
 {
   value arg[3];
   arg[0] = arg1;
   arg[1] = arg2;
   arg[2] = arg3;
+#ifdef BYTECODE_ONLY
   return caml_callbackN_exn(closure, 3, arg);
-}
-
 #else
+  return bytecode_callbackN_exn(closure, 3, arg);
+#endif
+}
 
 /* Native-code callbacks.  caml_callback[123]_asm are implemented in asm. */
 
-void caml_init_callbacks(void)
-{
-  /* Nothing to do */
-}
+#ifndef BYTECODE_ONLY
 
 typedef value (callback_stub)(caml_domain_state* state,
                               value closure,
@@ -182,12 +207,12 @@ callback_stub caml_callback_asm, caml_callback2_asm, caml_callback3_asm;
 
 CAMLexport value caml_callback_exn(value closure, value arg)
 {
+  if (Is_bytecode_closinfo(Closinfo_val(closure))) {
+    return bytecode_callback_exn(closure, arg);
+  }
   Caml_check_caml_state();
   caml_domain_state* domain_state = Caml_state;
   caml_maybe_expand_stack();
-
-  /* Assert that native closures do NOT have the bytecode bit set */
-  CAMLassert(!Is_bytecode_closinfo(Closinfo_val(closure)));
 
   if (Stack_parent(domain_state->current_stack)) {
     value cont, res;
@@ -215,12 +240,12 @@ CAMLexport value caml_callback_exn(value closure, value arg)
 
 CAMLexport value caml_callback2_exn(value closure, value arg1, value arg2)
 {
+  if (Is_bytecode_closinfo(Closinfo_val(closure))) {
+    return bytecode_callback2_exn(closure, arg1, arg2);
+  }
   Caml_check_caml_state();
   caml_domain_state* domain_state = Caml_state;
   caml_maybe_expand_stack();
-
-  /* Assert that native closures do NOT have the bytecode bit set */
-  CAMLassert(!Is_bytecode_closinfo(Closinfo_val(closure)));
 
   if (Stack_parent(domain_state->current_stack)) {
     value cont, res;
@@ -249,12 +274,12 @@ CAMLexport value caml_callback2_exn(value closure, value arg1, value arg2)
 CAMLexport value caml_callback3_exn(value closure,
                                     value arg1, value arg2, value arg3)
 {
+  if (Is_bytecode_closinfo(Closinfo_val(closure))) {
+    return bytecode_callback3_exn(closure, arg1, arg2, arg3);
+  }
   Caml_check_caml_state();
   caml_domain_state* domain_state = Caml_state;
   caml_maybe_expand_stack();
-
-  /* Assert that native closures do NOT have the bytecode bit set */
-  CAMLassert(!Is_bytecode_closinfo(Closinfo_val(closure)));
 
   if (Stack_parent(domain_state->current_stack))  {
     value cont, res;
@@ -281,8 +306,9 @@ CAMLexport value caml_callback3_exn(value closure,
 }
 
 CAMLexport value caml_callbackN_exn(value closure, int narg, value args[]) {
-  /* Assert that native closures do NOT have the bytecode bit set */
-  CAMLassert(!Is_bytecode_closinfo(Closinfo_val(closure)));
+  if (Is_bytecode_closinfo(Closinfo_val(closure))) {
+    return bytecode_callbackN_exn(closure, narg, args);
+  }
 
   while (narg >= 3) {
     /* We apply the first 3 arguments to get a new closure,
@@ -312,7 +338,7 @@ CAMLexport value caml_callbackN_exn(value closure, int narg, value args[]) {
   }
 }
 
-#endif
+#endif /* !BYTECODE_ONLY */
 
 /* Result-returning variants of the above */
 

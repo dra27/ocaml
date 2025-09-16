@@ -41,13 +41,8 @@ struct stack_handler {
  *  - handling a freelist of OCaml stacks in a stack_cache
  */
 struct stack_info {
-#ifdef NATIVE_CODE
   void* sp;            /* stack pointer of the OCaml stack when suspended */
   void* exception_ptr; /* exception pointer of OCaml stack when suspended */
-#else
-  value* sp;
-  value* exception_ptr;
-#endif
   struct stack_handler* handler; /* effect handling state for the fiber */
 
   /* [cache_bucket] is an index into the [Caml_state->stack_cache] array if

@@ -77,7 +77,7 @@ sp is a local copy of the global variable Caml_state->current_stack->sp. */
   { sp -= 3; sp[0] = accu; sp[1] = env; sp[2] = (value)pc; \
     domain_state->current_stack->sp = sp; }
 #define Restore_after_gc \
-  { sp = domain_state->current_stack->sp; accu = sp[0]; env = sp[1]; sp += 3; }
+  { sp = (value*)domain_state->current_stack->sp; accu = sp[0]; env = sp[1]; sp += 3; }
 /* Do call asynchronous callbacks from allocation functions */
 #define Enter_gc(dom_st, wosize) do {                            \
     Setup_for_gc;                                                \
@@ -93,7 +93,7 @@ sp is a local copy of the global variable Caml_state->current_stack->sp. */
   { sp -= 2; sp[0] = env; sp[1] = (value)(pc + 1); \
     domain_state->current_stack->sp = sp; }
 #define Restore_after_c_call \
-  { sp = domain_state->current_stack->sp; env = *sp; sp += 2; \
+  { sp = (value*)domain_state->current_stack->sp; env = *sp; sp += 2; \
     caml_update_young_limit_after_c_call(domain_state);       \
   }
 
@@ -111,7 +111,7 @@ sp is a local copy of the global variable Caml_state->current_stack->sp. */
     sp[5] = Val_long(extra_args); /* RETURN frame: saved extra args */ \
     domain_state->current_stack->sp = sp; }
 #define Restore_after_event \
-  { sp = domain_state->current_stack->sp; accu = sp[0]; \
+  { sp = (value*)domain_state->current_stack->sp; accu = sp[0]; \
     pc = (code_t) sp[3]; env = sp[4]; extra_args = Long_val(sp[5]); \
     sp += 6; }
 
@@ -123,7 +123,7 @@ sp is a local copy of the global variable Caml_state->current_stack->sp. */
      sp[2] = env; sp[3] = Val_long(extra_args); \
      domain_state->current_stack->sp = sp; }
 #define Restore_after_debugger \
-   { CAMLassert(sp == domain_state->current_stack->sp); \
+   { CAMLassert(sp == (value*)domain_state->current_stack->sp); \
      CAMLassert(sp[0] == accu); \
      CAMLassert(sp[2] == env); \
      sp += 4; }
@@ -155,7 +155,7 @@ Caml_inline void check_trap_barrier_for_effect
       = domain_state->current_stack->handler->parent;
     if (parent_stack != NULL
         && parent_stack->id == domain_state->trap_barrier_block
-        && parent_stack->sp + 2 - Stack_high (parent_stack)
+        && (value*)parent_stack->sp + 2 - Stack_high (parent_stack)
               /* Note: +2 is the same constant as in the REQ_UP_FRAME
                  case in caml_debugger() in debugger.c */
            == domain_state->trap_barrier_off){
@@ -322,12 +322,12 @@ value caml_bytecode_interpreter(code_t prog, asize_t prog_size,
 #endif
   initial_trap_sp_off = domain_state->trap_sp_off;
   initial_stack_words =
-    Stack_high(domain_state->current_stack) - domain_state->current_stack->sp;
+    Stack_high(domain_state->current_stack) - (value*)domain_state->current_stack->sp;
   initial_external_raise = domain_state->external_raise;
 
   if (sigsetjmp(raise_buf.buf, 0)) {
     /* no non-volatile local variables read here */
-    sp = domain_state->current_stack->sp;
+    sp = (value*)domain_state->current_stack->sp;
     accu = raise_exn_bucket;
 
     check_trap_barrier_for_exception (domain_state);
@@ -343,7 +343,7 @@ value caml_bytecode_interpreter(code_t prog, asize_t prog_size,
 
   domain_state->trap_sp_off = 1;
 
-  sp = domain_state->current_stack->sp;
+  sp = (value*)domain_state->current_stack->sp;
   pc = prog;
   extra_args = initial_extra_args;
   env = initial_env;
@@ -588,7 +588,7 @@ value caml_bytecode_interpreter(code_t prog, asize_t prog_size,
         CAMLassert(parent_stack != NULL);
 
         domain_state->current_stack = parent_stack;
-        sp = domain_state->current_stack->sp;
+        sp = (value*)domain_state->current_stack->sp;
         caml_free_stack(old_stack);
 
         domain_state->trap_sp_off = Long_val(sp[0]);
@@ -986,7 +986,7 @@ value caml_bytecode_interpreter(code_t prog, asize_t prog_size,
           value hexn = Stack_handle_exception(old_stack);
           old_stack->sp = sp;
           domain_state->current_stack = parent_stack;
-          sp = domain_state->current_stack->sp;
+          sp = (value*)domain_state->current_stack->sp;
           caml_free_stack(old_stack);
 
           domain_state->trap_sp_off = Long_val(sp[0]);
@@ -1018,7 +1018,7 @@ value caml_bytecode_interpreter(code_t prog, asize_t prog_size,
         if (!caml_try_realloc_stack(Stack_threshold_words)) {
           Setup_for_c_call; caml_raise_stack_overflow();
         }
-        sp = domain_state->current_stack->sp;
+        sp = (value*)domain_state->current_stack->sp;
       }
       Fallthrough; /* CHECK_SIGNALS */
 
@@ -1305,7 +1305,7 @@ do_resume: {
 
       domain_state->current_stack->sp = sp;
       domain_state->current_stack = stk;
-      sp = domain_state->current_stack->sp;
+      sp = (value*)domain_state->current_stack->sp;
 
       domain_state->trap_sp_off = Long_val(sp[0]);
       sp[0] = resume_arg;
@@ -1349,7 +1349,7 @@ do_resume: {
 
       old_stack->sp = sp;
       domain_state->current_stack = parent_stack;
-      sp = parent_stack->sp;
+      sp = (value*)parent_stack->sp;
       Stack_parent(old_stack) = NULL;
       Field(cont, 0) = Val_ptr(old_stack);
       Field(cont, 1) = Val_ptr(old_stack);
@@ -1392,7 +1392,7 @@ do_resume: {
 
       self->sp = sp;
       domain_state->current_stack = parent;
-      sp = parent->sp;
+      sp = (value*)parent->sp;
 
       CAMLassert(Stack_parent(cont_tail) == NULL);
       Stack_parent(self) = NULL;
