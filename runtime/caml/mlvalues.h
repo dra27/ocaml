@@ -313,20 +313,30 @@ Caml_inline void* Ptr_val(value val)
 #define Code_val(val) (((code_t *) (val)) [0])     /* Also an l-value. */
 #define Closinfo_val(val) Field((val), 1)          /* Arity and start env */
 /* In the closure info field, the top 8 bits are the arity (signed).
-   The low bit is set to one, to look like an integer.
-   The remaining bits are the field number for the first word of the
+   Bit 0 is set to one, to look like an integer.
+   Bit 1 is the bytecode flag (1 = bytecode, 0 = native).
+   The remaining bits (2+) are the field number for the first word of the
    environment, or, in other words, the offset (in words) from the closure
    to the environment part. */
+#define CLOSINFO_BYTECODE_BIT 2  /* Bit 1 when viewed as integer */
 #ifdef ARCH_SIXTYFOUR
 #define Arity_closinfo(info) ((intnat)(info) >> 56)
-#define Start_env_closinfo(info) (((uintnat)(info) << 8) >> 9)
+#define Start_env_closinfo(info) (((uintnat)(info) << 8) >> 10)
 #define Make_closinfo(arity,delta) \
-  (((uintnat)(arity) << 56) + ((uintnat)(delta) << 1) + 1)
+  (((uintnat)(arity) << 56) + ((uintnat)(delta) << 2) + 1)
+#define Is_bytecode_closinfo(info) (((uintnat)(info) & CLOSINFO_BYTECODE_BIT) != 0)
+#define Set_bytecode_closinfo(info) ((uintnat)(info) | CLOSINFO_BYTECODE_BIT)
+#define Make_bytecode_closinfo(arity,delta) \
+  Set_bytecode_closinfo(Make_closinfo(arity,delta))
 #else
 #define Arity_closinfo(info) ((intnat)(info) >> 24)
-#define Start_env_closinfo(info) (((uintnat)(info) << 8) >> 9)
+#define Start_env_closinfo(info) (((uintnat)(info) << 8) >> 10)
 #define Make_closinfo(arity,delta) \
-  (((uintnat)(arity) << 24) + ((uintnat)(delta) << 1) + 1)
+  (((uintnat)(arity) << 24) + ((uintnat)(delta) << 2) + 1)
+#define Is_bytecode_closinfo(info) (((uintnat)(info) & CLOSINFO_BYTECODE_BIT) != 0)
+#define Set_bytecode_closinfo(info) ((uintnat)(info) | CLOSINFO_BYTECODE_BIT)
+#define Make_bytecode_closinfo(arity,delta) \
+  Set_bytecode_closinfo(Make_closinfo(arity,delta))
 #endif
 
 /* This tag is used (with Forcing_tag & Forward_tag) to implement lazy values.

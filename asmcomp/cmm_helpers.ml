@@ -81,9 +81,9 @@ let pos_arity_in_closinfo = 8 * size_addr - 8
 
 let closure_info ~arity ~startenv =
   assert (-128 <= arity && arity <= 127);
-  assert (0 <= startenv && startenv < 1 lsl (pos_arity_in_closinfo - 1));
+  assert (0 <= startenv && startenv < 1 lsl (pos_arity_in_closinfo - 2));
   Nativeint.(add (shift_left (of_int arity) pos_arity_in_closinfo)
-                 (add (shift_left (of_int startenv) 1)
+                 (add (shift_left (of_int startenv) 2)
                       1n))
 
 let alloc_float_header dbg = Cconst_natint (float_header, dbg)

@@ -102,6 +102,9 @@ CAMLexport value caml_callbackN_exn(value closure, int narg, value args[])
   value res;
   caml_domain_state* domain_state = Caml_state;
 
+  /* Assert that bytecode closures have the bytecode bit set */
+  CAMLassert(Is_bytecode_closinfo(Closinfo_val(closure)));
+
   /* Ensure there's enough stack space */
   intnat req = narg + 3 + Stack_threshold_words;
   if (domain_state->current_stack->sp - req <
@@ -183,6 +186,9 @@ CAMLexport value caml_callback_exn(value closure, value arg)
   caml_domain_state* domain_state = Caml_state;
   caml_maybe_expand_stack();
 
+  /* Assert that native closures do NOT have the bytecode bit set */
+  CAMLassert(!Is_bytecode_closinfo(Closinfo_val(closure)));
+
   if (Stack_parent(domain_state->current_stack)) {
     value cont, res;
 
@@ -212,6 +218,9 @@ CAMLexport value caml_callback2_exn(value closure, value arg1, value arg2)
   Caml_check_caml_state();
   caml_domain_state* domain_state = Caml_state;
   caml_maybe_expand_stack();
+
+  /* Assert that native closures do NOT have the bytecode bit set */
+  CAMLassert(!Is_bytecode_closinfo(Closinfo_val(closure)));
 
   if (Stack_parent(domain_state->current_stack)) {
     value cont, res;
@@ -244,6 +253,9 @@ CAMLexport value caml_callback3_exn(value closure,
   caml_domain_state* domain_state = Caml_state;
   caml_maybe_expand_stack();
 
+  /* Assert that native closures do NOT have the bytecode bit set */
+  CAMLassert(!Is_bytecode_closinfo(Closinfo_val(closure)));
+
   if (Stack_parent(domain_state->current_stack))  {
     value cont, res;
 
@@ -269,6 +281,9 @@ CAMLexport value caml_callback3_exn(value closure,
 }
 
 CAMLexport value caml_callbackN_exn(value closure, int narg, value args[]) {
+  /* Assert that native closures do NOT have the bytecode bit set */
+  CAMLassert(!Is_bytecode_closinfo(Closinfo_val(closure)));
+
   while (narg >= 3) {
     /* We apply the first 3 arguments to get a new closure,
        and continue with the remaining arguments. */
