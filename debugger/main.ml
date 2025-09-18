@@ -238,3 +238,5 @@ let main () =
   | Cmi_format.Error e ->
       report Cmi_format.report_error e;
       exit 2
+
+let main () = Compmisc.with_standard_handlers main ()

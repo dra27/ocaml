@@ -395,7 +395,7 @@ let () =
     Misc.Style.(setup @@ Some Never)
   in
   try
-    Arg.parse args main usage;
+    Compmisc.with_standard_handlers (Arg.parse args main) usage;
     Printf.eprintf "expect: no input file\n";
     exit 2
   with exn ->

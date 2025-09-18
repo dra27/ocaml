@@ -25,6 +25,8 @@ let visible_files_uncap : registry ref = s_table STbl.create 42
 let hidden_files : registry ref = s_table STbl.create 42
 let hidden_files_uncap : registry ref = s_table STbl.create 42
 
+type _ Effect.t += Dir : string -> string list Effect.t
+
 module Dir = struct
   type t = {
     path : string;
@@ -52,17 +54,12 @@ module Dir = struct
     in
     List.find_map search t.files
 
-  (* For backward compatibility reason, simulate the behavior of
-     [Misc.find_in_path]: silently ignore directories that don't exist
-     + treat [""] as the current directory. *)
-  let readdir_compat dir =
-    try
-      Sys.readdir (if dir = "" then Filename.current_dir_name else dir)
-    with Sys_error _ ->
-      [||]
-
   let create ~hidden path =
-    { path; files = Array.to_list (readdir_compat path); hidden }
+    (* For backward compatibility reason, simulate the behavior of
+       [Misc.find_in_path]: silently ignore directories that don't exist
+       + treat [""] as the current directory. *)
+    let dir = if path = "" then Filename.current_dir_name else path in
+    { path; files = Effect.perform (Dir dir); hidden }
 end
 
 type auto_include_callback =

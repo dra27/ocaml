@@ -7085,9 +7085,11 @@ driver/errors.cmx : \
 driver/errors.cmi :
 driver/main.cmo : \
     driver/maindriver.cmi \
+    driver/compmisc.cmi \
     driver/main.cmi
 driver/main.cmx : \
     driver/maindriver.cmx \
+    driver/compmisc.cmx \
     driver/main.cmi
 driver/main.cmi :
 driver/main_args.cmo : \
@@ -7217,9 +7219,11 @@ driver/opterrors.cmx : \
 driver/opterrors.cmi :
 driver/optmain.cmo : \
     driver/optmaindriver.cmi \
+    driver/compmisc.cmi \
     driver/optmain.cmi
 driver/optmain.cmx : \
     driver/optmaindriver.cmx \
+    driver/compmisc.cmx \
     driver/optmain.cmi
 driver/optmain.cmi :
 driver/optmaindriver.cmo : \
@@ -8918,6 +8922,7 @@ ocamldoc/odoc.cmo : \
     ocamldoc/odoc_args.cmi \
     ocamldoc/odoc_analyse.cmi \
     otherlibs/dynlink/dynlink.cmi \
+    driver/compmisc.cmi \
     ocamldoc/odoc.cmi
 ocamldoc/odoc.cmx : \
     ocamldoc/odoc_messages.cmx \
@@ -8928,6 +8933,7 @@ ocamldoc/odoc.cmx : \
     ocamldoc/odoc_args.cmx \
     ocamldoc/odoc_analyse.cmx \
     otherlibs/dynlink/dynlink.cmx \
+    driver/compmisc.cmx \
     ocamldoc/odoc.cmi
 ocamldoc/odoc.cmi :
 ocamldoc/odoc_analyse.cmo : \

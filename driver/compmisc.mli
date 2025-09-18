@@ -28,3 +28,9 @@ val auto_include : Load_path.auto_include_callback
 (** [auto_include find_in_dir fn] is a callback function to be passed to
     {!Load_path.init} and automatically adds [-I +lib] to the load path after
     displaying an alert. *)
+
+val with_standard_handlers : ('a -> 'b) -> 'a -> 'b
+(** [with_standard_handlers f v] evaluates [f v] but handles any effects
+    performed by the compiler library:
+
+    - {!Load_path.Dir} is mapped to {!Sys.readdir} *)

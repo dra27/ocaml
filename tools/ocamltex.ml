@@ -251,9 +251,7 @@ let () =
              "-v", Arg.Bool (fun b -> verbose := b ), "output result on stderr"
             ]
     (fun s -> files := s :: !files)
-    "ocamltex: ";
-  Toplevel.init ()
-
+    "ocamltex: "
 
 (** The Output module deals with the analysis and classification
     of the interpreter output and the parsing of status-related options
@@ -781,9 +779,12 @@ let process_file file =
              started at position %d,@ the second one at %d"
         first second
 
-let _ =
+let main () =
+  Toplevel.init ();
   if !outfile <> "-" && !outfile <> "" then begin
     try close_out (open_out !outfile)
     with _ -> failwith "Cannot open output file"
   end;
-  List.iter process_file (List.rev !files);
+  List.iter process_file (List.rev !files)
+
+let () = Compmisc.with_standard_handlers main ()

@@ -138,7 +138,7 @@ let _ =
     invalid_arg "The ocamltoplevel.cma library from compiler-libs \
                  cannot be loaded inside the OCaml toplevel";
   Sys.interactive := true;
-  Topeval.init ()
+  Compmisc.with_standard_handlers Topeval.init ()
 
 (* Split a PATH-style variable, Windows-style. Entries are separated by
    semicolons. Sections of entries may be double-quoted (which allows

@@ -1206,5 +1206,16 @@ let run_main mapper =
     prerr_endline (Printexc.to_string exn);
     exit 2
 
-let register_function = ref (fun _name f -> run_main f)
+(* Duplicates Compmisc.with_standard_handlers, since we can't reference Compmisc
+   from this module. *)
+let with_standard_handlers f v =
+  try f v
+  with effect Load_path.Dir dir, k ->
+    let files =
+      try Array.to_list (Sys.readdir dir)
+      with Sys_error _ -> []
+    in
+    Effect.Deep.continue k files
+
+let register_function = ref (fun _name f -> with_standard_handlers run_main f)
 let register name f = !register_function name f

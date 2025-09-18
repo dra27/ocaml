@@ -95,6 +95,6 @@ let main () =
   Toploop.loop Format.std_formatter
 
 let main () =
-  match main () with
+  match Compmisc.with_standard_handlers main () with
   | exception Compenv.Exit_with_status n -> n
   | () -> 0

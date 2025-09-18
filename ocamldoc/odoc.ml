@@ -73,55 +73,49 @@ let load_plugin file =
       prerr_endline (Odoc_messages.load_file_error file s);
       exit 1
 ;;
-List.iter load_plugin plugins
 
-let () = Odoc_args.parse ()
-
-
-let loaded_modules =
-  List.flatten
-    (List.map
-       (fun f ->
-         Odoc_info.verbose (Odoc_messages.loading f);
-         try
-           let l = Odoc_analyse.load_modules f in
-           Odoc_info.verbose Odoc_messages.ok;
-           l
-         with Failure s ->
-           prerr_endline s ;
-           incr Odoc_global.errors ;
-           []
-       )
-       !Odoc_global.load
-    )
-
-let modules = Odoc_analyse.analyse_files ~init: loaded_modules !Odoc_global.files
-
-let _ =
-  match !Odoc_global.dump with
-    None -> ()
-  | Some f ->
-      try Odoc_analyse.dump_modules f modules
-      with Failure s ->
-        prerr_endline s ;
-        incr Odoc_global.errors
-
-
-let _ =
-  match !Odoc_args.current_generator with
-    None ->
-      ()
-  | Some gen ->
-      let generator = Odoc_gen.get_minimal_generator gen in
-      Odoc_info.verbose Odoc_messages.generating_doc;
-      generator#generate modules;
-      Odoc_info.verbose Odoc_messages.ok
-
-let _ =
-  if !Odoc_global.errors > 0 then
-  (
-   prerr_endline (Odoc_messages.errors_occured !Odoc_global.errors) ;
-   exit 1
-  )
-  else
+let main () =
+  List.iter load_plugin plugins;
+  Odoc_args.parse ();
+  let loaded_modules =
+    List.flatten
+      (List.map
+         (fun f ->
+           Odoc_info.verbose (Odoc_messages.loading f);
+           try
+             let l = Odoc_analyse.load_modules f in
+             Odoc_info.verbose Odoc_messages.ok;
+             l
+           with Failure s ->
+             prerr_endline s ;
+             incr Odoc_global.errors ;
+             []
+         )
+         !Odoc_global.load
+      )
+  in
+  let modules =
+    Odoc_analyse.analyse_files ~init: loaded_modules !Odoc_global.files
+  in
+  let dump_modules f =
+    try Odoc_analyse.dump_modules f modules
+    with Failure s ->
+      prerr_endline s ;
+      incr Odoc_global.errors
+  in
+  let generate gen =
+    let generator = Odoc_gen.get_minimal_generator gen in
+    Odoc_info.verbose Odoc_messages.generating_doc;
+    generator#generate modules;
+    Odoc_info.verbose Odoc_messages.ok
+  in
+  Option.iter dump_modules !Odoc_global.dump;
+  Option.iter generate !Odoc_args.current_generator;
+  if !Odoc_global.errors > 0 then begin
+    prerr_endline (Odoc_messages.errors_occured !Odoc_global.errors);
+    exit 1
+  end else
     exit 0
+
+let () =
+  Compmisc.with_standard_handlers main ()

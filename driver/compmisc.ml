@@ -135,3 +135,12 @@ let with_ppf_dump ~file_prefix f =
 
   in
   Misc.try_finally (fun () -> f ppf_dump) ~always:finally
+
+let with_standard_handlers f v =
+  try f v
+  with effect Load_path.Dir dir, k ->
+    let files =
+      try Array.to_list (Sys.readdir dir)
+      with Sys_error _ -> []
+    in
+    Effect.Deep.continue k files

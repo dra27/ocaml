@@ -31,6 +31,11 @@ val remove_dir : string -> unit
 val reset : unit -> unit
 (** Remove all directories *)
 
+type _ Effect.t += Dir : string -> string list Effect.t
+(** [Dir dir] is performed whenever a directory listing is required and the
+    results should be the list of basenames in that directory (as {!Sys.readdir}
+    would return). *)
+
 module Dir : sig
   type t
   (** Represent one directory in the load path. *)
