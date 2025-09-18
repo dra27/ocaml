@@ -2593,7 +2593,8 @@ partialclean::
 
 %.depend: beforedepend
 	$(V_OCAMLDEP)$(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $* $(INCLUDES) \
-	  $(OCAMLDEPFLAGS) $*/*.mli $*/*.ml > $@
+	  $(OCAMLDEPFLAGS) $(filter-out tools/builder.ml%, \
+	                     $(wildcard $*/*.mli) $(wildcard $*/*.ml)) > $@
 
 asmcomp.depend:: beforedepend $(cvt_emit)
 	$(V_OCAMLDEP)$(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I asmcomp $(INCLUDES) \
@@ -3028,3 +3029,28 @@ config.status:
 # This is why this dependency is kept at the very end of this file
 
 $(ALL_CMX_FILES): ocamlopt$(EXE)
+
+tools/builder.byte: \
+    compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
+    tools/builder.ml
+	$(BEST_OCAMLC) $(INCLUDES) -g -o $@ $^
+
+tools/builder.opt: \
+    compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlbytecomp.cmxa \
+    tools/builder.ml
+	$(BEST_OCAMLOPT) $(INCLUDES) -g -o $@ $^
+
+# TODO Why does .depend.menhir include an unnecessary (when not building with
+#      Menhir) dependency for these two files on all their .cmis? Causes the
+#      file to be constantly regenerated).
+.PHONY: rebuild
+rebuild: install/lib/ocaml/stdlib.cma
+	$(MAKE) tools/builder.byte
+	rm -f stdlib/*.cmi $(addsuffix /*.cmi,$(DEP_DIRS))
+	$(OCAMLRUN) tools/builder.byte
+
+install/lib/ocaml/stdlib.cma:
+	@echo 'The rebuild target needs to be set-up with:'
+	@echo '$$ ./configure --prefix $$PWD/install'
+	@echo '$$ make -j && make install'
+	@false
