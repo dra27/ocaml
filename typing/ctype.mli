@@ -82,6 +82,9 @@ val increase_global_level: unit -> int
 val restore_global_level: int -> unit
         (* This pair of functions is only used in Typetexp *)
 
+val reset: unit -> unit
+        (* Reset all level counters - used between compilation units *)
+
 val create_scope : unit -> int
 
 val newty: type_desc -> type_expr
