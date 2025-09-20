@@ -278,8 +278,8 @@ asmcomp_SOURCES = \
   driver/optmaindriver.mli driver/optmaindriver.ml
 
 # Files under middle_end/ are not to reference files under asmcomp/.
-# This ensures that the middle end can be linked (e.g. for objinfo) even when
-# the native code compiler is not present for some particular target.
+# This ensures that the middle end can be linked (e.g. for ocamlobjinfo) even
+# when the native code compiler is not present for some particular target.
 
 middle_end_closure_SOURCES = $(addprefix middle_end/closure/, \
   closure.mli closure.ml \
@@ -2450,7 +2450,7 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
 
 ocamlobjinfo_LIBRARIES = \
   $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamlmiddleend)
-ocamlobjinfo_SOURCES = tools/objinfo.mli tools/objinfo.ml
+ocamlobjinfo_SOURCES = tools/ocamlobjinfo.mli tools/ocamlobjinfo.ml
 
 # Scan object files for required primitives
 

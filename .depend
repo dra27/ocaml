@@ -8045,53 +8045,6 @@ tools/make_opcodes.cmo : \
 tools/make_opcodes.cmx : \
     tools/make_opcodes.cmi
 tools/make_opcodes.cmi :
-tools/objinfo.cmo : \
-    typing/typedtree.cmi \
-    bytecomp/symtable.cmi \
-    middle_end/symbol.cmi \
-    typing/shape_reduce.cmi \
-    typing/shape.cmi \
-    middle_end/printclambda.cmi \
-    parsing/pprintast.cmi \
-    utils/misc.cmi \
-    parsing/location.cmi \
-    middle_end/linkage_name.cmi \
-    typing/ident.cmi \
-    utils/format_doc.cmi \
-    middle_end/flambda/export_info.cmi \
-    middle_end/compilation_unit.cmi \
-    file_formats/cmxs_format.cmi \
-    file_formats/cmx_format.cmi \
-    file_formats/cmt_format.cmi \
-    file_formats/cmo_format.cmi \
-    file_formats/cmi_format.cmi \
-    bytecomp/bytesections.cmi \
-    utils/binutils.cmi \
-    tools/objinfo.cmi
-tools/objinfo.cmx : \
-    typing/typedtree.cmx \
-    bytecomp/symtable.cmx \
-    middle_end/symbol.cmx \
-    typing/shape_reduce.cmx \
-    typing/shape.cmx \
-    middle_end/printclambda.cmx \
-    parsing/pprintast.cmx \
-    utils/misc.cmx \
-    parsing/location.cmx \
-    middle_end/linkage_name.cmx \
-    typing/ident.cmx \
-    utils/format_doc.cmx \
-    middle_end/flambda/export_info.cmx \
-    middle_end/compilation_unit.cmx \
-    file_formats/cmxs_format.cmi \
-    file_formats/cmx_format.cmi \
-    file_formats/cmt_format.cmx \
-    file_formats/cmo_format.cmi \
-    file_formats/cmi_format.cmx \
-    bytecomp/bytesections.cmx \
-    utils/binutils.cmx \
-    tools/objinfo.cmi
-tools/objinfo.cmi :
 tools/ocamlcmt.cmo : \
     typing/untypeast.cmi \
     typing/stypes.cmi \
@@ -8165,6 +8118,53 @@ tools/ocamlmktop.cmx : \
     utils/ccomp.cmx \
     tools/ocamlmktop.cmi
 tools/ocamlmktop.cmi :
+tools/ocamlobjinfo.cmo : \
+    typing/typedtree.cmi \
+    bytecomp/symtable.cmi \
+    middle_end/symbol.cmi \
+    typing/shape_reduce.cmi \
+    typing/shape.cmi \
+    middle_end/printclambda.cmi \
+    parsing/pprintast.cmi \
+    utils/misc.cmi \
+    parsing/location.cmi \
+    middle_end/linkage_name.cmi \
+    typing/ident.cmi \
+    utils/format_doc.cmi \
+    middle_end/flambda/export_info.cmi \
+    middle_end/compilation_unit.cmi \
+    file_formats/cmxs_format.cmi \
+    file_formats/cmx_format.cmi \
+    file_formats/cmt_format.cmi \
+    file_formats/cmo_format.cmi \
+    file_formats/cmi_format.cmi \
+    bytecomp/bytesections.cmi \
+    utils/binutils.cmi \
+    tools/ocamlobjinfo.cmi
+tools/ocamlobjinfo.cmx : \
+    typing/typedtree.cmx \
+    bytecomp/symtable.cmx \
+    middle_end/symbol.cmx \
+    typing/shape_reduce.cmx \
+    typing/shape.cmx \
+    middle_end/printclambda.cmx \
+    parsing/pprintast.cmx \
+    utils/misc.cmx \
+    parsing/location.cmx \
+    middle_end/linkage_name.cmx \
+    typing/ident.cmx \
+    utils/format_doc.cmx \
+    middle_end/flambda/export_info.cmx \
+    middle_end/compilation_unit.cmx \
+    file_formats/cmxs_format.cmi \
+    file_formats/cmx_format.cmi \
+    file_formats/cmt_format.cmx \
+    file_formats/cmo_format.cmi \
+    file_formats/cmi_format.cmx \
+    bytecomp/bytesections.cmx \
+    utils/binutils.cmx \
+    tools/ocamlobjinfo.cmi
+tools/ocamlobjinfo.cmi :
 tools/ocamloptp.cmo : \
     tools/ocamlcp_common.cmi \
     driver/main_args.cmi \
