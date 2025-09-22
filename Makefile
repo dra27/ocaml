@@ -2741,17 +2741,17 @@ endif
 	done
 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) \
-	   utils/*.cmi \
-	   parsing/*.cmi \
-	   typing/*.cmi \
-	   bytecomp/*.cmi \
-	   file_formats/*.cmi \
-	   lambda/*.cmi \
-	   driver/*.cmi \
-	   toplevel/*.cmi \
+	   utils/*.cmi utils/*.cmo \
+	   parsing/*.cmi parsing/*.cmo \
+	   typing/*.cmi typing/*.cmo \
+	   bytecomp/*.cmi bytecomp/*.cmo \
+	   file_formats/*.cmi file_formats/*.cmo \
+	   lambda/*.cmi lambda/*.cmo \
+	   driver/*.cmi driver/*.cmo \
+	   toplevel/*.cmi toplevel/*.cmo \
 	   "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	   toplevel/byte/*.cmi \
+	   toplevel/byte/*.cmi toplevel/byte/*.cmo \
 	   "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
