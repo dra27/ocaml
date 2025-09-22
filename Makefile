@@ -960,7 +960,7 @@ ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
 
 ocamlc_SOURCES = driver/main.mli driver/main.ml
 
-ocamlc_BYTECODE_LINKFLAGS = -compat-32 -g
+ocamlc_BYTECODE_LINKFLAGS = -g -compat-32
 
 partialclean::
 	rm -f ocamlc ocamlc.exe ocamlc.opt ocamlc.opt.exe
@@ -2535,11 +2535,6 @@ ocamlnat_SOURCES = $(ocaml_SOURCES)
 
 ocamlnat_NATIVE_LINKFLAGS = -linkall -I toplevel/native
 
-COMPILE_NATIVE_MODULE = \
-  $(CAMLOPT) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) \
-  $(OC_NATIVE_COMPFLAGS)
-
-
 toplevel/topdirs.cmx toplevel/toploop.cmx $(ocamlnat_CMX_FILES): \
   OC_NATIVE_COMPFLAGS += -I toplevel/native
 
@@ -2572,11 +2567,17 @@ endif
 
 # Default rules
 
+# Add the directory of the target if it's not already in $(VPATH)
+COMP_INCLUDES = $(if $(filter $(@D), $(VPATH)),,-I $(@D) )$(INCLUDES)
+
 %.cmo: %.ml
-	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) -c $<
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) $(COMP_INCLUDES) -c $<
 
 %.cmi: %.mli
-	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) -c $<
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) $(COMP_INCLUDES) -c $<
+
+COMPILE_NATIVE_MODULE = \
+  $(CAMLOPT) $(OC_COMMON_COMPFLAGS) $(COMP_INCLUDES) $(OC_NATIVE_COMPFLAGS)
 
 %.cmx: %.ml
 	$(V_OCAMLOPT)$(COMPILE_NATIVE_MODULE) -c $<
