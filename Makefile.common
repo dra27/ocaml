@@ -212,6 +212,7 @@ endif
 %.$(O): %.c $(REQUIRED_HEADERS)
 	$(V_CC)$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ -c $<
+	$(V_CONCLUDE)
 
 $(DEPDIR):
 	$(MKDIR) $@
@@ -252,6 +253,7 @@ OCAMLLEXFLAGS ?= -q
 
 %.ml: %.mll
 	$(V_OCAMLLEX)$(OCAMLLEX) $(OCAMLLEXFLAGS) $<
+	$(V_CONCLUDE)
 
 # Parser generation
 
@@ -261,6 +263,7 @@ OCAMLYACCFLAGS ?= --strict -v
 
 %.ml %.mli: %.mly
 	$(V_OCAMLYACC)$(OCAMLYACC) $(OCAMLYACCFLAGS) $<
+	$(V_CONCLUDE)
 
 # Used with the Microsoft toolchain to merge generated manifest files into
 # executables
@@ -370,6 +373,7 @@ $(strip \
 $(1)$(EXE): $$$$($(basename $(notdir $(1)))_BCOBJS)
 	$$(V_LINKC)$$($(basename $(notdir $(1)))_BYTECODE_LINKCMD) -o $$@ \
 	  $$($(basename $(notdir $(1)))_BCOBJS)
+	$$(V_CONCLUDE)
 endef # _OCAML_BYTECODE_PROGRAM
 
 define OCAML_BYTECODE_PROGRAM
@@ -403,6 +407,7 @@ $(strip \
 $(1)$(EXE): $$$$($(basename $(notdir $(1)))_NCOBJS)
 	$$(V_LINKOPT)$$($(basename $(notdir $(1)))_NATIVE_LINKCMD) -o $$@ \
 	  $$($(basename $(notdir $(1)))_NCOBJS)
+	$$(V_CONCLUDE)
 endef # _OCAML_NATIVE_PROGRAM
 
 define OCAML_NATIVE_PROGRAM
@@ -448,6 +453,7 @@ $(1).cma: \
   $$$$($(basename $(notdir $(1)))_BCOBJS)
 	$$(V_LINKC)$$(LINK_BYTECODE_LIBRARY) -a -o $$@ \
 	  $$($(basename $(notdir $(1)))_BCOBJS)
+	$$(V_CONCLUDE)
 endef # _OCAML_BYTECODE_LIBRARY
 
 define OCAML_BYTECODE_LIBRARY
@@ -477,6 +483,7 @@ $(1).cmxa: \
   $$$$($(basename $(notdir $(1)))_NCOBJS)
 	$$(V_LINKOPT)$$(LINK_NATIVE_LIBRARY) -a -o $$@ \
 	  $$($(basename $(notdir $(1)))_NCOBJS)
+	$$(V_CONCLUDE)
 endef # _OCAML_NATIVE_LIBRARY
 
 define OCAML_NATIVE_LIBRARY

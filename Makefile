@@ -1019,6 +1019,7 @@ ocaml_CMO_FILES = toplevel/topstart.cmo
 ocaml.tmp: OC_BYTECODE_LINKFLAGS += -I toplevel/byte -linkall -g
 ocaml.tmp: $(ocaml_CMA_FILES) $(ocaml_CMO_FILES)
 	$(V_LINKC)$(LINK_BYTECODE_PROGRAM) -o $@ $^
+	$(V_CONCLUDE)
 
 $(eval $(call PROGRAM_SYNONYM,ocaml))
 ocaml$(EXE): $(expunge) ocaml.tmp
@@ -1416,6 +1417,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
 
 $(SAK): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
 	$(V_MKEXE)$(call SAK_BUILD,$@,$<)
+	$(V_CONCLUDE)
 
 C_LITERAL = $(shell $(SAK) $(ENCODE_C_LITERAL) '$(1)')
 
@@ -1431,51 +1433,67 @@ runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
 
 runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS)
+	$(V_CONCLUDE)
 
 runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
 	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(BYTECCLIBS))
+	$(V_CONCLUDE)
 
 runtime/libcamlrun.$(A): $(libcamlrun_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 runtime/libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 runtime/ocamlrund$(EXE): runtime/prims.$(O) runtime/libcamlrund.$(A)
 	$(V_MKEXE)$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(BYTECCLIBS)
+	$(V_CONCLUDE)
 
 runtime/libcamlrund.$(A): $(libcamlrund_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 runtime/ocamlruni$(EXE): runtime/prims.$(O) runtime/libcamlruni.$(A)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(INSTRUMENTED_RUNTIME_LIBS) $(BYTECCLIBS)
+	$(V_CONCLUDE)
 
 runtime/libcamlruni.$(A): $(libcamlruni_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 runtime/libcamlrun_pic.$(A): $(libcamlrunpic_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 runtime/libcamlrun_shared.$(SO): $(libcamlrunpic_OBJECTS)
 	$(V_MKDLL)$(MKDLL) -o $@ $^ $(BYTECCLIBS)
+	$(V_CONCLUDE)
 
 runtime/libasmrun.$(A): $(libasmrun_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 runtime/libasmrund.$(A): $(libasmrund_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 runtime/libasmruni.$(A): $(libasmruni_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 runtime/libasmrun_pic.$(A): $(libasmrunpic_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 runtime/libasmrun_shared.$(SO): $(libasmrunpic_OBJECTS)
 	$(V_MKDLL)$(MKDLL) -o $@ $^ $(NATIVECCLIBS)
+	$(V_CONCLUDE)
 
 runtime/libcomprmarsh.$(A): $(libcomprmarsh_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+	$(V_CONCLUDE)
 
 ## Runtime target-specific preprocessor and compiler flags
 
@@ -1546,6 +1564,7 @@ $(1).$(O): $(2).c \
 endif # ifeq "$(COMPUTE_DEPS)" "true"
 	$$(V_CC)$$(CC) $$(OC_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) $$(CPPFLAGS) \
 	  $$(OUTPUTOBJ)$$@ -c $$<
+	$(V_CONCLUDE)
 endef
 
 runtime/winpthreads/%.$(O): $(WINPTHREADS_SOURCE_DIR)/src/%.c \
@@ -1587,30 +1606,39 @@ ASPP_ERROR = \
           exit 2; }
 runtime/%.o: runtime/%.S
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+	$(V_CONCLUDE)
 
 runtime/%.d.o: runtime/%.S
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) $(ocamlrund_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+	$(V_CONCLUDE)
 
 runtime/%.i.o: runtime/%.S
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) $(ocamlruni_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+	$(V_CONCLUDE)
 
 runtime/%_libasmrunpic.o: runtime/%.S
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) $(SHAREDLIB_CFLAGS) -o $@ $<
+	$(V_CONCLUDE)
 
 runtime/domain_state.inc: runtime/caml/domain_state.tbl
 	$(V_GEN)$(CPP) $< > $@
+	$(V_CONCLUDE)
 
 runtime/amd64nt.obj: runtime/amd64nt.asm runtime/domain_state.inc
 	$(V_ASM)$(ASM)$@ $<
+	$(V_CONCLUDE)
 
 runtime/amd64nt.d.obj: runtime/amd64nt.asm runtime/domain_state.inc
 	$(V_ASM)$(ASM)$@ $(ocamlrund_CPPFLAGS) $<
+	$(V_CONCLUDE)
 
 runtime/amd64nt.i.obj: runtime/amd64nt.asm runtime/domain_state.inc
 	$(V_ASM)$(ASM)$@ $(ocamlruni_CPPFLAGS) $<
+	$(V_CONCLUDE)
 
 runtime/%_libasmrunpic.obj: runtime/%.asm
 	$(V_ASM)$(ASM)$@ $<
+	$(V_CONCLUDE)
 
 ## Runtime dependencies
 
@@ -1752,6 +1780,7 @@ ocamlyacc: $(ocamlyacc_PROGRAM)$(EXE)
 
 $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 	$(V_MKEXE)$(MKEXE) -o $@ $^
+	$(V_CONCLUDE)
 
 clean::
 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj) \
@@ -2240,6 +2269,7 @@ ocamldebugger: debugger/ocamldebug$(EXE) ocamlc ocamlyacc ocamllex
 $(ocamldebug_DEBUGGER_OBJECTS): OC_COMMON_COMPFLAGS += -for-pack ocamldebug
 debugger/ocamldebug.cmo: $(ocamldebug_DEBUGGER_OBJECTS)
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+	$(V_CONCLUDE)
 
 debugger/ocamldebug_entry.cmo: debugger/ocamldebug.cmo
 
@@ -2274,6 +2304,7 @@ checkstack: tools/checkstack$(EXE)
 .INTERMEDIATE: tools/checkstack$(EXE) tools/checkstack.$(O)
 tools/checkstack$(EXE): tools/checkstack.$(O)
 	$(V_MKEXE)$(MKEXE) $(OUTPUTEXE)$@ $<
+	$(V_CONCLUDE)
 else
 checkstack:
 	@
@@ -2598,12 +2629,15 @@ endif
 
 %.cmo: %.ml
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) -c $<
+	$(V_CONCLUDE)
 
 %.cmi: %.mli
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) -c $<
+	$(V_CONCLUDE)
 
 %.cmx: %.ml
 	$(V_OCAMLOPT)$(COMPILE_NATIVE_MODULE) -c $<
+	$(V_CONCLUDE)
 
 partialclean::
 	for d in utils parsing typing bytecomp asmcomp middle_end file_formats \
