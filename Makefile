@@ -697,12 +697,16 @@ coldstart: boot/ocamlrun$(EXE) runtime/libcamlrun.$(A)
 	rm -f $(addprefix boot/, libcamlrun.$(A) $(LIBFILES))
 	cp $(addprefix stdlib/, $(LIBFILES)) boot
 	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
+	$(call R_STAMP,BUILT)
 
 # Recompile the core system using the bootstrap compiler
 .PHONY: coreall
 coreall: runtime
+	$(call R_STAMP,BUILT,runtime,BEGIN,ocamlc)
 	$(MAKE) ocamlc
+	$(call R_STAMP,BUILT,ocamlc,BEGIN,ocamllex-ocamltools-library)
 	$(MAKE) ocamllex ocamltools library
+	$(call R_STAMP,BUILT,ocamllex-ocamltools-library)
 
 # Build the core system: the minimum needed to make depend and bootstrap
 .PHONY: core
@@ -758,8 +762,11 @@ promote: promote-common
 # Compile the native-code compiler
 .PHONY: opt-core
 opt-core: runtimeopt
+	$(call R_STAMP,BUILT,runtimeopt,BEGIN,ocamlopt)
 	$(MAKE) ocamlopt
+	$(call R_STAMP,BUILT,ocamlopt,BEGIN,libraryopt)
 	$(MAKE) libraryopt
+	$(call RSTAMP,BUILT,libraryopt)
 
 .PHONY: opt
 opt: checknative
@@ -772,25 +779,38 @@ opt: checknative
 .PHONY: opt.opt
 opt.opt: checknative
 	$(MAKE) checkstack
+	$(call R_STAMP,BEGIN,runtime)
 	$(MAKE) coreall
+	$(call R_STAMP,BEGIN,ocaml)
 	$(MAKE) ocaml
+	$(call R_STAMP,BUILT,ocaml,BEGIN,runtimeopt)
 	$(MAKE) opt-core
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+	$(call R_STAMP,BEGIN,flexlink.opt)
 	$(MAKE) flexlink.opt$(EXE)
+	$(call R_STAMP,BUILT,flexlink.opt)
 endif
+	$(call R_STAMP,BEGIN,ocamlc.opt)
 	$(MAKE) ocamlc.opt
 # TODO: introduce OPTIONAL_LIBRARIES and OPTIONAL_TOOLS variables to be
 # computed at configure time to keep track of which tools and libraries
 # need to be built
+	$(call R_STAMP,BUILT,ocamlc.opt,BEGIN,otherlibs-debugger-ocamldoc-ocamltest)
 	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(OCAMLDOC_TARGET) \
 	  $(OCAMLTEST_TARGET)
+	$(call R_STAMP,BUILT,otherlibs-debugger-ocamldoc-ocamltest,BEGIN,ocamlopt.opt)
 	$(MAKE) ocamlopt.opt
+	$(call R_STAMP,BUILT,ocamlopt.opt,BEGIN,otherlibrariesopt)
 	$(MAKE) otherlibrariesopt
+	$(call R_STAMP,BUILT,otherlibrariesopt,BEGIN,other-opt-tools)
 	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt \
 	  $(OCAMLDOC_OPT_TARGET) \
 	  $(OCAMLTEST_OPT_TARGET) othertools ocamlnat
+	$(call R_STAMP,BUILT,other-opt-tools)
 ifeq "$(build_libraries_manpages)" "true"
+	$(call R_STAMP,BEGIN,manpages)
 	$(MAKE) manpages
+	$(call R_STAMP,BUILT,manpages)
 endif
 
 # Core bootstrapping cycle
@@ -852,6 +872,10 @@ world: coldstart
 # Compile also native code compiler and libraries, fast
 .PHONY: world.opt
 world.opt: checknative
+ifeq "$(TIMING)" "1"
+	@rm -f timings
+endif
+	$(call R_STAMP,BEGIN,coldstart)
 	$(MAKE) coldstart
 	$(MAKE) opt.opt
 

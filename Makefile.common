@@ -40,25 +40,44 @@ endif
 
 V ?= 0
 
+TIMING ?= 0
+
+ifeq "$(TIMING)" "1"
+ifeq "$(origin START_STAMP_MS)" "undefined"
+export START_STAMP_MS := $(shell date '+%s%3N')
+#export START_STAMP_MS := $(stamp-ms )
+endif
+# XXX BEGIN/BUILT macros would be better!
+R_STAMP = @s="$$(expr "$$(date '+%s%3N')" - '$(START_STAMP_MS)')"; echo "$$(printf '%06d %s %s$(if $(3),\n%06d %s %s)' "$$s" '$(1)' '$(if $(2),$(2),$@)' $(if $(3),"$$s" '$(3)' '$(4)'))" >> timings
+#P_STAMP = $(START_STAMP_MS) $(stamp-ms )
+P_STAMP =
+#V_CONCLUDE = @$(info $   $(P_STAMP) <complete> $@)
+V_CONCLUDE =
+else
+R_STAMP =
+P_STAMP =
+V_CONCLUDE =
+endif
+
 ifeq "$(V)" "0"
 
-V_CC         = @$(info $   CC $@)
-V_CCDEPS     = @$(info $   CCDEPS $@)
-V_OCAMLC     = @$(info $   OCAMLC $@)
-V_OCAMLOPT   = @$(info $   OCAMLOPT $@)
-V_GEN        = @$(info $   GEN $@)
-V_LINKC      = @$(info $   LINKC $@)
-V_LINKOPT    = @$(info $   LINKOPT $@)
-V_MKEXE      = @$(info $   MKEXE $@)
-V_MKLIB      = @$(info $   MKLIB $@)
-V_MKDLL      = @$(info $   MKDLL $@)
-V_OCAMLLEX   = @$(info $   OCAMLLEX $@)
-V_OCAMLYACC  = @$(info $   OCAMLYACC $@)
-V_OCAMLDEP   = @$(info $   OCAMLDEP $@)
-V_ASM        = @$(info $   ASM $@)
-V_OCAMLMKLIB = @$(info $   OCAMLMKLIB $@)
-V_OCAMLDOC   = @$(info $   OCAMLDOC $@)
-V_ODOC       = @$(info $   ODOC $@)
+V_CC         = @$(info $   $(P_STAMP) CC $@)
+V_CCDEPS     = @$(info $   $(P_STAMP) CCDEPS $@)
+V_OCAMLC     = @$(info $   $(P_STAMP) OCAMLC $@)
+V_OCAMLOPT   = @$(info $   $(P_STAMP) OCAMLOPT $@)
+V_GEN        = @$(info $   $(P_STAMP) GEN $@)
+V_LINKC      = @$(info $   $(P_STAMP) LINKC $@)
+V_LINKOPT    = @$(info $   $(P_STAMP) LINKOPT $@)
+V_MKEXE      = @$(info $   $(P_STAMP) MKEXE $@)
+V_MKLIB      = @$(info $   $(P_STAMP) MKLIB $@)
+V_MKDLL      = @$(info $   $(P_STAMP) MKDLL $@)
+V_OCAMLLEX   = @$(info $   $(P_STAMP) OCAMLLEX $@)
+V_OCAMLYACC  = @$(info $   $(P_STAMP) OCAMLYACC $@)
+V_OCAMLDEP   = @$(info $   $(P_STAMP) OCAMLDEP $@)
+V_ASM        = @$(info $   $(P_STAMP) ASM $@)
+V_OCAMLMKLIB = @$(info $   $(P_STAMP) OCAMLMKLIB $@)
+V_OCAMLDOC   = @$(info $   $(P_STAMP) OCAMLDOC $@)
+V_ODOC       = @$(info $   $(P_STAMP) ODOC $@)
 
 else
 
