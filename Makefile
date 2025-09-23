@@ -2627,17 +2627,25 @@ endif
 
 # Default rules
 
+# XXX Would be better if the BUILT event was attached to the command itself,
+#     since then it wouldn't have to wait for make to schedule it
 %.cmo: %.ml
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) -c $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.cmi: %.mli
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) -c $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.cmx: %.ml
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLOPT)$(COMPILE_NATIVE_MODULE) -c $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 partialclean::
 	for d in utils parsing typing bytecomp asmcomp middle_end file_formats \
