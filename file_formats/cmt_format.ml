@@ -486,7 +486,7 @@ let save_cmt target binary_annots initial_env cmi shape =
            cmt_modname = Unit_info.Artifact.modname target;
            cmt_annots;
            cmt_declaration_dependencies = !uids_deps;
-           cmt_comments = Lexer.comments ();
+           cmt_comments = Keywords.comments ();
            cmt_args;
            cmt_sourcefile = sourcefile;
            cmt_builddir = Location.rewrite_absolute_path (Sys.getcwd ());
