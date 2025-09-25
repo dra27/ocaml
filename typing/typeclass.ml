@@ -17,7 +17,6 @@ open Parsetree
 open Asttypes
 open Path
 open Types
-open Typecore
 open Typetexp
 
 
@@ -695,7 +694,7 @@ let rec class_field_first_pass self_loc cl_num sign self_scope acc cf =
            end;
            let definition =
              Ctype.with_local_level_generalize_structure_if_principal
-               (fun () -> type_exp val_env sdefinition)
+               (fun () -> Typecore.type_exp val_env sdefinition)
            in
            add_instance_variable ~strict:true loc val_env
              label.txt mut Concrete definition.exp_type sign;
@@ -776,10 +775,10 @@ let rec class_field_first_pass self_loc cl_num sign self_scope acc cf =
                | Tvar _ ->
                    let ty' = Ctype.newvar () in
                    Ctype.unify val_env (Ctype.newmono ty') ty;
-                   type_approx val_env sbody ty'
+                   Typecore.type_approx val_env sbody ty'
                | Tpoly (ty1, tl) ->
                    let ty1' = Ctype.instance_poly tl ty1 in
-                   type_approx val_env sbody ty1'
+                   Typecore.type_approx val_env sbody ty1'
                | _ -> assert false
              with Ctype.Unify err ->
                raise(Error(loc, val_env,
@@ -910,12 +909,12 @@ and class_field_second_pass cl_num sign met_env field =
            let ty = Btype.method_type label.txt sign in
            let self_param_type = Btype.newgenmono sign.Types.csig_self in
            let meth_type =
-             mk_expected
+             Typecore.mk_expected
                (Btype.newgenty (Tarrow(Nolabel, self_param_type, ty, commu_ok)))
            in
            let texp =
              Ctype.with_raised_nongen_level
-               (fun () -> type_expect met_env sdefinition meth_type) in
+               (fun () -> Typecore.type_expect met_env sdefinition meth_type) in
            let kind = Tcfk_concrete (override, texp) in
            let desc = Tcf_method(label, priv, kind) in
            met_env, mkcf desc loc attributes)
@@ -928,12 +927,12 @@ and class_field_second_pass cl_num sign met_env field =
            let unit_type = Ctype.instance Predef.type_unit in
            let self_param_type = Ctype.newmono sign.Types.csig_self in
            let meth_type =
-             mk_expected (Ctype.newty
+             Typecore.mk_expected (Ctype.newty
               (Tarrow (Nolabel, self_param_type, unit_type, commu_ok)))
            in
            let texp =
              Ctype.with_raised_nongen_level
-               (fun () -> type_expect met_env sexpr meth_type) in
+               (fun () -> Typecore.type_expect met_env sexpr meth_type) in
            let desc = Tcf_initializer texp in
            met_env, mkcf desc loc attributes)
   | Attribute { attribute; loc; attributes; } ->
@@ -979,10 +978,10 @@ and class_structure cl_num virt self_scope final val_env met_env loc
   end;
 
   (* Self binder *)
-  let (self_pat, self_pat_vars) = type_self_pattern val_env spat in
+  let (self_pat, self_pat_vars) = Typecore.type_self_pattern val_env spat in
   let val_env, par_env =
     List.fold_right
-      (fun {pv_id; _} (val_env, par_env) ->
+      (fun {Typecore.pv_id; _} (val_env, par_env) ->
          let name = Ident.name pv_id in
          let val_env = enter_self_val name val_env in
          let par_env = enter_self_val name par_env in
@@ -1034,9 +1033,9 @@ and class_structure cl_num virt self_scope final val_env met_env loc
   in
   let met_env =
     List.fold_right
-      (fun {pv_id; pv_type; pv_loc; pv_kind; pv_attributes} met_env ->
+      (fun {Typecore.pv_id; pv_type; pv_loc; pv_kind; pv_attributes} met_env ->
          add_self_met pv_loc pv_id sign self_var_kind vars
-           cl_num (pv_kind=As_var) pv_type pv_attributes met_env)
+           cl_num (pv_kind=Typecore.As_var) pv_type pv_attributes met_env)
       self_pat_vars met_env
   in
   let fields =
@@ -1118,7 +1117,7 @@ and class_expr_aux cl_num val_env met_env virt self_scope scl =
           cl_attributes = scl.pcl_attributes;
          }
   | Pcl_fun (l, Some default, spat, sbody) ->
-      if has_poly_constraint spat then
+      if Typecore.has_poly_constraint spat then
         raise(Error(spat.ppat_loc, val_env, Polymorphic_class_parameter));
       let loc = default.pexp_loc in
       let open Ast_helper in
@@ -1153,7 +1152,7 @@ and class_expr_aux cl_num val_env met_env virt self_scope scl =
       in
       class_expr cl_num val_env met_env virt self_scope sfun
   | Pcl_fun (l, None, spat, scl') ->
-      if has_poly_constraint spat then
+      if Typecore.has_poly_constraint spat then
         raise(Error(spat.ppat_loc, val_env, Polymorphic_class_parameter));
       let (pat, pv, val_env', met_env) =
         Ctype.with_local_level_generalize_structure_if_principal
@@ -1183,7 +1182,7 @@ and class_expr_aux cl_num val_env met_env virt self_scope scl =
         | _ -> true
       in
       let partial =
-        let dummy = type_exp val_env (Ast_helper.Exp.unreachable ()) in
+        let dummy = Typecore.type_exp val_env (Ast_helper.Exp.unreachable ()) in
         Typecore.check_partial val_env pat.pat_type pat.pat_loc
           [{c_lhs = pat; c_cont = None; c_guard = None; c_rhs = dummy}]
       in
@@ -1237,16 +1236,16 @@ and class_expr_aux cl_num val_env met_env virt self_scope scl =
             let use_arg sarg l' =
               Arg (
                 if not optional || Btype.is_optional l' then
-                  type_argument val_env sarg ty ty0
+                  Typecore.type_argument val_env sarg ty ty0
                 else
-                  let ty' = extract_option_type val_env ty
-                  and ty0' = extract_option_type val_env ty0 in
-                  let arg = type_argument val_env sarg ty' ty0' in
-                  option_some val_env arg
+                  let ty' = Typecore.extract_option_type val_env ty
+                  and ty0' = Typecore.extract_option_type val_env ty0 in
+                  let arg = Typecore.type_argument val_env sarg ty' ty0' in
+                  Typecore.option_some val_env arg
               )
             in
             let eliminate_optional_arg () =
-              Arg (option_none val_env ty0 Location.none)
+              Arg (Typecore.option_none val_env ty0 Location.none)
             in
             let remaining_sargs, arg =
               if ignore_labels then begin
@@ -1349,7 +1348,7 @@ and class_expr_aux cl_num val_env met_env virt self_scope scl =
       in
       let cl = class_expr cl_num val_env met_env virt self_scope scl' in
       let defs = match rec_flag with
-        | Recursive -> annotate_recursive_bindings val_env defs
+        | Recursive -> Typecore.annotate_recursive_bindings val_env defs
         | Nonrecursive -> defs
       in
       rc {cl_desc = Tcl_let (rec_flag, defs, vals, cl);
@@ -1906,7 +1905,7 @@ let class_declarations env cls =
          (fun ci -> ci.cls_id, ci.cls_info.ci_expr)
          info)
   in
-  check_recursive_class_bindings env ids exprs;
+  Typecore.check_recursive_class_bindings env ids exprs;
   info, env
 
 let class_descriptions env cls =
