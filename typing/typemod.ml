@@ -2497,7 +2497,7 @@ and type_module_aux ~alias ~strengthen ~funct_body anchor env smod =
   | Pmod_unpack sexp ->
       let exp =
         Ctype.with_local_level_generalize_structure_if_principal
-          (fun () -> Typecore.type_exp env sexp)
+          (fun () -> !Typecore_ind.type_exp env sexp)
       in
       let mty =
         match get_desc (Ctype.expand_head env exp.exp_type) with
@@ -2505,14 +2505,14 @@ and type_module_aux ~alias ~strengthen ~funct_body anchor env smod =
             check_package_closed ~loc:smod.pmod_loc ~env ~typ:exp.exp_type
               pack.pack_constraints;
             if !Clflags.principal &&
-              not (Typecore.generalizable (Btype.generic_level-1) exp.exp_type)
+              not (!Typecore_ind.generalizable (Btype.generic_level-1) exp.exp_type)
             then
               Location.prerr_warning smod.pmod_loc
                 (not_principal "this module unpacking");
             modtype_of_package env smod.pmod_loc pack
         | Tvar _ ->
-            raise (Typecore.Error
-                     (smod.pmod_loc, env, Typecore.Cannot_infer_signature))
+            raise (Typecore_ind.Error
+                     (smod.pmod_loc, env, Typecore_ind.Cannot_infer_signature))
         | _ ->
             raise (Error(smod.pmod_loc, env, Not_a_packed_module exp.exp_type))
       in
@@ -2778,14 +2778,14 @@ and type_str_item ~names ~toplevel ~funct_body anchor env shape_map
     | Pstr_eval (sexpr, attrs) ->
         let expr =
           Builtin_attributes.warning_scope attrs
-            (fun () -> Typecore.type_expression env sexpr)
+            (fun () -> !Typecore_ind.type_expression env sexpr)
         in
         Tstr_eval (expr, attrs), [], shape_map, env
     | Pstr_value(rec_flag, sdefs) ->
         let (defs, newenv) =
-          Typecore.type_binding env rec_flag sdefs in
+          !Typecore_ind.type_binding env rec_flag sdefs in
         let defs = match rec_flag with
-          | Recursive -> Typecore.annotate_recursive_bindings env defs
+          | Recursive -> !Typecore_ind.annotate_recursive_bindings env defs
           | Nonrecursive -> defs
         in
         (* Note: Env.find_value does not trigger the value_used event. Values
@@ -3274,14 +3274,14 @@ let type_str_item env pstri =
   si, new_env
 
 let () =
-  Typecore.type_module := type_module_alias;
-  Typecore.type_str_item := type_str_item;
+  Typecore_ind.type_module := type_module_alias;
+  Typecore_ind.type_str_item := type_str_item;
   Typetexp.transl_modtype_longident := transl_modtype_longident;
   Typetexp.transl_modtype := transl_modtype;
-  Typecore.type_open := type_open_ ?toplevel:None;
+  Typecore_ind.type_open := type_open_ ?toplevel:None;
   Typetexp.type_open := type_open_ ?toplevel:None;
-  Typecore.type_open_decl := type_open_decl;
-  Typecore.type_package := type_package;
+  Typecore_ind.type_open_decl := type_open_decl;
+  Typecore_ind.type_package := type_package;
   Typeclass.type_open_descr := type_open_descr;
   type_module_type_of_fwd := type_module_type_of
 
@@ -3304,7 +3304,7 @@ let type_implementation target initial_env ast =
   in
   Cmt_format.clear ();
   Misc.try_finally (fun () ->
-      Typecore.reset_delayed_checks ();
+      !Typecore_ind.reset_delayed_checks ();
       Env.reset_required_globals ();
       if !Clflags.print_types then (* #7656 *)
         ignore @@ Warnings.parse_options false "-32-34-37-38-60";
@@ -3316,7 +3316,7 @@ let type_implementation target initial_env ast =
       in
       let simple_sg = Signature_names.simplify finalenv names sg in
       if !Clflags.print_types then begin
-        Typecore.force_delayed_checks ();
+        !Typecore_ind.force_delayed_checks ();
         let shape = Shape_reduce.local_reduce Env.empty shape in
         Printtyp.wrap_printing_env ~error:false initial_env
           Format.(fun () -> fprintf std_formatter "%a@."
@@ -3347,7 +3347,7 @@ let type_implementation target initial_env ast =
               sourcefile sg source_intf
               dclsig shape
           in
-          Typecore.force_delayed_checks ();
+          !Typecore_ind.force_delayed_checks ();
           (* It is important to run these checks after the inclusion test above,
              so that value declarations which are not used internally but
              exported are not reported as being unused. *)
@@ -3369,7 +3369,7 @@ let type_implementation target initial_env ast =
           in
           check_nongen_signature finalenv simple_sg;
           normalize_signature simple_sg;
-          Typecore.force_delayed_checks ();
+          !Typecore_ind.force_delayed_checks ();
           (* See comment above. Here the target signature contains all
              the values being exported. We can still capture unused
              declarations like "let x = true;; let x = 1;;", because in this

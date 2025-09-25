@@ -277,7 +277,7 @@ and transl_exp0 ~in_new_scope ~scopes e =
       transl_handler ~scopes e arg (Some (pat_expr_list, partial))
         exn_pat_expr_list eff_pat_expr_list
   | Texp_try(body, pat_expr_list, []) ->
-      let id = Typecore.name_cases "exn" pat_expr_list in
+      let id = Typecore_ind.name_cases "exn" pat_expr_list in
       Ltrywith(transl_exp ~scopes body, id,
                Matching.for_trywith ~scopes e.exp_loc (Lvar id)
                  (transl_cases_try ~scopes pat_expr_list))
@@ -1151,7 +1151,7 @@ and transl_match ~scopes e arg pat_expr_list partial =
      value actions run outside the try..with exception handler.
   *)
   let static_catch scrutinees val_ids handler =
-    let id = Typecore.name_pattern "exn" (List.map fst exn_cases) in
+    let id = Typecore_ind.name_pattern "exn" (List.map fst exn_cases) in
     let static_exception_id = next_raise_count () in
     Lstaticcatch
       (Ltrywith (Lstaticraise (static_exception_id, scrutinees), id,
@@ -1170,7 +1170,7 @@ and transl_match ~scopes e arg pat_expr_list partial =
         let val_ids =
           List.map
             (fun arg ->
-               Typecore.name_pattern "val" [],
+               Typecore_ind.name_pattern "val" [],
                Typeopt.value_kind arg.exp_env arg.exp_type
             )
             argl
@@ -1184,7 +1184,7 @@ and transl_match ~scopes e arg pat_expr_list partial =
       Matching.for_function ~scopes e.exp_loc
         None (transl_exp ~scopes arg) val_cases partial
     | arg, _ :: _ ->
-        let val_id = Typecore.name_pattern "val" (List.map fst val_cases) in
+        let val_id = Typecore_ind.name_pattern "val" (List.map fst val_cases) in
         let k = Typeopt.value_kind arg.exp_env arg.exp_type in
         static_catch [transl_exp ~scopes arg] [val_id, k]
           (Matching.for_function ~scopes e.exp_loc
@@ -1207,7 +1207,7 @@ and transl_handler ~scopes e body val_caselist exn_caselist eff_caselist =
          ~attr:default_function_attribute ~loc:Loc_unknown
     | Some (val_caselist, partial) ->
         let val_cases = transl_cases ~scopes val_caselist in
-        let param = Typecore.name_cases "param" val_caselist in
+        let param = Typecore_ind.name_cases "param" val_caselist in
         let body =
           Matching.for_function ~scopes e.exp_loc None (Lvar param) val_cases
             partial
@@ -1218,13 +1218,13 @@ and transl_handler ~scopes e body val_caselist exn_caselist eff_caselist =
   in
   let exn_fun =
     let exn_cases = transl_cases ~scopes exn_caselist in
-    let param = Typecore.name_cases "exn" exn_caselist in
+    let param = Typecore_ind.name_cases "exn" exn_caselist in
     let body = Matching.for_trywith ~scopes e.exp_loc (Lvar param) exn_cases in
     lfunction ~kind:Curried ~params:[param, Pgenval] ~return:Pgenval
       ~attr:default_function_attribute ~loc:Loc_unknown ~body
   in
   let eff_fun =
-    let param = Typecore.name_cases "eff" eff_caselist in
+    let param = Typecore_ind.name_cases "eff" eff_caselist in
     let cont = Ident.create_local "k" in
     let cont_tail = Ident.create_local "ktail" in
     let eff_cases = transl_cases ~scopes ~cont eff_caselist in

@@ -13,20 +13,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Type inference for the core language *)
+(* XXX TODO UPDATE-> Type inference for the core language *)
 
 open Asttypes
 open Types
 
-(* This variant is used to print improved error messages, and does not affect
-   the behavior of the typechecker itself.
-
-   It describes possible explanation for types enforced by a keyword of the
-   language; e.g. "if" requires the condition to be of type bool, and the
-   then-branch to be of type unit if there is no else branch; "for" requires
-   indices to be of type int, and the body to be of type unit.
-*)
-type type_forcing_context = Typecore_ind.type_forcing_context =
+type type_forcing_context =
   | If_conditional
   | If_no_else_branch
   | While_loop_conditional
@@ -38,23 +30,41 @@ type type_forcing_context = Typecore_ind.type_forcing_context =
   | Sequence_left_hand_side
   | When_guard
 
-(* The combination of a type and a "type forcing context". The intent is that it
-   describes a type that is "expected" (required) by the context. If unifying
-   with such a type fails, then the "explanation" field explains why it was
-   required, in order to display a more enlightening error message.
-*)
-type type_expected = Typecore_ind.type_expected = private {
+type type_expected = private {
   ty: type_expr;
   explanation: type_forcing_context option;
 }
 
-(* Variables in patterns *)
-type pattern_variable_kind = Typecore_ind.pattern_variable_kind =
+module Datatype_kind : sig
+  type t = Record | Variant
+  val type_name : t -> string
+  val label_name : t -> string
+end
+
+type wrong_name = {
+  type_path: Path.t;
+  kind: Datatype_kind.t;
+  name: string loc;
+  valid_names: string list;
+}
+
+type wrong_kind_context =
+  | Pattern
+  | Expression of type_forcing_context option
+
+type wrong_kind_sort =
+  | Constructor
+  | Record
+  | Boolean
+  | List
+  | Unit
+
+type pattern_variable_kind =
   | Std_var
   | As_var
   | Continuation_var
 
-type pattern_variable = Typecore_ind.pattern_variable =
+type pattern_variable =
   {
     pv_id: Ident.t;
     pv_type: type_expr;
@@ -69,90 +79,60 @@ val mk_expected:
   type_expr ->
   type_expected
 
-val is_nonexpansive: Typedtree.expression -> bool
-
-module Datatype_kind : sig
-  type t = Typecore_ind.Datatype_kind.t = Record | Variant
-  val type_name : t -> string
-  val label_name : t -> string
-end
-
-type wrong_name = Typecore_ind.wrong_name = {
-  type_path: Path.t;
-  kind: Datatype_kind.t;
-  name: string loc;
-  valid_names: string list;
-}
-
-type wrong_kind_context = Typecore_ind.wrong_kind_context =
-  | Pattern
-  | Expression of type_forcing_context option
-
-type wrong_kind_sort = Typecore_ind.wrong_kind_sort =
-  | Constructor
-  | Record
-  | Boolean
-  | List
-  | Unit
-
-type existential_restriction = Typecore_ind.existential_restriction =
-  | At_toplevel (** no existential types at the toplevel *)
-  | In_group (** nor with [let ... and ...] *)
-  | In_rec (** or recursive definition *)
-  | With_attributes (** or [let[@any_attribute] = ...] *)
-  | In_class_args (** or in class arguments [class c (...) = ...] *)
-  | In_class_def (** or in [class c = let ... in ...] *)
-  | In_self_pattern (** or in self pattern *)
+type existential_restriction =
+  | At_toplevel
+  | In_group
+  | In_rec
+  | With_attributes
+  | In_class_args
+  | In_class_def
+  | In_self_pattern
 
 val type_binding:
-        Env.t -> rec_flag ->
+       (Env.t -> rec_flag ->
           Parsetree.value_binding list ->
-          Typedtree.value_binding list * Env.t
+          Typedtree.value_binding list * Env.t) ref
 val type_let:
-        existential_restriction -> Env.t -> rec_flag ->
+       (existential_restriction -> Env.t -> rec_flag ->
           Parsetree.value_binding list ->
-          Typedtree.value_binding list * Env.t
+          Typedtree.value_binding list * Env.t) ref
 val type_expression:
-        Env.t -> Parsetree.expression -> Typedtree.expression
+       (Env.t -> Parsetree.expression -> Typedtree.expression) ref
 val type_class_arg_pattern:
-        string -> Env.t -> Env.t -> arg_label -> Parsetree.pattern ->
+       (string -> Env.t -> Env.t -> arg_label -> Parsetree.pattern ->
         Typedtree.pattern *
         (Ident.t * Ident.t * type_expr) list *
-        Env.t * Env.t
+        Env.t * Env.t) ref
 val type_self_pattern:
-        Env.t -> Parsetree.pattern ->
-        Typedtree.pattern * pattern_variable list
+       (Env.t -> Parsetree.pattern ->
+        Typedtree.pattern * pattern_variable list) ref
 val check_partial:
-        ?lev:int -> Env.t -> type_expr ->
-        Location.t -> Typedtree.value Typedtree.case list -> Typedtree.partial
+       (?lev:int -> Env.t -> type_expr ->
+        Location.t -> Typedtree.value Typedtree.case list -> Typedtree.partial) ref
 val type_expect:
-        Env.t -> Parsetree.expression -> type_expected -> Typedtree.expression
+       (Env.t -> Parsetree.expression -> type_expected -> Typedtree.expression) ref
 val type_exp:
-        Env.t -> Parsetree.expression -> Typedtree.expression
+       (Env.t -> Parsetree.expression -> Typedtree.expression) ref
 
-(** [type_approx env exp ty_expectd] approximates the type of the expression
-    [expr] and unifies the result with [ty_expected]. *)
 val type_approx:
-        Env.t -> Parsetree.expression -> type_expr -> unit
+       (Env.t -> Parsetree.expression -> type_expr -> unit) ref
 val type_argument:
-        Env.t -> Parsetree.expression ->
-        type_expr -> type_expr -> Typedtree.expression
+       (Env.t -> Parsetree.expression ->
+        type_expr -> type_expr -> Typedtree.expression) ref
 
-val option_some: Env.t -> Typedtree.expression -> Typedtree.expression
-val option_none: Env.t -> type_expr -> Location.t -> Typedtree.expression
-val extract_option_type: Env.t -> type_expr -> type_expr
-val generalizable: int -> type_expr -> bool
-val reset_delayed_checks: unit -> unit
-val force_delayed_checks: unit -> unit
+val option_some: (Env.t -> Typedtree.expression -> Typedtree.expression) ref
+val option_none: (Env.t -> type_expr -> Location.t -> Typedtree.expression) ref
+val extract_option_type: (Env.t -> type_expr -> type_expr) ref
+val generalizable: (int -> type_expr -> bool) ref
+val reset_delayed_checks: (unit -> unit) ref
+val force_delayed_checks: (unit -> unit) ref
 
-val has_poly_constraint : Parsetree.pattern -> bool
-
-type existential_binding = Typecore_ind.existential_binding =
+type existential_binding =
   | Bind_already_bound
   | Bind_not_in_scope
   | Bind_non_locally_abstract
 
-type error = Typecore_ind.error =
+type error =
   | Constructor_arity_mismatch of Longident.t * int * int
   | Label_mismatch of Longident.t * Errortrace.unification_error
   | Pattern_type_clash :
@@ -250,14 +230,39 @@ type error = Typecore_ind.error =
   | Optional_poly_param of string
 
 exception Error of Location.t * Env.t * error
-exception Error_forward of Location.error
 
-val report_error: loc:Location.t -> Env.t -> error -> Location.error
- (** @deprecated.  Use {!Location.error_of_exn}, {!Location.print_report}. *)
+val has_poly_constraint : (Parsetree.pattern -> bool) ref
 
-val constant: Parsetree.constant -> (Asttypes.constant, error) result
+val name_pattern : string -> Typedtree.pattern list -> Ident.t
+val name_cases : string -> Typedtree.value Typedtree.case list -> Ident.t
+
+val self_coercion : (Path.t * Location.t list ref) list ref
 
 val annotate_recursive_bindings :
-  Env.t -> Typedtree.value_binding list -> Typedtree.value_binding list
+  (Env.t -> Typedtree.value_binding list -> Typedtree.value_binding list) ref
 val check_recursive_class_bindings :
-  Env.t -> Ident.t list -> Typedtree.class_expr list -> unit
+  (Env.t -> Ident.t list -> Typedtree.class_expr list -> unit) ref
+
+(* Forward declaration, to be filled in by Typemod.type_module *)
+val type_module:
+  (Env.t -> Parsetree.module_expr -> Typedtree.module_expr * Shape.t) ref
+val type_str_item:
+  (Env.t -> Parsetree.structure_item -> Typedtree.structure_item * Env.t) ref
+(* Forward declaration, to be filled in by Typemod.type_open *)
+val type_open:
+  (?used_slot:bool ref -> override_flag -> Env.t -> Location.t ->
+   Longident.t loc -> Path.t * Env.t)
+    ref
+(* Forward declaration, to be filled in by Typemod.type_open_decl *)
+val type_open_decl:
+  (?used_slot:bool ref -> Env.t -> Parsetree.open_declaration ->
+   Typedtree.open_declaration * Types.signature * Env.t)
+    ref
+(* Forward declaration, to be filled in by Typeclass.class_structure *)
+val type_object:
+  (Env.t -> Location.t -> Parsetree.class_structure ->
+   Typedtree.class_structure * string list) ref
+val type_package:
+  (Env.t -> Parsetree.module_expr -> package ->
+   Typedtree.module_expr * package) ref
+
