@@ -144,31 +144,43 @@ clean::
 export AWK
 
 %.cmi: %.mli
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 # The dependency on the .mli file is in .depend (since stdlib__Foo.cmi
 # depends on stdlib__foo.mli)
 stdlib__%.cmi:
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
 	         -o $@ -c $(filter %.mli, $^)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.cmo: %.ml
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmo
 # depends on stdlib__foo.ml)
 stdlib__%.cmo:
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
 	         -o $@ -c $(filter %.ml, $^)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.cmx: %.ml
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmx
 # depends on stdlib__foo.ml)
 stdlib__%.cmx:
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) \
 	           -o $@ -c $(filter %.ml, $^)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 # Dependencies on the compiler
 COMPILER_DEPS=$(filter-out $(OCAMLRUN), $(CAMLC))

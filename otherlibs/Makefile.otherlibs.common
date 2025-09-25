@@ -152,23 +152,33 @@ distclean:: clean
 	rm -f META
 
 %.cmi: %.mli
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) -c $(COMPFLAGS) $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.cmo: %.ml
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) -c $(COMPFLAGS) $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.cmx: %.ml
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLOPT)$(CAMLOPT) -c $(COMPFLAGS) $(OPTCOMPFLAGS) $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.b.$(O): %.c $(REQUIRED_HEADERS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_CC)$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ -c $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.n.$(O): OC_CFLAGS += $(OC_NATIVE_CFLAGS)
 
 %.n.$(O): %.c $(REQUIRED_HEADERS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_CC)$(CC) $(OC_CFLAGS) $(CFLAGS) \
 	  $(OC_CPPFLAGS) $(CPPFLAGS) $(OUTPUTOBJ)$@ -c $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 ifeq "$(COMPUTE_DEPS)" "true"
 ifneq "$(COBJS_BYTECODE)" ""

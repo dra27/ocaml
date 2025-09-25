@@ -81,8 +81,10 @@ st_stubs.%.$(O): st_stubs.c
 else
 st_stubs.%.$(O): st_stubs.c $(RUNTIME_HEADERS) $(wildcard *.h)
 endif
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_CC)$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ -c $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 .PHONY: partialclean
 partialclean:
@@ -123,13 +125,19 @@ installopt:
 	  "$(INSTALL_THREADSLIBDIR)"
 
 %.cmi: %.mli
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) -c $(COMPFLAGS) $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.cmo: %.ml
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) -c $(COMPFLAGS) $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 %.cmx: %.ml
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLOPT)$(CAMLOPT) -c $(COMPFLAGS) $(OPTCOMPFLAGS) $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 DEP_FILES := st_stubs.b.$(D)
 ifeq "$(NATIVE_COMPILER)" "true"

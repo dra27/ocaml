@@ -48,7 +48,7 @@ export START_STAMP_MS := $(shell date '+%s%3N')
 #export START_STAMP_MS := $(stamp-ms )
 endif
 # XXX BEGIN/BUILT macros would be better!
-R_STAMP = @s="$$(expr "$$(date '+%s%3N')" - '$(START_STAMP_MS)')"; echo "$$(printf '%06d %s %s$(if $(3),\n%06d %s %s)' "$$s" '$(1)' '$(if $(2),$(2),$@)' $(if $(3),"$$s" '$(3)' '$(4)'))" >> timings
+R_STAMP = @s="$$(expr "$$(date '+%s%3N')" - '$(START_STAMP_MS)')"; echo "$$(printf '%06d %s %s$(if $(3),\n%06d %s %s)' "$$s" '$(1)' '$(if $(2),$(2),$@)' $(if $(3),"$$s" '$(3)' '$(4)'))" >> $(ROOTDIR)/profile
 #P_STAMP = $(START_STAMP_MS) $(stamp-ms )
 P_STAMP =
 #V_CONCLUDE = @$(info $   $(P_STAMP) <complete> $@)
@@ -210,9 +210,11 @@ REQUIRED_HEADERS := $(RUNTIME_HEADERS) $(wildcard *.h)
 endif
 
 %.$(O): %.c $(REQUIRED_HEADERS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_CC)$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ -c $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 $(DEPDIR):
 	$(MKDIR) $@
@@ -252,8 +254,10 @@ OCAMLLEX ?= $(BEST_OCAMLLEX)
 OCAMLLEXFLAGS ?= -q
 
 %.ml: %.mll
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLLEX)$(OCAMLLEX) $(OCAMLLEXFLAGS) $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 # Parser generation
 
@@ -262,8 +266,10 @@ OCAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc$(EXE)
 OCAMLYACCFLAGS ?= --strict -v
 
 %.ml %.mli: %.mly
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLYACC)$(OCAMLYACC) $(OCAMLYACCFLAGS) $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 # Used with the Microsoft toolchain to merge generated manifest files into
 # executables
@@ -371,9 +377,11 @@ $(strip \
   $$($(basename $(notdir $(1)))_BYTECODE_LINKFLAGS))
 
 $(1)$(EXE): $$$$($(basename $(notdir $(1)))_BCOBJS)
+	$$(call R_STAMP,ARTEFACT_BEGIN)
 	$$(V_LINKC)$$($(basename $(notdir $(1)))_BYTECODE_LINKCMD) -o $$@ \
 	  $$($(basename $(notdir $(1)))_BCOBJS)
 	$$(V_CONCLUDE)
+	$$(call R_STAMP,ARTEFACT_BUILT)
 endef # _OCAML_BYTECODE_PROGRAM
 
 define OCAML_BYTECODE_PROGRAM
@@ -405,9 +413,11 @@ $(strip \
   $$($(basename $(notdir $(1)))_NATIVE_LINKFLAGS))
 
 $(1)$(EXE): $$$$($(basename $(notdir $(1)))_NCOBJS)
+	$$(call R_STAMP,ARTEFACT_BEGIN)
 	$$(V_LINKOPT)$$($(basename $(notdir $(1)))_NATIVE_LINKCMD) -o $$@ \
 	  $$($(basename $(notdir $(1)))_NCOBJS)
 	$$(V_CONCLUDE)
+	$$(call R_STAMP,ARTEFACT_BUILT)
 endef # _OCAML_NATIVE_PROGRAM
 
 define OCAML_NATIVE_PROGRAM
@@ -451,9 +461,11 @@ $(basename $(notdir $(1)))_BCOBJS = \
 $(1).cma: \
   $$$$($(basename $(notdir $(1)))_BYTE_CMI_FILES) \
   $$$$($(basename $(notdir $(1)))_BCOBJS)
+	$$(call R_STAMP,ARTEFACT_BEGIN)
 	$$(V_LINKC)$$(LINK_BYTECODE_LIBRARY) -a -o $$@ \
 	  $$($(basename $(notdir $(1)))_BCOBJS)
 	$$(V_CONCLUDE)
+	$$(call R_STAMP,ARTEFACT_BUILT)
 endef # _OCAML_BYTECODE_LIBRARY
 
 define OCAML_BYTECODE_LIBRARY
@@ -481,9 +493,11 @@ $(basename $(notdir $(1)))_NCOBJS = \
 $(1).cmxa: \
   $$$$($(basename $(notdir $(1)))_NATIVE_CMI_FILES) \
   $$$$($(basename $(notdir $(1)))_NCOBJS)
+	$$(call R_STAMP,ARTEFACT_BEGIN)
 	$$(V_LINKOPT)$$(LINK_NATIVE_LIBRARY) -a -o $$@ \
 	  $$($(basename $(notdir $(1)))_NCOBJS)
 	$$(V_CONCLUDE)
+	$$(call R_STAMP,ARTEFACT_BUILT)
 endef # _OCAML_NATIVE_LIBRARY
 
 define OCAML_NATIVE_LIBRARY

@@ -766,7 +766,7 @@ opt-core: runtimeopt
 	$(MAKE) ocamlopt
 	$(call R_STAMP,BUILT,ocamlopt,BEGIN,libraryopt)
 	$(MAKE) libraryopt
-	$(call RSTAMP,BUILT,libraryopt)
+	$(call R_STAMP,BUILT,libraryopt)
 
 .PHONY: opt
 opt: checknative
@@ -873,11 +873,15 @@ world: coldstart
 .PHONY: world.opt
 world.opt: checknative
 ifeq "$(TIMING)" "1"
-	@rm -f timings
+	@rm -f profile
 endif
 	$(call R_STAMP,BEGIN,coldstart)
 	$(MAKE) coldstart
 	$(MAKE) opt.opt
+ifeq "$(TIMING)" "1"
+	@./timing_to_chrome_trace profile > profile.json
+#	@rm -f profile
+endif
 
 # FlexDLL sources missing error messages
 # Different git mechanism displayed depending on whether this source tree came
@@ -1018,12 +1022,14 @@ ocaml_CMO_FILES = toplevel/topstart.cmo
 .INTERMEDIATE: ocaml.tmp
 ocaml.tmp: OC_BYTECODE_LINKFLAGS += -I toplevel/byte -linkall -g
 ocaml.tmp: $(ocaml_CMA_FILES) $(ocaml_CMO_FILES)
+	$(call R_STAMP,ARTEFACT_BEGIN,ocaml$(EXE))
 	$(V_LINKC)$(LINK_BYTECODE_PROGRAM) -o $@ $^
 	$(V_CONCLUDE)
 
 $(eval $(call PROGRAM_SYNONYM,ocaml))
 ocaml$(EXE): $(expunge) ocaml.tmp
 	- $(V_GEN)$(OCAMLRUN) $^ $@ $(PERVASIVES)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 partialclean::
 	rm -f ocaml ocaml.exe
@@ -1416,8 +1422,10 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
 	       -e '/^}/q' > $@
 
 $(SAK): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKEXE)$(call SAK_BUILD,$@,$<)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 C_LITERAL = $(shell $(SAK) $(ENCODE_C_LITERAL) '$(1)')
 
@@ -1432,68 +1440,100 @@ runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
 ## Runtime libraries and programs
 
 runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(BYTECCLIBS))
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libcamlrun.$(A): $(libcamlrun_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/ocamlrund$(EXE): runtime/prims.$(O) runtime/libcamlrund.$(A)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKEXE)$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(BYTECCLIBS)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libcamlrund.$(A): $(libcamlrund_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/ocamlruni$(EXE): runtime/prims.$(O) runtime/libcamlruni.$(A)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(INSTRUMENTED_RUNTIME_LIBS) $(BYTECCLIBS)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libcamlruni.$(A): $(libcamlruni_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libcamlrun_pic.$(A): $(libcamlrunpic_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libcamlrun_shared.$(SO): $(libcamlrunpic_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKDLL)$(MKDLL) -o $@ $^ $(BYTECCLIBS)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libasmrun.$(A): $(libasmrun_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libasmrund.$(A): $(libasmrund_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libasmruni.$(A): $(libasmruni_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libasmrun_pic.$(A): $(libasmrunpic_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libasmrun_shared.$(SO): $(libasmrunpic_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKDLL)$(MKDLL) -o $@ $^ $(NATIVECCLIBS)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/libcomprmarsh.$(A): $(libcomprmarsh_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 ## Runtime target-specific preprocessor and compiler flags
 
@@ -1562,16 +1602,20 @@ $(1).$(O): $(2).c \
   $(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) \
   $(RUNTIME_HEADERS)
 endif # ifeq "$(COMPUTE_DEPS)" "true"
+	$$(call R_STAMP,ARTEFACT_BEGIN)
 	$$(V_CC)$$(CC) $$(OC_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) $$(CPPFLAGS) \
 	  $$(OUTPUTOBJ)$$@ -c $$<
-	$(V_CONCLUDE)
+	$$(V_CONCLUDE)
+	$$(call R_STAMP,ARTEFACT_BUILT)
 endef
 
 runtime/winpthreads/%.$(O): $(WINPTHREADS_SOURCE_DIR)/src/%.c \
                             $(wildcard $(WINPTHREADS_SOURCE_DIR)/include/*.h) \
                               | runtime/winpthreads
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_CC)$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ -c $<
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/winpthreads:
 	$(MKDIR) $@
@@ -1605,40 +1649,57 @@ ASPP_ERROR = \
           echo "try producing $*.o by hand.";\
           exit 2; }
 runtime/%.o: runtime/%.S
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/%.d.o: runtime/%.S
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) $(ocamlrund_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/%.i.o: runtime/%.S
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) $(ocamlruni_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/%_libasmrunpic.o: runtime/%.S
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) $(SHAREDLIB_CFLAGS) -o $@ $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/domain_state.inc: runtime/caml/domain_state.tbl
 	$(V_GEN)$(CPP) $< > $@
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/amd64nt.obj: runtime/amd64nt.asm runtime/domain_state.inc
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_ASM)$(ASM)$@ $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/amd64nt.d.obj: runtime/amd64nt.asm runtime/domain_state.inc
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_ASM)$(ASM)$@ $(ocamlrund_CPPFLAGS) $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/amd64nt.i.obj: runtime/amd64nt.asm runtime/domain_state.inc
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_ASM)$(ASM)$@ $(ocamlruni_CPPFLAGS) $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 runtime/%_libasmrunpic.obj: runtime/%.asm
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_ASM)$(ASM)$@ $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 ## Runtime dependencies
 
@@ -1779,8 +1840,10 @@ ocamlyacc_CPPFLAGS = -DNDEBUG
 ocamlyacc: $(ocamlyacc_PROGRAM)$(EXE)
 
 $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKEXE)$(MKEXE) -o $@ $^
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 clean::
 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj) \
@@ -2268,8 +2331,10 @@ ocamldebugger: debugger/ocamldebug$(EXE) ocamlc ocamlyacc ocamllex
 
 $(ocamldebug_DEBUGGER_OBJECTS): OC_COMMON_COMPFLAGS += -for-pack ocamldebug
 debugger/ocamldebug.cmo: $(ocamldebug_DEBUGGER_OBJECTS)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 
 debugger/ocamldebug_entry.cmo: debugger/ocamldebug.cmo
 
@@ -2303,8 +2368,10 @@ checkstack: tools/checkstack$(EXE)
 
 .INTERMEDIATE: tools/checkstack$(EXE) tools/checkstack.$(O)
 tools/checkstack$(EXE): tools/checkstack.$(O)
+	$(call R_STAMP,ARTEFACT_BEGIN)
 	$(V_MKEXE)$(MKEXE) $(OUTPUTEXE)$@ $<
 	$(V_CONCLUDE)
+	$(call R_STAMP,ARTEFACT_BUILT)
 else
 checkstack:
 	@
