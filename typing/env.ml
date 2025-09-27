@@ -818,7 +818,7 @@ module Current_unit : sig
   end
 end = struct
   let current_unit : Unit_info.t option ref =
-    ref None
+    s_ref None
   let get () =
     !current_unit
   let set cu =

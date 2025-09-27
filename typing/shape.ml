@@ -43,7 +43,7 @@ module Uid = struct
       print fmt t
   end)
 
-  let id = ref (-1)
+  let id = Local_store.s_ref (-1)
 
   let reinit () = id := (-1)
 

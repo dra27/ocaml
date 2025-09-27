@@ -134,7 +134,7 @@ end = struct
      type.
   *)
   let used_variables =
-    ref (TyVarMap.empty : (type_expr * Location.t * bool ref) TyVarMap.t)
+    Local_store.s_ref (TyVarMap.empty : (type_expr * Location.t * bool ref) TyVarMap.t)
 
   (* These are variables we expect to become univars (they were introduced with
      e.g. ['a .]), but we need to make sure they don't unify first.  Why not

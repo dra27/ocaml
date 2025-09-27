@@ -2757,7 +2757,7 @@ let check_unused
 
 (** Some delayed checks, to be executed after typing the whole
     compilation unit or toplevel phrase *)
-let delayed_checks = ref []
+let delayed_checks = Local_store.s_ref []
 let reset_delayed_checks () = delayed_checks := []
 let add_delayed_check f =
   delayed_checks := (f, Warnings.backup ()) :: !delayed_checks
