@@ -25,7 +25,7 @@ open Debuginfo.Scoped_location
 
 (**** Label generation ****)
 
-let label_counter = ref 0
+let label_counter = Local_store.s_ref 0
 
 let new_label () =
   incr label_counter; !label_counter
@@ -340,7 +340,7 @@ let functions_to_compile  = (Stack.create () : function_to_compile Stack.t)
 
 (* Name of current compilation unit (for debugging events) *)
 
-let compunit_name = ref ""
+let compunit_name = Local_store.s_ref ""
 
 let check_stack stack_info sz =
   let curr = stack_info.max_stack_used in

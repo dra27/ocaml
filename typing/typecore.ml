@@ -535,12 +535,12 @@ let unify_pat_types loc env ty ty' =
 (* GADT unification inside solve_Ppat_construct and check_counter_example_pat *)
 (* We need to distinguish [pat] and [expected] if [refine = true] and
    [penv.in_counterexample = false] (see [unify_gadt] for details) *)
-let nothing_equated = TypePairs.create 0
+let nothing_equated = Local_store.s_table TypePairs.create 0
 let unify_pat_types_return_equated_pairs ~refine loc penv ~pat ~expected =
   try
     if refine || penv.Pattern_env.in_counterexample
     then unify_gadt penv ~pat ~expected
-    else (unify !!penv pat expected; nothing_equated)
+    else (unify !!penv pat expected; !nothing_equated)
   with
   | Unify err ->
       raise(Error(loc, !!penv, Pattern_type_clash(err, None)))
@@ -3582,7 +3582,7 @@ let generalizable level ty =
   end
 
 (* Hack to allow coercion of self. Will clean-up later. *)
-let self_coercion = ref ([] : (Path.t * Location.t list ref) list)
+let self_coercion = Local_store.s_ref ([] : (Path.t * Location.t list ref) list)
 
 (* Helpers for type_cases *)
 

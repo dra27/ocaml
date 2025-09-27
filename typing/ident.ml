@@ -120,7 +120,7 @@ let scope = function
   | Local _ -> highest_scope
   | Global _ | Predef _ -> lowest_scope
 
-let reinit_level = ref (-1)
+let reinit_level = Local_store.s_ref (-1)
 
 let reinit () =
   if !reinit_level < 0
