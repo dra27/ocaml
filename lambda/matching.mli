@@ -72,3 +72,5 @@ val expand_stringswitch:
     lambda option -> lambda
 
 val inline_lazy_force : lambda -> scoped_location -> lambda
+
+val reset : unit -> unit
