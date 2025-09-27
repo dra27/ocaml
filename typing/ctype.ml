@@ -147,7 +147,7 @@ exception Incompatible
 
 (**** Control tracing of GADT instances *)
 
-let trace_gadt_instances = Local_store.s_ref false
+let trace_gadt_instances = ref false
 let check_trace_gadt_instances ?(force=false) env =
   not !trace_gadt_instances && (force || Env.has_local_constraints env) &&
   (trace_gadt_instances := true; cleanup_abbrev (); true)
@@ -163,7 +163,7 @@ let wrap_trace_gadt_instances ?force env f x =
 (**** Abbreviations without parameters ****)
 (* Shall reset after generalizing *)
 
-let simple_abbrevs = Local_store.s_ref Mnil
+let simple_abbrevs = ref Mnil
 
 let proper_abbrevs tl abbrev =
   if tl <> [] || !trace_gadt_instances || !Clflags.principal
@@ -1144,7 +1144,7 @@ let rec find_repr p1 =
    scope and performing the necessary book-keeping -- in particular
    reverting the in-place updates after the instantiation is done. *)
 
-let abbreviations = Local_store.s_ref (ref Mnil)
+let abbreviations = ref (ref Mnil)
   (* Abbreviation memorized. *)
 
 (* partial: we may not wish to copy the non generic types
@@ -1596,7 +1596,7 @@ let apply ?(use_current_level = false) env params body args =
    checks whether any of types, modules, or local constraints have
    been changed.
 *)
-let previous_env = Local_store.s_ref Env.empty
+let previous_env = ref Env.empty
 (*let string_of_kind = function Public -> "public" | Private -> "private"*)
 let check_abbrev_env env =
   if not (Env.same_type_declarations env !previous_env) then begin
@@ -1896,7 +1896,7 @@ let rec occur_rec env visited allow_recursive parents ty0 ty =
     ignore (try_mark_node visited ty)
   end
 
-let type_changed = Local_store.s_ref false (* trace possible changes to the studied type *)
+let type_changed = ref false (* trace possible changes to the studied type *)
 
 let merge r b = if b then r := true
 
@@ -2132,7 +2132,7 @@ let univars_escape env univar_pairs vl ty =
   occur ty
   end
 
-let univar_pairs = Local_store.s_ref []
+let univar_pairs = ref []
 
 let with_univar_pairs pairs f =
   let old = !univar_pairs in
@@ -2711,7 +2711,7 @@ let compare_package env unify_list lv1 pack1 lv2 pack2 =
 (* Code smell: this could also be put in unification_environment.
    Only modified by expand_head_rigid, but the corresponding unification
    environment is built in subst. *)
-let rigid_variants = Local_store.s_ref false
+let rigid_variants = ref false
 
 let unify1_var uenv t1 t2 =
   assert (is_Tvar t1);
@@ -4774,7 +4774,7 @@ let match_class_declarations env patt_params patt_type subj_params subj_type =
    [posi] true if the current variance is positive
    [level] number of expansions/enlargement allowed on this branch *)
 
-let warn = Local_store.s_ref false  (* whether double coercion might do better *)
+let warn = ref false  (* whether double coercion might do better *)
 let pred_expand n = if n mod 2 = 0 && n > 0 then pred n else n
 let pred_enlarge n = if n mod 2 = 1 then pred n else n
 
@@ -5001,7 +5001,7 @@ let enlarge_type env ty =
     [generic_abbrev ...]).
 *)
 
-let subtypes = Local_store.s_table TypePairs.create 17
+let subtypes = TypePairs.create 17
 
 let subtype_error ~env ~trace ~unification_trace =
   raise (Subtype (Subtype.error
@@ -5011,10 +5011,10 @@ let subtype_error ~env ~trace ~unification_trace =
 let rec subtype_rec env trace t1 t2 constraints =
   if eq_type t1 t2 then constraints else
 
-  if TypePairs.mem !subtypes (t1, t2) then
+  if TypePairs.mem subtypes (t1, t2) then
     constraints
   else begin
-    TypePairs.add !subtypes (t1, t2);
+    TypePairs.add subtypes (t1, t2);
     match (get_desc t1, get_desc t2) with
       (Tvar _, _) | (_, Tvar _) ->
         (trace, t1, t2, !univar_pairs)::constraints
@@ -5252,13 +5252,13 @@ and subtype_row env trace row1 row2 constraints =
       raise Exit
 
 let subtype env ty1 ty2 =
-  TypePairs.clear !subtypes;
+  TypePairs.clear subtypes;
   with_univar_pairs [] (fun () ->
     (* Build constraint set. *)
     let constraints =
       subtype_rec env [Subtype.Diff {got = ty1; expected = ty2}] ty1 ty2 []
     in
-    TypePairs.clear !subtypes;
+    TypePairs.clear subtypes;
     (* Enforce constraints. *)
     function () ->
       List.iter
@@ -5497,10 +5497,10 @@ let normalize_type ty =
    expand_abbrev.
 *)
 
-let nondep_hash     = Local_store.s_table TypeHash.create 47
-let nondep_variants = Local_store.s_table TypeHash.create 17
+let nondep_hash     = TypeHash.create 47
+let nondep_variants = TypeHash.create 17
 let clear_hash ()   =
-  TypeHash.clear !nondep_hash; TypeHash.clear !nondep_variants
+  TypeHash.clear nondep_hash; TypeHash.clear nondep_variants
 
 let rec nondep_type_rec ?(expand_private=false) env ids ty =
   let try_expand env t =
@@ -5509,10 +5509,10 @@ let rec nondep_type_rec ?(expand_private=false) env ids ty =
   in
   match get_desc ty with
     Tvar _ | Tunivar _ -> ty
-  | _ -> try TypeHash.find !nondep_hash ty
+  | _ -> try TypeHash.find nondep_hash ty
   with Not_found ->
     let ty' = newgenstub ~scope:(get_scope ty) in
-    TypeHash.add !nondep_hash ty ty';
+    TypeHash.add nondep_hash ty ty';
     match
       match get_desc ty with
       | Tconstr(p, tl, _abbrev) as desc ->
@@ -5557,13 +5557,13 @@ let rec nondep_type_rec ?(expand_private=false) env ids ty =
           let more = row_more row in
           (* We must keep sharing according to the row variable *)
           begin try
-            let ty2 = TypeHash.find !nondep_variants more in
+            let ty2 = TypeHash.find nondep_variants more in
             (* This variant type has been already copied *)
-            TypeHash.add !nondep_hash ty ty2;
+            TypeHash.add nondep_hash ty ty2;
             Tlink ty2
           with Not_found ->
             (* Register new type first for recursion *)
-            TypeHash.add !nondep_variants more ty';
+            TypeHash.add nondep_variants more ty';
             let static = static_row row in
             let more' =
               if static then newgenty Tnil else nondep_type_rec env ids more
@@ -5582,7 +5582,7 @@ let rec nondep_type_rec ?(expand_private=false) env ids ty =
       Transient_expr.set_stub_desc ty' desc;
       ty'
     | exception e ->
-      TypeHash.remove !nondep_hash ty;
+      TypeHash.remove nondep_hash ty;
       raise e
 
 let nondep_type env id ty =

@@ -44,7 +44,7 @@ end
 type bound_ident = { hide:bool; ident:Ident.t }
 
 (* printing environment for path shortening and naming *)
-let printing_env = Local_store.s_ref Env.empty
+let printing_env = ref Env.empty
 
 (* When printing, it is important to only observe the
    current printing environment, without reading any new
@@ -127,7 +127,7 @@ module Ident_conflicts = struct
   module M = String.Map
   type explanation =
     { kind: namespace; name:string; root_name:string; location:Location.t}
-  let explanations = Local_store.s_ref M.empty
+  let explanations = ref M.empty
 
   let add namespace name id =
     match Namespace.location (Some namespace) id with
@@ -230,7 +230,7 @@ module Ident_names = struct
 module M = String.Map
 module S = String.Set
 
-let enabled = Local_store.s_ref true
+let enabled = ref true
 let enable b = enabled := b
 
 (* Names bound in recursive definitions should be considered as bound
@@ -262,7 +262,7 @@ let bound_in_recursion = ref M.empty
    syntactic argument may be represented by different identifiers during the
    error processing, we are thus disabling disambiguation on the argument name
 *)
-let fuzzy = Local_store.s_ref S.empty
+let fuzzy = ref S.empty
 let with_fuzzy id f =
   protect_refs [ R(fuzzy, S.add (Ident.name id) !fuzzy) ] f
 let fuzzy_id namespace id = namespace = Module && S.mem (Ident.name id) !fuzzy
@@ -462,13 +462,13 @@ type best_path = Paths of Path.t list | Best of Path.t
 (** Short-paths cache: the five mutable variables below implement a one-slot
     cache for short-paths
  *)
-let printing_old = Local_store.s_ref Env.empty
-let printing_pers = Local_store.s_ref String.Set.empty
+let printing_old = ref Env.empty
+let printing_pers = ref String.Set.empty
 (** {!printing_old} and  {!printing_pers} are the keys of the one-slot cache *)
 
-let printing_depth = Local_store.s_ref 0
-let printing_cont = Local_store.s_ref ([] : Env.iter_cont list)
-let printing_map = Local_store.s_ref Path.Map.empty
+let printing_depth = ref 0
+let printing_cont = ref ([] : Env.iter_cont list)
+let printing_map = ref Path.Map.empty
 (**
    - {!printing_map} is the main value stored in the cache.
    Note that it is evaluated lazily and its value is updated during printing.
@@ -718,7 +718,7 @@ module Internal_names : sig
 
 end = struct
 
-  let names = Local_store.s_ref Ident.Set.empty
+  let names = ref Ident.Set.empty
 
   let reset () =
     names := Ident.Set.empty
@@ -798,15 +798,15 @@ end = struct
      which maps from types to types.  The lookup process is
      "type -> apply substitution -> find name".  The substitution is presumed to
      be one-shot. *)
-  let names = Local_store.s_ref ([] : (transient_expr * string) list)
-  let name_subst = Local_store.s_ref ([] : (transient_expr * transient_expr) list)
-  let name_counter = Local_store.s_ref 0
-  let named_vars = Local_store.s_ref ([] : string list)
-  let visited_for_named_vars = Local_store.s_ref ([] : transient_expr list)
+  let names = ref ([] : (transient_expr * string) list)
+  let name_subst = ref ([] : (transient_expr * transient_expr) list)
+  let name_counter = ref 0
+  let named_vars = ref ([] : string list)
+  let visited_for_named_vars = ref ([] : transient_expr list)
 
-  let weak_counter = Local_store.s_ref 1
-  let weak_var_map = Local_store.s_ref TypeMap.empty
-  let named_weak_vars = Local_store.s_ref String.Set.empty
+  let weak_counter = ref 1
+  let weak_var_map = ref TypeMap.empty
+  let named_weak_vars = ref String.Set.empty
 
   let reset_names () =
     names := [];
@@ -937,10 +937,10 @@ end = struct
 end
 
 module Aliases = struct
-  let visited_objects = Local_store.s_ref ([] : transient_expr list)
-  let aliased = Local_store.s_ref ([] : transient_expr list)
-  let delayed = Local_store.s_ref ([] : transient_expr list)
-  let printed_aliases = Local_store.s_ref ([] : transient_expr list)
+  let visited_objects = ref ([] : transient_expr list)
+  let aliased = ref ([] : transient_expr list)
+  let delayed = ref ([] : transient_expr list)
+  let printed_aliases = ref ([] : transient_expr list)
 
 (* [printed_aliases] is a subset of [aliased] that records only those aliased
    types that have actually been printed; this allows us to avoid naming loops
@@ -1043,7 +1043,7 @@ let prepare_for_printing tyl =
 let add_type_to_preparation = prepare_type
 
 (* Disabled in classic mode when printing an unification error *)
-let print_labels = Local_store.s_ref true
+let print_labels = ref true
 let with_labels b f = Misc.protect_refs [R (print_labels,b)] f
 
 let alias_nongen_row mode px ty =

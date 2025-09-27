@@ -1486,7 +1486,7 @@ let make_copy_of_types env0 =
    not yet evaluated structures) *)
 
 type iter_cont = unit -> unit
-let iter_env_cont = Local_store.s_ref []
+let iter_env_cont = ref []
 
 let rec scrape_alias_for_visit env mty =
   let open Subst.Lazy in

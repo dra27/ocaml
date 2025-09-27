@@ -27,8 +27,8 @@ let raw_list pr ppf = function
       fprintf ppf "@[<1>[%a%t]@]" pr a
         (fun ppf -> List.iter (fun x -> fprintf ppf ";@,%a" pr x) l)
 
-let kind_vars = Local_store.s_ref []
-let kind_count = Local_store.s_ref 0
+let kind_vars = ref []
+let kind_count = ref 0
 
 let string_of_field_kind v =
   match field_kind_repr v with
@@ -53,7 +53,7 @@ let print_name ppf = function
 
 let path = Format_doc.compat Path.print
 
-let visited = Local_store.s_ref []
+let visited = ref []
 let rec raw_type ppf ty =
   let ty = safe_repr [] ty in
   if List.memq ty !visited then fprintf ppf "{id=%d}" ty.id else begin

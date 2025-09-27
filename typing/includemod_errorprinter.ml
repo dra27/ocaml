@@ -242,7 +242,7 @@ end
 
 module Err = Includemod.Error
 
-let buffer = Local_store.s_ref Bytes.empty
+let buffer = ref Bytes.empty
 let is_big obj =
   let size = !Clflags.error_size in
   size > 0 &&

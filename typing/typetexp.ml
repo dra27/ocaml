@@ -149,7 +149,7 @@ end = struct
        if possible *)
   }
 
-  let univars = Local_store.s_ref ([] : (string * pending_univar) list)
+  let univars = ref ([] : (string * pending_univar) list)
   let assert_univars uvs =
     assert (List.for_all (fun (_name, v) -> not_generic v.univar) uvs)
 
@@ -157,7 +157,7 @@ end = struct
      current type. Used to force free variables in method types to become
      univars.
   *)
-  let pre_univars = Local_store.s_ref ([] : type_expr list)
+  let pre_univars = ref ([] : type_expr list)
 
   let reset () =
     reset_global_level ();

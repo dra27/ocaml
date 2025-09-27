@@ -46,8 +46,8 @@ let get_location ti =
   | An_call (l, _k) -> l
   | An_ident (l, _s, _k) -> l
 
-let annotations = Local_store.s_ref ([] : annotation list)
-let phrases = Local_store.s_ref ([] : Location.t list)
+let annotations = ref ([] : annotation list)
+let phrases = ref ([] : Location.t list)
 
 let record ti =
   if !Clflags.annotations && not (get_location ti).Location.loc_ghost then
