@@ -2142,11 +2142,18 @@ let get_pat_args_lazy p rem =
 
 let prim_obj_tag = Primitive.simple ~name:"caml_obj_tag" ~arity:1 ~alloc:false
 
-let code_force_lazy_block =
-  lazy (transl_prim "CamlinternalLazy" "force_lazy_block")
+let dummy = lazy (Lconst (Const_base (Const_int 42)))
+let code_force_lazy_block = ref dummy
+let code_force_lazy = ref dummy
 
-let code_force_lazy =
-  lazy (transl_prim "CamlinternalLazy" "force_gen")
+let reset () =
+  code_force_lazy_block :=
+    lazy (transl_prim "CamlinternalLazy" "force_lazy_block");
+  code_force_lazy :=
+    lazy (transl_prim "CamlinternalLazy" "force_gen")
+
+let () =
+  reset ()
 
 (* inline_lazy_force inlines the beginning of the code of Lazy.force. When
    the value argument is tagged as:
@@ -2164,7 +2171,7 @@ let call_force_lazy_block varg loc =
      [CamlinternalLazy.force_gen], and discussions on PRs #9998 and #10909).
      Alternatively, [ap_inlined] could be set to [Never_inline] to achieve a
      similar result. *)
-  let force_fun = Lazy.force code_force_lazy_block in
+  let force_fun = Lazy.force !code_force_lazy_block in
   Lapply
     { ap_tailcall = Default_tailcall;
       ap_loc = loc;
@@ -2243,7 +2250,7 @@ let inline_lazy_force arg loc =
     Lapply
       { ap_tailcall = Default_tailcall;
         ap_loc = loc;
-        ap_func = Lazy.force code_force_lazy;
+        ap_func = Lazy.force !code_force_lazy;
         ap_args = [ Lconst (Const_base (Const_int 0)); arg ];
         ap_inlined = Never_inline;
         ap_specialised = Default_specialise

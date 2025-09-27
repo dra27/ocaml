@@ -7047,6 +7047,7 @@ driver/compmisc.cmo : \
     typing/types.cmi \
     typing/typemod.cmi \
     utils/misc.cmi \
+    lambda/matching.cmi \
     parsing/location.cmi \
     utils/load_path.cmi \
     typing/ident.cmi \
@@ -7061,6 +7062,7 @@ driver/compmisc.cmx : \
     typing/types.cmx \
     typing/typemod.cmx \
     utils/misc.cmx \
+    lambda/matching.cmx \
     parsing/location.cmx \
     utils/load_path.cmx \
     typing/ident.cmx \
