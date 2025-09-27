@@ -123,3 +123,5 @@ val prepend_dir : Dir.t -> unit
 val get_visible : unit -> Dir.t list
 (** Same as [get_paths ()], except that it returns a [Dir.t list], and doesn't
     include the -H paths. *)
+
+type _ Effect.t += Missing : string -> unit Effect.t

@@ -1305,6 +1305,7 @@ typing/persistent_env.cmo : \
     parsing/unit_info.cmi \
     utils/misc.cmi \
     parsing/location.cmi \
+    utils/local_store.cmi \
     utils/load_path.cmi \
     utils/lazy_backtrack.cmi \
     utils/format_doc.cmi \
@@ -1317,6 +1318,7 @@ typing/persistent_env.cmx : \
     parsing/unit_info.cmx \
     utils/misc.cmx \
     parsing/location.cmx \
+    utils/local_store.cmx \
     utils/load_path.cmx \
     utils/lazy_backtrack.cmx \
     utils/format_doc.cmx \

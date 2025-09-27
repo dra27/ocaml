@@ -31,6 +31,18 @@ type error =
 exception Error of error
 let error err = raise (Error err)
 
+let read_cmi filename =
+  (* XXX Need a default handler for this in the driver which turns this back
+         into the appropriate exception *)
+  if not (Sys.file_exists filename) then begin
+    let store = Local_store.make_snapshot () in
+    Effect.perform (Load_path.Missing filename);
+    Local_store.restore store;
+    if not (Sys.file_exists filename) then
+      failwith (Printf.sprintf "File %s not created?!" filename)
+  end;
+  read_cmi filename
+
 module Persistent_signature = struct
   type t =
     { filename : string;

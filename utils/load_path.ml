@@ -234,3 +234,5 @@ let find_normalized_with_visibility fn =
     (!auto_include_callback Dir.find_normalized fn_uncap, Visible)
 
 let find_normalized fn = fst (find_normalized_with_visibility fn)
+
+type _ Effect.t += Missing : string -> unit Effect.t

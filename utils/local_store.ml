@@ -72,3 +72,24 @@ let with_store slots f =
     List.iter (fun (Slot s) -> s.value <- !(s.ref)) slots;
     global_bindings.is_bound <- false;
   )
+
+(* XXX Not necessarily the final way to do this, but this function makes the
+       stores slightly more on-the-fly *)
+let make_snapshot () =
+  let slots =
+    List.map (function
+      | Table { ref; init } ->
+          let slot = Slot {ref; value = !ref} in
+          ref := init (); slot
+      | Ref r ->
+          if not global_bindings.frozen then r.snapshot <- !(r.ref);
+          let slot = Slot { ref = r.ref; value = !(r.ref) } in
+          r.ref := r.snapshot; slot
+    ) global_bindings.refs
+  in
+  global_bindings.frozen <- true;
+  slots
+
+let restore slots =
+  (* XXX Not yet doing anything with is_bound *)
+  List.iter (fun (Slot s) -> s.ref := s.value) slots

@@ -104,7 +104,7 @@ let tree_predictor dir =
   if not (Filename.is_relative dir) then
     raise (Sys_error ("Skipping " ^ dir))
   else if Filename.basename dir = "boot" then
-    Sys.readdir dir
+    Array.to_list (Sys.readdir dir)
   else
     let files =
       let not_artefact file =
@@ -150,7 +150,7 @@ let tree_predictor dir =
         | _ ->
             files
     in
-    Array.of_list (StringSet.elements (StringSet.fold expand files files))
+    StringSet.elements (StringSet.fold expand files files)
 
 (*
 let compile_interface ~source_file ~output_prefix =
@@ -204,7 +204,7 @@ module Status = struct
     Printf.ksprintf f fmt
 end
 
-let compile_file source_file =
+let compile_file source_file () =
   let source_file = Filename.canonical source_file in
   Status.compiling source_file;
   Compenv.readenv Format.std_formatter (Before_compile source_file);
@@ -969,6 +969,22 @@ let programs = programs @ List.map build_tool tools
 let get_objects files =
   List.filter_map (fun file -> if Filename.extension file = ".ml" then Some (Compenv.output_prefix file ^ ".cmo") else None) files
 
+let rec execute task =
+  try task ()
+  with effect (Load_path.Missing path), k ->
+    if Filename.extension path <> ".cmi" then begin
+      Printf.eprintf "Not a .cmi?!\n";
+      exit 1
+    end;
+    let file = Filename.chop_extension path ^ ".mli" in
+    execute (compile_file file);
+    execute (Effect.Deep.continue k)
+
+let compile_files files =
+  Clflags.compile_only := true;
+  List.iter execute (List.map compile_file files);
+  Clflags.compile_only := false
+
 let compare this that =
   let that = Filename.concat "install" that in
   let this_md5 = In_channel.with_open_bin this (fun ic -> Digest.channel ic (-1)) in
@@ -980,17 +996,16 @@ let compare this that =
   end
 
 let compile_library (name, install_name, flags, files) =
+  let files = List.filter (fun file -> Filename.extension file <> ".mli") files in
   Bytelibrarian.reset ();
-  Clflags.compile_only := true;
-  List.iter compile_file files;
-  Clflags.compile_only := false;
+  compile_files files;
   List.iter set_flag flags;
   Compmisc.init_path ();
   Bytelibrarian.create_archive (get_objects files) (name ^ ".cma");
   List.iter reset_flag flags;
   compare (name ^ ".cma") (Filename.concat "lib" (Filename.concat "ocaml" (install_name ^ ".cma")))
 
-let compile_stdlib_module (name, flags) =
+let compile_stdlib_module (name, flags) () =
   List.iter set_flag flags;
   let restore = !Clflags.include_dirs in
   Clflags.include_dirs := [];
@@ -998,14 +1013,32 @@ let compile_stdlib_module (name, flags) =
     Clflags.output_name := None
   else
     Clflags.output_name := Some ("stdlib__" ^ String.capitalize_ascii (Filename.chop_extension name) ^ (if Filename.extension name = ".mli" then ".cmi" else ".cmo"));
-  compile_file name;
+  compile_file name ();
   Clflags.include_dirs := restore;
   List.iter reset_flag flags
+
+let rec stdlib_execute task =
+  try task ()
+  with effect (Load_path.Missing path), k ->
+    if Filename.extension path <> ".cmi" then begin
+      Printf.eprintf "Not a .cmi?!\n";
+      exit 1
+    end;
+    let file = Filename.chop_extension path ^ ".mli" in
+    let file =
+      if String.starts_with ~prefix:"stdlib__" file then
+        String.uncapitalize_ascii (String.sub file 8 (String.length file - 8))
+      else
+        file
+    in
+    stdlib_execute (compile_stdlib_module (file, stdlib_compflags path));
+    stdlib_execute (Effect.Deep.continue k)
 
 let compile_stdlib modules =
   Sys.chdir "stdlib";
   List.iter set_flag stdlib_compile_flags;
   Clflags.compile_only := true;
+  let modules = List.filter (fun name -> Filename.extension name <> ".mli") modules in
   let modules =
     let f name =
       let artefact =
@@ -1016,9 +1049,9 @@ let compile_stdlib modules =
       in
       (name, stdlib_compflags artefact)
     in
-    List.map f modules @ [("std_exit.mli", []); ("std_exit.ml", [])]
+    List.map f modules @ [(*("std_exit.mli", []);*) ("std_exit.ml", [])]
   in
-  List.iter compile_stdlib_module modules; (* XXX Bad sign that std_exit.ml needed to be last - presumably a flag being reset for the compilation. This should be at the start of the list *)
+  List.iter stdlib_execute (List.map compile_stdlib_module modules); (* XXX Bad sign that std_exit.ml needed to be last - presumably a flag being reset for the compilation. This should be at the start of the list *)
   Clflags.compile_only := false;
   (* XXX Dreadful duplication... *)
   Bytelibrarian.reset ();
@@ -1030,6 +1063,7 @@ let add_include dir = Clflags.include_dirs := dir :: !Clflags.include_dirs
 
 let compile_program (name, install_name, precompiled, flags, files) =
   let name = if Sys.win32 then name ^ ".exe" else name in
+  let files = List.filter (fun file -> Filename.extension file <> ".mli") files in
   Dll.reset ();
   Symtable.reset ();
   Bytelink.reset ();
@@ -1042,9 +1076,7 @@ let compile_program (name, install_name, precompiled, flags, files) =
     end else
       files
   in
-  Clflags.compile_only := true;
-  List.iter compile_file files;
-  Clflags.compile_only := false;
+  compile_files files;
   List.iter set_flag flags;
   Compmisc.init_path ();
   (* XXX Temporarily: allows comparing without installing first *)
@@ -1062,10 +1094,11 @@ let compile_program (name, install_name, precompiled, flags, files) =
 
 (* XXX main *)
 
-let main () =
+let _ =
   try
-    (* Plumb in the load path *)
-    (*Load_path.readdir_hook := tree_predictor;*)
+    (* XXX This is actually done to freeze the local store, and is therefore
+           something of a hack... *)
+    let _ = Local_store.fresh () in
     List.iter add_include (List.rev include_dirs);
     if Sys.backend_type = Native then
       ()
@@ -1088,5 +1121,5 @@ let main () =
       Status.complete "Build complete!"
     end
   with e -> Location.report_exception Format.err_formatter e
-
-let () = Compmisc.with_standard_handlers main ()
+  | effect Load_path.Dir dir, k ->
+      Effect.Deep.continue k (tree_predictor dir)
