@@ -95,6 +95,38 @@ extern void caml_win32_maperr(DWORD errcode);
 
 #endif /* _WIN32 */
 
+/* C API for manipulating Unix.file_descr. There are two separate notions of
+   file descriptor: those of the C Runtime Library (the CRT) and those of the
+   underlying OS. On Unix systems, these two are the same; on Windows, the CRT
+   notion is equivalent to its Unix counterpart, but the OS notion is not. */
+
+#define CAML_UNIX_FILE_DESCR_API
+
+#ifdef _WIN32
+typedef HANDLE file_descriptor_os;
+#else
+typedef int file_descriptor_os;
+#endif
+
+/* Allocates a Unix.file_descr based on an OS file descriptor. */
+value caml_unix_file_descr_of_os(file_descriptor_os h);
+
+/* Allocates a Unix.file_descr based on a CRT file descriptor. */
+value caml_unix_file_descr_of_fd(int fildes);
+
+/* Returns the CRT file descriptor associated with a Unix.file_descr. On
+   Windows, this will allocate one, if necessary.
+
+   There is no caml_unix_os_of_file_descr, as this function is not useful. Code
+   which needs to deal with OS file descriptors in a portable way should instead
+   use caml_unix_fd_of_file_descr to obtain a CRT file descriptor and then use
+   CRT functions (for example, _get_osfhandle) to access the OS file descriptor.
+   Using Handle_val, Socket_val and Descr_kind_val is not recommended, as the
+   interface of these is unstable and could change (in particular, there is not
+   a permanent guarantee that a Unix.file_descr always has an OS file descriptor
+   associated with it). */
+int caml_unix_fd_of_file_descr(value fd);
+
 #define Nothing ((value) 0)
 
 extern value caml_unix_error_of_code (int errcode);
