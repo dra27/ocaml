@@ -236,6 +236,8 @@ let stdin = 0
 let stdout = 1
 let stderr = 2
 
+external fdopen : int -> file_descr = "caml_unix_fdopen"
+
 type open_flag =
     O_RDONLY
   | O_WRONLY
