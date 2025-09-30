@@ -350,6 +350,30 @@ val stdout : file_descr
 val stderr : file_descr
 (** File descriptor for standard error. *)
 
+val fdopen : int -> file_descr
+(** [fdopen stream_number] allocates a {!file_descr} corresponding to the given
+    file stream number. The returned [file_descr] inherits the same mode as the
+    file stream (unlike the corresponding function in C, there is no ability to
+    restrict the mode further).
+
+    This function is typically only required where processes are known to be
+    executed (on both Unix and Windows) with file streams opened in addition to
+    the standard streams {!stdin}, {!stdout} and {!stderr}. In this case, the
+    program opens these known file streams at startup.
+
+    When using C libraries which return file stream numbers, these numbers
+    should not be returned to OCaml code, but rather
+    [caml_unix_file_descr_of_fd] should be used in the C stub wrapping such
+    calls to allocate a [file_descr] value to be returned to OCaml code.
+    Likewise, when a [file_descr] value needs to be passed to a function in a
+    C library, [caml_unix_fd_of_file_descr] exists to allow this to be done in
+    the C stub. OCaml code should never need to store a file stream number as an
+    [int].
+
+    @raise Invalid_argument for stream numbers less than 3
+
+    @since 5.5 *)
+
 type open_flag =
     O_RDONLY                    (** Open for reading *)
   | O_WRONLY                    (** Open for writing *)

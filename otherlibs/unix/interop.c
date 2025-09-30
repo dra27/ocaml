@@ -15,6 +15,7 @@
 #define CAML_INTERNALS
 
 #include <caml/mlvalues.h>
+#include <caml/fail.h>
 #include "caml/unixsupport.h"
 
 #ifdef _WIN32
@@ -69,4 +70,15 @@ int caml_unix_fd_of_file_descr(value fd)
   return caml_win32_CRT_fd_of_filedescr(fd);
 
 #endif
+}
+
+CAMLprim value caml_unix_fdopen(value stream_number)
+{
+  /* Negative stream numbers are invalid and the standard streams should not be
+     retrieved using this function. */
+  int fd = Int_val(stream_number);
+  if (fd < 3)
+    caml_invalid_argument("Unix.fdopen");
+  else
+    return caml_unix_file_descr_of_fd(fd);
 }
