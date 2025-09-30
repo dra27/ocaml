@@ -182,3 +182,16 @@ CAMLprim value caml_unix_filedescr_of_fd(value vfd)
   CRT_field_val(res) = crt_fd;
   return res;
 }
+
+CAMLprim value caml_win32_introspect_file_descr(value file_descr)
+{
+  CAMLparam1(file_descr);
+  int fd = caml_win32_get_CRT_fd(file_descr);
+
+  CAMLreturn(
+    caml_alloc_4(0,
+                 caml_copy_nativeint((intnat)Handle_val(file_descr)),
+                 Val_bool(Descr_kind_val(file_descr) == KIND_SOCKET),
+                 (fd == NO_CRT_FD ? Val_none : caml_alloc_some(Val_int(fd))),
+                 Val_bool(Flags_fd_val(file_descr) & FLAGS_FD_IS_BLOCKING)));
+}
