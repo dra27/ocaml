@@ -75,18 +75,15 @@ value caml_win32_alloc_socket(SOCKET s)
   return res;
 }
 
-#if 0
-/* PR#4750: this function is no longer used */
-value win_alloc_handle_or_socket(HANDLE h)
+value caml_win32_alloc_handle_or_socket(HANDLE h)
 {
-  value res = win_alloc_handle(h);
-  int opt;
-  int optlen = sizeof(opt);
-  if (getsockopt((SOCKET) h, SOL_SOCKET, SO_TYPE, (char *)&opt, &optlen) == 0)
-    Descr_kind_val(res) = KIND_SOCKET;
-  return res;
+  int _opt, _optlen = sizeof(int);
+  /* Trivial call to getsockopt to test if h is a SOCKET: values are unused */
+  if (getsockopt((SOCKET)h, SOL_SOCKET, SO_TYPE, (char *)&_opt, &_optlen) == 0)
+    return caml_win32_alloc_socket((SOCKET)h);
+  else
+    return caml_win32_alloc_handle(h);
 }
-#endif
 
 /* Mapping of Windows error codes to POSIX error codes */
 

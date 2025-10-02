@@ -250,12 +250,35 @@ let nice _ = invalid_arg "Unix.nice not implemented"
 
 type file_descr
 
+external details :
+  file_descr -> nativeint * socket:bool * int option * blocking:bool
+    = "caml_win32_introspect_file_descr"
+
+let pp_file_descr output_string channel descr =
+  let handle, ~socket, fd, ~blocking = details descr in
+  let kind =
+    if socket then
+      "SOCKET"
+    else
+      "HANDLE"
+  in
+  let blocking =
+    if blocking then
+      " (FD_IS_BLOCKING)"
+    else
+      ""
+  in
+  let fd = Option.fold ~none:"" ~some:(Printf.sprintf "; fd %d") fd in
+  output_string channel (Printf.sprintf "<%s 0x%nx%s%s" kind handle blocking fd)
+
 external filedescr_of_unix_fd_num : int -> file_descr
                                   = "caml_unix_filedescr_of_fd"
 
 let stdin = filedescr_of_unix_fd_num 0
 let stdout = filedescr_of_unix_fd_num 1
 let stderr = filedescr_of_unix_fd_num 2
+
+external fdopen : int -> file_descr = "caml_unix_fdopen"
 
 type open_flag =
     O_RDONLY

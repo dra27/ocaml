@@ -46,8 +46,9 @@ endif
 # C source files common to both Unix and Windows
 COMMON_C_SOURCES = $(addsuffix .c, \
   access addrofstr chdir chmod cst2constr cstringv execv execve execvp fsync \
-  mkdir exit getaddrinfo getcwd gethost gethostname getnameinfo getproto \
-  getserv gmtime mmap_ba putenv rename rmdir socketaddr strofaddr time unlink)
+  mkdir exit fdopen getaddrinfo getcwd gethost gethostname getnameinfo \
+  getproto getserv gmtime mmap_ba putenv rename rmdir socketaddr strofaddr \
+  time unlink)
 
 # OS-specific C source files
 OS_C_SOURCES = $(addsuffix _$(UNIX_OR_WIN32).c, \

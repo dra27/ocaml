@@ -29,10 +29,9 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <wspiapi.h>
+#include <io.h>
 #else /* Unix */
-#ifndef _WIN32
 #include <unistd.h>
-#endif
 #endif
 
 #ifdef __cplusplus
@@ -65,6 +64,7 @@ struct filedescr {
 
 extern value caml_win32_alloc_handle(HANDLE);
 extern value caml_win32_alloc_socket(SOCKET);
+extern value caml_win32_alloc_handle_or_socket(HANDLE);
 
 #define NO_CRT_FD (-1)
 #define GETTING_CRT_FD (-2)
@@ -94,6 +94,56 @@ extern void caml_win32_maperr(DWORD errcode);
 #define CAML_NT_EPOCH_100ns_TICKS 116444736000000000ULL
 
 #endif /* _WIN32 */
+
+/* C API for manipulating Unix.file_descr. There are two separate notions of
+   file descriptor: those of the C Runtime Library (the CRT) and those of the
+   underlying OS. On Unix systems, these two are the same; on Windows, the CRT
+   notion is equivalent to its Unix counterpart, but the OS notion is not. */
+
+#define CAML_UNIX_FILE_DESCR_API
+
+/* Allocates a Unix.file_descr based on an OS file descriptor. */
+#ifndef _WIN32
+Caml_inline value caml_unix_file_descr_of_os(int fd)
+{
+  return Val_int(fd);
+}
+#else
+Caml_inline value caml_unix_file_descr_of_os(HANDLE h)
+{
+  return caml_win32_alloc_handle_or_socket(h);
+}
+#endif
+
+/* Allocates a Unix.file_descr based on a CRT file descriptor. */
+Caml_inline value caml_unix_file_descr_of_fd(int fildes)
+{
+#ifndef _WIN32
+  return caml_unix_file_descr_of_os(fildes);
+#else
+  return caml_unix_file_descr_of_os((HANDLE)_get_osfhandle(fildes));
+#endif
+}
+
+/* Returns the CRT file descriptor associated with a Unix.file_descr. On
+   Windows, this will allocate one, if necessary.
+
+   There is no caml_unix_os_of_file_descr, as this function is not useful. Code
+   which needs to deal with OS file descriptors in a portable way should instead
+   use caml_unix_fd_of_file_descr to obtain a CRT file descriptor and then use
+   CRT functions (for example, _get_osfhandle) to access the OS file descriptor.
+   Using Handle_val, Socket_val and Descr_kind_val is not recommended, as the
+   interface of these is unstable and could change (in particular, there is not
+   a permanent guarantee that a Unix.file_descr always has an OS file descriptor
+   associated with it). */
+Caml_inline int caml_unix_fd_of_file_descr(value fd)
+{
+#ifndef _WIN32
+  return Int_val(fd);
+#else
+  return caml_win32_CRT_fd_of_filedescr(fd);
+#endif
+}
 
 #define Nothing ((value) 0)
 

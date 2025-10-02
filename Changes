@@ -138,6 +138,10 @@ Working version
 
 ### Other libraries:
 
+- #9052, #14???: Add Unix.pp_file_descr for use in debugging to provide a
+  printable/loggable representation of Unix.file_descr values.
+  (David Allsopp, review by ???)
+
 * #14046: On Windows, `Unix.kill pid Sys.sigkill` causes the receiving process
   to exit with code ERROR_PROCESS_ABORTED (1067) instead of 0.
   (Nicolás Ojeda Bär, review by Miod Vallat, Antonin Décimo and David Allsopp)
@@ -152,6 +156,15 @@ Working version
   calling `caml_sys_system_command` on Windows. Error with EINVAL
   instead of ENOENT if the command string is not a valid C string.
   (Antonin Décimo, review by Gabriel Scherer and Nicolás Ojeda Bär)
+
+- #14???: Add a C API in unixsupport.h for allowing manipulation (in C) of
+  Unix.file_descr values in order to facilitate portable interop with third
+  party C code using file descriptors.
+  (David Allsopp, review by ???)
+
+- #14???: Add Unix.fdopen to allow programs which are started with additional
+  file streams opened to be able to use them portably.
+  (David Allsopp, review by ???)
 
 ### Tools:
 

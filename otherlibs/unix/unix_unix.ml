@@ -229,9 +229,14 @@ external nice : int -> int = "caml_unix_nice"
 
 type file_descr = int
 
+let pp_file_descr output_string channel descr =
+  output_string channel (Printf.sprintf "<fd %d>" descr)
+
 let stdin = 0
 let stdout = 1
 let stderr = 2
+
+external fdopen : int -> file_descr = "caml_unix_fdopen"
 
 type open_flag =
     O_RDONLY
