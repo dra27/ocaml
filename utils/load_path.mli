@@ -125,3 +125,5 @@ val get_visible : unit -> Dir.t list
     include the -H paths. *)
 
 type _ Effect.t += Missing : string -> unit Effect.t
+
+val hooked : bool ref

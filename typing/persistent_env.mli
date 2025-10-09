@@ -30,6 +30,8 @@ exception Error of error
 val report_error: error Format_doc.format_printer
 val report_error_doc: error Format_doc.printer
 
+type _ Effect.t += CMI : string -> Cmi_format.cmi_infos Effect.t
+
 module Persistent_signature : sig
   type t =
     { filename : string; (** Name of the file containing the signature. *)

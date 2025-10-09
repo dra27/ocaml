@@ -236,3 +236,5 @@ let find_normalized_with_visibility fn =
 let find_normalized fn = fst (find_normalized_with_visibility fn)
 
 type _ Effect.t += Missing : string -> unit Effect.t
+
+let hooked = ref false
