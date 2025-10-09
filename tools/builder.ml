@@ -978,6 +978,7 @@ let programs = programs @ List.map build_tool tools
 let get_objects files =
   List.filter_map (fun file -> if Filename.extension file = ".ml" then Some (Compenv.output_prefix file ^ ".cmo") else None) files
 
+let cmis = Hashtbl.create 512
 let rec execute task =
   try task ()
   with effect (Load_path.Missing path), k ->
@@ -988,6 +989,20 @@ let rec execute task =
     let file = Filename.chop_extension path ^ ".mli" in
     execute (compile_file file);
     execute (Effect.Deep.continue k)
+  | effect (Persistent_env.CMI path), k ->
+      let cmi =
+        try Hashtbl.find cmis path
+        with Not_found ->
+          if Filename.basename (Filename.dirname path) <> "boot" then begin
+            let file = Filename.chop_extension path ^ ".mli" in
+            execute (compile_file file)
+          end;
+          let cmi = Cmi_format.read_cmi path in
+          Hashtbl.add cmis path cmi;
+          cmi
+      in
+      let task () = Effect.Deep.continue k (cmi : Cmi_format.cmi_infos) in
+      execute task
 
 let compile_files files =
   Clflags.compile_only := true;
@@ -1042,6 +1057,24 @@ let rec stdlib_execute task =
     in
     stdlib_execute (compile_stdlib_module (file, stdlib_compflags path));
     stdlib_execute (Effect.Deep.continue k)
+  | effect (Persistent_env.CMI path), k ->
+      let cmi =
+        try Hashtbl.find cmis path
+        with Not_found ->
+          let file = Filename.chop_extension path ^ ".mli" in
+          let file =
+            if String.starts_with ~prefix:"stdlib__" file then
+              String.uncapitalize_ascii (String.sub file 8 (String.length file - 8))
+            else
+              file
+          in
+          stdlib_execute (compile_stdlib_module (file, stdlib_compflags path));
+          let cmi = Cmi_format.read_cmi path in
+          Hashtbl.add cmis path cmi;
+          cmi
+      in
+      let task () = Effect.Deep.continue k cmi in
+      stdlib_execute task
 
 let compile_stdlib modules =
   Sys.chdir "stdlib";
@@ -1110,6 +1143,7 @@ let _ =
     (* XXX This is actually done to freeze the local store, and is therefore
            something of a hack... *)
     let _ = Local_store.fresh () in
+    Load_path.hooked := true;
     List.iter add_include (List.rev include_dirs);
     if Sys.backend_type = Native then
       ()
