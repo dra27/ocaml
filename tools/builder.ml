@@ -100,7 +100,13 @@ let never_built =
    "utils/config.fixed.ml"]
   |> StringSet.of_list
 
+let cwd = ref "."
+let cache = Hashtbl.create 42
+
 let tree_predictor dir =
+  try Hashtbl.find cache (!cwd, dir)
+  with Not_found ->
+    let results =
   if not (Filename.is_relative dir) then
     raise (Sys_error ("Skipping " ^ dir))
   else if Filename.basename dir = "boot" then
@@ -151,6 +157,9 @@ let tree_predictor dir =
             files
     in
     StringSet.elements (StringSet.fold expand files files)
+    in
+    Hashtbl.add cache (!cwd, dir) results;
+    results
 
 (*
 let compile_interface ~source_file ~output_prefix =
@@ -1036,6 +1045,7 @@ let rec stdlib_execute task =
 
 let compile_stdlib modules =
   Sys.chdir "stdlib";
+  cwd := "stdlib";
   List.iter set_flag stdlib_compile_flags;
   Clflags.compile_only := true;
   let modules = List.filter (fun name -> Filename.extension name <> ".mli") modules in
@@ -1057,6 +1067,7 @@ let compile_stdlib modules =
   Bytelibrarian.reset ();
   Bytelibrarian.create_archive (List.filter_map (fun (name, _) -> if Filename.extension name = ".mli" || name = "std_exit.ml" then None else let name = Filename.chop_extension name in Some (if String.starts_with ~prefix:"camlinternal" name || name = "stdlib" then name ^ ".cmo" else "stdlib__" ^ String.capitalize_ascii name ^ ".cmo")) modules) "stdlib.cma";
   Sys.chdir "..";
+  cwd := ".";
   compare "stdlib/stdlib.cma" (Filename.concat "lib" (Filename.concat "ocaml" "stdlib.cma"))
 
 let add_include dir = Clflags.include_dirs := dir :: !Clflags.include_dirs
