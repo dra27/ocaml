@@ -240,6 +240,8 @@ case "$1" in
     esac
     find "../$BUILD_PREFIX-$PORT" -type f \( -name \*.dll -o -name \*.so \) | \
       xargs rebase -i "$ARG"
+    find "../$BUILD_PREFIX-$PORT" -type f \( -name \*.dll -o -name \*.so \) | \
+      xargs ldd
 
     ;;
 esac
