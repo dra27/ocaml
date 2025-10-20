@@ -1,19 +1,7 @@
-OCaml 5.3 maintenance version
+OCaml 5.4 maintenance version
 -----------------------------
 
 ### Runtime system:
-
-* #11449, #13497: Add caml_stat_char_array_{to,of}_os functions allowing
-  conversion of string data which may contain NUL characters. Correct
-  implementation of caml_stat_strdup_to_utf16 to raise Out_of_memory instead of
-  returning of NULL (the behaviour of caml_stat_strdup_to_os was inconsistent
-  between Unix/Windows).
-  (David Allsopp, review by Nick Barnes, Antonin Décimo and Miod Vallat)
-
-- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
-  shared_libs_path item in `ocamlrun -config` in addition to displaying the
-  entries found in ld.conf.
-  (David Allsopp, review by Stephen Dolan)
 
 * #14???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
   "../<path...>") are interpreted as being relative to the directory ld.conf
@@ -34,31 +22,20 @@ OCaml 5.3 maintenance version
 
 ### Build system:
 
-- #13494: Use native symlinks on Windows for the OCaml installation, reducing
-  disk usage considerably.
-  (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
-
-- #13789: Harden the escaping of backslashes when generating
-  runtime/build_config.h (in particular, if the underlying implementation of sh
-  is dash, rather than bash, this now works correctly).
-  (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
-
 - #14???: New configure option --with-stublibs allows an additional directory
   to be added to the start of ld.conf. Additionally, the stublibs subdirectory
   is no longer created, nor added to ld.conf, when building OCaml with
   --disable-shared.
   (David Allsopp, review by ???)
 
-<<<<<<<
-=======
 - #14???: Normalise `--prefix` when compiling on MSYS2 in the same way as is
   already done on Cygwin. In particular, backslashes are converted to slashes
   and MSYS2-style paths (e.g. resulting from `--prefix $PWD/install`) are
   converted to Windows-style paths.
   (David Allsopp, review by ???)
 
-OCaml 5.4.0
----------------
+OCaml 5.4.0 (9 October 2025)
+----------------------------
 
 (Changes that can break existing programs are marked with a "*")
 
@@ -133,7 +110,7 @@ OCaml 5.4.0
 - #13768: Add Either.get_left and Either.get_right
   (T. Kinsart, review by Nicolás Ojeda Bär and Florian Angeletti)
 
-- #13570, #13794: Format, add an out_width function to Format device for
+* #13570, #13794: Format, add an out_width function to Format device for
    approximating unicode width.
   (Florian Angeletti, review by Nicolás Ojeda Bär, Daniel Bünzli,
    and Gabriel Scherer)
@@ -395,7 +372,7 @@ OCaml 5.4.0
 - #13921: Set cloexec correctly on CRT file descriptors created by the Unix
   library on Windows. The inheritance on the underlying Win32 handles was
   correctly set, but the book-keeping for the CRT was leaking the value of
-  non-inherited handles which combined with re-use of HANDLE values within
+  non-inherited handles which combined with reuse of HANDLE values within
   processes could appear to make a CRT file descriptor "re-open".
   (David Allsopp, review by Nicolás Ojeda Bär)
 
@@ -463,6 +440,10 @@ OCaml 5.4.0
   fails. Similarly for anonymous functor calls (of the form `F(struct ... end))
   (Clement Blaudeau, review by Gabriel Scherer)
 
+- #13747: Document support for native debugging with GDB and LLDB.
+   (Tim McGilchrist, review by Daniel Bünzli, Samuel Hym, Olivier Nicole
+   and Antonin Décimo)
+
 ### Compiler user-interface and warnings:
 
 - #13817: align spellchecking hints with the possibly misspelled identifier/
@@ -516,7 +497,7 @@ OCaml 5.4.0
   (Samuel Vivien, review by Florian Angeletti and Gabriel Scherer)
 
 - #13814, 13898: Add an `unused-type-declaration` warning when using
-  a `t as 'a` with no other occurences of `'a`
+  a `t as 'a` with no other occurrences of `'a`
   (Samuel Vivien, review by Florian Angeletti, Kate Deplaix)
 
 - #13818: better delimited hints in error message
@@ -595,7 +576,7 @@ OCaml 5.4.0
   content of a `Tpackage` node
   (Samuel Vivien, review by Florian Angeletti)
 
-- #13866: Modified occurence check that prevents recursive types for it to see
+- #13866: Modified occurrence check that prevents recursive types for it to see
   the checked type as a graph rather than a tree
   (Samuel Vivien, report by Didier Remy, review by Florian Angeletti
    and Jacques Garrigue)
@@ -640,16 +621,175 @@ OCaml 5.4.0
   rejected too.
   (David Allsopp, review by Antonin Décimo and Gabriel Scherer)
 
->>>>>>>
 ### Bug fixes:
+
+- #13819: Fix field initialisation bug in runtime events subsystem.
+  (Nick Barnes, review by Gabriel Scherer).
+
+- #13977: Pass `-fPIC` when compiling C files using `ocamlopt`. This was a
+  regression in OCaml 5.3.
+  (Nicolás Ojeda Bär, review by Daniel Bünzli and Gabriel Scherer)
+
+- #13957: Allow 'effect' as attribute id.
+  (Pieter Goetschalckx, review by Nicolás Ojeda Bär and Florian Angeletti)
+
+- #13691 #13895: Make four globals underlying Gc.control atomic to avoid C data
+  races against them.
+  (Jan Midtgaard, review by Miod Vallat, Sadiq Jaffer and Antonin Décimo)
+
+- #13454: Output a correct trace of the C_CALLN bytecode.
+  (Miod Vallat, review by Antonin Décimo)
+
+- #13595: Use x19 as Canonical Frame Address (CFA) register. This would cause
+  backtraces to be truncated when calling no alloc C code.
+  (Tim McGilchrist, report by Nick Barnes, review by Nick Barnes)
+
+* #13605: Fix ungenerated constraints when they where impossible due to polyvars
+  issues
+  (Samuel Vivien, review by Florian Angeletti, Richard Eisenberg
+   and Jacques Garrigue)
+
+- #13677, #13679: domain.c: remove backup_thread_running to simplify
+  concurrent state updates to the backup thread status.
+  (Gabriel Scherer, review by Jan Midtgaard and Miod Vallat,
+   report by Jan Midtgaard)
+
+- #13896, #14098: ocamldoc, do not wrap module description in a paragraph tag
+  inside the table of modules
+  (Florian Angeletti, report by John Whitington, review by Gabriel Scherer)
+
+- #13703: wrong explanation for some polymorphic-variant subtyping errors
+  (Gabriel Scherer, review by Jacques Garrigue,
+   report by Wiktor Kuchta and Richard Eisenberg)
+
+- #13710: Support unicode identifiers in comments.
+  (Pieter Goetschalckx, review by Florian Angeletti and Gabriel Scherer)
+
+- #13763: Track type of variables bound by as-patterns
+  (Leo White, review by Gabriel Scherer, port by Vincent Laviron)
+
+- #13778, #13811: do not warn for unused type declarations when the type is used
+  in a first-class module type (`module S with type t = int)`.
+  (Florian Angeletti, report by Nicolás Ojeda Bär, review by Gabriel Scherer)
+
+- #13790: Fix bytecode-only build of Cygwin when flexlink is being bootstrapped
+  with the compiler.
+  (David Allsopp, review by Antonin Décimo and Miod Vallat)
+
+- #13812: Add forgotten check about the validity of the type variable name on
+  the right-hand side of `_ as _`.
+  (Samuel Vivien, review by Gabriel Scherer)
+
+- #13845: Fix bug in untypeast/pprintast for value bindings with polymorphic
+  type annotations.
+  (Chris Casinghino, review by Florian Angeletti and Gabriel Scherer)
+
+- #13930, #13933: Fix bugs in recursive values definitions involving
+  lazy values that have already been evaluated.
+  (Gabriel Scherer, review by Vincent Laviron, report by Vincent Laviron)
+
+- #13867: Fix bug with some recursive bindings of lazy values.
+  (Guillaume Bury and Vincent Laviron, review by Stefan Muenzel
+   and Gabriel Scherer)
+
+- #13931: fix bugs in nested recursive value definitions.
+  (Gabriel Scherer, review by Vincent Laviron,
+   report by Vincent Laviron)
+
+- #13875, #13878: Add dedicated constructor for mutable variable access in
+  Cmm to prevent bugs linked to incorrect handling of coeffects.
+  (Vincent Laviron, review by Gabriel Scherer)
+
+- #13880: Make object stat counters atomic
+  (Dimitris Mostrous, review by Gabriel Scherer and Nicolás Ojeda Bär)
+
+- #13172, #13829: Fix a missing check of illegal recursive module-type
+  definitions
+  (Clement Blaudeau, review by Florian Angeletti)
+
+- #13541, #13777: Using C++11 `thread_local` causes name-mangling
+  issues when linking with flexlink on Cygwin.
+  (Antonin Décimo and David Allsopp, report by Kate Deplaix)
+
+* #13874, #13882: Make evaluation order consistent for applications when using
+  the non-flambda native compiler
+  (Vincent Laviron, report by Jean-Marie Madiot, review by Gabriel Scherer)
+
+- #13942: Fix assertion on empty array case
+  (Olivier Nicole, review by Gabriel Scherer)
+
+- #13950: Avoid tearing in `Array.sub`
+  (Gabriel Scherer and Olivier Nicole, report by Jan Midtgaard, review by
+   Gabriel Scherer)
+
+- #13928, #13944: Fix handling of excessively nested unboxed types
+  (Vincent Laviron, review by Gabriel Scherer)
+
+- #13987: Remove a spurious TSan report in case of benign data race between
+  major GC read and write from the mutator (fixes #13427)
+  (Olivier Nicole, report by Thomas Leonard, review by Gabriel Scherer)
 
 - #14007, #14015: Fix memory corruption when an exception is raised during
   demarshaling.
   (Benoît Vaugon, review by David Allsopp and Gabriel Scherer)
 
-- #13790: Fix bytecode-only build of Cygwin when flexlink is being bootstrapped
-  with the compiler.
-  (David Allsopp, review by Antonin Décimo and Miod Vallat)
+- #14025: fix data race between compaction and domain termination
+  (Gabriel Scherer, review by Jan Midtgaard,
+   report by Jan Midtgaard)
+
+- #13956 Fix a regression introduced in #13308 triggering wrong unused warnings.
+  (Ulysse Gérard, review by Florian Angeletti)
+
+- #14070: also point to label mismatches in error messages for labelled tuples
+  (Florian Angeletti, review by Gabriel Scherer)
+
+- #14088, #14091: fix non-deterministic code generation in
+  matching.ml (backport of rescript-lang/rescript#7557)
+  (Christiano Calgano, review by Gabriel Scherer and Vincent Laviron)
+
+- #14105: Fix a loop in Pprintast that could result in a hang when printing
+  constructor `(::)` in isolation.
+  (Ulysse Gérard, review by Nicolás Ojeda Bär and Florian Angeletti)
+
+- #14108: toplevel, fix a typo in directive type mismatch
+  (Florian Angeletti, review by Gabriel Scherer)
+
+- #13586, #14093: Fix closing an out_channel during flush
+  (Stephen Dolan, report by Jan Midtgaard, investigation by Nick Roberts,
+   review by Antonin Décimo and Miod Vallat)
+
+- #14101, #14139: define atomic helper types inside `caml/misc.h` to improve
+  header compatibility with C++
+  (Florian Angeletti, report by Kate Deplaix, review by Gabriel Scherer)
+
+- #14135: Fix a rare internal typechecker error when combining recursive
+  modules, polymorphic fields or methods, and constrained type parameters.
+  (Florian Angeletti, review by Gabriel Scherer)
+
+- #14169: runtime, fix cache miss within the stack fragments cache
+  (Florian Angeletti, review by Gabriel Scherer)
+
+- #14196, #14197: ocamlprof: do not instrument unreachable clauses
+  (Gabriel Scherer, review by Nicolás Ojeda Bär, report by Ali Caglayan)
+
+- #14200, #14202 : bad variance check with private aliases
+  (Jacques Garrigue, report and review by Stephen Dolan)
+
+- #14061, #14209: fix a memory-ordering bug in Weak.set that could
+  result in uninitialized memory seen by Weak.get on another domain.
+  (Damien Doligez, review by Gabriel Scherer)
+
+- #14214, #14221: fix a confused error message for module inclusions,
+  functor error messages were missing some type equalities potentially leading
+  to nonsensical "type t is not compatible with type t" submessage
+  (Florian Angeletti, report by Basile Clément, review by Gabriel Scherer)
+
+- #14238: Fix certain variadic macros in misc.h which could trigger C warnings
+  under certain conditions in prerelease versions of OCaml 5.4.
+  (Antonin Décimo, review by Nicolás Ojeda Bär)
+
+- #14287: Bugfix for GC root mishandling in memprof.c
+  (Stephen Dolan, review by Leo White)
 
 OCaml 5.3.0 (8 January 2025)
 ----------------------------
@@ -757,7 +897,7 @@ OCaml 5.3.0 (8 January 2025)
   (Antonin Décimo, review by David Allsopp)
 
 - #10696: Introduce __has_attribute and __has_c_attributes in
-  <caml/misc.h> to test the support of specific atributes in C
+  <caml/misc.h> to test the support of specific attributes in C
   code. Introduce fallthrough as a wrapper around the fallthrough
   attribute.
   (Antonin Décimo, review by Nicolás Ojeda Bär, Xavier Leroy, and

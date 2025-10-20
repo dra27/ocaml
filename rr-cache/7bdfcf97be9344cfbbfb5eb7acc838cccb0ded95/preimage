@@ -14,6 +14,46 @@ OCaml 5.4 maintenance version
   both Windows and Unix.
   (David Allsopp, review by ???)
 
+- #14???: Added --with-relative-bindir which allows the runtime and the
+  compilers to locate the Standard Library relative to where the binaries
+  themselves are installed, removing the absolute path previously embedded in
+  caml_standard_library_default. Executables linked with `ocamlc -custom` now
+  always attempt to load bytecode from the executable itself, rather than first
+  trying `argv[0]`.
+  (David Allsopp, review by ???)
+
+- #14???: Introduce Runtime IDs for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system. The IDs are used, along with the host
+  triplet, to provide mangled names for the ocamlrun executable and its variants
+  and the DLL versions of both the bytecode and native runtimes, with symlinks
+  created for the original names. They are also used to mangle the names of stub
+  libraries so that stub libraries compiled for a given configuration of the
+  runtime will only be sought by that runtime. The behaviour is disabled by
+  configuring with --disable-suffixing.
+  (David Allsopp, review by ???)
+
+### Tools:
+
+- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by ???)
+
+### Compiler user-interface and warnings:
+
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
+- #14???: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix. New option -runtime-search extends the bytecode executable
+  header to be able to search for the runtime interpreter in the directory
+  containing the executable and in PATH rather than relying on a single
+  hard-coded path.
+  (David Allsopp, review by ???)
+
 ### Internal/compiler-libs changes:
 
 - #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
@@ -28,14 +68,58 @@ OCaml 5.4 maintenance version
   --disable-shared.
   (David Allsopp, review by ???)
 
-- #14???: Normalise `--prefix` when compiling on MSYS2 in the same way as is
-  already done on Cygwin. In particular, backslashes are converted to slashes
-  and MSYS2-style paths (e.g. resulting from `--prefix $PWD/install`) are
-  converted to Windows-style paths.
+- #14???: When targeting native Windows on Cygwin or MSYS2, preserve
+  backslashes in the supplied `--prefix` (in particular, backslashes instead of
+  slashes will then be displayed by `ocamlopt -config-var standard_library`).
+  If the supplied prefix contains a slash, then it is normalised, as
+  previously.
   (David Allsopp, review by ???)
+
+<<<<<<<
+- #14???: New --enable-runtime-search configure option controls the
+  -runtime-search option used to build the bytecode binaries in the compiler
+  distribution. --enable-runtime-search-target controls the default value of
+  -runtime-search used for bytecode executables produced by the compiler.
+  (David Allsopp, review by ???)
+
+### Bug fixes:
+
+- #14071: Fix exception name in Dynlink.Error printer.
+  (Etienne Millon, review by Nicolás Ojeda Bär)
+
+- #13853: Format breaks some line too early when there
+  is a break hint at the end.
+  (Florian Angeletti, review by Gabriel Scherer)
+
+- #10570: Fix handling of caml_sys_argv when exposed directly as an
+  external
+  (Keryan Didier, review by Vincent Laviron and Gabriel Scherer)
+
+- #14155: Audit unexecuted phrases in compiler expect tests and
+  fix all occurences
+  (Stefan Muenzel, review by Gabriel Scherer)
+
+- #14163, #14176: add a filename location to the deprecation alert for implicit
+  uses of libraries bundled with the compiler (unix,re,threads,dynlink)
+  (Florian Angeletti, report by Ali Caglayan, review by Gabriel Scherer)
+
+- #13658, #14181: Fix handling of recursive function types that can result
+  in an unbounded number of labeled or optional arguments.
+  (Stefan Muenzel, report by Samuel Vivien, review by Florian Angeletti)
+
+- #14061, #14209: fix a memory-ordering bug in Weak.set that could
+  result in uninitialized memory seen by Weak.get on another domain.
+  (Damien Doligez, review by Gabriel Scherer)
+
+- #14230 : ocamltest fails to link test program with -custom in some cases
+  (Damien Doligez, review by David Allsopp)
 
 OCaml 5.4.0
 ---------------
+=======
+OCaml 5.4.0 (9 October 2025)
+----------------------------
+>>>>>>>
 
 (Changes that can break existing programs are marked with a "*")
 
@@ -110,7 +194,7 @@ OCaml 5.4.0
 - #13768: Add Either.get_left and Either.get_right
   (T. Kinsart, review by Nicolás Ojeda Bär and Florian Angeletti)
 
-- #13570, #13794: Format, add an out_width function to Format device for
+* #13570, #13794: Format, add an out_width function to Format device for
    approximating unicode width.
   (Florian Angeletti, review by Nicolás Ojeda Bär, Daniel Bünzli,
    and Gabriel Scherer)
@@ -372,7 +456,7 @@ OCaml 5.4.0
 - #13921: Set cloexec correctly on CRT file descriptors created by the Unix
   library on Windows. The inheritance on the underlying Win32 handles was
   correctly set, but the book-keeping for the CRT was leaking the value of
-  non-inherited handles which combined with re-use of HANDLE values within
+  non-inherited handles which combined with reuse of HANDLE values within
   processes could appear to make a CRT file descriptor "re-open".
   (David Allsopp, review by Nicolás Ojeda Bär)
 
@@ -440,6 +524,10 @@ OCaml 5.4.0
   fails. Similarly for anonymous functor calls (of the form `F(struct ... end))
   (Clement Blaudeau, review by Gabriel Scherer)
 
+- #13747: Document support for native debugging with GDB and LLDB.
+   (Tim McGilchrist, review by Daniel Bünzli, Samuel Hym, Olivier Nicole
+   and Antonin Décimo)
+
 ### Compiler user-interface and warnings:
 
 - #13817: align spellchecking hints with the possibly misspelled identifier/
@@ -493,7 +581,7 @@ OCaml 5.4.0
   (Samuel Vivien, review by Florian Angeletti and Gabriel Scherer)
 
 - #13814, 13898: Add an `unused-type-declaration` warning when using
-  a `t as 'a` with no other occurences of `'a`
+  a `t as 'a` with no other occurrences of `'a`
   (Samuel Vivien, review by Florian Angeletti, Kate Deplaix)
 
 - #13818: better delimited hints in error message
@@ -572,7 +660,7 @@ OCaml 5.4.0
   content of a `Tpackage` node
   (Samuel Vivien, review by Florian Angeletti)
 
-- #13866: Modified occurence check that prevents recursive types for it to see
+- #13866: Modified occurrence check that prevents recursive types for it to see
   the checked type as a graph rather than a tree
   (Samuel Vivien, report by Didier Remy, review by Florian Angeletti
    and Jacques Garrigue)
@@ -780,6 +868,13 @@ OCaml 5.4.0
   to nonsensical "type t is not compatible with type t" submessage
   (Florian Angeletti, report by Basile Clément, review by Gabriel Scherer)
 
+- #14238: Fix certain variadic macros in misc.h which could trigger C warnings
+  under certain conditions in prerelease versions of OCaml 5.4.
+  (Antonin Décimo, review by Nicolás Ojeda Bär)
+
+- #14287: Bugfix for GC root mishandling in memprof.c
+  (Stephen Dolan, review by Leo White)
+
 OCaml 5.3.0 (8 January 2025)
 ----------------------------
 
@@ -886,7 +981,7 @@ OCaml 5.3.0 (8 January 2025)
   (Antonin Décimo, review by David Allsopp)
 
 - #10696: Introduce __has_attribute and __has_c_attributes in
-  <caml/misc.h> to test the support of specific atributes in C
+  <caml/misc.h> to test the support of specific attributes in C
   code. Introduce fallthrough as a wrapper around the fallthrough
   attribute.
   (Antonin Décimo, review by Nicolás Ojeda Bär, Xavier Leroy, and

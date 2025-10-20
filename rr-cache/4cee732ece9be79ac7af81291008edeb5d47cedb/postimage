@@ -1,168 +1,5 @@
-<<<<<<<
 OCaml 5.3 maintenance version
 -----------------------------
-=======
-OCaml 5.4 maintenance version
------------------------------
-
-
-### Build system:
-
-- #14???: New configure option --with-stublibs allows an additional directory
-  to be added to the start of ld.conf.
-  (David Allsopp, review by ???)
-
-OCaml 5.4.0
----------------
-
-(Changes that can break existing programs are marked with a "*")
-
-### Language features:
-
-- #13097: added immutable arrays (`'a iarray` type, Iarray stdlib module)
-  (Antal Spector-Zabusky and Olivier Nicole, review by Gabriel Scherer,
-  Jeremy Yallop and Vincent Laviron)
-
-- #13340: Array literal syntax [| e1; ...; en |] can now be used to
-  denote values of type `'a array` and `'a iarray` and `floatarray`,
-  both in expressions and patterns. The compiler disambiguates each
-  case by using contextual type information (assuming `'a array`
-  by default).
-  (Nicolás Ojeda Bär, review by Richard Eisenberg, Jeremy Yallop, Jacques
-  Garrigue, and Gabriel Scherer)
-
-- #13498: Tuple fields are now optionally labeled:
-  `(x:42, y:0)` and `let (~x, ~y) = ... in ...`.
-  (Ryan Tjoa and Chris Casinghino, review by Gabriel Scherer, Chris Casinghino,
-  and Leo White)
-
-- RFCs#39, #13404: atomic record fields
-    `{ ...; mutable readers : int [@atomic]; ... }`
-    `Atomic.Loc.fetch_and_add [%atomic.loc data.readers] 1`
-  (Clément Allain and Gabriel Scherer, review by KC Sivaramakrishnan,
-   Basile Clément and Olivier Nicole)
-
-### Standard library:
-
-* #14124: Do not raise Invalid_argument on negative List.{drop,take}.
-  (Daniel Bünzli, review by Gabriel Scherer, Nicolás Ojeda Bär)
-
-- #13696: Add Result.product and Result.Syntax:
-  `let open Result.Syntax in let* x = ... in ...`
-  (Daniel Bünzli, review by Gabriel Scherer, Nicolás Ojeda Bär)
-
-- #12871: Add the Pqueue module to the stdlib. It implements priority queues.
-  (Jean-Christophe Filliâtre, review by Daniel Bünzli, Léo Andrès and
-  Gabriel Scherer)
-
-- #13760: Add String.{edit_distance,spellcheck}
-  (Daniel Bünzli, review by wikku, Nicolás Ojeda Bär, Gabriel Scherer and
-   Florian Angeletti)
-
-- #13753, #13755: Add Stdlib.Repr:
-  Repr.phys_equal and Repr.compare are more explicit than (==) and `compare`.
-  (Kate Deplaix, Thomas Blanc and Léo Andrès, review by Gabriel Scherer,
-   Florian Angeletti, Nicolás Ojeda Bär, Daniel Bünzli and Jeremy Yallop)
-
-- #13695: Add Stdlib.Char.Ascii
-  (Daniel Bünzli, review by by Nicolás Ojeda Bär and Jeremy Yallop)
-
-
-- #13720: Add Result.{get_ok',error_to_failure}
- (Daniel Bünzli, review by wikku, Gabriel Scherer, Nicolás Ojeda Bär,
-  Vincent Laviron and hirrolot)
-
-- #13885: Add Dynarray.{exists2, for_all2}.
-  (T. Kinsart, review by Daniel Bünzli, Gabriel Scherer, and Nicolás Ojeda Bär)
-
-* #13862: Make List.sort_uniq keep the first occurrences of duplicates.
-  (Benoît Jubin, review by Nicolás Ojeda Bär, Gabriel Scherer)
-
-- #13836: Add [Float.]Array.{equal,compare}.
-  (Daniel Bünzli, review by Nicolás Ojeda Bär and Gabriel Scherer)
-
-- #13796: Add Uchar.utf_8_decode_length_of_byte and
-  Uchar.max_utf_8_decode_length.
-  (Daniel Bünzli, review by Nicolás Ojeda Bär and Florian Angeletti)
-
-- #13768: Add Either.get_left and Either.get_right
-  (T. Kinsart, review by Nicolás Ojeda Bär and Florian Angeletti)
-
-- #13570, #13794: Format, add an out_width function to Format device for
-   approximating unicode width.
-  (Florian Angeletti, review by Nicolás Ojeda Bär, Daniel Bünzli,
-   and Gabriel Scherer)
-
-- #13731: Add Either.retract
-  (Daniel Bünzli, review by Nicolás Ojeda Bär and David Allsopp)
-
-- #13729: Add Seq.filteri
-  (T. Kinsart, review by Nicolás Ojeda Bär and Daniel Bünzli)
-
-- #13721: Add Result.retract
-  (Daniel Bünzli, review by Gabriel Scherer, Nicolás Ojeda Bär and
-   David Allsopp)
-
-- #13310: Add Stdlib.Pair
-  (Victoire Noizet, review by Nicolás Ojeda Bär, Daniel Bünzli, Xavier Van de
-   Woestyne, Jeremy Yallop and Florian Angeletti)
-
-- #13662: Add eager boolean operations Bool.logand, Bool.logor, Bool.logxor
-  (Jeremy Yallop, review by Nicolás Ojeda Bär)
-
-- #13463, #13572: Avoid raising Queue.empty in Format when it is used
-  concurrently, raise a specific exception instead.
-  (Chritophe Raffalli, review by Gabriel Scherer and Daniel Bünzli)
-
-- #13620: Avoid copying the string in String.concat, String.sub and
-  String.split_on_char when the full string is returned.
-  (Christophe Raffalli, review by Nicolás Ojeda Bär and Gabriel Scherer and
-   Hugo Heuzard)
-
-- #13727: Reimplement Sys.getenv_opt not to use exceptions internally, meaning
-  that the current backtrace is preserved when Sys.getenv_opt returns None.
-  (David Allsopp, review by Nicolás Ojeda Bär, Josh Berdine and Gabriel Scherer)
-
-- #13737: Avoid closure allocations in Weak.Make.add when resizing the
-  table
-  (Vincent Laviron, review by Gabriel Scherer and Daniel Bünzli)
-
-- #13740: Improve performance of Weak.find_aux
-  (Josh Berdine, review by Gabriel Scherer)
-
-- #13782: Improve performance and type safety of Type.Id by using
-  [%extension_constructor] instead of Obj.Extension_constructor.of_val.
-  (Basile Clément, review by Vincent Laviron and Nicolás Ojeda Bär)
-
-- #13589: Expose Sys.io_buffer_size, the size of internal buffers used by the
-  runtime system and the `unix` library.
-  (Yves Ndiaye and Nicolás Ojeda Bär, review by Daniel Bünzli and Nicolás Ojeda
-  Bär)
-
-- #13569: add a `Format.format_text` which adds break hints to format literals.
-  (Florian Angeletti, review by Nicolás Ojeda Bär, Daniel Bünzli,
-   and Gabriel Scherer)
-
-- #13578: On Windows, use the OS CSPRNG to seed the Stdlib.Random generator.
-  (Antonin Décimo, review by Miod Vallat, Nicolás Ojeda Bär, and Xavier Leroy)
-
-- #13859: Fix Weak.get_copy not darkening custom blocks
-  (Josh Berdine, review by Stephen Dolan)
-
-- #13909: Add `Dynarray.unsafe_to_iarray`
-  (Olivier Nicole, review by Daniel Bünzli, Stefan Muenzel and Gabriel Scherer,
-  request by Daniel Bünzli)
-
-- #13932: Add List.singleton and Seq.singleton
-  (David Allsopp, tariffs applied by Nicolás Ojeda Bär and Gabriel Scherer)
-
-* #13843: Add signal definitions for SIGIO and SIGWINCH. Introduces a
-  type alias for signal int, signal_to_string to convert OCaml signal numbers
-  to their POSIX equivalent names, and signal_of_int/signal_to_int for
-  converting between OCaml and platform signal numbers. (Reported in #13825)
-  (Tim McGilchrist, review by David Allsopp, Nicolás Ojeda Bär, Daniel Bünzli
-   Jan Midtgaard and Miod Vallat)
->>>>>>>
 
 ### Runtime system:
 
@@ -178,6 +15,63 @@ OCaml 5.4.0
   entries found in ld.conf.
   (David Allsopp, review by Stephen Dolan)
 
+* #14???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
+  "../<path...>") are interpreted as being relative to the directory ld.conf
+  was loaded from, and the default ld.conf now uses relative paths, rather than
+  embedding the absolute path to the Standard Library. The brave may continue to
+  put implicit paths in ld.conf. The interpretation of CAML_LD_LIBRARY_PATH is
+  unaltered. Additionally, ld.conf is loaded from all of $OCAMLLIB/ld.conf,
+  $CAMLLIB/ld.conf and standard_library_default/ld.conf rather than just the
+  first one found. ld.conf files with CRLF line endings are now consistently on
+  both Windows and Unix.
+  (David Allsopp, review by ???)
+
+- #14???: Added --with-relative-bindir which allows the runtime and the
+  compilers to locate the Standard Library relative to where the binaries
+  themselves are installed, removing the absolute path previously embedded in
+  caml_standard_library_default. Executables linked with `ocamlc -custom` now
+  always attempt to load bytecode from the executable itself, rather than first
+  trying `argv[0]`.
+  (David Allsopp, review by ???)
+
+- #14???: Introduce Runtime IDs for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system. The IDs are used, along with the host
+  triplet, to provide mangled names for the ocamlrun executable and its variants
+  and the DLL versions of both the bytecode and native runtimes, with symlinks
+  created for the original names. They are also used to mangle the names of stub
+  libraries so that stub libraries compiled for a given configuration of the
+  runtime will only be sought by that runtime. The behaviour is disabled by
+  configuring with --disable-suffixing.
+  (David Allsopp, review by ???)
+
+### Tools:
+
+- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by ???)
+
+### Compiler user-interface and warnings:
+
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
+- #14???: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix. New option -runtime-search extends the bytecode executable
+  header to be able to search for the runtime interpreter in the directory
+  containing the executable and in PATH rather than relying on a single
+  hard-coded path.
+  (David Allsopp, review by ???)
+
+### Internal/compiler-libs changes:
+
+- #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #13494: Use native symlinks on Windows for the OCaml installation, reducing
@@ -188,6 +82,25 @@ OCaml 5.4.0
   runtime/build_config.h (in particular, if the underlying implementation of sh
   is dash, rather than bash, this now works correctly).
   (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
+
+- #14???: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf. Additionally, the stublibs subdirectory
+  is no longer created, nor added to ld.conf, when building OCaml with
+  --disable-shared.
+  (David Allsopp, review by ???)
+
+- #14???: When targeting native Windows on Cygwin or MSYS2, preserve
+  backslashes in the supplied `--prefix` (in particular, backslashes instead of
+  slashes will then be displayed by `ocamlopt -config-var standard_library`).
+  If the supplied prefix contains a slash, then it is normalised, as
+  previously.
+  (David Allsopp, review by ???)
+
+- #14???: New --enable-runtime-search configure option controls the
+  -runtime-search option used to build the bytecode binaries in the compiler
+  distribution. --enable-runtime-search-target controls the default value of
+  -runtime-search used for bytecode executables produced by the compiler.
+  (David Allsopp, review by ???)
 
 ### Bug fixes:
 
