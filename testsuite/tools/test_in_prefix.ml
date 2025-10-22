@@ -52,12 +52,12 @@ let print_summary config header_size ~prefix ~bindir_suffix ~libdir_suffix
     \  - Executable header size is %.2fKiB (%d bytes)\n\
     \  - Testing %s\n@?"
        prefix bindir_suffix libdir_suffix
-       Config.c_compiler Config.c_compiler_vendor Config.target
+       Config.c_compiler Toolchain.c_compiler_vendor Config.target
        pp_relocatable relocatable pp_reproducible reproducible
        pp_relocatable target_relocatable
        (float_of_int header_size /. 1024.0) header_size summary
 
-let run_tests ~sh config env =
+let run_tests ~sh config legacy env =
   TestDynlink.run config env Bytecode;
   if config.has_ocamlopt && Config.supports_shared_libraries then
     TestDynlink.run config env Native;
@@ -65,12 +65,48 @@ let run_tests ~sh config env =
   if config.has_ocamlnat then
     TestToplevel.run config env Native;
   Test_ld_conf.run config env;
-  TestBytecodeBinaries.run config env;
+  TestBytecodeBinaries.run config legacy env;
   TestLinkModes.run ~sh config env
 
+type launch_method =
+| Shebang_bin_sh of string
+| Executable
+
+type runtime_launch_info = {
+  buffer : string;
+  launcher : launch_method;
+  executable_offset : int
+}
+
+let read_runtime_launch_info file =
+  let buffer =
+    try
+      In_channel.with_open_bin file In_channel.input_all
+    with Sys_error msg -> Harness.fail_because "%s: %s" file msg
+  in
+  try
+    let bindir_start = String.index buffer '\n' + 1 in
+    let bindir_end = String.index_from buffer bindir_start '\000' in
+    let executable_offset = bindir_end + 2 in
+    let launcher =
+      let kind = String.sub buffer 0 (bindir_start - 1) in
+      if kind = "exe" then
+        Executable
+      else if kind <> "" && (kind.[0] = '/' || kind = "sh") then
+        Shebang_bin_sh kind
+      else
+        raise Not_found in
+    if String.length buffer < executable_offset
+       || buffer.[executable_offset - 1] <> '\n' then
+      raise Not_found
+    else
+      {launcher; buffer; executable_offset}
+  with Not_found ->
+    Harness.fail_because "%s: corrupt header" file
+
 let () =
-  let ~config, ~pwd, ~prefix, ~bindir:_, ~bindir_suffix, ~libdir,
-      ~libdir_suffix, ~summarise_only, ~verbose =
+  let config, legacy, pwd, prefix, _, bindir_suffix, libdir, libdir_suffix,
+      summarise_only, verbose =
     match Cmdline.parse Sys.argv with
     | Result.Error (code, msg) ->
         prerr_string msg;
@@ -117,12 +153,12 @@ let () =
   in
   let runtime_launch_info =
     let file = Filename.concat libdir "runtime-launch-info" in
-    Bytelink.read_runtime_launch_info file in
+    read_runtime_launch_info file in
   let header_size =
-    let {Bytelink.buffer; executable_offset; _} = runtime_launch_info in
+    let {buffer; executable_offset; _} = runtime_launch_info in
     String.length buffer - executable_offset in
   let bytecode_shebangs_by_default =
-    runtime_launch_info.launcher <> Bytelink.Executable in
+    runtime_launch_info.launcher <> Executable in
   let launcher_searches_for_ocamlrun = Sys.win32 in
   let target_launcher_searches_for_ocamlrun = Sys.win32 in
   let config =
@@ -199,7 +235,7 @@ let () =
      | _ ->
          Harness.fail_because "Unexpected response from command -v sh"
   in
-  let run_tests = run_tests ~sh config in
+  let run_tests = run_tests ~sh config legacy in
   (* 1. Relocation test *)
   TestRelocation.run ~reproducible config env;
   (* 2. Run the main test battery in the Original phase. The result is a list
@@ -225,6 +261,6 @@ let () =
   List.iter
     (function `Some f -> assert (f env = `None) | `None -> ()) programs;
   (* 4. Finally re-run the main test battery in the new prefix *)
-  Compmisc.init_path ~standard_library:libdir ();
+  Compmisc.reinit_path ~standard_library:libdir ();
   let programs = run_tests env in
   assert (List.for_all (function `None -> true | _ -> false) programs)

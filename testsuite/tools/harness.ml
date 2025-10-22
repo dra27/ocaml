@@ -12,6 +12,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Option = struct
+  include Option
+
+  let exists p = function
+    | None -> false
+    | Some v -> p v
+end
+
 module Import = struct
   type launch_mode = Header_exe | Header_shebang
 
@@ -24,6 +32,10 @@ module Import = struct
 
   type mode = Bytecode | Native
 
+  type legacy = {
+    shebangscripts: bool;
+  }
+
   type config = {
     has_ocamlnat: bool;
     has_ocamlopt: bool;
@@ -34,6 +46,8 @@ module Import = struct
     bytecode_shebangs_by_default: bool;
     libraries: string list list
   }
+
+  module Option = Option
 end
 
 open Import
@@ -44,8 +58,9 @@ let exe =
   else
     Fun.id
 
-external proc_self_exe : unit -> string option = "caml_sys_proc_self_exe"
-let no_caml_executable_name = (proc_self_exe () = None)
+external no_caml_executable_name : unit -> bool
+  = "caml_in_prefix_test_no_caml_executable_name"
+let no_caml_executable_name = no_caml_executable_name ()
 
 (* Belt-and-braces file removal function - allow up to 30 seconds for
    Windows Defender and other nonsense *)

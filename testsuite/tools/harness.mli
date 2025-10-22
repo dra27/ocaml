@@ -46,6 +46,12 @@ module Import : sig
   | Native
       (* Native OCaml. *)
 
+  (** Legacy support (not required in OCaml 5.5+) *)
+  type legacy = {
+    shebangscripts: bool;
+      (** {v $(SHEBANGSCRIPTS) v} - {v Makefile.config v} *)
+  }
+
   (** Compiler installation's configuration *)
   type config = {
     has_ocamlnat: bool;
@@ -71,6 +77,12 @@ module Import : sig
       (** Sorted list of basenames of libraries to test.
           Derived from {v [$(OTHERLIBRARIES)] v} - {v Makefile.config v} *)
   }
+
+  module Option : sig
+    include module type of (struct include Option end)
+
+    val exists : ('a -> bool) -> 'a option -> bool
+  end
 end
 
 open Import

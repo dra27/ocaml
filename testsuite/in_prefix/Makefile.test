@@ -28,6 +28,9 @@ DRIVER_ARGS = \
   $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
   $(OTHERLIBRARIES) --pwd "$(SRCDIR_ABS)/testsuite/in_prefix"
 
+DRIVER_ARGS += \
+  $(call bool_to_with, shebangscripts, $(SHEBANGSCRIPTS))
+
 default: $(DRIVER)
 	@$(info In order to execute the test itself, run $(MAKE) test-in-prefix)
 	@$< $(DRIVER_ARGS) --summary

@@ -14,4 +14,5 @@
 
 (** Test 4 - installed bytecode binaries execute correctly. *)
 
-val run : Harness.Import.config -> Environment.t -> unit
+val run :
+  Harness.Import.config -> Harness.Import.legacy -> Environment.t -> unit

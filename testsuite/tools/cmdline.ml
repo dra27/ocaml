@@ -64,7 +64,7 @@ let split_to_prefix first second =
             let prefix = List.fold_left Filename.concat dir dirs in
             let first_suffix = List.fold_left Filename.concat dir1 dirs1 in
             let second_suffix = List.fold_left Filename.concat dir2 dirs2 in
-            Result.ok (~prefix, ~first, ~first_suffix, ~second, ~second_suffix)
+            Result.ok (prefix, first, first_suffix, second, second_suffix)
       else
         loop (dir1::prefix) (dirs1, dirs2)
   | [], _ ->
@@ -89,7 +89,7 @@ let walk_to_prefix first second =
       and+ first_suffix = concat_all `Second_in_first suffix1
       and+ second_suffix = concat_all `First_in_second suffix2 in
       let second = Filename.concat prefix second_suffix in
-      (~prefix, ~first, ~first_suffix, ~second, ~second_suffix)
+      (prefix, first, first_suffix, second, second_suffix)
   in
   loop [] (List.rev (split_dir [] first), split_dir [] second)
 
@@ -100,7 +100,10 @@ let parse argv =
   let bindir = ref "" in
   let libdir = ref "" in
   let tree =
-    ref (~prefix:"", ~first:"", ~first_suffix:"", ~second:"", ~second_suffix:"")
+    ref ("", "", "", "", "")
+  in
+  let legacy =
+    ref {shebangscripts = false}
   in
   let config =
     ref {has_ocamlnat = false; has_ocamlopt = false; has_relative_libdir = None;
@@ -128,8 +131,7 @@ let parse argv =
           error "directory given for --bindir inside that given for --libdir"
       | Result.Error `Second_in_first ->
           error "directory given for --libdir inside that given for --bindir"
-      | Result.Ok ((~prefix, ~first:_, ~first_suffix:_,
-                    ~second:libdir, ~second_suffix:_) as result) ->
+      | Result.Ok ((prefix, _, _, libdir, _) as result) ->
           if Sys.file_exists (prefix ^ ".new") then
             error "can't rename %s to %s.new as the latter already exists!"
                   prefix prefix
@@ -159,6 +161,9 @@ let parse argv =
   in
   let has_ocamlnat has_ocamlnat () = config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () = config := {!config with has_ocamlopt} in
+  let shebangscripts shebangscripts () =
+    legacy := {shebangscripts}
+  in
   let parse_search = function
   | "enable" -> true
   | "always" -> false
@@ -191,6 +196,9 @@ let parse argv =
 \tCompiler bytecode binaries can search for their runtimes";
     "--without-runtime-search",
       Arg.Unit (fun () -> has_runtime_search None), "";
+    "--with-shebangscripts", Arg.Unit (shebangscripts true), "\
+\tShebang scripts are supported";
+    "--without-shebangscripts", Arg.Unit (shebangscripts false), "";
   ] in
   let libraries lib =
     config := {!config with libraries = [lib]::config.contents.libraries}
@@ -204,10 +212,8 @@ options are:" in
   | exception Arg.Help msg ->
       Result.error (0, msg)
   | () ->
-      let config, pwd, summarise_only, verbose =
-        !config, !pwd, !summary, !verbose in
-      let ~prefix,
-          ~first:bindir, ~first_suffix:bindir_suffix,
-          ~second:libdir, ~second_suffix:libdir_suffix = !tree in
-      Result.ok (~config, ~pwd, ~prefix, ~bindir, ~bindir_suffix, ~libdir,
-                 ~libdir_suffix, ~summarise_only, ~verbose)
+      let config, legacy, pwd, summarise_only, verbose =
+        !config, !legacy, !pwd, !summary, !verbose in
+      let prefix, bindir, bindir_suffix, libdir, libdir_suffix = !tree in
+      Result.ok (config, legacy, pwd, prefix, bindir, bindir_suffix, libdir,
+                 libdir_suffix, summarise_only, verbose)
