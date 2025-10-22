@@ -106,7 +106,8 @@ let parse argv =
     ref {has_ocamlnat = false; has_ocamlopt = false; has_relative_libdir = None;
          has_runtime_search = None; launcher_searches_for_ocamlrun = false;
          target_launcher_searches_for_ocamlrun = false;
-         bytecode_shebangs_by_default = false; libraries = []}
+         bytecode_shebangs_by_default = false; shebangscripts = false;
+         libraries = []}
   in
   let error fmt = Printf.ksprintf (fun s -> raise (Arg.Bad s)) fmt in
   let check_tree () =
@@ -159,6 +160,9 @@ let parse argv =
   in
   let has_ocamlnat has_ocamlnat () = config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () = config := {!config with has_ocamlopt} in
+  let shebangscripts shebangscripts () =
+    config := {!config with shebangscripts}
+  in
   let parse_search = function
   | "enable" -> true
   | "always" -> false
@@ -191,6 +195,9 @@ let parse argv =
 \tCompiler bytecode binaries can search for their runtimes";
     "--without-runtime-search",
       Arg.Unit (fun () -> has_runtime_search None), "";
+    "--with-shebangscripts", Arg.Unit (shebangscripts true), "\
+\tShebang scripts are supported";
+    "--without-shebangscripts", Arg.Unit (shebangscripts false), "";
   ] in
   let libraries lib =
     config := {!config with libraries = [lib]::config.contents.libraries}

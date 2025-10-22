@@ -1987,8 +1987,9 @@ $(asmgen_OBJECT): $(asmgen_SOURCE)
 endif
 
 test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
-  toolchain.mli toolchain.ml \
+  stubs.c \
   harness.mli harness.ml \
+  toolchain.mli toolchain.ml \
   environment.mli environment.ml \
   cmdline.mli cmdline.ml \
   testBytecodeBinaries.mli testBytecodeBinaries.ml \
@@ -2000,6 +2001,10 @@ test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
   test_in_prefix.mli test_in_prefix.ml)
 test_in_prefix_LIBRARIES = \
   otherlibs/unix/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
+
+# Needed for the additional stubs.c (since caml_sys_proc_self_exe is 5.5+)
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
 
 # test_in_prefix% would only match test_in_prefix.opt, hence the missing 'x'!
 testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
@@ -2656,6 +2661,7 @@ endif
 	$(MAKE) -C manual distclean
 	rm -f ocamldoc/META
 	rm -f $(addprefix ocamltest/,ocamltest_config.ml ocamltest_unix.ml)
+	rm -f testsuite/tools/toolchain.ml
 	rm -f otherlibs/dynlink/META otherlibs/dynlink/dynlink_config.ml \
 	  otherlibs/dynlink/dynlink_cmo_format.mli \
 	  otherlibs/dynlink/dynlink_cmxs_format.mli \

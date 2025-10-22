@@ -12,9 +12,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Harness.Import
+
+let c_compiler_vendor = {@QS@|@ocaml_cc_vendor@|@QS@}
+
 (* cf. OCAML_CC_VENDOR in aclocal.m4 and utils.config.mli *)
 let is_clang =
-  List.mem "clang" (String.split_on_char '-' Config.c_compiler_vendor)
+  List.mem "clang" (String.split_on_char '-' c_compiler_vendor)
 
 let is_msvc = Config.ccomp_type = "msvc"
 
@@ -50,7 +54,7 @@ let assembler_embeds_build_path =
   (* The clang internal assembler only embeds build paths when called by
      ocamlopt if clang is emitting DWARF v5 by default. *)
   if is_clang_assembler then
-    Option.exists (fun version -> version > 4) Config.asm_dwarf_version
+    Option.exists (fun version -> version > 4) (@asm_dwarf_version@)
   else
     (* The clang internal assembler does not embed build paths when called by
        ocamlopt and neither does the GNU assembler on Windows. *)

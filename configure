@@ -3596,6 +3596,8 @@ ac_config_files="$ac_config_files otherlibs/runtime_events/META"
 
 ac_config_files="$ac_config_files stdlib/META"
 
+ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
+
 
 # Definitions related to the version of OCaml
 printf "%s\n" "#define OCAML_VERSION_MAJOR 5" >>confdefs.h
@@ -14807,7 +14809,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking C compiler vendor" >&5
 printf %s "checking C compiler vendor... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 #if defined(_MSC_VER)
@@ -24920,6 +24922,7 @@ do
     "otherlibs/dynlink/META") CONFIG_FILES="$CONFIG_FILES otherlibs/dynlink/META" ;;
     "otherlibs/runtime_events/META") CONFIG_FILES="$CONFIG_FILES otherlibs/runtime_events/META" ;;
     "stdlib/META") CONFIG_FILES="$CONFIG_FILES stdlib/META" ;;
+    "testsuite/tools/toolchain.ml") CONFIG_FILES="$CONFIG_FILES testsuite/tools/toolchain.ml" ;;
     "native-symlinks") CONFIG_COMMANDS="$CONFIG_COMMANDS native-symlinks" ;;
     "ocamldoc/META") CONFIG_FILES="$CONFIG_FILES ocamldoc/META" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
