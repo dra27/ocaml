@@ -28,8 +28,9 @@ let auto_include find_in_dir fn =
    then the directories specified with the -H option (in command line order).
  *)
 
-let init_path ?(standard_library=Config.standard_library)
-              ?(auto_include=auto_include) ?(dir="") () =
+let reinit_path ?(auto_include=auto_include)
+                ?(standard_library=Config.standard_library)
+                ?(dir="") () =
   let visible =
     if !Clflags.use_threads then "+threads" :: !Clflags.include_dirs
     else
@@ -60,6 +61,8 @@ let init_path ?(standard_library=Config.standard_library)
   in
   Load_path.init ~auto_include ~visible ~hidden;
   Env.reset_cache ()
+
+let init_path = reinit_path ?standard_library:None
 
 (* Return the initial environment in which compilation proceeds. *)
 

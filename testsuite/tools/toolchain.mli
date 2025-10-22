@@ -45,3 +45,7 @@ val linker_embeds_build_path : bool
 val linker_is_flexlink : bool
 (** [true] if {v flexlink v} is responsible for linking executables and shared
     libraries. *)
+
+val c_compiler_vendor : string
+(** The vendor and version of the C compiler, as determined by configure.ac
+    (see Config.c_compiler_vendor in OCaml 5.5) *)

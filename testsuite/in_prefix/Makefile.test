@@ -24,6 +24,7 @@ endif
 
 DRIVER_ARGS = \
   $(VERBOSE_FLAG) --bindir "$(BINDIR)" --libdir "$(LIBDIR)" \
+  $(call bool_to_with, shebangscripts, $(SHEBANGSCRIPTS)) \
   $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
   $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
   $(OTHERLIBRARIES) --pwd "$(SRCDIR_ABS)/testsuite/in_prefix"

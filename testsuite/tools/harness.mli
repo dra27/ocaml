@@ -67,10 +67,18 @@ module Import : sig
     bytecode_shebangs_by_default: bool;
       (** True if ocamlc uses a shebang-style header rather than an executable
           header for tendered bytecode executables. *)
+    shebangscripts: bool;
+      (** {v $(SHEBANGSCRIPTS) v} - {v Makefile.config v} *)
     libraries: string list list
       (** Sorted list of basenames of libraries to test.
           Derived from {v [$(OTHERLIBRARIES)] v} - {v Makefile.config v} *)
   }
+
+  module Option : sig
+    include module type of (struct include Option end)
+
+    val exists : ('a -> bool) -> 'a option -> bool
+  end
 end
 
 open Import
