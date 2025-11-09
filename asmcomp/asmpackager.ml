@@ -218,7 +218,7 @@ let build_package_cmx members cmxfile =
       Clambda (get_approx ui)
   in
   let ui_need_stdlib =
-    List.fold_left (fun acc unit -> acc || unit.ui_need_stdlib) false units
+    List.exists (function {ui_need_stdlib; _} -> ui_need_stdlib) units
   in
   Export_info_for_pack.clear_import_state ();
   let pkg_infos =
