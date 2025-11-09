@@ -54,7 +54,7 @@ enum caml_byte_program_mode {
   EMBEDDED  /* bytecode embedded in C (e.g. -output-complete-exe/-output-obj) */
 };
 
-extern enum caml_byte_program_mode caml_byte_program_mode;
+extern const enum caml_byte_program_mode caml_byte_program_mode;
 
 #endif /* CAML_INTERNALS */
 
