@@ -66,5 +66,5 @@ echo '  0 };'
 # ocamlrun is able to use any of the mechanisms to load the bytecode
 cat <<'EOF'
 
-enum caml_byte_program_mode caml_byte_program_mode = STANDARD;
+const enum caml_byte_program_mode caml_byte_program_mode = STANDARD;
 EOF

@@ -480,8 +480,16 @@ CAMLexport void caml_main(char_os **argv)
 
   proc_self_exe = caml_executable_name();
 
+  /* In APPENDED mode (i.e. with -custom), we always want to load the bytecode
+     from the running executable, and argv[0] should never be used. However,
+     some platforms still don't implement caml_executable_name, so there is an
+     escape hatch here to fallback to checking argv[0] if proc_self_exe is
+     NULL.
+     For STANDARD mode (i.e. the current executable is ocamlrun), argv[0] is
+     tried first, as this should be the path to shebang-script/executable
+     originally executed by the user. */
+  CAMLassert(caml_byte_program_mode != EMBEDDED);
   if (caml_byte_program_mode != APPENDED || proc_self_exe == NULL) {
-    /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
     exe_name = argv[0];
     fd = caml_attempt_open(&exe_name, &trail, 0);
   }

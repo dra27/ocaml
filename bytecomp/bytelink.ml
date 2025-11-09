@@ -618,7 +618,7 @@ extern "C" {
 #include <caml/sys.h>
 #include <caml/misc.h>
 
-enum caml_byte_program_mode caml_byte_program_mode = EMBEDDED;
+const enum caml_byte_program_mode caml_byte_program_mode = EMBEDDED;
 
 static int caml_code[] = {
 |};
@@ -811,7 +811,7 @@ extern "C" {
 #include <caml/mlvalues.h>
 #include <caml/startup.h>
 
-enum caml_byte_program_mode caml_byte_program_mode = APPENDED;
+const enum caml_byte_program_mode caml_byte_program_mode = APPENDED;
 
 |};
          Symtable.output_primitive_table poc;
