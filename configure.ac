@@ -426,6 +426,17 @@ AS_IF([test -n "$csc"],
       AS_CASE([$host_cpu], [i*86], [CSCFLAGS="$CSCFLAGS /platform:x86"])],
     [AC_MSG_WARN([Mono is not yet supported - C sharp tests disabled])])])
 
+# Environment-specific set-up
+
+dnl The separator should be being treated differently for host/target for
+dnl cross-compilers, but the installation layout for cross-compilers is already
+dnl incorrect (for example, ld.conf is processed by _both_ the host and target
+dnl runtimes), so this is left as target-specific for now.
+AS_CASE([$target],
+  [*-w64-mingw32*|*-pc-windows],
+    [default_separator='\'],
+  [default_separator='/'])
+
 # Environment variables that are taken into account
 
 AC_ARG_VAR([AS], [which assembler to use])
@@ -663,9 +674,14 @@ AC_ARG_ENABLE([mmap-map-stack],
 
 AC_ARG_WITH([relative-libdir],
   [AS_HELP_STRING([--with-relative-libdir],
-    [location of the Standard Library, specified relative to --bindir])],
-  [AS_IF([test x"$withval" = 'xno'],
-    [bindir_to_libdir=''],
+    m4_normalize([location of the Standard Library, specified relative to
+       --bindir (if no argument is given to --with-relative-libdir, defaults to
+       ../lib/ocaml)]))],
+  [AS_CASE([$withval],
+    [no],
+      [bindir_to_libdir=''],
+    [yes],
+      [bindir_to_libdir="..${default_separator}lib${default_separator}ocaml"],
     [bindir_to_libdir="$withval"])],
   [bindir_to_libdir=''])
 
@@ -3001,7 +3017,8 @@ AS_IF([test x"$libdir" = x'${exec_prefix}/lib/ocaml'],
     AS_CASE([$build_bindir_to_libdir],
       [./*],[libdir="$bindir${build_bindir_to_libdir[#].}"],
       [../*],[libdir="$bindir/$build_bindir_to_libdir"],
-      [AC_MSG_ERROR([--with-relative-libdir requires a relative path])])])],
+      [AC_MSG_ERROR(m4_normalize([--with-relative-libdir requires an explicit
+        relative path]))])])],
   [AS_IF([test x"$bindir_to_libdir" != 'x'],
     [AC_MSG_ERROR(m4_normalize([--with-relative-libdir and --libdir cannot both
       be specified]))])])

@@ -28,22 +28,17 @@ val bindir: string
     with [--with-relative-libdir] then this will be the directory containing the
     currently executing runtime. *)
 
+val standard_library_relative: string option
+(** The explicit relative path from the compiler binaries to the standard
+    libraries directory if the compiler was configured with
+    [--with-relative-libdir], or [None] otherwise.
+
+    @since 5.5 *)
+
 val standard_library_default: string
-(** The configured value for the directory containing the standard libraries.
-    May be a relative path if the compiler was configured with
-    [--with-relative-libdir].
-
-    @since 5.5 *)
-
-val standard_library_effective: string
-(** The standard library directory, computed taking {!standard_library_relative}
-    and {!standard_library_default} into account, but not taking CAMLLIB or
-    OCAMLLIB into account.
-
-    @since 5.5 *)
-
-val standard_library_relative: bool
-(** Whether {!standard_library_effective} is computed relative to the runtime
+(** The effective value for the default directory containing the standard
+    libraries. This is always an absolute path, computed using
+    {!standard_library_relative} if necessary.
 
     @since 5.5 *)
 

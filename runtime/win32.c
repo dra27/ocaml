@@ -1365,7 +1365,7 @@ CAMLextern char_os* caml_locate_standard_library (const wchar_t *exe_name,
       return caml_stat_wcsdup(stdlib_default);
     }
 
-    CAMLassert(basename != root && Is_separator(*(basename - 1)));
+    CAMLassert(basename && basename != root && Is_separator(*(basename - 1)));
 
     /* Make root the dirname portion */
     *(basename - 1) = 0;
@@ -1392,9 +1392,7 @@ CAMLextern char_os* caml_locate_standard_library (const wchar_t *exe_name,
     } while (l >= buf_len);
 
     if (l > 0) {
-      /* GetFinalPathNameByHandle always returns \\?\ which needs stripping.
-         UNC paths are returned as \\?\UNC\ - in this case, reuse the \\ from
-         \\?\. */
+      /* GetFinalPathNameByHandle always returns \\?\ which needs stripping. */
       CAMLassert(l > 4 && resolved_candidate[0] == '\\'
                        && resolved_candidate[1] == '\\'
                        && resolved_candidate[2] == '?'
@@ -1406,7 +1404,9 @@ CAMLextern char_os* caml_locate_standard_library (const wchar_t *exe_name,
                  && resolved_candidate[5] == 'N'
                  && resolved_candidate[6] == 'C'
                  && resolved_candidate[7] == '\\') {
-        /* NT native UNC path - reuse the 'C' for the backslash */
+        /* NT native UNC path (\\?\UNC\foo). We change the last C to a backslash
+           (\\?\UN\\foo) and then include that altered character and the
+           original final slash to create a normal UNC path. */
         resolved_candidate[6] = '\\';
         candidate = caml_stat_wcsdup(resolved_candidate + 6);
       } else {

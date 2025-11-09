@@ -531,7 +531,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
          (* OCaml Standard Library Default location *)
          let standard_library_default =
            Option.value
-             ~default:Config.standard_library_effective
+             ~default:Config.standard_library_default
              !Clflags.standard_library_default
          in
          output_string outchan standard_library_default;
@@ -645,7 +645,7 @@ let c_string_literal_of_string s =
 
 let emit_runtime_standard_library_default outchan =
   let stdlib =
-    let default = Config.standard_library_effective in
+    let default = Config.standard_library_default in
     Option.value ~default !Clflags.standard_library_default in
   let literal = c_string_literal_of_string stdlib in
   Printf.fprintf outchan

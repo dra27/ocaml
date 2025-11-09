@@ -66,7 +66,7 @@ Working version
   (Tim McGilchrist, review by Nick Barnes, Sadiq Jaffer and
   Gabriel Scherer)
 
-- #14244: Added --with-relative-bindir which allows the runtime and the
+- #14244: Added --with-relative-libdir which allows the runtime and the
   compilers to locate the Standard Library relative to where the binaries
   themselves are installed, removing the absolute path previously embedded in
   caml_standard_library_default. Executables linked with `ocamlc -custom` now

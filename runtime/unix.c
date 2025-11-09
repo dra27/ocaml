@@ -556,7 +556,7 @@ static char * caml_dirname (const char * path)
   return res;
 #else
   /* See Filename.generic_dirname */
-  size_t n = strlen(path) - 1;
+  ptrdiff_t n = strlen(path) - 1;
   char *res;
   if (n < 0) /* path is "" */
     return caml_stat_strdup(".");
@@ -598,7 +598,7 @@ CAMLextern char_os* caml_locate_standard_library (const char *exe_name,
     /* If realpath fails, use the non-normalised path for error messages. */
     if (resolved_candidate != NULL) {
       caml_stat_free(candidate);
-      /* caml_realpath uses malloc */
+      /* realpath uses malloc */
       candidate = caml_stat_strdup(resolved_candidate);
       free(resolved_candidate);
     }
