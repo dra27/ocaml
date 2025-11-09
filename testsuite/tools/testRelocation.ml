@@ -187,10 +187,6 @@ let libdir_rules config file =
           not (is_ocaml || String.starts_with ~prefix:"flexdll_" basename) in
         (~stdlib:false, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
       else if ext = Config.ext_lib || ext = Config.ext_dll then
-        (* Based on the filename, is this one of the bytecode runtime libraries
-           (libcamlrun.a, libcamlrund.a, libcamlrun_shared.so, etc.
-           Note that these properties are _not_ used for libasmrun* (see
-           below) *)
         if ext = Config.ext_lib then
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =

@@ -199,11 +199,8 @@ let make_globals_map units_list ~crc_interfaces =
 
 let make_startup_file ~ppf_dump units_list ~crc_interfaces =
   let need_stdlib =
-    let needs_stdlib = function
-    | ({ui_need_stdlib = true; _}, _, _) -> true
-    | _ -> false
-    in
-      List.exists needs_stdlib units_list
+    let needs_stdlib ({ui_need_stdlib; _}, _, _) = ui_need_stdlib in
+    List.exists needs_stdlib units_list
   in
   let compile_phrase p = Asmgen.compile_phrase ~ppf_dump p in
   Location.input_name := "caml_startup"; (* set name of "current" input *)

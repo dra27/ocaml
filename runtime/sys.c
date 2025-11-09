@@ -743,7 +743,7 @@ CAMLprim value caml_sys_const_backend_type(value unit)
    completely in libasmrun as there are no other existing instances in the
    native runtime where OCAML_STDLIB_DIR ends up being embedded. */
 #ifndef NATIVE_CODE
-/* If this remains unset than caml_runtime_standard_library_default is used */
+/* If this remains unset then caml_runtime_standard_library_default is used */
 char_os *caml_standard_library_default = NULL;
 
 CAMLprim value caml_sys_const_standard_library_default(value unit)
