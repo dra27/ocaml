@@ -1774,7 +1774,8 @@ Optional Packages:
   --with-odoc             build documentation with odoc
   --with-target-sh        location of Posix sh on the target system
   --with-relative-libdir  location of the Standard Library, specified relative
-                          to --bindir
+                          to --bindir (if no argument is given to
+                          --with-relative-libdir, defaults to ../lib/ocaml)
   --with-afl              use the AFL fuzzer
   --with-flexdll          bootstrap FlexDLL from the given sources
   --with-winpthreads-msvc build winpthreads (only for the MSVC port) from the
@@ -3980,6 +3981,15 @@ printf "%s\n" "$as_me: WARNING: Mono is not yet supported - C sharp tests disabl
 esac
 fi
 
+# Environment-specific set-up
+
+case $target in #(
+  *-w64-mingw32*|*-pc-windows) :
+    default_separator='\' ;; #(
+  *) :
+    default_separator='/' ;;
+esac
+
 # Environment variables that are taken into account
 
 
@@ -4336,12 +4346,14 @@ fi
 # Check whether --with-relative-libdir was given.
 if test ${with_relative_libdir+y}
 then :
-  withval=$with_relative_libdir; if test x"$withval" = 'xno'
-then :
-  bindir_to_libdir=''
-else $as_nop
-  bindir_to_libdir="$withval"
-fi
+  withval=$with_relative_libdir; case $withval in #(
+  no) :
+    bindir_to_libdir='' ;; #(
+  yes) :
+    bindir_to_libdir="..${default_separator}lib${default_separator}ocaml" ;; #(
+  *) :
+    bindir_to_libdir="$withval" ;;
+esac
 else $as_nop
   bindir_to_libdir=''
 fi
@@ -24279,7 +24291,7 @@ esac
   ../*) :
     libdir="$bindir/$build_bindir_to_libdir" ;; #(
   *) :
-    as_fn_error $? "--with-relative-libdir requires a relative path" "$LINENO" 5 ;;
+    as_fn_error $? "--with-relative-libdir requires an explicit relative path" "$LINENO" 5 ;;
 esac
 fi
 else $as_nop
