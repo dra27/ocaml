@@ -334,21 +334,24 @@ let find_bin_sh () =
 
 (* Writes the shell script version of the bytecode launcher to outchan *)
 let write_sh_launcher outchan bin_sh bindir search runtime =
-  let open struct type tag = D | A | E end in
+  let open struct type tag = DEA | E | EA end in
   let l tag fmt =
     let output s =
-      if tag = D || tag = A && search <> Config.Absolute
-         || tag = E && search = Config.Absolute_then_search then begin
-        output_string outchan (String.trim s);
-        output_char outchan '\n'
-      end
+      match tag, search with
+      | DEA, _
+      | E, Config.Enable
+      | EA, (Config.Enable | Config.Always) ->
+          output_string outchan (String.trim s);
+          output_char outchan '\n'
+      | _ ->
+          ()
     in
     Printf.ksprintf output fmt
   in
   let runtime = Filename.quote runtime in
   let bin = Filename.quote (Filename.concat bindir "") in
   let exec =
-    if search = Config.Absolute then
+    if search = Config.Disable then
       runtime
     else
       {|"$c"|}
@@ -389,22 +392,22 @@ let write_sh_launcher outchan bin_sh bindir search runtime =
      If the script fails to find an interpreter, $c will always be empty
        (since [command -v] will have returned an empty string) and an
        error message can be displayed. *)
-  l D   {|#!%s                                                     |} bin_sh;
-  l  A  {|r=%s                                                     |} runtime;
-  l   E {|c=%s"$r"                                                 |} bin;
-  l   E {|if ! test -f "$c"; then                                  |};
-  l  A  {|  d="$(dirname "$0" 2>/dev/null)"                        |};
-  l  A  {|  test -z "$d" || d="${d%%/}/"                           |};
-  l  A  {|  c="$(command -v "$d$r")"                               |};
-  l  A  {|  test -n "$c" || c="$(command -v "$r")"                 |};
-  l   E {|fi                                                       |};
-  l  A  {|if test -z "$c"; then                                    |};
-  l  A  {|  echo 'This program requires an OCaml %s interpreter'>&2|} release;
-  l  A  {|  echo "$r not found either with $0 or in \$PATH">&2     |};
-  l  A  {|else                                                     |};
-  l D   {|  exec %s "$0" "$@"                                      |} exec;
-  l  A  {|fi                                                       |};
-  l  A  {|exit 126                                                 |}
+  l DEA {|#!%s                                                     |} bin_sh;
+  l  EA {|r=%s                                                     |} runtime;
+  l  E  {|c=%s"$r"                                                 |} bin;
+  l  E  {|if ! test -f "$c"; then                                  |};
+  l  EA {|  d="$(dirname "$0" 2>/dev/null)"                        |};
+  l  EA {|  test -z "$d" || d="${d%%/}/"                           |};
+  l  EA {|  c="$(command -v "$d$r")"                               |};
+  l  EA {|  test -n "$c" || c="$(command -v "$r")"                 |};
+  l  E  {|fi                                                       |};
+  l  EA {|if test -z "$c"; then                                    |};
+  l  EA {|  echo 'This program requires an OCaml %s interpreter'>&2|} release;
+  l  EA {|  echo "$r not found either alongside $0 or in \$PATH">&2|};
+  l  EA {|else                                                     |};
+  l DEA {|  exec %s "$0" "$@"                                      |} exec;
+  l  EA {|fi                                                       |};
+  l  EA {|exit 126                                                 |}
 
 (* Writes the executable header to outchan and writes the RNTM section, if
    needed. Returns a toc_writer (i.e. Bytesections.init_record is always
@@ -416,15 +419,15 @@ let write_header outchan =
       (* Do not use BUILD_PATH_PREFIX_MAP mapping for this. *)
       let runtime = !Clflags.use_runtime in
       if Filename.is_relative runtime then
-        Filename.concat (Sys.getcwd ()) runtime, Config.Absolute
+        Filename.concat (Sys.getcwd ()) runtime, Config.Disable
       else
-        runtime, Config.Absolute
+        runtime, Config.Disable
     else
       let runtime = "ocamlrun" ^ !Clflags.runtime_variant in
-      if !Clflags.search_method <> Config.Absolute then
+      if !Clflags.search_method <> Config.Disable then
         runtime, !Clflags.search_method
       else
-        Filename.concat !Clflags.target_bindir runtime, Config.Absolute
+        Filename.concat !Clflags.target_bindir runtime, Config.Disable
   in
   (* Determine which method will be used for launching the executable:
      Executable: concatenate the bytecode image to the executable stub
@@ -435,7 +438,7 @@ let write_header outchan =
     | Config.Executable ->
         Executable
     | Config.Shebang sh ->
-        if search <> Config.Absolute || invalid_for_shebang_line runtime then
+        if search <> Config.Disable || invalid_for_shebang_line runtime then
           let sh =
             match sh with
             | Some sh -> sh
@@ -463,7 +466,7 @@ let write_header outchan =
   (* Write the header *)
   match launcher with
   | Shebang_runtime ->
-      assert (search = Config.Absolute);
+      assert (search = Config.Disable);
       (* Use the runtime directly *)
       Printf.fprintf outchan "#!%s\n" runtime;
       Bytesections.init_record outchan
@@ -490,13 +493,13 @@ let write_header outchan =
          is written verbatim (no extra NUL), otherwise the directory separator
          just before the basename is effectively turned into a NUL (for Search,
          there is no dirname, so the string "begins" with a NUL character). *)
-      if search = Absolute then
+      if search = Disable then
         output_string outchan runtime
       else begin
-        if search = Absolute_then_search then
+        if search = Enable then
           (* Ensure bindir does _not_ end up with a separator *)
           output_string outchan
-          (Filename.(dirname (concat bindir current_dir_name)));
+            (Filename.(dirname (concat bindir current_dir_name)));
         output_char outchan '\000';
         output_string outchan runtime
       end;

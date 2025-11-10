@@ -533,9 +533,10 @@ let mk_search_method f =
   Printf.sprintf
     "  Control the way the bytecode header searches for the interpreter\n\
     \    The following settings are supported:\n\
-    \      disable  use a fixed absolute path to the runtime\n\
-    \      enable   search for runtime only if not found at the absolute path\n\
-    \      always   always search for the runtime\n\
+    \      disable  use a fixed absolute path to the nterpreter\n\
+    \      enable   search for interpreter only if not found at the absolute \
+                    path\n\
+    \      always   always search for the interpreter\n\
     \    The default setting is 'disable'."
 
 let mk_use_runtime f =
@@ -2025,11 +2026,11 @@ third-party libraries such as Lwt, but with a different API."
             "-launch-method: expect sh, exe or an absolute path for <method>"
     let _search_method = function
     | "disable" ->
-        search_method := Config.Absolute
+        search_method := Config.Disable
     | "enable" ->
-        search_method := Config.Absolute_then_search
+        search_method := Config.Enable
     | "always" ->
-        search_method := Config.Search
+        search_method := Config.Always
     | _ ->
         assert false
     let _v () = Compenv.print_version_and_library "compiler"

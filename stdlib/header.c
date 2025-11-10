@@ -321,7 +321,7 @@ static char * read_runtime_path(file_descriptor fd, uint32_t *rntm_strlen)
   if (*rntm_strlen == 0) return NULL;
   /* The last character of runtime_path must be '\0', so RNTM must be strictly
      less than PATH_MAX */
-  if (*rntm_strlen > PATH_MAX * RNTM_ENCODING_LENGTH) return NULL;
+  if (*rntm_strlen >= PATH_MAX * RNTM_ENCODING_LENGTH) return NULL;
   if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
   if (read(fd, runtime_path, *rntm_strlen) != *rntm_strlen) return NULL;
 
@@ -409,7 +409,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
   /* If we get here, we've failed... */
   exit_with_error(T("This program requires OCaml ") SHORT_VERSION T("\n")
                   T("Interpreter ("), (rntm_bindir_end + 1),
-                  T(") not found with the program or in " PATH_NAME));
+                  T(") not found alongside the program or in " PATH_NAME));
 }
 
 #ifdef _WIN32
