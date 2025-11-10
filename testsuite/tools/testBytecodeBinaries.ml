@@ -89,19 +89,19 @@ let run config env =
                       in
                       match search with
                       | Disable dir ->
-                          dir ^ runtime ^ id, Config.Absolute
+                          dir ^ runtime ^ id, Config.Disable
                       | Enable dir ->
                           Printf.sprintf "[%s]%s%s" dir runtime id,
-                          Config.Absolute_then_search
+                          Config.Enable
                       | Always ->
-                          runtime ^ id, Config.Search
+                          runtime ^ id, Config.Always
                     in
                     let expected_id =
                       if config.filename_mangling then
                         match config.has_runtime_search with
-                        | Config.Absolute | Config.Absolute_then_search ->
+                        | Config.Disable | Config.Enable ->
                             Some (Misc.RuntimeID.make_zinc ())
-                        | Config.Search ->
+                        | Config.Always ->
                             Some (Misc.RuntimeID.make_zinc ())
                       else
                         None
