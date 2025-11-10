@@ -469,13 +469,13 @@ let compile_test usr_bin_sh config env test test_program description =
             | _ ->
                 [] in
           let target_launcher_searches_for_ocamlrun =
-            (search_method <> Config.Absolute)
+            (search_method <> Config.Disable)
           in
           let param =
             match search_method with
-            | Absolute -> "disable"
-            | Absolute_then_search -> "enable"
-            | Search -> "always"
+            | Disable -> "disable"
+            | Enable -> "enable"
+            | Always -> "always"
           in
           let args = "-runtime-search" :: param :: args in
           f ~target_launcher_searches_for_ocamlrun ~tendered:true args
@@ -675,11 +675,11 @@ let run ~sh config env =
                 pp_path ocamlc_where pp_path ocamlopt_where;
   let compile_test = compile_test sh config env in
   let tests = [
-    compile_test (Default_ocamlc(Header_exe, Absolute))
+    compile_test (Default_ocamlc(Header_exe, Disable))
       "byt_default_exe_disable" "with absolute tender";
-    compile_test (Default_ocamlc(Header_exe, Absolute_then_search))
+    compile_test (Default_ocamlc(Header_exe, Enable))
       "byt_default_exe_enable" "with fallback tender";
-    compile_test (Default_ocamlc(Header_exe, Search))
+    compile_test (Default_ocamlc(Header_exe, Always))
       "byt_default_exe_always" "with relocatable tender";
     compile_test (Custom_runtime Static)
       "custom_static" "-custom static runtime";
@@ -710,11 +710,11 @@ let run ~sh config env =
   ] in
   let tests =
     if Config.shebangscripts then
-      (compile_test (Default_ocamlc(Header_shebang, Absolute))
+      (compile_test (Default_ocamlc(Header_shebang, Disable))
         "byt_default_sh_disable" "with absolute #!") ::
-      (compile_test (Default_ocamlc(Header_shebang, Absolute_then_search))
+      (compile_test (Default_ocamlc(Header_shebang, Enable))
         "byt_default_sh_enable" "with fallback #!") ::
-      (compile_test (Default_ocamlc(Header_shebang, Search))
+      (compile_test (Default_ocamlc(Header_shebang, Always))
         "byt_default_sh_always" "with relocatable #!") ::
       tests
     else
