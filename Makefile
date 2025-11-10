@@ -2755,13 +2755,13 @@ endif
 define INSTALL_RUNTIME
 install::
 	$(INSTALL_PROG) \
-    runtime/$(1)$(EXE) \
-      "$(INSTALL_BINDIR)/$(call MANGLE_RUNTIME_NAME,$(1))"
+	  runtime/$(1)$(EXE) \
+	    "$(INSTALL_BINDIR)/$(call MANGLE_RUNTIME_NAME,$(1))"
 ifeq "$(SUFFIXING)" "true"
 	cd "$(INSTALL_BINDIR)" && \
-    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
+	  $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
 	cd "$(INSTALL_BINDIR)" && \
-    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
+	  $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
 	    "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
 endif
 endef

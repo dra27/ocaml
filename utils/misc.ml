@@ -1537,7 +1537,7 @@ module RuntimeID = struct
       else
         None
 
-  let of_zinc_hi ?(dev = not Config.is_release)
+  let of_zinc_hi ?(dev = not Config.is_official_release)
                  ?(release = Config.release_number) s =
     Option.map (fun id -> {id with dev; release}) (of_string ("00" ^ s))
 
