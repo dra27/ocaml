@@ -165,7 +165,7 @@ let mk_H f =
 
 let mk_set_runtime_default f =
   "-set-runtime-default", Arg.String f, "<param>=<value>  Set the default for \
-      runtime parameter <param> to <value>"
+      runtime parameter <param> to <value> (see the manual for further details)"
 
 let mk_impl f =
   "-impl", Arg.String f, "<file>  Compile <file> as a .ml file"
