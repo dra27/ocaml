@@ -337,17 +337,6 @@ let find_bin_sh () =
    called) *)
 
 let write_header outchan =
-  (* Determine which method will be used for launching the executable:
-     Executable: concatenate the bytecode image to the executable stub
-     Shebang_runtime: #! line with the required runtime
-     Shebang_bin_sh: #! for a shell script calling exec *)
-  let launcher, bindir =
-    match !Clflags.launch_method with
-    | Config.Executable, bindir ->
-        Executable, bindir
-    | Config.Shebang sh, bindir ->
-        Shebang_bin_sh (Option.value ~default:"sh" sh), bindir
-  in
   let runtime =
     if String.length !Clflags.use_runtime > 0 then
       (* Do not use BUILD_PATH_PREFIX_MAP mapping for this. *)
@@ -363,28 +352,29 @@ let write_header outchan =
       if Sys.win32 then
         runtime
       else
-        Filename.concat bindir runtime
+        Filename.concat !Clflags.target_bindir runtime
   in
+  (* Determine which method will be used for launching the executable:
+     Executable: concatenate the bytecode image to the executable stub
+     Shebang_runtime: #! line with the required runtime
+     Shebang_bin_sh: #! for a shell script calling exec *)
   let launcher =
-    if launcher = Executable then
-      Executable
-    else
-      if invalid_for_shebang_line runtime then
-        match launcher with
-        | Shebang_bin_sh sh ->
-            let sh =
-              if sh = "sh" then
-                find_bin_sh ()
-              else
-                sh in
-            if sh = "" || invalid_for_shebang_line sh then
-              Executable
-            else
-              Shebang_bin_sh sh
-        | _ ->
+    match !Clflags.launch_method with
+    | Config.Executable ->
+        Executable
+    | Config.Shebang sh ->
+        if invalid_for_shebang_line runtime then
+          let sh =
+            match sh with
+            | Some sh -> sh
+            | None -> find_bin_sh ()
+          in
+          if sh = "" || invalid_for_shebang_line sh then
             Executable
-      else
-        Shebang_runtime
+          else
+            Shebang_bin_sh sh
+        else
+          Shebang_runtime
   in
   let write_exe_launcher data =
     (* Compatibility with previous header format - remove post-bootstrap *)
