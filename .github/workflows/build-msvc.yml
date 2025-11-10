@@ -146,7 +146,7 @@ jobs:
             ${{ matrix.cc != 'gcc' && format('CC={0}', matrix.cc) || '' }}
             --enable-ocamltest
             ${{ endsWith(matrix.arch, '64') && '--enable-native-toplevel' || '--disable-native-toplevel' }}
-            ${{ matrix.libdir == 'relative' && (matrix.cc == 'gcc' && '--with-relative-libdir=../lib/ocaml' || '--with-relative-libdir=..\\lib\\ocaml') || '--without-relative-libdir' }}
+            ${{ matrix.libdir == 'relative' && '--with-relative-libdir' || '--without-relative-libdir' }}
             ${{ matrix.config_arg }}
         run: |
           eval $(tools/msvs-promote-path)
