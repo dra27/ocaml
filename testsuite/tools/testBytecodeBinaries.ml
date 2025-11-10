@@ -83,18 +83,18 @@ let run config env =
                 | Tendered {runtime; header; search; _} ->
                     let reported_runtime =
                       match search with
-                      | Absolute dir ->
+                      | Disable dir ->
                           dir ^ runtime
-                      | Absolute_then_search dir ->
+                      | Enable dir ->
                           Printf.sprintf "[%s/]%s" dir runtime
-                      | Search ->
+                      | Always ->
                           runtime
                     in
                     let expected_search =
                       if Sys.win32 then
-                        Byterntm.Search
+                        Byterntm.Always
                       else
-                        Byterntm.Absolute
+                        Byterntm.Disable
                           (Filename.concat (Environment.bindir env) "")
                     in
                     let expected_launch_mode =
@@ -104,12 +104,12 @@ let run config env =
                         Header_exe
                     in
                     let pp_search f = function
-                    | Byterntm.Absolute _ ->
-                        Format.pp_print_string f "absolute"
-                    | Byterntm.Absolute_then_search _ ->
-                        Format.pp_print_string f "fallback"
-                    | Byterntm.Search ->
-                        Format.pp_print_string f "search"
+                    | Byterntm.Disable _ ->
+                        Format.pp_print_string f "disable"
+                    | Byterntm.Enable _ ->
+                        Format.pp_print_string f "enable"
+                    | Byterntm.Always ->
+                        Format.pp_print_string f "always"
                     in
                     let pp_launch f = function
                     | Header_shebang -> Format.pp_print_string f "shebang"

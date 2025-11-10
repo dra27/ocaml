@@ -14,10 +14,12 @@
 
 {
 type search_method =
-| Absolute of string
-| Absolute_then_search of string
-| Search
+| Disable of string
+| Enable of string
+| Always
 
+(* First word of the current line being analysed - [exec ...], [r=...], or
+   [c=...] *)
 type state = Exec | R | C of string
 }
 
@@ -29,19 +31,19 @@ rule analyze = parse
     ([^ '\\' '/' '\000']+ as runtime) eof           (* Runtime portion *)
       { if sep = '\000' then
           if dir = "" then
-            Some (runtime, Search)
+            Some (runtime, Always)
           else
-            Some (runtime, Absolute_then_search (Filename.concat dir ""))
+            Some (runtime, Enable (Filename.concat dir ""))
         else
-          Some (runtime, Absolute (dir ^ String.make 1 sep)) }
+          Some (runtime, Disable (dir ^ String.make 1 sep)) }
 
 (* Legacy RNTM (remove after bootstrap) *)
   | (([^ '\000']* ['/' '\\']) as dir)
     ([^ '\\' '/' '\000']+ as runtime) '\000' eof
       { if dir = "" then
-          Some (runtime, Search)
+          Some (runtime, Always)
         else
-          Some (runtime, Absolute dir) }
+          Some (runtime, Disable dir) }
 
 (* Shell script launcher (if it matches, this always matches more than the above
    regexp) *)
@@ -68,7 +70,7 @@ and analyze_sh_launcher state b = parse
           let dir =
             String.sub name 0 (String.length name - String.length runtime)
           in
-          Some (runtime, Absolute dir)
+          Some (runtime, Disable dir)
         else
           None }
 
@@ -77,7 +79,7 @@ and analyze_sh_launcher state b = parse
       { if state = R then
           let runtime = Buffer.contents b in
           if c = None then
-            Some (runtime, Search)
+            Some (runtime, Always)
           else
             analyze_sh_launcher (C runtime) (Buffer.clear b; b) lexbuf
         else
@@ -87,7 +89,7 @@ and analyze_sh_launcher state b = parse
   | "'\"$r\"\n"
       { match state with
         | C runtime ->
-            Some (runtime, Absolute_then_search (Buffer.contents b))
+            Some (runtime, Enable (Buffer.contents b))
         | _ ->
             None }
 

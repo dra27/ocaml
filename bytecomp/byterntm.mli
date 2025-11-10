@@ -17,11 +17,11 @@
 
 (** Search methods used by a tendered bytecode image to find a runtime. *)
 type search_method =
-| Absolute of string
+| Disable of string
     (** Check fixed location only *)
-| Absolute_then_search of string
+| Enable of string
     (** Check given location first then search for the interpreter *)
-| Search
+| Always
     (** Always search for the interpreter *)
 
 val read_runtime :
