@@ -24214,7 +24214,7 @@ esac
 
 # Determine the three Runtime IDs (see runtime/Mangling.md)
 
-alphabet='0123456789abcdefghijklmnopqrstuv'
+
 
 
 
@@ -24226,11 +24226,10 @@ alphabet='0123456789abcdefghijklmnopqrstuv'
 
 # Bits 7-9 (low 3 bits of reserved)
 quintet1="1 + $(expr \( $reserved_header_bits \* 4 \) % 32)"
-quintet1="$(echo "$alphabet" | cut -c $(expr $quintet1 + 1))"
+quintet1="$(echo '0123456789abcdefghijklmnopqrstuv' | cut -c $(expr \( $quintet1 \) + 1))"
 
 # Bits 10-11 (high 2 bits of reserved)
-quintet2_byte=\
-"$(echo "$alphabet" | cut -c $(expr \( $reserved_header_bits / 8 \) + 1))"
+quintet2_byte="$(echo '0123456789abcdefghijklmnopqrstuv' | cut -c $(expr \( $reserved_header_bits / 8 \) + 1))"
 
 # Bit 12 (no-flat-float-array)
 if $flat_float_array
@@ -24253,9 +24252,9 @@ then :
   quintet2_native="16 + $quintet2_native"
 fi
 
-quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
-quintet2_byte="$(echo "$alphabet" | cut -c $(expr $quintet2_byte + 1))"
-quintet2_native="$(echo "$alphabet" | cut -c $(expr $quintet2_native + 1))"
+quintet2_zinc="$(echo '0123456789abcdefghijklmnopqrstuv' | cut -c $(expr \( $quintet2_zinc \) + 1))"
+quintet2_byte="$(echo '0123456789abcdefghijklmnopqrstuv' | cut -c $(expr \( $quintet2_byte \) + 1))"
+quintet2_native="$(echo '0123456789abcdefghijklmnopqrstuv' | cut -c $(expr \( $quintet2_native \) + 1))"
 
 # Bit 15 (int31)
 if $arch64
@@ -24283,8 +24282,8 @@ case $target,$windows_unicode in #(
 esac
 # Bit 19 (mutable-string) cannot be set since OCaml 5.0
 
-quintet3_zinc="$(echo "$alphabet" | cut -c $(expr $quintet3_zinc + 1))"
-quintet3="$(echo "$alphabet" | cut -c $(expr $quintet3 + 1))"
+quintet3_zinc="$(echo '0123456789abcdefghijklmnopqrstuv' | cut -c $(expr \( $quintet3_zinc \) + 1))"
+quintet3="$(echo '0123456789abcdefghijklmnopqrstuv' | cut -c $(expr \( $quintet3 \) + 1))"
 
 zinc_runtime_id_lo="b1"
 zinc_runtime_id_hi="${quintet2_zinc}${quintet3_zinc}"
