@@ -525,7 +525,7 @@ let mk_launch_method f =
   "<method>  Specify the mechanism for the bytecode launcher:\n\
   \          exe - use the executable launcher in runtime-launch-info\n\
   \          sh - use a #!, using sh if the interpreter path cannot be used\n\
-  \          /path/interpreter - use #!, or the given sh-compatible \
+  \          /path/interpreter - use #!, or the given sh-compatible \n\
   \            interpreter if the interpreter path cannot be used"
 
 let mk_use_runtime f =
