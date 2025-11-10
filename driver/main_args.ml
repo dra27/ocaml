@@ -1993,18 +1993,21 @@ third-party libraries such as Lwt, but with a different API."
     let _use_prims s = use_prims := s
     let _use_runtime s = use_runtime := s
     let _launch_method s =
-      let s, bindir =
-        try Misc.cut_at s ' '
+      let setting =
+        try
+          let s, bindir = Misc.cut_at s ' ' in
+          target_bindir := bindir;
+          s
         with Not_found ->
-          s, Config.target_bindir
+          s
       in
-      match s with
+      match setting with
       | "exe" ->
-          launch_method := (Config.Executable, bindir)
+          launch_method := Config.Executable;
       | "sh" ->
-          launch_method := (Config.Shebang None, bindir)
+          launch_method := Config.Shebang None
       | s when s <> "" && s.[0] = '/' ->
-          launch_method := (Config.Shebang (Some s), bindir)
+          launch_method := Config.Shebang (Some s)
       | _ ->
           Compenv.fatal
             "-launch-method: expect sh, exe or an absolute path for <method>"
