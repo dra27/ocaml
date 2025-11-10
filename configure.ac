@@ -190,7 +190,7 @@ AC_SUBST([winpthreads_source_dir])
 AC_SUBST([winpthreads_source_include_dir])
 AC_SUBST([shebangscripts])
 AC_SUBST([launch_method])
-AC_SUBST([target_launch_method])
+AC_SUBST([launch_method_target])
 AC_SUBST([AR])
 AC_SUBST([mklib])
 AC_SUBST([supports_shared_libraries])
@@ -590,9 +590,9 @@ AC_ARG_WITH([target-sh],
   [AS_HELP_STRING([--with-target-sh],
     [location of Posix sh on the target system])],
   [AS_IF([test x"$withval" = 'xno'],
-    [target_launch_method='exe'],
-    [target_launch_method="$withval"])],
-  [target_launch_method=''])
+    [launch_method_target='exe'],
+    [launch_method_target="$withval"])],
+  [launch_method_target=''])
 
 AC_ARG_WITH([additional-stublibsdir],
   [AS_HELP_STRING([--with-additional-stublibsdir],
@@ -913,8 +913,8 @@ AS_IF([test "x$interpval" = "xyes"],
       # not use shebang scripts
       shebangscripts=true
       launch_method='sh'
-      AS_IF([test x"$target_launch_method" = 'x'],
-        [target_launch_method='exe'])],
+      AS_IF([test x"$launch_method_target" = 'x'],
+        [launch_method_target='exe'])],
     [*-w64-mingw32*|*-pc-windows], [],
     [shebangscripts=true
     launch_method='sh']
@@ -927,15 +927,15 @@ AS_IF([test "x$interpval" = "xyes"],
 AC_CONFIG_COMMANDS([shebang],
   [printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
     > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
+  printf '%s\n%s\000\n' "$launch_method_target" "$TARGET_BINDIR" \
     > stdlib/target_runtime.info],
 dnl These declarations are put in a here-document in configure, so the command
 dnl in '$(...)' _is_ evaluated as the content is written to config.status (by
 dnl standard interpretation of a here-document). The sed commands quote any
 dnl nefarious single quotes which may appear in any of the strings.
   [launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
-  target_launch_method=\
-'$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  launch_method_target=\
+'$(echo "$launch_method_target" | sed -e "s/'/'\"'\"'/g")'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'])
 
@@ -2961,8 +2961,8 @@ AC_CONFIG_COMMANDS_PRE([
   eval "ocaml_bindir=\"$bindir\""
   eval "ocaml_libdir=\"$libdir\""
   AS_IF([test x"$TARGET_BINDIR" = 'x'],[TARGET_BINDIR="$ocaml_bindir"])
-  AS_IF([test x"$target_launch_method" = 'x'],
-    [target_launch_method="$launch_method"])
+  AS_IF([test x"$launch_method_target" = 'x'],
+    [launch_method_target="$launch_method"])
   prefix="$saved_prefix"
   exec_prefix="$saved_exec_prefix"])
 

@@ -105,4 +105,4 @@ let tsan = @tsan@
 
 let shebangscripts = @shebangscripts@
 
-let launch_method = {@QS@|@target_launch_method@|@QS@}
+let launch_method = {@QS@|@launch_method_target@|@QS@}
