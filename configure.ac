@@ -338,11 +338,12 @@ AS_IF([test -n "$target_alias"],
 # (host=x86_64-pc-cygwin; target=*-w64-mingw32) and $build when running from
 # within Cygwin is always *-pc-cygwin.
 #
-# In MSYS2, the mingw-w64 compiler are normal host compilers, which MSYS2 makes
-# available through different Environments (in a similar to the Microsoft Visual
+# In MSYS2, the mingw-w64 compilers are normal host compilers, which MSYS2 makes
+# available through different Environments (similar to the Microsoft Visual
 # Studio Tools Command Prompts; see https://www.msys2.org/docs/environments/).
 # It is possible to use MSYS2's "Cygwin" gcc (the equivalent of compiling native
-# Cygwin), in which case $build is *-*-msys*.
+# Cygwin), in which case $build is *-*-cygwin (some older MSYS2 installations
+# may report the legacy *-*-msys*)
 # The mingw-w64 Environments manually set $build to *-w64-mingw32, but the
 # _native_ value inferred by config.guess (which uses uname -s) will be
 # *-pc-mingw32 (for the 32-bit _target_ environments, even though MSYS2 is a
@@ -351,8 +352,8 @@ AS_IF([test -n "$target_alias"],
 #
 # This leads to the four patterns below, all of which imply that the build is
 # taking place on a system where Cygwin's utilities (cygpath, etc.) can be
-# expected to be found and semantics (CYGWIN=winsymlinks:native, etc.) expected
-# to apply.
+# expected to be found and its semantics (CYGWIN=winsymlinks:native, etc.) be
+# expected to apply.
 #
 # Note that although build=x86_64-pc-mingw64 will be accepted here, it is highly
 # likely that that's a misconfigured environment, and the script will
