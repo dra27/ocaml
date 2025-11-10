@@ -40,8 +40,9 @@ end)
 
 let objfiles = ref ([] : string list)         (* .cmo and .cma files *)
 and ccobjs = ref ([] : string list)           (* .o, .a, .so and -cclib -lxxx *)
-and dllibs = ref ([] : (bool * string) list)  (* .so, -dllib -lxxx and
-                                                 '-dllib-suffixed -lxxx *)
+and dllibs = ref ([] : (suffixed:bool * string) list)
+                                              (* .so, -dllib -lxxx and
+                                                 -dllib-suffixed -lxxx *)
 
 let cmi_file = ref None
 

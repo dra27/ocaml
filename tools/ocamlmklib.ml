@@ -216,6 +216,8 @@ Options are:
   -rpath <dir>   Same as -dllpath <dir>
   -R<dir>        Same as -rpath
   -suffixed      Append runtime ID to any generated shared libraries
+  -no-suffixed   Do not append runtime ID to any generated shared libraries
+                 (default)
   -verbose       Print commands before executing them
   -v             same as -verbose
   -version       Print version and exit
