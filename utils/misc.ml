@@ -1448,7 +1448,7 @@ module RuntimeID = struct
     ansi: bool;
   }
 
-  let make fn ?(dev = not Config.is_release)
+  let make fn ?(dev = not Config.is_official_release)
               ?(release = Config.release_number)
               ?(reserved = Config.reserved_header_bits)
               ?(no_flat_float_array = not Config.flat_float_array)

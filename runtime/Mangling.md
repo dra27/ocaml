@@ -59,9 +59,9 @@ generates some kind of unique identifier which can then be used in filenames.
   minor release of the compiler, with OCaml 3.12.0[^1] being release 0. At
   present, the ordering of release numbers matches the semantic ordering of the
   version numbers, but this is not guaranteed and should not be assumed[^2].
-- Bits 7-11 (**reserved**): Number of reserved header bits. This is the value
-  passed to `--enable-reserved-header-bits` when the compiler distribution was
-  configured.
+- Bits 7-11 (**reserved**): Number of reserved bits in the OCaml value header.
+  This is the number passed to `--enable-reserved-header-bits` when the compiler
+  distribution was configured.
 - Bit 12 (**no-flat-float-array**): Set if the compiler distribution was
   configured with `--disable-flat-float-array`.
 - Bit 13 (**fp**): Set if the compiler distribution was configured with

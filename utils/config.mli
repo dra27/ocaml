@@ -28,7 +28,7 @@ val release_number: int
 
     @since 5.5 *)
 
-val is_release: bool
+val is_official_release: bool
 (** True if the compiler is an unmodified official OCaml release
 
     @since 5.5 *)

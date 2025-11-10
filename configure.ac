@@ -2959,7 +2959,7 @@ AS_CASE([$target],
 
 # Determine the three Runtime IDs (see runtime/Mangling.md)
 m4_define([ALPHABET], [0123456789abcdefghijklmnopqrstuv])
-alphabet='ALPHABET'
+AC_DEFUN([BASE32], ["$(echo 'ALPHABET' | cut -c $(expr \( $1 \) + 1))"])
 
 m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
   [m4_define([ID_VERSION], m4_eval((OCAML__RELEASE_NUMBER << 1) + 1))],
@@ -2975,11 +2975,10 @@ m4_define([QUINTET1_ZINC],
 
 # Bits 7-9 (low 3 bits of reserved)
 quintet1="QUINTET1_ZINC + $(expr \( $reserved_header_bits \* 4 \) % 32)"
-quintet1="$(echo "$alphabet" | cut -c $(expr $quintet1 + 1))"
+quintet1=BASE32([$quintet1])
 
 # Bits 10-11 (high 2 bits of reserved)
-quintet2_byte=\
-"$(echo "$alphabet" | cut -c $(expr \( $reserved_header_bits / 8 \) + 1))"
+quintet2_byte=BASE32([$reserved_header_bits / 8])
 
 # Bit 12 (no-flat-float-array)
 AS_IF([$flat_float_array],
@@ -2994,9 +2993,9 @@ AS_IF([$frame_pointers],
 AS_IF([$tsan],
   [quintet2_native="16 + $quintet2_native"])
 
-quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
-quintet2_byte="$(echo "$alphabet" | cut -c $(expr $quintet2_byte + 1))"
-quintet2_native="$(echo "$alphabet" | cut -c $(expr $quintet2_native + 1))"
+quintet2_zinc=BASE32([$quintet2_zinc])
+quintet2_byte=BASE32([$quintet2_byte])
+quintet2_native=BASE32([$quintet2_native])
 
 # Bit 15 (int31)
 AS_IF([$arch64],
@@ -3015,18 +3014,18 @@ AS_CASE([$target,$windows_unicode],
   [quintet3="$quintet3_zinc"])
 # Bit 19 (mutable-string) cannot be set since OCaml 5.0
 
-quintet3_zinc="$(echo "$alphabet" | cut -c $(expr $quintet3_zinc + 1))"
-quintet3="$(echo "$alphabet" | cut -c $(expr $quintet3 + 1))"
+quintet3_zinc=BASE32([$quintet3_zinc])
+quintet3=BASE32([$quintet3])
 
 zinc_runtime_id_lo="QUINTET0[]QUINTET1_ZINC"
 zinc_runtime_id_hi="${quintet2_zinc}${quintet3_zinc}"
 bytecode_runtime_id="QUINTET0${quintet1}${quintet2_byte}${quintet3}"
 native_runtime_id="QUINTET0${quintet1}${quintet2_native}${quintet3}"
 
-# Update the values for is_release and release_number in
+# Update the values for is_official_release and release_number in
 # utils/config.common.ml.in (this is done when tools/autogen is run, not each
 # time configure is run!)
-m4_syscmd([sed -e '/^let is_release =/s/=.*/= ]'\
+m4_syscmd([sed -e '/^let is_official_release =/s/=.*/= ]'\
 'm4_if(OCAML__DEVELOPMENT_VERSION,true,false,true)[/' \
     -e '/^let release_number =/s/=.*/= ]OCAML__RELEASE_NUMBER[/' \
     utils/config.common.ml.in > utils/config.common.ml.in.new
