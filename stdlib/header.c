@@ -321,7 +321,7 @@ static char * read_runtime_path(file_descriptor fd, uint32_t *rntm_strlen)
   if (*rntm_strlen == 0) return NULL;
   /* The last character of runtime_path must be '\0', so RNTM must be strictly
      less than PATH_MAX */
-  if (*rntm_strlen > PATH_MAX * RNTM_ENCODING_LENGTH) return NULL;
+  if (*rntm_strlen >= PATH_MAX * RNTM_ENCODING_LENGTH) return NULL;
   if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
   if (read(fd, runtime_path, *rntm_strlen) != *rntm_strlen) return NULL;
 
@@ -347,28 +347,28 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
   while (*rntm_bindir_end != 0)
     rntm_bindir_end++;
 
-  /* The first character of rntm is NUL for Search mode */
+  /* The first character of rntm is NUL for Always mode */
   if (*rntm != 0) {
     /* boot/ocamlc writes a NUL-terminated string to RNTM. In this case,
        rntm_bindir_end points to that NUL (which will have been included in the
        length of RNTM recorded in the bytecode image) and immediately following
        it is the extra NUL character required by this function.
-       Interpret this as Absolute. For Windows, where the RNTM written by
+       Interpret this as Disable. For Windows, where the RNTM written by
        boot/ocamlc will have just been "ocamlrun\0", this maintains the required
-       Search behaviour! This can be removed after a bootstrap. */
+       Always behaviour! This can be removed after a bootstrap. */
     if (rntm_bindir_end + 1 == rntm_end)
       rntm_bindir_end++;
-    /* For Absolute mode, there is no NUL in RNTM, so rntm_bindir_end points to
-       the terminator pointed to be rntm_end. For Absolute_then_search, there is
-       a NUL in the middle of the RNTM "string", which rntm_bindir_end points
-       at. Change that to a directory separator, so that rntm now points to a
-       NUL-terminated full path we can attempt to exec. */
+    /* For Disable mode, there is no NUL in RNTM, so rntm_bindir_end points to
+       the terminator pointed to by rntm_end. For Enable, there is a NUL in the
+       middle of the RNTM "string", which rntm_bindir_end points at. Change that
+       to a directory separator, so that rntm now points to a NUL-terminated
+       full path we can attempt to exec. */
     if (rntm_bindir_end != rntm_end)
       *rntm_bindir_end = Directory_separator_character;
     int status = exec_file(rntm, argv);
-    /* exec failed. For Absolute mode, there's nothing else to be tried. For
-       Absolute_then_search, if the failure was for any other reason than ENOENT
-       then there is also nothing else to be tried. */
+    /* exec failed. For Disable mode, there's nothing else to be tried. For
+       Enable, if the failure was for any other reason than ENOENT then there is
+       also nothing else to be tried. */
     if (rntm_bindir_end == rntm_end || status != ENOENT)
       exit_with_error(T("Cannot exec "), rntm, NULL);
   }
@@ -409,7 +409,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
   /* If we get here, we've failed... */
   exit_with_error(T("This program requires OCaml ") SHORT_VERSION T("\n")
                   T("Interpreter ("), (rntm_bindir_end + 1),
-                  T(") not found with the program or in " PATH_NAME));
+                  T(") not found alongside the program or in " PATH_NAME));
 }
 
 #ifdef _WIN32

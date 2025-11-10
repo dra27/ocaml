@@ -291,9 +291,9 @@ let p_list title print = function
 let p_runtime (runtime, search) =
   let runtime =
     match search with
-    | Byterntm.Search -> runtime
-    | Byterntm.Absolute dir -> dir ^ runtime
-    | Byterntm.Absolute_then_search dir -> Printf.sprintf "[%s]%s" dir runtime
+    | Byterntm.Always -> runtime
+    | Byterntm.Disable dir -> dir ^ runtime
+    | Byterntm.Enable dir -> Printf.sprintf "[%s]%s" dir runtime
   in
   printf "Runtime:\n\t%s\n" runtime
 
