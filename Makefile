@@ -2779,12 +2779,12 @@ else
 installopt::
 endif
 	$(INSTALL_PROG) \
-    runtime/lib$(1)_shared$(EXT_DLL) \
+	  runtime/lib$(1)_shared$(EXT_DLL) \
 	    "$(INSTALL_LIBDIR)/$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))"
 ifeq "$(SUFFIXING)" "true"
 	cd "$(INSTALL_LIBDIR)" && \
-    $(LN) "$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))" \
-    "lib$(1)_shared$(EXT_DLL)"
+	  $(LN) "$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))" \
+	  "lib$(1)_shared$(EXT_DLL)"
 endif
 endef
 
