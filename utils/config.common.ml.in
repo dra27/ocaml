@@ -62,9 +62,9 @@ let launch_method =
 
 let search_method =
   match search_method with
-  | "always" -> Search
-  | "enable" -> Absolute_then_search
-  | _ -> Absolute
+  | "always" -> Always
+  | "enable" -> Enable
+  | _ -> Disable
 
 let interface_suffix = ref ".mli"
 
