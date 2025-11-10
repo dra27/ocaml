@@ -525,24 +525,17 @@ let link_bytecode ?final_name tolink exec_name standalone =
          ~filename:final_name ~kind:"bytecode executable"
          outchan (Symtable.initial_global_table());
        Bytesections.record toc_writer DATA;
-       let standard_library_default =
-         if standalone && needs_stdlib then
-           (* -set-runtime-default *)
-           if !Clflags.standard_library_default = None then
-             Some Config.standard_library_default
-           else
+       (* -custom executables don't need OSLD sections - the correct value is
+          already included in the runtime. *)
+       if standalone && needs_stdlib then begin
+         (* OCaml Standard Library Default location *)
+         let standard_library_default =
+           Option.value
+             ~default:Config.standard_library_default
              !Clflags.standard_library_default
-         else
-           (* -custom executables don't need OSLD sections - the correct value
-              is already included in the runtime. *)
-           None
-       in
-       begin match standard_library_default with
-       | Some value ->
-           (* OCaml Standard Library Default location *)
-           output_string outchan value;
-           Bytesections.record toc_writer OSLD
-       | None -> ()
+         in
+         output_string outchan standard_library_default;
+         Bytesections.record toc_writer OSLD
        end;
        (* The map of global identifiers *)
        Symtable.output_global_map outchan;
