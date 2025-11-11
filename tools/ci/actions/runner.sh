@@ -243,10 +243,11 @@ CreateSwitch () {
   curl -Lo opam \
  'https://github.com/ocaml/opam/releases/download/2.4.1/opam-2.4.1-x86_64-linux'
   chmod +x opam
-  ./opam init --bare --disable-sandboxing --yes --auto-setup
+  ./opam init --cli=2.4 --bare --disable-sandboxing --yes --auto-setup
   # This is intentionally done before the switch is created - if the install
   # target creates _opam then the switch creation will fail.
   $MAKE INSTALL_MODE=opam OPAM_PACKAGE_NAME=ocaml-variants install
+  # These commands intentionally run using opam's "default" CLI
   ./opam switch create ~/local --empty
   ./opam switch --switch ~/local set-invariant --no-action ocaml-option-flambda
   ./opam pin add --switch ~/local --no-action --kind=path ocaml-variants .
