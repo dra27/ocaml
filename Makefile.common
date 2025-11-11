@@ -346,7 +346,7 @@ RECORD_FILE_TO_INSTALL = \
 #   $2 = subdirectory (may be empty, but otherwise must end with "/")
 #   $3 = name to install $1 (must be specified)
 # The compiler is installed as the ocaml package in opam, but the actual files
-# are installed from other packages (typically ocaml-compiler). For the the lib
+# are installed from other packages (typically ocaml-compiler). For the lib
 # directory, the lib_root and libexec_root sections allow files to be installed
 # to lib/ocaml, but there's no equivalent mechanism for the doc directory. These
 # files are recorded to be copied manually in the fixup script.
