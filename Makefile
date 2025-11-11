@@ -2731,13 +2731,13 @@ endif
 
 # These three targets are the slightly esoteric special sauce that avoid
 # recursive make invocations in the install targets.
-# There are three basic install recipies:
+# There are three basic install recipes:
 # - The old install target is available to common-install, but never recurses to
 # - The old installopt target is available as both full-installopt and
 #   native-install
 # - The old installoptopt target is also available as full-installoptopt and
 #   installopt
-# These sets of recipies are then welded together by these three dependency
+# These sets of recipes are then welded together by these three dependency
 # specifications
 # - When configured with --disable-native-compiler, the install target simply
 #   depends on common-install (see above)
