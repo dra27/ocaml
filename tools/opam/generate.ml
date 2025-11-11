@@ -34,8 +34,6 @@ let ln_command = Sys.argv.(3)
 
 let output_endline oc = Printf.kfprintf (fun oc -> output_char oc '\n') oc
 
-(* [generate_file file] processes then erases opam-bin, opam-lib opam-libexec
-   and opam-man to produce [file] *)
 let write_install_lines oc file =
   In_channel.with_open_text file @@
     In_channel.fold_lines (fun _ -> output_endline oc "  %s") ()
@@ -54,6 +52,8 @@ let output_section oc section =
     Sys.remove file
   end
 
+(* [generate_install file] processes then erases opam-bin, opam-lib opam-libexec
+   and opam-man to produce [file] *)
 let generate_install file =
   Out_channel.with_open_text file @@ fun oc ->
     List.iter (output_section oc) ["bin"; "lib"; "libexec"; "man"];
