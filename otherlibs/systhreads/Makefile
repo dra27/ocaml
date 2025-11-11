@@ -69,7 +69,7 @@ lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
 lib$(LIBNAME)nat.$(A): OC_CFLAGS = $(OC_NATIVE_CFLAGS)
 
 lib$(LIBNAME)nat.$(A): $(NATIVECODE_C_OBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME)nat $^
+	$(V_OCAMLMKLIB)$(MKLIB) -custom -o $(LIBNAME)nat $^
 
 $(LIBNAME).cma: $(THREADS_BCOBJS)
 	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^
