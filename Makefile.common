@@ -153,7 +153,7 @@ INSTALL_ITEMS_OPT = \
 
 INSTALL_ENSURE_DIR = \
   $(if $(filter undefined,$(origin DIR_CREATED_$(subst exec,,$(1))_$(2))),$\
-    $(eval DIR_CREATED_$(1)_$(2):=)$\
+    $(eval DIR_CREATED_$(subst exec,,$(1))_$(2):=)$\
     $(call INSTALL_DESPATCH_$(INSTALL_MODE)_MKDIR,$\
       $(subst exec,,$(1)),$(2)))
 
