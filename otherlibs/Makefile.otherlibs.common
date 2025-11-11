@@ -124,6 +124,7 @@ installopt:
 	   $(CAMLOBJS_NAT) $(LIBNAME).cmxa $(LIBNAME).$(A), lib, $(LIBNAME))
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 	$(call INSTALL_ITEMS, $(LIBNAME).cmxs, libexec, $(LIBNAME))
+	$(call INSTALL_ITEMS, dll$(CLIBNAME_NATIVE)$(EXT_DLL), stublibs)
 endif
 ifneq "$(STUBSLIB_NATIVE)" ""
 	$(call INSTALL_ITEMS, $(STUBSLIB_NATIVE), lib)
