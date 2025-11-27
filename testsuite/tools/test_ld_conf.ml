@@ -68,6 +68,7 @@ let tests config env =
         if config.has_relative_libdir = None then
           libdir
         else
+          (* Unix.realpath raises Invalid_argument if it's not available *)
           try Unix.realpath libdir
           with Invalid_argument _ -> libdir in
       let (/) = Filename.concat in
