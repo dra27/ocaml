@@ -33,6 +33,10 @@ CAMLextern void caml_sys_init (const char_os * exe_name, char_os ** argv);
 
 CAMLnoret CAMLextern void caml_do_exit (int);
 
+/* The default location of the Standard Library as used by the
+   %standard_library_default to find */
+extern char_os *caml_standard_library_default;
+
 #endif /* CAML_INTERNALS */
 
 #endif /* CAML_SYS_H */

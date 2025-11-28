@@ -23,11 +23,48 @@
 val version: string
 (** The current version number of the system *)
 
+val release_number: int
+(** The release number for the compiler
+
+    @since 5.5 *)
+
+val is_release: bool
+(** True if the compiler is an unmodified official OCaml release
+
+    @since 5.5 *)
+
 val bindir: string
-(** The directory containing the binary programs *)
+(** The directory containing the binary programs. If the compiler was configured
+    with [--with-relative-libdir] then this will be the directory containing the
+    currently executing runtime. *)
+
+val standard_library_default: string
+(** The configured value for the directory containing the standard libraries.
+    May be a relative path if the compiler was configured with
+    [--with-relative-libdir].
+
+    @since 5.5 *)
+
+val standard_library_effective: string
+(** The standard library directory, computed taking {!standard_library_relative}
+    and {!standard_library_default} into account, but not taking CAMLLIB or
+    OCAMLLIB into account.
+
+    @since 5.5 *)
+
+val standard_library_relative: bool
+(** Whether {!standard_library_effective} is computed relative to the runtime
+
+    @since 5.5 *)
+
+val target_bindir: string
+(** The directory containing the runtime binaries on the target system
+
+    @since 5.5 *)
 
 val standard_library: string
-(** The directory containing the standard libraries *)
+(** The effective directory containing the standard libraries, taking CAMLLIB
+    and OCAMLLIB into account. *)
 
 val ccomp_type: string
 (** The "kind" of the C compiler, assembler and linker used: one of
@@ -46,6 +83,12 @@ val c_has_debug_prefix_map : bool
 
 val as_has_debug_prefix_map : bool
 (** Whether the assembler supports --debug-prefix-map *)
+
+val as_is_cc : bool
+(** Whether the assembler is actually an assembler, or whether we are really
+    assembling files via the C compiler
+
+    @since 5.5 *)
 
 val bytecode_cflags : string
 (** The flags ocamlc should pass to the C compiler *)
@@ -179,7 +222,24 @@ val target_os_type: string
 (** Operating system targetted by the native-code compiler. One of
 -  ["Unix"] (for all Unix versions, including Linux and macOS),
 -  ["Win32"] (for MS-Windows, OCaml compiled with MSVC++ or MinGW-w64),
--  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin). *)
+-  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin).
+
+    @since 5.4 *)
+
+val target_unix: bool
+(** True if [target_os_type = "Unix"]
+
+    @since 5.5 *)
+
+val target_win32: bool
+(** True if [target_os_type = "Win32"]
+
+    @since 5.5 *)
+
+val target_cygwin: bool
+(** True if [target_os_type = "Cygwin"]
+
+    @since 5.5 *)
 
 val asm: string
 (** The assembler (and flags) to use for assembling
@@ -285,6 +345,51 @@ val ar_supports_response_files: bool
 
 val tsan : bool
 (** Whether ThreadSanitizer instrumentation is enabled *)
+
+(** Launch mechanisms for bytecode executables
+
+    @since 5.5 *)
+type launch_method =
+| Executable               (** Use executable launcher stub *)
+| Shebang of string option (** Use shebang-style launcher, either directly to
+                               the runtime, or via sh. The parameter if
+                               specified is the full path to sh, otherwise the
+                               linker searches for it. *)
+
+val launch_method : launch_method
+(** Default launch mechanism for bytecode executables
+
+    @since 5.5 *)
+
+(** Mechanisms used by tendered bytecode executables to locate the interpreter
+
+    @since 5.5 *)
+type search_method =
+| Absolute             (** Check fixed absolute location only *)
+| Absolute_then_search (** Check fixed absolute location, but perform a search
+                           if that fails *)
+| Search               (** Always search for the interpreter *)
+
+val search_method : search_method
+(** Default search mechanism for bytecode executables
+
+    @since 5.5 *)
+
+val suffixing : bool
+(** Whether the runtime executable and shared library filenames and C stub
+    library filenames are being mangled with Runtime IDs and the {!target}.
+
+    @since 5.5 *)
+
+val bytecode_runtime_id : string
+(** The Runtime ID for this build of the bytecode runtime system
+
+    @since 5.5 *)
+
+val native_runtime_id : string
+(** The Runtime ID for this build of the native runtime system
+
+    @since 5.5 *)
 
 (** Access to configuration values *)
 val print_config : out_channel -> unit
