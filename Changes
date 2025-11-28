@@ -15,6 +15,15 @@ OCaml 4.11 maintenance branch
 
 ### Build system:
 
+- #10135: Overhaul the FlexDLL bootstrap process. It's now fully integrated
+  with the default build target and controlled by --with-flexdll which allows
+  externally downloaded sources for FlexDLL to be specified. A separate
+  non-shared version of the runtime is built, and shared artefacts are no longer
+  built twice. When bootstrapping, any flexlink in PATH is now ignored and the
+  Cygwin port also supports bootstrapping FlexDLL. flexlink.opt is automatically
+  built and installed as part of opt.opt/world.opt.
+  (David Allsopp, review by Sébastien Hinderer)
+
 - #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.

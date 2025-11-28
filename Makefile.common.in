@@ -23,6 +23,10 @@ INSTALL ?= @INSTALL@
 INSTALL_DATA ?= $(INSTALL) -m u=rw,g=rw,o=r
 INSTALL_PROG ?= $(INSTALL) -m u=rwx,g=rwx,o=rx
 
+# The location of the FlexDLL sources to use (usually provided as the flexdll
+# Git submodule)
+FLEXDLL_SOURCES=@flexdir@
+
 # note: these are defined by lazy expansions
 # as some parts of the makefiles change BINDIR, etc.
 # and expect INSTALL_BINDIR, etc. to stay in synch
@@ -33,11 +37,7 @@ INSTALL_LIBDIR = $(DESTDIR)$(LIBDIR)
 INSTALL_STUBLIBDIR = $(DESTDIR)$(STUBLIBDIR)
 INSTALL_MANDIR = $(DESTDIR)$(MANDIR)
 
-ifeq "$(UNIX_OR_WIN32)" "win32"
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
-else
-FLEXDLL_SUBMODULE_PRESENT =
-endif
 
 # Use boot/ocamlc.opt if available
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
@@ -49,7 +49,7 @@ else
   BOOT_OCAMLC = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc
 endif
 
-ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
   FLEXLINK_ENV =
   CAMLOPT_CMD = $(CAMLOPT)
   OCAMLOPT_CMD = $(OCAMLOPT)
@@ -57,14 +57,20 @@ ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
   ocamlc_cmd = $(ocamlc)
   ocamlopt_cmd = $(ocamlopt)
 else
+ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun $(ROOTDIR)/flexdll/flexlink.exe"
+    OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun$(EXE) \
+                    $(ROOTDIR)/boot/flexlink.byte$(EXE)"
+else
+  FLEXLINK_ENV = \
+    OCAML_FLEXLINK="$(ROOTDIR)/flexlink.opt$(EXE) -I $(ROOTDIR)/stdlib/flexdll"
+endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   CAMLOPT_CMD = $(FLEXLINK_ENV) $(CAMLOPT)
   OCAMLOPT_CMD = $(FLEXLINK_ENV) $(OCAMLOPT)
   MKLIB_CMD = $(FLEXLINK_ENV) $(MKLIB)
   ocamlc_cmd = $(FLEXLINK_ENV) $(ocamlc)
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
-endif
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
 OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
