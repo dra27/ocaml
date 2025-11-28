@@ -137,6 +137,7 @@ host=''
 conffile=Makefile.config
 make=make
 instdir="$HOME/ocaml-tmp-install"
+reldir='../lib/ocaml'
 confoptions="--enable-ocamltest --enable-dependency-generation \
 ${OCAML_CONFIGURE_OPTIONS}"
 make_native=true
@@ -168,6 +169,7 @@ case "${OCAML_ARCH}" in
     build='--build=i686-pc-cygwin'
     host='--host=i686-w64-mingw32'
     instdir='C:/ocamlmgw'
+    reldir='..\lib\ocaml'
     cleanup=true
     check_make_alldepend=true
     init_submodule=true
@@ -176,6 +178,7 @@ case "${OCAML_ARCH}" in
     build='--build=x86_64-pc-cygwin'
     host='--host=x86_64-w64-mingw32'
     instdir='C:/ocamlmgw64'
+    reldir='..\lib\ocaml'
     cleanup=true
     check_make_alldepend=true
     init_submodule=true
@@ -184,6 +187,7 @@ case "${OCAML_ARCH}" in
     build='--build=i686-pc-cygwin'
     host='--host=i686-pc-windows'
     instdir='C:/ocamlms'
+    reldir='..\lib\ocaml'
     cleanup=true
     init_submodule=true
   ;;
@@ -191,6 +195,7 @@ case "${OCAML_ARCH}" in
     build='--build=x86_64-pc-cygwin'
     host='--host=x86_64-pc-windows'
     instdir='C:/ocamlms64'
+    reldir='..\lib\ocaml'
     cleanup=true
     init_submodule=true
   ;;
@@ -251,7 +256,19 @@ if test "$flambda" = "true"; then
   confoptions="$confoptions --enable-flambda --enable-flambda-invariants"
 fi
 
+case $NODE_NAME in
+  *-32|ocaml-ppc-64-be)
+    # Native compilation not supported
+    ;;
+  *)
+    # Include ocamlnat in the in-prefix tests
+    confoptions="$confoptions --enable-native-toplevel";;
+esac
+
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
+
+grep -F -e prefix -e DIR= Makefile.config
+grep -F 'LIBDIR' Makefile.build_config
 
 grep -q '^NATIVE_COMPILER=false' Makefile.config && make_native=false
 
@@ -276,6 +293,7 @@ if $make_native && $check_make_alldepend; then
 fi
 
 $make --warn-undefined-variables install
+$make -f Makefile.test -C testsuite/in_prefix test-in-prefix
 rm -rf "$instdir"
 
 cd testsuite
@@ -283,7 +301,20 @@ if test -n "$jobs" && test -x /usr/bin/parallel
 then PARALLEL="$jobs $PARALLEL" $make --warn-undefined-variables parallel
 else $make --warn-undefined-variables all
 fi
+cd ..
+
+git clean -q -f -d -x
+eval ./configure "$CCOMP" $build $host --prefix='$instdir' \
+                 '--with-relative-libdir=$reldir' \
+                 --enable-runtime-search=always --enable-runtime-search-target \
+                 $confoptions
+grep -F -e prefix -e DIR= Makefile.config
+grep -F 'LIBDIR' Makefile.build_config
+$make $jobs
+$make install
+$make -f Makefile.test -C testsuite/in_prefix test-in-prefix
+rm -rf "$instdir"
 
 if $bootstrap; then
-  git checkout ../boot/ocamlc ../boot/ocamllex
+  git checkout boot/ocamlc boot/ocamllex
 fi

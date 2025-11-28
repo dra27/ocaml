@@ -27,22 +27,22 @@ else
 fi
 
 function run {
-    if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
-    NAME=$1
-    shift
-    echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    if [[ -n $SHOW_CMD ]]; then (set -x; "$@"); else "$@"; fi
-    CODE=$?
-    if [[ $CODE -ne 0 ]] ; then
-        echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-        if [[ $BUILD_PID -ne 0 ]] ; then
-          kill -KILL $BUILD_PID 2>/dev/null
-          wait $BUILD_PID 2>/dev/null
-        fi
-        exit $CODE
-    else
-        echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
+  NAME=$1
+  shift
+  echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ -n $SHOW_CMD ]]; then (set -x; "$@"); else "$@"; fi
+  CODE=$?
+  if [[ $CODE -ne 0 ]] ; then
+    echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    if [[ $BUILD_PID -ne 0 ]] ; then
+      kill -KILL $BUILD_PID 2>/dev/null
+      wait $BUILD_PID 2>/dev/null
     fi
+    exit $CODE
+  else
+    echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  fi
 }
 
 # Function: set_configuration
@@ -50,53 +50,54 @@ function run {
 # $1:the Windows port. Recognized values: mingw, msvc and msvc64
 # $2: the prefix to use to install
 function set_configuration {
-    case "$1" in
-        cygwin*)
-            dep='--disable-dependency-generation'
-            man=''
-        ;;
-        mingw32)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-w64-mingw32'
-            dep='--disable-dependency-generation'
-            man=''
-        ;;
-        mingw64)
-            build='--build=i686-pc-cygwin'
-            host='--host=x86_64-w64-mingw32'
-            dep='--disable-dependency-generation'
-            man='--disable-stdlib-manpages'
-        ;;
-        msvc32)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-pc-windows'
-            dep='--disable-dependency-generation'
-            man=''
-        ;;
-        msvc64)
-            build='--build=x86_64-pc-cygwin'
-            host='--host=x86_64-pc-windows'
-            # Explicitly test dependency generation on msvc64
-            dep='--enable-dependency-generation'
-            man=''
-        ;;
-    esac
+  args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
+        '--prefix' "$2/_opam" \
+        '--docdir' "$2/_opam/doc/ocaml" \
+        '--enable-ocamltest')
 
-    mkdir -p "$CACHE_DIRECTORY"
-    ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                $dep $build $man $host --prefix="$2" --enable-ocamltest || ( \
-      rm -f "$CACHE_DIRECTORY/config.cache-$1" ; \
-      ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                  $dep $build $man $host --prefix="$2" --enable-ocamltest )
+  case "$1" in
+    cygwin*)
+      args+=('--disable-dependency-generation' '--enable-native-toplevel');;
+    mingw32)
+      args+=('--host=i686-w64-mingw32' '--disable-dependency-generation');;
+    mingw64)
+      args+=('--host=x86_64-w64-mingw32' '--disable-dependency-generation' \
+             '--disable-stdlib-manpages' '--enable-native-toplevel');;
+    msvc32)
+      args+=('--host=i686-pc-windows' '--disable-dependency-generation');;
+    msvc64)
+      # Explicitly test dependency generation on msvc64
+      args+=('--host=x86_64-pc-windows' '--enable-dependency-generation' \
+             '--enable-native-toplevel');;
+  esac
+  case "$RELOCATABLE,$1" in
+    true,cygwin*)
+      args+=('--with-relative-libdir=../lib/ocaml');;
+    true,*)
+      args+=('--with-relative-libdir=..\lib\ocaml');;
+  esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--enable-runtime-search=always' '--enable-runtime-search-target')
+  fi
 
-#    FILE=$(pwd | cygpath -f - -m)/Makefile.config
-#    run "Content of $FILE" cat Makefile.config
+  mkdir -p "$CACHE_DIRECTORY"
+  echo './configure' "${args[@]@Q}"
+  if ! ./configure "${args[@]}"; then
+    rm -f "$CACHE_DIRECTORY/config.cache-$1"
+    ./configure "${args[@]}"
+  fi
+
+  cp "$CACHE_DIRECTORY/config.cache-$1" config.cache
+
+#  FILE=$(pwd | cygpath -f - -m)/Makefile.config
+#  run "Content of $FILE" cat Makefile.config
 }
 
-PARALLEL_URL='https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel'
+PARALLEL_URL=\
+'https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel?h=20241222'
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 FLEXDLLROOT="$PROGRAMFILES/flexdll"
-OCAMLROOT=$(echo "$OCAMLROOT" | cygpath -f - -m)
+export OPAMSWITCH="$OCAMLROOT"
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
@@ -107,13 +108,7 @@ fi
 
 case "$1" in
   install)
-    if [ ! -e "$CACHE_DIRECTORY/parallel-source" ] || \
-       [ "$PARALLEL_URL" != "$(cat "$CACHE_DIRECTORY/parallel-source")" ] ; then
-      # Download latest version directly from the repo
-      curl -Ls $PARALLEL_URL -o "$CACHE_DIRECTORY/parallel"
-      echo "$PARALLEL_URL" > "$CACHE_DIRECTORY/parallel-source"
-    fi
-    cp "$CACHE_DIRECTORY/parallel" /usr/bin
+    cp "$APPVEYOR_BUILD_FOLDER/tools/ci/appveyor/parallel" /usr/bin
     chmod +x /usr/bin/parallel
     parallel --version
     if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
@@ -133,7 +128,7 @@ case "$1" in
     ;;
   test)
     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+    #run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
     if [[ $PORT =~ mingw* ]] ; then
       run "Check runtime symbols" \
           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
@@ -143,7 +138,7 @@ case "$1" in
     run_testsuite=true
     if [[ -n $APPVEYOR_PULL_REQUEST_NUMBER ]]; then
       API_URL="https://api.github.com/repos/$APPVEYOR_REPO_NAME/issues/$APPVEYOR_PULL_REQUEST_NUMBER"
-      if curl --silent "$API_URL/labels" | grep -q "no-testsuite"; then
+      if curl --silent "$API_URL/labels" | grep -q 'CI: Skip testsuite'; then
         run_testsuite=false
       fi
     fi
@@ -152,15 +147,52 @@ case "$1" in
       # tests now (to include natdynlink)
       run "test dynlink $PORT" \
           $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-      # Now reconfigure ocamltest to run in bytecode-only mode
-      sed -i '/native_/s/true/false/' \
-             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+      case "$PORT" in
+        *64)
+          # Now reconfigure ocamltest to run in bytecode-only mode
+          sed -i '/native_/s/true/false/' \
+                 "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt;;
+      esac
       # And run the entire testsuite, skipping all the native-code tests
       run "test $PORT" \
           make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    make -C "$FULL_BUILD_PREFIX-$PORT" INSTALL_MODE=clone install
+    (
+      cd "$OCAMLROOT"
+      mv _opam destdir
+      #ret="$PWD"
+      #script="$PWD/ocaml-compiler-clone.sh"
+      #cd "$(find $PWD/install -name _opam -type d)"
+      mkdir -p "destdir/share/ocaml"
+      cp "$FULL_BUILD_PREFIX-$PORT/config."{cache,status} 'destdir/share/ocaml/'
+      cp "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" \
+           'destdir/share/ocaml/clone'
+      cd destdir
+      sh "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" "$OCAMLROOT/_opam"
+    )
+    rm -rf "$OCAMLROOT"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" OPAM_PACKAGE_NAME=ocaml-variants \
+      INSTALL_MODE=opam install
+    (
+      cd "$FULL_BUILD_PREFIX-$PORT"
+      export PATH="$FLEXDLLROOT:$PATH"
+      opam init --bare --yes --disable-sandboxing --auto-setup \
+                --cygwin-local-install
+      opam switch create "$OPAMSWITCH" --empty
+      opam pin add --no-action --kind=path ocaml-variants .
+      opam pin add --no-action flexdll flexdll
+      opam install --yes flexdll
+      opam install --yes --assume-built ocaml-variants
+      rm -f config.cache ocaml-variants.install ocaml-variants-fixup.sh \
+            ocaml-compiler-clone.sh
+      opam exec -- ocamlc -v
+    )
+    run "test $PORT in prefix" \
+      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
+            test-in-prefix
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches

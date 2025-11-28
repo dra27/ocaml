@@ -124,3 +124,10 @@ val function_sections : bool
 
 val instrumented_runtime : bool
 (** Whether the instrumented runtime is available *)
+
+val has_relative_libdir : bool
+(** Whether the compiler has been configured using --with-relative-libdir *)
+
+val suffixing : bool
+(** Whether C stub library filenames are being mangled with the Bytecode
+    Runtime ID and {!Config.target}. *)

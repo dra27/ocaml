@@ -26,6 +26,7 @@ m4_include([build-aux/ltoptions.m4])
 m4_include([build-aux/ltsugar.m4])
 m4_include([build-aux/ltversion.m4])
 m4_include([build-aux/lt~obsolete.m4])
+m4_include([build-aux/ax_check_compile_flag.m4])
 
 # Macros from the autoconf macro archive
 m4_include([build-aux/ax_func_which_gethostbyname_r.m4])
@@ -557,4 +558,15 @@ AC_DEFUN([OCAML_CC_SUPPORTS_ATOMIC], [
   [cc_supports_atomic=false
    AC_MSG_RESULT([no])])
   LIBS="$saved_LIBS"
+])
+
+AC_DEFUN([OCAML_CHECK_LN_ON_WINDOWS], [
+  AC_MSG_CHECKING([for a workable solution for ln -sf])
+  AS_IF([m4_normalize(MSYS=winsymlinks:nativestrict
+                      CYGWIN=winsymlinks:nativestrict
+                      ln -sf configure conftestLink 2>/dev/null)],
+    [ln='ln -sf'],
+    [ln='cp -pf']
+  )
+  AC_MSG_RESULT([$ln])
 ])

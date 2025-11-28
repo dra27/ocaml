@@ -62,7 +62,8 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST_QUOTE,FLEXDLL_DIR) \
 	    $(call SUBST_STRING,FLEXDLL_CHAIN) \
 	    $(call SUBST,HOST) \
-	    $(call SUBST_STRING,BINDIR) \
+	    $(call SUBST_STRING,OCAML_BINDIR) \
+	    $(call SUBST_STRING,TARGET_BINDIR) \
 	    $(call SUBST_STRING,LIBDIR) \
 	    $(call SUBST_STRING,MKDLL_EXP) \
 	    $(call SUBST_STRING,MKEXE_EXP) \
@@ -71,6 +72,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST_STRING,MKMAINDLL) \
 	    $(call SUBST,MODEL) \
 	    $(call SUBST_STRING,NATIVECCLIBS) \
+	    $(call SUBST,AS_IS_CC) \
 	    $(call SUBST_STRING,OCAMLC_CFLAGS) \
 	    $(call SUBST_STRING,OCAMLC_CPPFLAGS) \
 	    $(call SUBST_STRING,OCAMLOPT_CFLAGS) \
@@ -90,6 +92,11 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST,FUNCTION_SECTIONS) \
 	    $(call SUBST,CC_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,AS_HAS_DEBUG_PREFIX_MAP) \
+	    $(call SUBST,SUFFIXING) \
+	    $(call SUBST_STRING,TARGET_LAUNCH_METHOD) \
+	    $(call SUBST_STRING,TARGET_SEARCH_METHOD) \
+	    $(call SUBST_STRING,BYTECODE_RUNTIME_ID) \
+	    $(call SUBST_STRING,NATIVE_RUNTIME_ID) \
 	    $< > $@
 	cat config.common.ml >> $@
 
