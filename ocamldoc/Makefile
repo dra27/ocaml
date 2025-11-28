@@ -14,6 +14,7 @@
 #**************************************************************************
 
 ROOTDIR = ..
+SUBDIR_NAME = ocamldoc
 
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
@@ -54,7 +55,7 @@ endif
 
 
 INCLUDE_DIRS = $(addprefix $(ROOTDIR)/,\
-  utils parsing typing driver bytecomp toplevel) generators
+  utils parsing typing driver bytecomp toplevel runtime) generators
 INCLUDES_DEP = $(addprefix -I ,$(INCLUDE_DIRS))
 INCLUDES_NODEP = $(addprefix -I $(ROOTDIR)/,\
   compilerlibs otherlibs/str otherlibs/dynlink \
@@ -67,7 +68,8 @@ COMPFLAGS = \
   -g $(INCLUDES) -absname -w +a-4-9-41-42-44-45-48 -warn-error +A \
   -strict-sequence -strict-formats -bin-annot -principal
 
-LINKFLAGS = $(INCLUDES)
+LINKFLAGS = $(INCLUDES) \
+  -set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
 
 CMOFILES=\
   odoc_config.cmo \
@@ -161,6 +163,10 @@ OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 
 $(eval $(call PROGRAM_SYNONYM,ocamldoc))
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+$(OCAMLDOC): LINKFLAGS += $(BYTECODE_LAUNCHER_FLAGS)
+endif
+
 $(OCAMLDOC): $(EXECMOFILES)
 	$(V_LINKC)$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_BCLIBRARIES) $^
 
@@ -214,19 +220,12 @@ DEPEND_PREREQS = $(LEXERS:.mll=.ml) \
 
 .PHONY: install
 install:
-	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
-	$(INSTALL_PROG) $(OCAMLDOC) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) \
-	  ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) META \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBCMIS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	$(call INSTALL_ITEMS, ocamldoc$(EXE), bin)
+	$(call INSTALL_ITEMS, ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) META, \
+	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	$(call INSTALL_ITEMS, $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS), \
+	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 endif
 
 # Note: at the moment, $(INSTALL_MANODIR) is created even if the doc has
@@ -238,20 +237,10 @@ installopt:
 
 .PHONY: installopt_really
 installopt_really:
-	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
-	$(INSTALL_PROG) $(OCAMLDOC_OPT) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBCMIS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-endif
-	$(INSTALL_DATA) \
-	  ocamldoc.hva *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	$(call INSTALL_ITEMS, ocamldoc.opt$(EXE), bin)
+	$(call INSTALL_ITEMS, \
+	  *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA), \
+	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 
 # TODO: also split into several rules
 

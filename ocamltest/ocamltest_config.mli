@@ -127,3 +127,10 @@ val instrumented_runtime : bool
 
 val frame_pointers : bool
 (** Whether frame-pointers have been enabled at configure time *)
+
+val has_relative_libdir : bool
+(** Whether the compiler has been configured using --with-relative-libdir *)
+
+val suffixing : bool
+(** Whether C stub library filenames are being mangled with the Bytecode
+    Runtime ID and {!Config.target}. *)

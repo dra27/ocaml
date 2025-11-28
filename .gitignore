@@ -26,6 +26,7 @@
 *.cmx[as]
 *.cmti
 *.annot
+*.stripped
 *.exe
 *.exe.manifest
 .DS_Store
@@ -80,6 +81,7 @@ META
 
 /bytecomp/opcodes.ml
 /bytecomp/opcodes.mli
+/bytecomp/byterntm.ml
 
 /debugger/debugger_lexer.ml
 /debugger/debugger_parser.ml
@@ -251,9 +253,7 @@ META
 /runtime/domain_state64.inc
 
 /stdlib/camlheader
-/stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
+/stdlib/target_camlheader*
 /stdlib/camlheader_ur
 /stdlib/labelled-*
 /stdlib/caml
@@ -272,11 +272,15 @@ META
 
 
 /testsuite/tools/codegen
+/testsuite/tools/dummy
 /testsuite/tools/expect_test
 /testsuite/tools/lexcmm.ml
 /testsuite/tools/parsecmm.ml
 /testsuite/tools/parsecmm.mli
 /testsuite/tools/parsecmm.output
+/testsuite/tools/test_in_prefix
+/testsuite/tools/test_in_prefix.opt
+/testsuite/tools/toolchain.ml
 
 /tools/ocamldep
 /tools/ocamldep.opt

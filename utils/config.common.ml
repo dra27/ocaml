@@ -19,6 +19,21 @@
 (* The main OCaml version string has moved to ../build-aux/ocaml_version.m4 *)
 let version = Sys.ocaml_version
 
+(* is_release and release_number are automatically updated autoconf from values
+   in ../build-aux/ocaml_version.m4 - do not edit these lines directly. *)
+let is_release = false
+let release_number = 17
+
+external standard_library_default : unit -> string = "%standard_library_default"
+
+let standard_library_default = standard_library_default ()
+
+external stdlib_dirs : string -> string * string option
+   = "caml_sys_get_stdlib_dirs"
+
+let standard_library_effective, relative_root_dir =
+  stdlib_dirs standard_library_default
+
 let standard_library =
   try
     Sys.getenv "OCAMLLIB"
@@ -26,7 +41,16 @@ let standard_library =
   try
     Sys.getenv "CAMLLIB"
   with Not_found ->
-    standard_library_default
+    standard_library_effective
+
+let standard_library_relative = relative_root_dir <> None
+
+let bindir = Option.value ~default:bindir relative_root_dir
+let target_bindir =
+  if target_bindir = Filename.current_dir_name then
+    Filename.dirname Sys.executable_name
+  else
+    target_bindir
 
 let exec_magic_number = "Caml1999X033"
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
@@ -53,6 +77,21 @@ let safe_string = true
 let default_safe_string = true
 let naked_pointers = false
 
+type launch_method = Executable | Shebang of string option
+type search_method = Absolute | Absolute_then_search | Search
+
+let launch_method =
+  match launch_method with
+  | "exe" -> Executable
+  | "sh" -> Shebang None
+  | _ -> Shebang (Some launch_method)
+
+let search_method =
+  match search_method with
+  | "always" -> Search
+  | "enable" -> Absolute_then_search
+  | _ -> Absolute
+
 let interface_suffix = ref ".mli"
 
 let max_tag = 243
@@ -64,6 +103,7 @@ let lazy_tag = 246
 let max_young_wosize = 256
 let stack_threshold = 32 (* see runtime/caml/config.h *)
 let stack_safety_margin = 6
+let target_win32 = Sys.win32
 let default_executable_name =
   match Sys.os_type with
     "Unix" -> "a.out"
@@ -78,9 +118,20 @@ let configuration_variables () =
   let p x v = (x, String v) in
   let p_int x v = (x, Int v) in
   let p_bool x v = (x, Bool v) in
+  let is_explicit_relative path =
+    path = Filename.current_dir_name
+    || path = Filename.parent_dir_name
+    || Filename.is_relative path && not (Filename.is_implicit path)
+  in
+  let standard_library_relative =
+    if is_explicit_relative standard_library_default then
+      standard_library_default
+    else
+      "" in
 [
   p "version" version;
-  p "standard_library_default" standard_library_default;
+  p "standard_library_default" standard_library_effective;
+  p "standard_library_relative" standard_library_relative;
   p "standard_library" standard_library;
   p "ccomp_type" ccomp_type;
   p "c_compiler" c_compiler;
@@ -92,6 +143,7 @@ let configuration_variables () =
   p "native_c_compiler" native_c_compiler;
   p "bytecomp_c_libraries" bytecomp_c_libraries;
   p "native_c_libraries" native_c_libraries;
+  p "compression_c_libraries" compression_c_libraries;
   p "native_pack_linker" native_pack_linker;
   p_bool "native_compiler" native_compiler;
   p "architecture" architecture;
@@ -112,6 +164,8 @@ let configuration_variables () =
   p_bool "systhread_supported" systhread_supported;
   p "host" host;
   p "target" target;
+  p "bytecode_runtime_id" bytecode_runtime_id;
+  p "native_runtime_id" native_runtime_id;
   p_bool "flambda" flambda;
   p_bool "safe_string" safe_string;
   p_bool "default_safe_string" default_safe_string;

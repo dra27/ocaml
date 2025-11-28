@@ -104,7 +104,7 @@ bytecode_modules := $(o_files) $(cmo_files)
 native_modules := $(o_files) $(cmx_files)
 
 directories := $(addprefix $(ROOTDIR)/,utils bytecomp parsing \
-                                       compilerlibs file_formats)
+                                       compilerlibs file_formats runtime)
 
 include_directories := $(addprefix -I , $(directories))
 
