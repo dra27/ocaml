@@ -20,6 +20,7 @@
 # FIXME reduce redundancy by including ../Makefile
 
 ROOTDIR = ../..
+SUBDIR_NAME = otherlibs/dynlink
 
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
@@ -140,6 +141,9 @@ $(LOCAL_SRC)/Makefile: $(LOCAL_SRC)/Makefile.copy-sources Makefile
             >> $@; \
         done
 
+$(LOCAL_SRC)/dll.ml:
+	sed -e '/caml_dynlink_parse/s/_parse_/_parse_runtime_/' $< > $@
+
 # Rules to automatically generate dependencies for the local copy of the
 # compilerlibs sources.
 
@@ -239,20 +243,14 @@ $(extract_crc): dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
 	$(OCAMLC) -o $@ $^
 
 install:
-	$(INSTALL_DATA) \
-	  dynlink.cmi dynlink.cma \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmi dynlink.cma, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  dynlink.cmti dynlink.mli \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmti dynlink.mli, lib)
 endif
 
 installopt:
 ifeq "$(strip $(NATDYNLINK))" "true"
-	$(INSTALL_DATA) \
-	  $(NATOBJS) dynlink.cmxa dynlink.$(A) \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, $(NATOBJS) dynlink.cmxa dynlink.$(A), lib)
 endif
 
 partialclean:

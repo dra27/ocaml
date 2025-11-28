@@ -46,7 +46,7 @@ BINDIR=@bindir@
 
 datarootdir=@datarootdir@
 
-### Where to install the standard library
+### Where to install the standard library on host
 LIBDIR=@libdir@
 
 ### Where to install the stub code for the standard library
@@ -58,15 +58,6 @@ STUBLIBDIR=@libdir@/stublibs
 MANDIR=@mandir@
 PROGRAMS_MAN_DIR=$(MANDIR)/man1
 LIBRARIES_MAN_DIR=$(MANDIR)/man3
-
-### Do #! scripts work on your system?
-### Beware: on some systems (e.g. SunOS 4), this will work only if
-### the string "#!$(BINDIR)/ocamlrun" is less than 32 characters long.
-### In doubt, set HASHBANGSCRIPTS to false.
-SHEBANGSCRIPTS=@shebangscripts@
-LONG_SHEBANG=@long_shebang@
-# For compatibility
-HASHBANGSCRIPTS:=$(SHEBANGSCRIPTS)
 
 ### Path to the libtool script
 LIBTOOL = $(TOP_BUILDDIR)/libtool
@@ -267,7 +258,15 @@ FLEXLINK_FLAGS=@flexlink_flags@
 FLEXLINK_CMD=flexlink
 FLEXLINK=$(FLEXLINK_CMD) $(FLEXLINK_FLAGS)
 
+# Runtime ID values
+BYTECODE_RUNTIME_ID=@bytecode_runtime_id@
+NATIVE_RUNTIME_ID=@native_runtime_id@
+
 # Deprecated variables
+
+SHEBANGSCRIPTS=@shebangscripts@
+HASHBANGSCRIPTS=$(SHEBANGSCRIPTS)
+LONG_SHEBANG=false
 
 ## Variables renamed in OCaml 4.13
 

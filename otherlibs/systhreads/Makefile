@@ -14,6 +14,7 @@
 #**************************************************************************
 
 ROOTDIR=../..
+SUBDIR_NAME=otherlibs/systhreads
 
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
@@ -35,6 +36,12 @@ CAMLC=$(BEST_OCAMLC) $(LIBS)
 CAMLOPT=$(BEST_OCAMLOPT) $(LIBS)
 
 MKLIB=$(OCAMLRUN) $(ROOTDIR)/tools/ocamlmklib$(EXE)
+ifeq "$(SUFFIXING)" "true"
+MKLIB += -suffixed
+DLLTHREADS = dllthreads-$(TARGET)-$(BYTECODE_RUNTIME_ID)$(EXT_DLL)
+else
+DLLTHREADS = dllthreads$(EXT_DLL)
+endif
 COMPFLAGS=-w +33..39 -warn-error +A -g -bin-annot -safe-string
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
@@ -95,8 +102,8 @@ st_stubs.%.$(O): st_stubs.c
 else
 st_stubs.%.$(O): st_stubs.c $(RUNTIME_HEADERS) $(wildcard *.h)
 endif
-	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
-	  $(OUTPUTOBJ)$@ $<
+	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(PRIVATE_CFLAGS) \
+	  $(OC_CPPFLAGS) $(CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
 partialclean:
 	rm -f *.cm*
@@ -105,30 +112,22 @@ clean: partialclean
 	rm -f dllthreads*.so dllthreads*.dll *.a *.lib *.o *.obj
 	rm -rf $(DEPDIR)
 
-INSTALL_THREADSLIBDIR=$(INSTALL_LIBDIR)/$(LIBNAME)
-
 install:
-	if test -f dllthreads$(EXT_DLL); then \
-	  $(INSTALL_PROG) dllthreads$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
-	fi
-	$(INSTALL_DATA) libthreads.$(A) "$(INSTALL_LIBDIR)"
-	mkdir -p "$(INSTALL_THREADSLIBDIR)"
-	$(INSTALL_DATA) \
-	  $(CMIFILES) threads.cma \
-	  "$(INSTALL_THREADSLIBDIR)"
-ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(CMIFILES:.cmi=.cmti) \
-	  "$(INSTALL_THREADSLIBDIR)"
-	$(INSTALL_DATA) $(MLIFILES) "$(INSTALL_THREADSLIBDIR)"
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+	$(call INSTALL_ITEMS, $(DLLTHREADS), stublibs)
 endif
-	$(INSTALL_DATA) threads.h "$(INSTALL_LIBDIR)/caml"
+	$(call INSTALL_ITEMS, libthreads.$(A), lib)
+	$(call INSTALL_ITEMS, $(CMIFILES) threads.cma, lib, $(LIBNAME))
+ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
+	$(call INSTALL_ITEMS, $(CMIFILES:.cmi=.cmti), lib, $(LIBNAME))
+	$(call INSTALL_ITEMS, $(MLIFILES), lib, $(LIBNAME))
+endif
+	$(call INSTALL_ITEMS, threads.h, lib, $(INSTALL_LIBDIR_CAML))
 
 installopt:
-	$(INSTALL_DATA) libthreadsnat.$(A) "$(INSTALL_LIBDIR)"
-	$(INSTALL_DATA) \
-	  $(THREADS_NCOBJS) threads.cmxa threads.$(A) \
-	  "$(INSTALL_THREADSLIBDIR)"
+	$(call INSTALL_ITEMS, libthreadsnat.$(A), lib)
+	$(call INSTALL_ITEMS, $(THREADS_NCOBJS) threads.cmxa threads.$(A), \
+	  lib, $(LIBNAME))
 
 %.cmi: %.mli
 	$(CAMLC) -c $(COMPFLAGS) $<
