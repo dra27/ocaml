@@ -14,9 +14,10 @@
 #**************************************************************************
 
 ROOTDIR = ..
+SUBDIR_NAME = ocamldoc
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
 OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
@@ -113,7 +114,8 @@ INCLUDES_NODEP=\
   -I $(ROOTDIR)/otherlibs/str \
   -I $(ROOTDIR)/otherlibs/dynlink \
   -I $(ROOTDIR)/otherlibs/dynlink/native \
-  -I $(ROOTDIR)/otherlibs/$(UNIXLIB)
+  -I $(ROOTDIR)/otherlibs/$(UNIXLIB) \
+  -I $(ROOTDIR)/runtime
 
 DEPINCLUDES=$(INCLUDES_DEP)
 INCLUDES=$(INCLUDES_DEP) $(INCLUDES_NODEP)
@@ -121,7 +123,8 @@ INCLUDES=$(INCLUDES_DEP) $(INCLUDES_NODEP)
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48 -warn-error A \
   -safe-string -strict-sequence -strict-formats -bin-annot -principal
 
-LINKFLAGS=$(INCLUDES) -nostdlib
+LINKFLAGS=$(INCLUDES) -nostdlib \
+  -set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
 
 CMOFILES=\
   odoc_config.cmo \
@@ -185,14 +188,8 @@ LIBCMOFILES = $(CMOFILES)
 LIBCMXFILES = $(LIBCMOFILES:.cmo=.cmx)
 LIBCMIFILES = $(LIBCMOFILES:.cmo=.cmi)
 
-ifeq "$(STDLIB_MANPAGES)" "true"
-DOCS_TARGET = manpages
-else
-DOCS_TARGET =
-endif
-
 .PHONY: all
-all: lib exe generators $(DOCS_TARGET)
+all: lib exe generators
 
 .PHONY: exe
 exe: $(OCAMLDOC)
@@ -225,6 +222,17 @@ OCAMLDOC_LIBRARIES = ocamlcommon unix str dynlink
 
 OCAMLDOC_BCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cma)
 OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
+
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+  # ocamldebug is linked with -g which will result in a -custom executable when
+  # shared libraries are not available. Ensure that the primitives object is
+  # compiled with the correct flags
+$(OCAMLDOC): LINKFLAGS += $(addprefix -ccopt$(SPACE), $(BUILD_MAP_CFLAGS))
+endif
+else
+$(OCAMLDOC): LINKFLAGS += $(BYTECODE_LAUNCHER_FLAGS)
+endif
 
 $(OCAMLDOC): $(EXECMOFILES)
 	$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_BCLIBRARIES) $^
@@ -305,31 +313,21 @@ odoc_see_lexer.ml: odoc_see_lexer.mll
 # TODO: it may be good to split the following rule in several ones, e.g.
 # install-programs, install-doc, install-libs
 
-INSTALL_MANODIR=$(INSTALL_MANDIR)/man3
-
 .PHONY: install
 install:
-	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
-	$(MKDIR) "$(INSTALL_MANODIR)"
-	$(INSTALL_PROG) $(OCAMLDOC) "$(INSTALL_BINDIR)/$(OCAMLDOC)$(EXE)"
-	$(INSTALL_DATA) \
-	  ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBCMIS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	$(call INSTALL_ITEMS, ocamldoc, bin, , ocamldoc$(EXE))
+	$(call INSTALL_ITEMS, ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA), \
+	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	$(call INSTALL_ITEMS, $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS), \
+	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 endif
-	if test -d stdlib_man; then \
-	  $(INSTALL_DATA) stdlib_man/* "$(INSTALL_MANODIR)"; \
-	else : ; fi
+	$(if $(wildcard stdlib_man), \
+	  $(call INSTALL_ITEMS, stdlib_man/*, \
+	    man, $(INSTALL_MANDIR_LIBRARIES)))
 
-# Note: at the moment, $(INSTALL_MANODIR) is created even if the doc has
-# not been built. This is not clean and should be changed.
+# Note: at the moment, $(INSTALL_MANDIR_LIBRARIES) is created even if the doc
+# has not been built. This is not clean and should be changed.
 
 .PHONY: installopt
 installopt:
@@ -337,21 +335,10 @@ installopt:
 
 .PHONY: installopt_really
 installopt_really:
-	$(MKDIR) "$(INSTALL_BINDIR)"
-	$(MKDIR) "$(INSTALL_LIBDIR)/ocamldoc"
-	$(INSTALL_PROG) \
-	   $(OCAMLDOC_OPT) "$(INSTALL_BINDIR)/$(OCAMLDOC_OPT)$(EXE)"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBCMIS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(OCAMLDOC_LIBMLIS) $(OCAMLDOC_LIBCMTS) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
-endif
-	$(INSTALL_DATA) \
-	  ocamldoc.hva *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
-	  "$(INSTALL_LIBDIR)/ocamldoc"
+	$(call INSTALL_ITEMS, ocamldoc.opt, bin, , ocamldoc.opt$(EXE))
+	$(call INSTALL_ITEMS, \
+	  *.cmx $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA), \
+	  lib, $(INSTALL_LIBDIR_OCAMLDOC))
 
 # TODO: also split into several rules
 
@@ -511,12 +498,13 @@ odoc:
 .PHONY: clean
 clean:
 	rm -f \#*\#
-	rm -f $(OCAMLDOC) $(OCAMLDOC_OPT) *.cma *.cmxa *.cmo *.cmi *.cmx *.cmt *.cmti *.$(A) *.$(O)
+	rm -f $(OCAMLDOC) $(OCAMLDOC_OPT) *.cma *.cmxa *.cmo *.cmi *.cmx *.cmt *.cmti *.a *.lib *.o *.obj
 	rm -f odoc_parser.output odoc_text_parser.output
 	rm -f odoc_lexer.ml odoc_text_lexer.ml odoc_see_lexer.ml odoc_ocamlhtml.ml
 	rm -f odoc_parser.ml odoc_parser.mli odoc_text_parser.ml odoc_text_parser.mli
 	rm -rf stdlib_man stdlib_html stdlib_texi stdlib_latex
-	rm -f generators/*.cm[taiox] generators/*.$(A) generators/*.$(O) generators/*.cmx[as]
+	rm -f generators/*.cm[taiox] generators/*.a generators/*.lib generators/*.o generators/*.obj \
+        generators/*.cmx[as]
 
 .PHONY: depend
 depend:

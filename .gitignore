@@ -40,7 +40,7 @@ _build
 
 # local to root directory
 
-/Makefile.common
+/Makefile.build_config
 /Makefile.config
 /autom4te.cache
 /ocamlc
@@ -48,6 +48,7 @@ _build
 /ocaml-*.cache
 /config.log
 /config.status
+/flexlink.opt
 /libtool
 /ocamlc.opt
 /expunge
@@ -67,11 +68,14 @@ _build
 /asmcomp/CSE.ml
 
 /boot/ocamlrun
+/boot/ocamlruns
 /boot/camlheader
 /boot/ocamlc.opt
+/boot/flexlink.byte
 
 /bytecomp/opcodes.ml
 /bytecomp/opcodes.mli
+/bytecomp/byterntm.ml
 
 /debugger/lexer.ml
 /debugger/parser.ml
@@ -81,6 +85,8 @@ _build
 /emacs/ocamltags
 /emacs/*.elc
 
+/flexdll-sources
+
 /lambda/runtimedef.ml
 
 /lex/parser.ml
@@ -89,6 +95,8 @@ _build
 /lex/ocamllex
 /lex/ocamllex.opt
 /lex/parser.output
+
+/man/*.link
 
 /manual/manual/cmds/warnings-help.etex
 /manual/manual/warnings-help.etex
@@ -117,6 +125,7 @@ _build
 /ocamltest/ocamltest
 /ocamltest/ocamltest.opt
 /ocamltest/ocamltest_config.ml
+/ocamltest/ocamltest_config.mlp
 /ocamltest/tsl_lexer.ml
 /ocamltest/tsl_parser.ml
 /ocamltest/tsl_parser.mli
@@ -184,19 +193,20 @@ _build
 /runtime/ocamlrun
 /runtime/ocamlrund
 /runtime/ocamlruni
+/runtime/caml_internal_config.h
 /runtime/ld.conf
 /runtime/interp.a.lst
 /runtime/*.[sd]obj
 /runtime/.gdb_history
 /runtime/*.d.c
 /runtime/*.pic.c
+/runtime/build_config.h
+/runtime/sak
 /runtime/domain_state32.inc
 /runtime/domain_state64.inc
 
 /stdlib/camlheader
-/stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
+/stdlib/target_camlheader*
 /stdlib/camlheader_ur
 /stdlib/labelled-*
 /stdlib/caml
@@ -215,10 +225,14 @@ _build
 
 
 /testsuite/tools/codegen
+/testsuite/tools/dummy
 /testsuite/tools/expect_test
 /testsuite/tools/lexcmm.ml
 /testsuite/tools/parsecmm.ml
 /testsuite/tools/parsecmm.mli
+/testsuite/tools/test_in_prefix
+/testsuite/tools/test_in_prefix.opt
+/testsuite/tools/toolchain.ml
 
 /tools/ocamldep
 /tools/ocamldep.opt

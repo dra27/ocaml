@@ -18,49 +18,25 @@
 ROOTDIR = ..
 
 include $(ROOTDIR)/Makefile.config
+include $(ROOTDIR)/Makefile.common
 
-ifeq "$(UNIX_OR_WIN32)" "win32"
-ifeq "$(wildcard $(ROOTDIR)/flexdll/Makefile)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
   FLEXDLL_DIR =
 else
-  FLEXDLL_DIR = $(if $(wildcard $(ROOTDIR)/flexdll/flexdll_*.$(O)),+flexdll)
-endif
-else
-  FLEXDLL_DIR =
+  FLEXDLL_DIR = +flexdll
 endif
 
 FLEXLINK_FLAGS ?=
 
-# Escape special characters in the argument string.
-# There are four characters that need escaping:
-# - backslash and ampersand, which are special in the replacement text
-#   of sed's "s" command
-# - exclamation mark, which is the delimiter we use for sed's "s" command
-# - single quote, which interferes with shell quoting.  We are inside
-#   single quotes already, so the proper escape is '\''
-#   (close single quotation, insert single quote character,
-#    reopen single quotation).
-SED_ESCAPE=$(subst ','\'',$(subst !,\!,$(subst &,\&,$(subst \,\\,$1))))
-
-# Escape special characters in an OCaml string literal "..."
-# There are two: backslash and double quote.
-OCAML_ESCAPE=$(subst ",\",$(subst \,\\,$1))
-
-# SUBST generates the sed substitution for the variable *named* in $1
-SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
-
-# SUBST_STRING does the same, for a variable that occurs between "..."
-# in config.mlp.  Thus, backslashes and double quotes must be escaped.
-SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
-
-# SUBST_QUOTE does the same, adding OCaml quotes around non-empty strings
-#   (see FLEXDLL_DIR which must empty if FLEXDLL_DIR is empty but an OCaml
-#    string otherwise)
+# SUBST_QUOTE does the same as SUBST_STRING, adding OCaml quotes around
+#   non-empty strings (see FLEXDLL_DIR which must empty if FLEXDLL_DIR is empty
+#   but an OCaml string otherwise)
 SUBST_QUOTE2=\
   -e 's!%%$1%%!$(if $2,$(call SED_ESCAPE,"$(call OCAML_ESCAPE,$2)"))!'
 SUBST_QUOTE=$(call SUBST_QUOTE2,$1,$($1))
 
 FLEXLINK_LDFLAGS=$(if $(OC_LDFLAGS), -link "$(OC_LDFLAGS)")
+FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
 
 config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	sed $(call SUBST,AFL_INSTRUMENT) \
@@ -82,15 +58,19 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST_STRING,FLEXLINK_FLAGS) \
 	    $(call SUBST_QUOTE,FLEXDLL_DIR) \
 	    $(call SUBST,HOST) \
+	    $(call SUBST_STRING,OCAML_BINDIR) \
+	    $(call SUBST_STRING,TARGET_BINDIR) \
 	    $(call SUBST_STRING,LIBDIR) \
 	    $(call SUBST,LIBUNWIND_AVAILABLE) \
 	    $(call SUBST,LIBUNWIND_LINK_FLAGS) \
 	    $(call SUBST_STRING,MKDLL) \
 	    $(call SUBST_STRING,MKEXE) \
 	    $(call SUBST_STRING,FLEXLINK_LDFLAGS) \
+	    $(call SUBST_STRING,FLEXLINK_DLL_LDFLAGS) \
 	    $(call SUBST_STRING,MKMAINDLL) \
 	    $(call SUBST,MODEL) \
 	    $(call SUBST_STRING,NATIVECCLIBS) \
+	    $(call SUBST,AS_IS_CC) \
 	    $(call SUBST_STRING,OCAMLC_CFLAGS) \
 	    $(call SUBST_STRING,OCAMLC_CPPFLAGS) \
 	    $(call SUBST_STRING,OCAMLOPT_CFLAGS) \
@@ -101,6 +81,7 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST,FORCE_SAFE_STRING) \
 	    $(call SUBST,DEFAULT_SAFE_STRING) \
 	    $(call SUBST,WINDOWS_UNICODE) \
+	    $(call SUBST,NAKED_POINTERS) \
 	    $(call SUBST,SUPPORTS_SHARED_LIBRARIES) \
 	    $(call SUBST,SYSTEM) \
 	    $(call SUBST,SYSTHREAD_SUPPORT) \
@@ -113,6 +94,11 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST,FUNCTION_SECTIONS) \
 	    $(call SUBST,CC_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,AS_HAS_DEBUG_PREFIX_MAP) \
+	    $(call SUBST,SUFFIXING) \
+	    $(call SUBST_STRING,TARGET_LAUNCH_METHOD) \
+	    $(call SUBST_STRING,TARGET_SEARCH_METHOD) \
+	    $(call SUBST_STRING,BYTECODE_RUNTIME_ID) \
+	    $(call SUBST_STRING,NATIVE_RUNTIME_ID) \
 	    $< > $@
 
 # Test for the substitution functions above

@@ -14,9 +14,10 @@
 #**************************************************************************
 
 ROOTDIR=../..
+SUBDIR_NAME=otherlibs/systhreads
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
 OC_CFLAGS += $(SHAREDLIB_CFLAGS)
@@ -34,6 +35,12 @@ CAMLC=$(BEST_OCAMLC) $(LIBS)
 CAMLOPT=$(BEST_OCAMLOPT) $(LIBS)
 
 MKLIB=$(CAMLRUN) $(ROOTDIR)/tools/ocamlmklib
+ifeq "$(SUFFIXING)" "true"
+MKLIB += -suffixed
+DLLTHREADS = dllthreads-$(TARGET)-$(BYTECODE_RUNTIME_ID)$(EXT_DLL)
+else
+DLLTHREADS = dllthreads$(EXT_DLL)
+endif
 COMPFLAGS=-w +33..39 -warn-error A -g -bin-annot -safe-string
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
@@ -68,23 +75,14 @@ all: lib$(LIBNAME).$(A) $(LIBNAME).cma $(CMIFILES)
 allopt: lib$(LIBNAME)nat.$(A) $(LIBNAME).cmxa $(CMIFILES)
 
 lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
-	$(MKLIB_CMD) -o $(LIBNAME) $(BYTECODE_C_OBJS) $(PTHREAD_LINK)
+	$(MKLIB_CMD) -o $(LIBNAME) $(BYTECODE_C_OBJS)
 
 lib$(LIBNAME)nat.$(A): $(NATIVECODE_C_OBJS)
 	$(MKLIB_CMD) -o $(LIBNAME)nat $^
 
+# Bytecode programs always link with pthread libraries
 $(LIBNAME).cma: $(THREADS_BCOBJS)
-ifeq "$(UNIX_OR_WIN32)" "unix"
-	$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -cclib -lunix -linkall \
-	  $(PTHREAD_CAML_LINK) $^
-# TODO: Figure out why -cclib -lunix is used here.
-# It may be because of the threadsUnix module which is deprecated.
-# It may hence be good to figure out whether this module shouldn't be
-# removed, and then -cclib -lunix arguments.
-else # Windows
-	$(MKLIB) -o $(LIBNAME) -ocamlc "$(CAMLC)" -linkall \
-	  $(PTHREAD_CAML_LINK) $^
-endif
+	$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^
 
 # See remark above: force static linking of libthreadsnat.a
 $(LIBNAME).cmxa: $(THREADS_NCOBJS)
@@ -102,45 +100,33 @@ $(LIBNAME).cmxa: $(THREADS_NCOBJS)
 st_stubs_n.$(O): OC_CPPFLAGS += $(NATIVE_CPPFLAGS)
 
 st_stubs_b.$(O): st_stubs.c $(HEADER)
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
+	$(CC) -c $(OC_CFLAGS) $(PRIVATE_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
 st_stubs_n.$(O): st_stubs.c $(HEADER)
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
+	$(CC) -c $(OC_CFLAGS) $(PRIVATE_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
 partialclean:
 	rm -f *.cm*
 
 clean: partialclean
-	rm -f dllthreads*$(EXT_DLL) *.$(A) *.$(O)
-
-INSTALL_THREADSLIBDIR=$(INSTALL_LIBDIR)/$(LIBNAME)
+	rm -f dllthreads*.so dllthreads*.dll *.a *.lib *.o *.obj
 
 install:
-	if test -f dllthreads$(EXT_DLL); then \
-	  $(INSTALL_PROG) \
-	    dllthreads$(EXT_DLL) "$(INSTALL_STUBLIBDIR)/dllthreads$(EXT_DLL)"; \
-	fi
-	$(INSTALL_DATA) libthreads.$(A) "$(INSTALL_LIBDIR)"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) libthreads.$(A)
-	mkdir -p "$(INSTALL_THREADSLIBDIR)"
-	$(INSTALL_DATA) \
-	  $(CMIFILES) threads.cma \
-	  "$(INSTALL_THREADSLIBDIR)"
-ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  $(CMIFILES:.cmi=.cmti) \
-	  "$(INSTALL_THREADSLIBDIR)"
-	$(INSTALL_DATA) $(MLIFILES) "$(INSTALL_THREADSLIBDIR)"
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+	$(call INSTALL_ITEMS, $(DLLTHREADS), stublibs)
 endif
-	$(INSTALL_DATA) threads.h "$(INSTALL_LIBDIR)/caml"
+	$(call INSTALL_ITEMS, libthreads.$(A), lib)
+	$(call INSTALL_ITEMS, $(CMIFILES) threads.cma, lib, $(LIBNAME))
+ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
+	$(call INSTALL_ITEMS, $(CMIFILES:.cmi=.cmti), lib, $(LIBNAME))
+	$(call INSTALL_ITEMS, $(MLIFILES), lib, $(LIBNAME))
+endif
+	$(call INSTALL_ITEMS, threads.h, lib, $(INSTALL_LIBDIR_CAML))
 
 installopt:
-	$(INSTALL_DATA) libthreadsnat.$(A) "$(INSTALL_LIBDIR)"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) libthreadsnat.$(A)
-	$(INSTALL_DATA) \
-	  $(THREADS_NCOBJS) threads.cmxa threads.$(A) \
-	  "$(INSTALL_THREADSLIBDIR)"
-	cd "$(INSTALL_THREADSLIBDIR)" && $(RANLIB) threads.$(A)
+	$(call INSTALL_ITEMS, libthreadsnat.$(A), lib)
+	$(call INSTALL_ITEMS, $(THREADS_NCOBJS) threads.cmxa threads.$(A), \
+	  lib, $(LIBNAME))
 
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
