@@ -159,11 +159,19 @@ let libdir_rules config file =
        - contains OCaml debug information
        - contains C debug information
        - contains objects which have been created by the assembler *)
+<<<<<<< HEAD
     let (embeds_stdlib_location, has_ocaml_debug_info, has_c_debug_info,
          contains_assembled_objects) =
       if List.mem basename ["Makefile.config";
                             "ld.conf";
                             "runtime-launch-info"] then
+=======
+    let (~stdlib:embeds_stdlib_location,
+         ~ocaml_debug:has_ocaml_debug_info,
+         ~c_debug:has_c_debug_info,
+         ~s:contains_assembled_objects) =
+      if basename = "Makefile.config" || basename = "runtime-launch-info" then
+>>>>>>> 1e05f341eaf
         (* These files all embed the Standard Library location *)
         (true, false, false, false)
       else if basename = "config.cmx" then
