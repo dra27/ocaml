@@ -211,6 +211,9 @@ let build_package_cmx members cmxfile =
     else
       Clambda (get_approx ui)
   in
+  let ui_need_stdlib =
+    List.fold_left (fun acc unit -> acc || unit.ui_need_stdlib) false units
+  in
   Export_info_for_pack.clear_import_state ();
   let pkg_infos =
     { ui_name = ui.ui_name;
@@ -232,6 +235,7 @@ let build_package_cmx members cmxfile =
       ui_force_link =
           List.exists (fun info -> info.ui_force_link) units;
       ui_export_info;
+      ui_need_stdlib;
     } in
   Compilenv.write_unit_info pkg_infos cmxfile
 

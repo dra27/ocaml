@@ -70,10 +70,11 @@ val use_inlining_arguments_set : ?round:int -> inlining_arguments -> unit
 
 val objfiles : string list ref
 val ccobjs : string list ref
-val dllibs : string list ref
+val dllibs : (bool * string) list ref
 val compile_only : bool ref
 val output_name : string option ref
 val include_dirs : string list ref
+val standard_library_default : string option ref
 val no_std_include : bool ref
 val print_types : bool ref
 val make_archive : bool ref
@@ -108,6 +109,8 @@ val noinit : bool ref
 val noversion : bool ref
 val use_prims : string ref
 val use_runtime : string ref
+val launch_method : (Config.launch_method * string) ref
+val search_method : Config.search_method ref
 val plugin : bool ref
 val principal : bool ref
 val real_paths : bool ref

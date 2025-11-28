@@ -117,10 +117,6 @@ $(filter-out camlinternal%,$(compilerlibref)),\
 build/latex/compilerlibs_input.tex: | build/latex
 	echo $(compilerlibs_INPUT) > $@
 
-INSTALL_MANODIR=$(INSTALL_MANDIR)/man3
 .PHONY:install
 install:
-	$(MKDIR) "$(INSTALL_MANODIR)"
-	if test -d build/man; then \
-	  $(INSTALL_DATA) build/man/*.3o "$(INSTALL_MANODIR)"; \
-	else : ; fi
+	$(call INSTALL_ITEMS_OPT, build/man/*.3o, man, $(INSTALL_MANDIR_LIBRARIES))
