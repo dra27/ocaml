@@ -16,7 +16,7 @@
 (* Handling of dynamically-linked libraries *)
 
 (* Extract the name of a DLLs from its external name (xxx.so or -lxxx) *)
-val extract_dll_name: string -> string
+val extract_dll_name: bool * string -> string
 
 type dll_mode =
   | For_checking     (* will just check existence of symbols;
@@ -49,6 +49,9 @@ val add_path: string list -> unit
 
 (* Remove the given directories from the search path for DLLs *)
 val remove_path: string list -> unit
+
+(* Return the current search path for DLLs *)
+val search_path: unit -> string list
 
 (* Initialization for separate compilation.
    Initialize the DLL search path to the directories given in the

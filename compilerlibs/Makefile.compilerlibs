@@ -96,7 +96,7 @@ COMMON_CMI=$(UTILS_CMI) $(PARSING_CMI) $(TYPING_CMI) $(LAMBDA_CMI) $(COMP_CMI)
 
 COMMON=$(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 
-BYTECOMP=bytecomp/instruct.cmo bytecomp/bytegen.cmo \
+BYTECOMP=bytecomp/byterntm.cmo bytecomp/instruct.cmo bytecomp/bytegen.cmo \
   bytecomp/printinstr.cmo bytecomp/emitcode.cmo \
   bytecomp/bytelink.cmo bytecomp/bytelibrarian.cmo bytecomp/bytepackager.cmo \
   driver/errors.cmo driver/compile.cmo
@@ -105,7 +105,6 @@ BYTECOMP_CMI=
 ARCH_SPECIFIC =\
   asmcomp/arch.ml asmcomp/proc.ml asmcomp/CSE.ml asmcomp/selection.ml \
   asmcomp/scheduling.ml asmcomp/reload.ml
-ARCH_SPECIFIC_CMI=
 
 INTEL_ASM=\
   asmcomp/x86_proc.cmo \
@@ -116,6 +115,7 @@ INTEL_ASM_CMI=\
   asmcomp/x86_ast.cmi
 
 ARCH_SPECIFIC_ASMCOMP=
+ARCH_SPECIFIC_ASMCOMP_CMI=
 ifeq ($(ARCH),i386)
 ARCH_SPECIFIC_ASMCOMP=$(INTEL_ASM)
 ARCH_SPECIFIC_ASMCOMP_CMI=$(INTEL_ASM_CMI)

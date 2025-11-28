@@ -1,11 +1,11 @@
 (* TEST
 flags = "-no-alias-deps"
 compile_only = "true"
-files = "c.mli d.mli"
+files = "b.cmi.in c.mli d.mli"
 * setup-ocamlc.byte-build-env
 ** script
 script =
-  "cp ${test_source_directory}/b.cmi.invalid ${test_build_directory}/b.cmi"
+  "cp ${test_source_directory}/b.cmi.in ${test_build_directory}/b.cmi"
 *** ocamlc.byte
 all_modules = "c.mli d.mli aliases.ml"
 **** check-ocamlc.byte-output

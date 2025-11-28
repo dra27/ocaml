@@ -14,6 +14,7 @@
 #**************************************************************************
 
 ROOTDIR = ..
+SUBDIR_NAME = runtime
 
 -include $(ROOTDIR)/Makefile.config
 -include $(ROOTDIR)/Makefile.common
@@ -57,20 +58,20 @@ endif
 
 # Targets to build and install
 
-PROGRAMS := ocamlrun$(EXE)
-BYTECODE_STATIC_LIBRARIES := ld.conf libcamlrun.$(A)
+PROGRAMS := ocamlrun
+BYTECODE_STATIC_LIBRARIES := libcamlrun.$(A)
 BYTECODE_SHARED_LIBRARIES :=
 NATIVE_STATIC_LIBRARIES := libasmrun.$(A)
 NATIVE_SHARED_LIBRARIES :=
 
 ifeq "$(RUNTIMED)" "true"
-PROGRAMS += ocamlrund$(EXE)
+PROGRAMS += ocamlrund
 BYTECODE_STATIC_LIBRARIES += libcamlrund.$(A)
 NATIVE_STATIC_LIBRARIES += libasmrund.$(A)
 endif
 
 ifeq "$(RUNTIMEI)" "true"
-PROGRAMS += ocamlruni$(EXE)
+PROGRAMS += ocamlruni
 BYTECODE_STATIC_LIBRARIES += libcamlruni.$(A)
 NATIVE_STATIC_LIBRARIES += libasmruni.$(A)
 endif
@@ -78,9 +79,9 @@ endif
 ifeq "$(UNIX_OR_WIN32)" "unix"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 BYTECODE_STATIC_LIBRARIES += libcamlrun_pic.$(A)
-BYTECODE_SHARED_LIBRARIES += libcamlrun_shared.$(SO)
+BYTECODE_SHARED_LIBRARIES += camlrun
 NATIVE_STATIC_LIBRARIES += libasmrun_pic.$(A)
-NATIVE_SHARED_LIBRARIES += libasmrun_shared.$(SO)
+NATIVE_SHARED_LIBRARIES += asmrun
 endif
 endif
 
@@ -89,6 +90,10 @@ endif
 ASM_OBJECTS := $(ASM_SOURCES:.$(ASM_EXT)=.$(O))
 
 libcamlrun_OBJECTS := $(BYTECODE_C_SOURCES:.c=_b.$(O))
+
+libcamlrun_non_shared_OBJECTS := \
+  $(subst $(UNIX_OR_WIN32)_b.$(O),$(UNIX_OR_WIN32)_non_shared_b.$(O), \
+          $(libcamlrun_OBJECTS))
 
 libcamlrund_OBJECTS := $(BYTECODE_C_SOURCES:.c=_bd.$(O)) \
   instrtrace_bd.$(O)
@@ -108,31 +113,6 @@ libasmrunpic_OBJECTS := $(NATIVE_C_SOURCES:.c=_npic.$(O)) \
 
 # General (non target-specific) assembler and compiler flags
 
-ifdef BOOTSTRAPPING_FLEXLINK
-OC_CPPFLAGS += -DBOOTSTRAPPING_FLEXLINK
-endif
-
-# On Windows, OCAML_STDLIB_DIR needs to be defined dynamically
-
-ifeq "$(UNIX_OR_WIN32)" "win32"
-# OCAML_STDLIB_DIR needs to arrive in dynlink.c as a string which both gcc and
-# msvc are willing parse without warning. This means we can't pass UTF-8
-# directly since, as far as I can tell, cl can cope, but the pre-processor
-# can't. So the string needs to be directly translated to L"" form. To do this,
-# we take advantage of the fact that Cygwin uses GNU libiconv which includes a
-# Java pseudo-encoding which translates any UTF-8 sequences to \uXXXX (and,
-# unlike the C99 pseudo-encoding, emits two surrogate values when needed, rather
-# than \UXXXXXXXX). The \u is then translated to \x in order to accommodate
-# pre-Visual Studio 2013 compilers where \x is a non-standard alias for \u.
-OCAML_STDLIB_DIR = $(shell echo $(LIBDIR)| iconv -t JAVA | sed -e 's/\\u/\\x/g')
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='L"$(OCAML_STDLIB_DIR)"'
-else # Unix
-OCAML_STDLIB_DIR = $(LIBDIR)
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='"$(OCAML_STDLIB_DIR)"'
-endif
-
-OC_CPPFLAGS += $(IFLEXDIR)
-
 ifneq "$(CCOMPTYPE)" "msvc"
 OC_CFLAGS += -g
 endif
@@ -143,7 +123,7 @@ ifeq "$(UNIX_OR_WIN32)" "unix"
 OC_NATIVE_CPPFLAGS += -DMODEL_$(MODEL)
 endif
 
-OC_NATIVE_CPPFLAGS += -DSYS_$(SYSTEM) $(IFLEXDIR) $(LIBUNWIND_INCLUDE_FLAGS)
+OC_NATIVE_CPPFLAGS += -DSYS_$(SYSTEM) $(LIBUNWIND_INCLUDE_FLAGS)
 
 OC_DEBUG_CPPFLAGS=-DDEBUG
 OC_INSTR_CPPFLAGS=-DCAML_INSTR
@@ -162,60 +142,83 @@ endif
 
 # Commands used to build native libraries
 
+LIBS := $(BYTECCLIBS)
+
 ifeq "$(UNIX_OR_WIN32)" "win32"
-LIBS = $(BYTECCLIBS) $(EXTRALIBS)
-ifdef BOOTSTRAPPING_FLEXLINK
-MAKE_OCAMLRUN=$(MKEXE_BOOT)
-else
-MAKE_OCAMLRUN = $(MKEXE) -o $(1) $(2)
-endif
-else
-LIBS = $(BYTECCLIBS)
-MAKE_OCAMLRUN = $(MKEXE) -o $(1) $(2)
+LIBS += $(EXTRALIBS)
 endif
 
 # Build, install and clean targets
 
 .PHONY: all
-all: $(BYTECODE_STATIC_LIBRARIES) $(BYTECODE_SHARED_LIBRARIES) $(PROGRAMS)
+all: $(BYTECODE_STATIC_LIBRARIES) \
+     $(BYTECODE_SHARED_LIBRARIES:%=lib%_shared$(EXT_DLL)) \
+     $(PROGRAMS:%=%$(EXE))
 
 .PHONY: allopt
-allopt: $(NATIVE_STATIC_LIBRARIES) $(NATIVE_SHARED_LIBRARIES)
+allopt: $(NATIVE_STATIC_LIBRARIES) \
+        $(NATIVE_SHARED_LIBRARIES:%=lib%_shared$(EXT_DLL))
 
-INSTALL_INCDIR=$(INSTALL_LIBDIR)/caml
 .PHONY: install
-install:
-	$(INSTALL_PROG) $(PROGRAMS) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) $(BYTECODE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
-ifneq "$(BYTECODE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(BYTECODE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
+
+ifeq "$(SUFFIXING)" "true"
+MANGLE_RUNTIME_NAME = $(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)
+MANGLE_RUNTIME_DLL_NAME = lib$(1)-$(TARGET)-$($(2)_RUNTIME_ID)$(EXT_DLL)
+else
+MANGLE_RUNTIME_NAME = $(1)$(EXE)
+MANGLE_RUNTIME_DLL_NAME = lib$(1)_shared$(EXT_DLL)
 endif
-	mkdir -p "$(INSTALL_INCDIR)"
-	$(INSTALL_DATA) caml/domain_state.tbl caml/*.h "$(INSTALL_INCDIR)"
+
+define INSTALL_RUNTIME
+install::
+	$$(call INSTALL_ITEM, $(1)$(EXE), bin, , \
+    $(call MANGLE_RUNTIME_NAME,$(1)), $(if $(filter true, $(SUFFIXING)), \
+      $(1)$(EXE) $(1)-$(ZINC_RUNTIME_ID)$(EXE)))
+endef
+define INSTALL_RUNTIME_LIB
+ifeq "$(2)" "BYTECODE"
+install::
+else
+installopt::
+endif
+	$$(call INSTALL_ITEM, lib$(1)_shared$(EXT_DLL), libexec, , \
+	   $(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2)), \
+	     $(if $(filter true, $(SUFFIXING)), lib$(1)_shared$(EXT_DLL)))
+endef
+
+$(foreach runtime, $(PROGRAMS), \
+  $(eval $(call INSTALL_RUNTIME,$(runtime))))
+
+install::
+	$(call INSTALL_ITEMS, ld.conf $(BYTECODE_STATIC_LIBRARIES), lib)
+
+$(foreach shared_runtime, $(BYTECODE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),BYTECODE)))
+
+install::
+	$(call INSTALL_ITEMS, caml/domain_state.tbl caml/*.h, \
+	  lib, $(INSTALL_LIBDIR_CAML))
 
 .PHONY: installopt
-installopt:
-	$(INSTALL_DATA) $(NATIVE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
-ifneq "$(NATIVE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(NATIVE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
-endif
+installopt::
+	$(call INSTALL_ITEMS, $(NATIVE_STATIC_LIBRARIES), lib)
+
+$(foreach shared_runtime, $(NATIVE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),NATIVE)))
 
 .PHONY: clean
 clean:
-	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
-	rm -f ocamlrun ocamlrund ocamlruni
-	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe
+	rm -f *.o *.obj *.a *.lib *.so *.dll
+	rm -f ocamlrun ocamlrund ocamlruni ocamlruns sak
+	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe sak.exe
 	rm -f primitives primitives.new prims.c caml/opnames.h caml/jumptbl.h
-	rm -f caml/version.h domain_state*.inc
+	rm -f caml/version.h domain_state*.inc build_config.h
 
 .PHONY: distclean
 distclean: clean
+	rm -f ld.conf caml_internal_config.h
 
 # Generated non-object files
-
-ld.conf: $(ROOTDIR)/Makefile.config
-	echo "$(STUBLIBDIR)" > $@
-	echo "$(LIBDIR)" >> $@
 
 # If primitives contain duplicated lines (e.g. because the code is defined
 # like
@@ -242,17 +245,33 @@ primitives: $(shell ./gen_primitives.sh > primitives.new; \
                     cmp -s primitives primitives.new || echo primitives.new)
 	cp $^ $@
 
+ifeq "$(UNIX_OR_WIN32)" "unix"
+  CHAR_OS = char
+else
+  CHAR_OS = wchar_t
+endif
+
 prims.c : primitives
-	(echo '#define CAML_INTERNALS'; \
-         echo '#include "caml/mlvalues.h"'; \
-	 echo '#include "caml/prims.h"'; \
-	 sed -e 's/.*/extern value &();/' primitives; \
+	export LC_ALL=C; \
+	(echo '#include "caml/config.h"'; \
+	 echo '#include "build_config.h"'; \
+	 echo 'typedef intnat value;'; \
+	 echo 'typedef value (*c_primitive)(void);'; \
+	 echo; \
+	 sed -e 's/.*/extern value &(void);/' $<; \
+	 echo; \
 	 echo 'c_primitive caml_builtin_cprim[] = {'; \
-	 sed -e 's/.*/	&,/' primitives; \
-	 echo '	 0 };'; \
+	 sed -e 's/.*/  &,/' $<; \
+	 echo '  0 };'; \
+	 echo; \
 	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
-	 sed -e 's/.*/	"&",/' primitives; \
-	 echo '	 0 };') > prims.c
+	 sed -e 's/.*/  "&",/' $<; \
+	 echo '  0 };'; \
+	 echo; \
+	 echo 'enum caml_byte_program_mode {STANDARD, APPENDED, EMBEDDED};'; \
+   echo 'enum caml_byte_program_mode caml_byte_program_mode = STANDARD;'; \
+	 echo "const $(CHAR_OS) *caml_runtime_standard_library_default = \
+OCAML_STDLIB_DIR;") > $@
 
 caml/opnames.h : caml/instruct.h
 	tr -d '\r' < $< | \
@@ -271,12 +290,34 @@ caml/jumptbl.h : caml/instruct.h
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 	$^ > $@
 
+sak$(EXE): sak.$(O)
+	$(call MKEXE_BOOT,$@,$^)
+
+C_LITERAL = $(shell ./sak$(EXE) encode-C-literal $(call QUOTE_SINGLE,$(1)))
+
+build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
+	{ \
+	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
+	  printf '#define OCAML_STDLIB_DIR %s\n' \
+	         $(call QUOTE_SINGLE,$(call C_LITERAL,$(TARGET_LIBDIR))); \
+	  echo '#define HOST "$(HOST)"'; \
+	  echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"'; \
+	} > $@
+
+prims.$(O): build_config.h
+
 # Libraries and programs
 
 ocamlrun$(EXE): prims.$(O) libcamlrun.$(A)
-	$(call MAKE_OCAMLRUN,$@,$^ $(LIBS))
+	$(MKEXE) -o $@ $^ $(LIBS)
+
+ocamlruns$(EXE): prims.$(O) libcamlrun_non_shared.$(A)
+	$(call MKEXE_BOOT,$@,$^ $(LIBS))
 
 libcamlrun.$(A): $(libcamlrun_OBJECTS)
+	$(call MKLIB,$@, $^)
+
+libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
 	$(call MKLIB,$@, $^)
 
 ocamlrund$(EXE): prims.$(O) libcamlrund.$(A)
@@ -335,16 +376,21 @@ libasmrun_shared.$(SO): $(libasmrunpic_OBJECTS)
 # that corresponds to the name of the generated object file
 # (without the extension, which is added by the macro)
 define COMPILE_C_FILE
-$(1).$(O): %.c
-	$$(CC) -c $$(OC_CFLAGS) $$(OC_CPPFLAGS) $$(OUTPUTOBJ)$$@ $$<
+$(1).$(O): $(2).c
+	$$(CC) -c $$(OC_CFLAGS) $$(PRIVATE_CFLAGS) $$(OC_CPPFLAGS) \
+	  $$(OUTPUTOBJ)$$@ $$<
 endef
 
 object_types := % %_b %_bd %_bi %_bpic %_n %_nd %_ni %_np %_npic
 
 $(foreach object_type, $(object_types), \
-  $(eval $(call COMPILE_C_FILE,$(object_type))))
+  $(eval $(call COMPILE_C_FILE,$(object_type),%)))
 
-dynlink_%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG)
+$(UNIX_OR_WIN32)_non_shared_%.$(O): OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
+
+$(eval $(call COMPILE_C_FILE,$(UNIX_OR_WIN32)_non_shared_%,$(UNIX_OR_WIN32)))
+
+startup_byt.%.$(O): OC_CPPFLAGS += -DHOST='"$(HOST)"'
 
 $(foreach object_type,$(subst %,,$(object_types)), \
   $(eval dynlink$(object_type).$(O): $(ROOTDIR)/Makefile.config))
@@ -388,7 +434,7 @@ NATIVE_DEP_CPPFLAGS := $(OC_CPPFLAGS) $(OC_NATIVE_CPPFLAGS)
 BYTECODE_DEP_FILES := $(BYTECODE_C_SOURCES) $(other_files) instrtrace.c
 NATIVE_DEP_FILES := $(NATIVE_C_SOURCES) $(other_files)
 
-depend: *.c caml/opnames.h caml/jumptbl.h caml/version.h
+depend: *.c caml/opnames.h caml/jumptbl.h caml/version.h build_config.h
 	$(CC) -MM $(OC_CPPFLAGS) $(BYTECODE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_b.$$(O)/' > .depend
 	$(CC) -MM $(OC_CPPFLAGS) $(OC_DEBUG_CPPFLAGS) \
@@ -412,3 +458,8 @@ depend: *.c caml/opnames.h caml/jumptbl.h caml/version.h
 endif
 
 include .depend
+
+# This empty target is here for AppVeyor to allow dependencies to be built
+# without doing anything else.
+.PHONY: setup-depend
+setup-depend:

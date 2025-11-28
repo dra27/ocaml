@@ -39,6 +39,8 @@ let fatal err =
   prerr_endline err;
   exit 2
 
+let fatalf fmt = Printf.ksprintf fatal fmt
+
 let extract_output = function
   | Some s -> s
   | None ->
@@ -582,7 +584,7 @@ type deferred_action =
   | ProcessCFile of string
   | ProcessOtherFile of string
   | ProcessObjects of string list
-  | ProcessDLLs of string list
+  | ProcessDLLs of bool * string list
 
 let c_object_of_filename name =
   Filename.chop_suffix (Filename.basename name) ".c" ^ Config.ext_obj
@@ -607,8 +609,8 @@ let process_action
       ccobjs := c_object_of_filename name :: !ccobjs
   | ProcessObjects names ->
       ccobjs := names @ !ccobjs
-  | ProcessDLLs names ->
-      dllibs := names @ !dllibs
+  | ProcessDLLs (suffixed, names) ->
+      dllibs := (List.map (fun n -> (suffixed, n)) names) @ !dllibs
   | ProcessOtherFile name ->
       if Filename.check_suffix name ocaml_mod_ext
       || Filename.check_suffix name ocaml_lib_ext then
@@ -619,7 +621,7 @@ let process_action
            || Filename.check_suffix name Config.ext_lib then
         ccobjs := name :: !ccobjs
       else if not !native_code && Filename.check_suffix name Config.ext_dll then
-        dllibs := name :: !dllibs
+        dllibs := (false, name) :: !dllibs
       else
         raise(Arg.Bad("don't know what to do with " ^ name))
 
@@ -676,4 +678,15 @@ let process_deferred_actions env =
     !print_types ||
     match !stop_after with
     | None -> false
-    | Some p -> Clflags.Compiler_pass.is_compilation_pass p;
+    | Some p -> Clflags.Compiler_pass.is_compilation_pass p
+
+let parse_runtime_parameter opt =
+  let k, setting =
+    try Misc.cut_at opt '='
+    with Not_found ->
+      fatalf "-set-runtime-default: invalid runtime parameter '%s'. \
+              Expected <name>=<value>." opt in
+    if k = "standard_library_default" then
+      Clflags.standard_library_default := Some setting
+    else
+      fatalf "-set-runtime-default: unrecognized runtime parameter %s." k
