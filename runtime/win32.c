@@ -40,6 +40,7 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <wchar.h>
 #include "caml/alloc.h"
 #include "caml/codefrag.h"
 #include "caml/fail.h"
@@ -955,28 +956,45 @@ CAMLexport value caml_copy_string_of_utf16(const wchar_t *s)
   return v;
 }
 
-CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
+CAMLexport wchar_t *caml_stat_char_array_to_utf16(const char *s, size_t size,
+                                                  size_t *out_size)
 {
   wchar_t * ws;
   int retcode;
 
-  retcode = caml_win32_multi_byte_to_wide_char(s, -1, NULL, 0);
-  ws = caml_stat_alloc_noexc(retcode * sizeof(*ws));
-  caml_win32_multi_byte_to_wide_char(s, -1, ws, retcode);
+  retcode = caml_win32_multi_byte_to_wide_char(s, size, NULL, 0);
+  ws = caml_stat_alloc(retcode * sizeof(wchar_t));
+  caml_win32_multi_byte_to_wide_char(s, size, ws, retcode);
+  if (out_size != NULL)
+    *out_size = retcode;
 
   return ws;
 }
 
-CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
+CAMLexport wchar_t *caml_stat_strdup_to_utf16(const char *s)
+{
+  return caml_stat_char_array_to_utf16(s, -1, NULL);
+}
+
+CAMLexport caml_stat_string caml_stat_char_array_of_utf16(const wchar_t *s,
+                                                          size_t size,
+                                                          size_t *out_size)
 {
   caml_stat_string out;
   int retcode;
 
-  retcode = caml_win32_wide_char_to_multi_byte(s, -1, NULL, 0);
+  retcode = caml_win32_wide_char_to_multi_byte(s, size, NULL, 0);
   out = caml_stat_alloc(retcode);
-  caml_win32_wide_char_to_multi_byte(s, -1, out, retcode);
+  caml_win32_wide_char_to_multi_byte(s, size, out, retcode);
+  if (out_size != NULL)
+    *out_size = retcode;
 
   return out;
+}
+
+CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
+{
+  return caml_stat_char_array_of_utf16(s, -1, NULL);
 }
 
 void caml_probe_win32_version(void)
@@ -1265,4 +1283,89 @@ value caml_win32_xdg_defaults(void)
   CoTaskMemFree(wpath);
 
   CAMLreturn(result);
+}
+
+CAMLextern char_os* caml_locate_standard_library (const wchar_t *exe_name,
+                                                  const wchar_t *stdlib_default,
+                                                  wchar_t **dirname)
+{
+  if (Is_relative_dir(stdlib_default)) {
+    LPWSTR root = NULL, basename;
+    DWORD l = MAX_PATH + 1, buf_len;
+
+    do {
+      buf_len = l;
+      caml_stat_free(root);
+      root = caml_stat_alloc(buf_len * sizeof(WCHAR));
+      l = GetFullPathName(exe_name, buf_len, root, &basename);
+    } while (l >= buf_len);
+    /* It should be an Impossible Thing for exe_name (which will have been the
+       result of GetModuleFileName) to be unparsable by GetFullPathName */
+    if (l == 0) {
+      caml_stat_free(root);
+      return caml_stat_wcsdup(stdlib_default);
+    }
+
+    CAMLassert(basename != root && Is_separator(*(basename - 1)));
+
+    /* Make root the dirname portion */
+    *(basename - 1) = 0;
+
+    LPWSTR candidate =
+      caml_stat_wcsconcat(3, root, CAML_DIR_SEP, stdlib_default);
+    HANDLE h =
+      CreateFile(candidate, 0,
+                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
+                 OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    if (h == INVALID_HANDLE_VALUE) {
+      caml_stat_free(candidate);
+      return caml_stat_wcsdup(stdlib_default);
+    }
+
+    LPWSTR resolved_candidate = NULL;
+    l = MAX_PATH + 1;
+    do {
+      buf_len = l;
+      caml_stat_free(resolved_candidate);
+      resolved_candidate = caml_stat_alloc(buf_len * sizeof(WCHAR));
+      l = GetFinalPathNameByHandle(h, resolved_candidate, buf_len,
+                                   FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+    } while (l >= buf_len);
+
+    if (l > 0) {
+      /* GetFinalPathNameByHandle always returns \\?\ which needs stripping.
+         UNC paths are returned as \\?\UNC\ - in this case, reuse the \\ from
+         \\?\. */
+      CAMLassert(l > 4 && resolved_candidate[0] == '\\'
+                       && resolved_candidate[1] == '\\'
+                       && resolved_candidate[2] == '?'
+                       && resolved_candidate[3] == '\\');
+
+      caml_stat_free(candidate);
+
+      if (l >= 8 && resolved_candidate[4] == 'U'
+                 && resolved_candidate[5] == 'N'
+                 && resolved_candidate[6] == 'C'
+                 && resolved_candidate[7] == '\\') {
+        /* NT native UNC path - reuse the 'C' for the backslash */
+        resolved_candidate[6] = '\\';
+        candidate = caml_stat_wcsdup(resolved_candidate + 6);
+      } else {
+        /* Local device path */
+        candidate = caml_stat_wcsdup(resolved_candidate + 4);
+      }
+    }
+
+    /* It should be another Impossible Thing for l == 0 in the above. If that
+       did happen, candidate will _not_ have been freed, and we'll return the
+       path returned by GetFullPathName */
+    caml_stat_free(resolved_candidate);
+
+    if (dirname != NULL)
+      *dirname = caml_stat_wcsdup(root);
+    caml_stat_free(root);
+    return candidate;
+  } else {
+    return caml_stat_wcsdup(stdlib_default);
+  }
 }

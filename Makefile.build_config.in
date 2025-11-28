@@ -29,6 +29,8 @@ INSTALL ?= @INSTALL@ -p
 INSTALL_DATA ?= @INSTALL_DATA@
 INSTALL_PROG ?= @INSTALL_PROGRAM@
 
+SRCDIR_ABS = @ocamlsrcdir@
+
 # Whether to build certain libraries and tools
 
 build_ocamldebug = @build_ocamldebug@
@@ -63,8 +65,19 @@ INSTALL_OCAMLNAT = @install_ocamlnat@
 DEP_CC=@DEP_CC@ -MM
 COMPUTE_DEPS=@compute_deps@
 
+# The C compiler vendor
+OCAML_CC_VENDOR = @ocaml_cc_vendor@
+
+BUILD_PATH_LOGICAL = @srcdir_abs@
+BUILD_PATH_PHYSICAL = @srcdir_abs_real@
+BUILD_MAP_FLAGS = @build_map_flags@
+BUILD_MAP_CFLAGS = $(foreach flag, $(BUILD_MAP_FLAGS), \
+  $(call QUOTE_SINGLE,$(flag)$(BUILD_PATH_LOGICAL)=+build) \
+  $(if $(BUILD_PATH_PHYSICAL), \
+    $(call $(QUOTE_SINGLE),$(flag)$(BUILD_PATH_PHYSICAL)=+build)))
+
 # Build-system flags to use to compile C files
-OC_CFLAGS=@oc_cflags@
+OC_CFLAGS=@oc_cflags@ $(BUILD_MAP_CFLAGS)
 OC_CPPFLAGS=-I$(ROOTDIR)/runtime @oc_cppflags@
 
 # The following variable defines flags to be passed to the C preprocessor
@@ -91,6 +104,9 @@ OC_EXE_LDFLAGS=@oc_exe_ldflags@
 MKEXE_VIA_CC=\
   $(CC) $(OC_EXE_LDFLAGS) $(OC_CFLAGS) $(CFLAGS) @mkexe_via_cc_ldflags@
 
+LAUNCH_METHOD = @launch_method@
+SUFFIXING = @suffixing@
+
 # Which tool to use to display differences between files
 DIFF=@DIFF@
 # Which flags to pass to the diff tool
@@ -115,6 +131,10 @@ BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 datarootdir = @datarootdir@
 DOCDIR=@docdir@
+
+### Where to look for the standard library on target
+TARGET_LIBDIR=@TARGET_LIBDIR@
+TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
 
 unix_directory = @unix_directory@
 unix_library = @unix_library@
@@ -155,6 +175,12 @@ OC_NATIVE_COMPFLAGS = @oc_native_compflags@
 
 OC_NATIVE_LINKFLAGS = -g
 
+BUILD_TRIPLET = @build@
+
+# Zinc Runtime ID is needed for installation only
+ZINC_RUNTIME_ID_HI = @zinc_runtime_id_hi@
+ZINC_RUNTIME_ID = @zinc_runtime_id_lo@$(ZINC_RUNTIME_ID_HI)
+
 # Platform-dependent command to create symbolic links
 LN = @ln@
 
@@ -172,3 +198,5 @@ TSAN=@tsan@
 # Contains TSan-specific runtime files, or nothing if TSan support is
 # disabled
 TSAN_NATIVE_RUNTIME_C_SOURCES = @tsan_native_runtime_c_sources@
+
+RUNTIME_SEARCH = @runtime_search@
