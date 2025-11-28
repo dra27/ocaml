@@ -15,6 +15,7 @@
 
 MAKEFLAGS := -r -R
 ROOTDIR = ..
+SUBDIR_NAME = tools
 
 include $(ROOTDIR)/Makefile.common
 
@@ -42,7 +43,8 @@ $(and $(filter-out 1,$(words $1)),$(error \
 $(call PROGRAM_SYNONYM, $1)
 
 $1$(EXE): $3 $2
-	$$(CAMLC) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
+	$$(CAMLC) $$(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, $$(LINKFLAGS)) \
+	          $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
 
 $(call PROGRAM_SYNONYM, $1.opt)
 
@@ -78,7 +80,7 @@ INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
                        file_formats lambda)
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -strict-sequence -warn-error A \
  -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
-LINKFLAGS = $(INCLUDES)
+LINKFLAGS = $(INCLUDES) $(OC_COMMON_LINKFLAGS)
 VPATH := $(filter-out -I,$(INCLUDES))
 
 .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
@@ -109,7 +111,7 @@ CSLPROF_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
   pprintast.cmo \
   lexer.cmo parse.cmo
 
-$(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) profiling.cmo $(CSLPROF),)
+$(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) $(CSLPROF),profiling.cmo)
 
 ocamlcp_cmos = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
                warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
@@ -123,19 +125,13 @@ $(call byte_and_opt,ocamloptp,$(ocamlcp_cmos) ocamloptp.cmo,)
 opt:: profiling.cmx
 
 install::
-	$(INSTALL_DATA) \
-	  profiling.cmi profiling.cmo \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmi profiling.cmo, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  profiling.cmt profiling.cmti \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmt profiling.cmti, lib)
 endif
 
 installopt::
-	$(INSTALL_DATA) \
-          profiling.cmx profiling.$(O) \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, profiling.cmx profiling.$(O), lib)
 
 # To help building mixed-mode libraries (OCaml + C)
 
@@ -144,7 +140,7 @@ $(call byte_and_opt,ocamlmklib,ocamlmklibconfig.cmo config.cmo \
 
 
 ocamlmklibconfig.ml: $(ROOTDIR)/Makefile.config Makefile
-	(echo 'let bindir = "$(BINDIR)"'; \
+	(echo 'let bindir = {|$(OCAML_BINDIR)|}'; \
          echo 'let supports_shared_libraries = $(SUPPORTS_SHARED_LIBRARIES)';\
          echo 'let default_rpath = "$(RPATH)"'; \
          echo 'let mksharedlibrpath = "$(MKSHAREDLIBRPATH)"'; \
@@ -169,33 +165,15 @@ $(call byte_and_opt,ocamlmktop,$(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP),)
 
 LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
 
-ifeq ($(UNIX_OR_WIN32),unix)
-LN := ln -sf
-else
-LN := cp -pf
-endif
-
+define INSTALL_ONE_TOOL
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-	for i in $(install_files); \
-	do \
-	  $(INSTALL_PROG) "$$i$(EXE)" "$(INSTALL_BINDIR)/$$i.byte$(EXE)"; \
-	  if test -f "$$i".opt$(EXE); then \
-	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)" && \
-	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
-	  else \
-	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.byte$(EXE)" "$$i$(EXE)"); \
-	  fi; \
-	done
-else
-	for i in $(install_files); \
-	do \
-	  if test -f "$$i".opt$(EXE); then \
-	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)"; \
-	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
-	  fi; \
-	done
+	$(call INSTALL_ITEM, $(1)$(EXE), bin, , $(1).byte$(EXE), \
+	                     $(if $(wildcard $(1).opt$(EXE)),, $(1)$(EXE)))
 endif
+	$(if $(wildcard $(1).opt$(EXE)), \
+	  $(call INSTALL_ITEM, $(1).opt$(EXE), bin, , , $(1)$(EXE)))
+endef
 
 # The preprocessor for asm generators
 
@@ -223,12 +201,9 @@ ocamlcmt_objects= \
 $(call byte_and_opt,ocamlcmt,$(ocamlcmt_objects),)
 
 install::
-	if test -f ocamlcmt.opt$(EXE); then \
-	  $(INSTALL_PROG)\
-	    ocamlcmt.opt$(EXE) "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"; \
-	else \
-	  $(INSTALL_PROG) ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
-	fi
+	$(call INSTALL_ITEM, \
+	  ocamlcmt$(if $(wildcard ocamlcmt.opt$(EXE)),.opt)$(EXE), bin, , \
+	  ocamlcmt$(EXE))
 
 # The bytecode disassembler
 
@@ -297,9 +272,7 @@ clean::
 # Eventlog metadata file
 
 install::
-	$(INSTALL_DATA) \
-	  eventlog_metadata \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, eventlog_metadata, lib)
 
 # Copy a bytecode executable, stripping debug info
 
@@ -325,11 +298,25 @@ caml_tex_files := \
   $(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.cma \
   caml_tex.ml
 
+# checkstack tool
+
+checkstack$(EXE): checkstack.$(O)
+	$(MKEXE) $(OUTPUTEXE)$@ $<
+
 #Scan latex files, and run ocaml code examples
 
 caml_tex := caml-tex$(EXE)
 
-$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+$(caml_tex): LINKFLAGS += $(BYTECODE_LAUNCHER_FLAGS)
+endif
+
+# caml-tex uses str.cma and unix.cma and so must be compiled with
+# $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
+# compiler does not necessarily have the correct shared library
+# configuration.
+$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
+                         -I $(ROOTDIR)/runtime
 $(caml_tex): $(caml_tex_files)
 	$(ROOTDIR)/runtime/ocamlrun$(EXE) $(ROOTDIR)/ocamlc$(EXE) -nostdlib \
 	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
@@ -342,6 +329,11 @@ opt.opt: $(caml_tex)
 endif
 clean::
 	rm -f -- caml-tex caml-tex.exe caml_tex.cm?
+
+# This must appear after all updates to $(install_files)
+
+$(foreach tool, $(install_files), \
+  $(eval $(call INSTALL_ONE_TOOL,$(tool))))
 
 # Common stuff
 

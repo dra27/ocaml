@@ -21,7 +21,10 @@ FIND=find
 TOPDIR := ..
 include $(TOPDIR)/Makefile.tools
 
-OCAMLTESTDIR_CYGPATH=$(shell $(CYGPATH) $(BASEDIR)/$(DIR)/_ocamltest)
+BASEDIR_HOST := $(shell $(CYGPATH) "$(BASEDIR)")
+TOPDIR_HOST := $(BASEDIR_HOST)/$(TOPDIR)
+
+OCAMLTESTDIR = $(BASEDIR_HOST)/$(DIR)/_ocamltest
 
 failstamp := failure.stamp
 
@@ -39,32 +42,43 @@ ifeq "$(UNIX_OR_WIN32)" "unix"
   else # Non-cygwin Unix
     find := find
   endif
-  FLEXLINK_ENV =
 else # Windows
   find := /usr/bin/find
-  FLEXDLL_SUBMODULE_PRESENT := $(wildcard ../flexdll/Makefile)
-  ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
-    FLEXLINK_ENV =
-  else
-    ROOT := $(shell cd .. && pwd| cygpath -m -f -)
-    FLEXLINK_ENV = \
-      OCAML_FLEXLINK="$(ROOT)/boot/ocamlrun $(ROOT)/flexdll/flexlink.exe"
-  endif
 endif
+
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
+  FLEXLINK_ENV =
+else
+  # The testsuite needs an absolute path to the runtime, so override the
+  # definition in Makefile.common
+  FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
+  FLEXLINK_EXE_LDFLAGS=$(if $(OC_LDFLAGS), -link "$(OC_LDFLAGS)")
+ifeq "$(wildcard $(TOPDIR_HOST)/flexlink.opt$(EXE))" ""
+  FLEXLINK_ENV = \
+    OCAML_FLEXLINK="$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
+                    $(TOPDIR_HOST)/boot/flexlink.byte$(EXE)"
+  MKDLL=$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
+        $(TOPDIR_HOST)/boot/flexlink.byte$(EXE) \
+        $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
+  MKEXE=$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
+        $(TOPDIR_HOST)/boot/flexlink.byte$(EXE) \
+        $(FLEXLINK_FLAGS) -exe $(FLEXLINK_EXE_LDFLAGS)
+else
+  FLEXLINK_ENV = \
+    OCAML_FLEXLINK="$(TOPDIR_HOST)/flexlink.opt$(EXE) \
+      -I $(TOPDIR_HOST)/stdlib/flexdll"
+  MKDLL=$(TOPDIR_HOST)/flexlink.opt$(EXE) -I $(TOPDIR_HOST)/stdlib/flexdll \
+        $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
+  MKEXE=$(TOPDIR_HOST)/flexlink.opt$(EXE) -I $(TOPDIR_HOST)/stdlib/flexdll \
+        $(FLEXLINK_FLAGS) -exe $(FLEXLINK_EXE_LDFLAGS)
+endif # ifeq "$(wildcard $(TOPDIR_HOST)/flexlink.opt$(EXE))" ""
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
 ifeq "$(ocamltest_program)" ""
   ocamltest = $(error ocamltest not found in $(ocamltest_directory))
 else
-  ifeq "$(FLEXLINK_ENV)" ""
-    ocamltest := MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
-  else
-    FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
-    MKDLL=$(WINTOPDIR)/boot/ocamlrun $(WINTOPDIR)/flexdll/flexlink.exe \
-                                     $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
-
-    ocamltest := $(FLEXLINK_ENV) MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) \
-                                 $(ocamltest_program)
-  endif
+  ocamltest := $(FLEXLINK_ENV) MKEXE="$(MKEXE)" MKDLL="$(MKDLL)" SORT=$(SORT) \
+                               MAKE=$(MAKE) $(ocamltest_program)
 endif
 
 # PROMOTE is only meant to be used internally in recursive calls;
@@ -118,7 +132,7 @@ all:
 	@$(MAKE) --no-print-directory report
 
 .PHONY: new-without-report
-new-without-report: lib tools
+new-without-report: lib tools | tests
 	@rm -f $(failstamp)
 	@(IFS=$$(printf "\r\n"); \
 	$(ocamltest) -find-test-dirs tests | while IFS='' read -r dir; do \
@@ -138,7 +152,7 @@ check-failstamp:
 	fi
 
 .PHONY: all-%
-all-%: lib tools
+all-%: lib tools | tests
 	@for dir in tests/$**; do \
 	  $(MAKE) --no-print-directory exec-one DIR=$$dir; \
 	done 2>&1 | tee $(TESTLOG)
@@ -169,7 +183,7 @@ all-%: lib tools
 # but the demangling separation is arguably nicer behavior that we might
 # want to implement at the exec-one level to also have it in the 'all' target.
 .PHONY: parallel-%
-parallel-%: lib tools
+parallel-%: lib tools | tests
 	@echo | parallel >/dev/null 2>/dev/null \
 	 || (echo "Unable to run the GNU parallel tool;";\
 	     echo "You should install it before using the parallel* targets.";\
@@ -227,7 +241,7 @@ exec-one:
 	@if $(ocamltest) -list-tests $(DIR) >/dev/null 2>&1; then \
 	  echo "Running tests from '$$DIR' ..."; \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
-	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)"; \
+	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR)"; \
 	else \
 	  for dir in $(DIR)/*; do \
 	    if [ -d $$dir ]; then \
@@ -271,7 +285,7 @@ promote:
 	fi
 	@if $(ocamltest) -list-tests $(DIR) >/dev/null 2>&1; then \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
-	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)" \
+	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR)" \
 	    PROMOTE="true"; \
 	else \
 	  cd $(DIR) && $(MAKE) TERM=dumb BASEDIR=$(BASEDIR) promote; \
@@ -296,3 +310,25 @@ clean:
 report:
 	@if [ ! -f $(TESTLOG) ]; then echo "No $(TESTLOG) file."; exit 1; fi
 	@$(AWK) -f ./summarize.awk < $(TESTLOG)
+
+# When an archive is created by git-archive, this is expanded to the SHA of the
+# commit. The filter-out causes this to be blank if it's run when the Format
+# tag has not been expanded
+GIT_ARCHIVE_SHA = $(filter-out ormat%, $Format:%H$ )
+
+tests:
+	@echo "There are no tests in the tests directory!"
+	@echo "This happens when the sources of OCaml are extracted from a \
+tarball"
+	@echo "generated by git-archive (which includes those generated by \
+GitHub)"
+	@head -n 1 $(ROOTDIR)/VERSION | grep -Fq + || \
+   echo "Note that the release tarballs published at \
+https://caml.inria.fr/pub/distrib/ include all the manual and testsuite sources"
+	@$(if $(GIT_ARCHIVE_SHA),,false)
+	@echo "The required files are in commit $(GIT_ARCHIVE_SHA), for \
+example:"
+	@echo "  git clone https://github.com/ocaml/ocaml \
+--revision $(GIT_ARCHIVE_SHA) --depth 1 git-sources"
+	@echo "  mv git-sources/$@ ."
+	@false

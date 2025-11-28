@@ -13,6 +13,8 @@
 #*                                                                        *
 #**************************************************************************
 
+SUBDIR_NAME = otherlibs/win32unix
+
 # Note: since this directory is Windows-specific, it may be good to make sure
 # its content can not be compiled under Unix.
 # This directory could even become a subdirectory of the unix directory.
@@ -68,3 +70,8 @@ depend: $(ALL_FILES) $(UNIX_CAML_FILES) unix.ml
 	  unix.ml > .depend
 
 include .depend
+
+# This empty target is here for AppVeyor to allow dependencies to be built
+# without doing anything else.
+.PHONY: setup-depend
+setup-depend:

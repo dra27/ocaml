@@ -700,6 +700,7 @@ DIRECT_LD
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
+flexlink
 ac_ct_DEP_CC
 DEP_CC
 CPP
@@ -747,8 +748,25 @@ build_os
 build_vendor
 build_cpu
 build
+runtime_search_target
+runtime_search
+suffixing
+native_runtime_id
+bytecode_runtime_id
+zinc_runtime_id_hi
+zinc_runtime_id_lo
+build_map_flags
+srcdir_abs_real
+srcdir_abs
+target_libdir_is_relative
+target_bindir
+QS
+TARGET_LIBDIR
+TARGET_BINDIR
 naked_pointers_checker
 naked_pointers
+ocaml_bindir
+ocaml_prefix
 compute_deps
 stdlib_manpages
 PACKLD
@@ -783,6 +801,7 @@ ocamltest
 ocamldoc
 with_camltex
 with_debugger
+as_is_cc
 as_has_debug_prefix_map
 cc_has_debug_prefix_map
 otherlibraries
@@ -797,9 +816,11 @@ mklib
 RANLIBCMD
 RANLIB
 AR
+target_launch_method
+launch_method
 shebangscripts
-long_shebang
-iflexdir
+bootstrapping_flexdll
+flexdir
 ocamlc_cppflags
 ocamlc_cflags
 nativecclibs
@@ -819,8 +840,10 @@ extralibs
 syslib
 outputobj
 outputexe
+ln
 unixlib
 unix_or_win32
+ocamlsrcdir
 systhread_support
 system
 model
@@ -834,6 +857,7 @@ exeext
 ac_tool_prefix
 DIRECT_CPP
 CC
+ocaml_cv_cc_vendor
 VERSION
 native_compiler
 CONFIGURE_ARGS
@@ -901,13 +925,20 @@ enable_native_compiler
 enable_flambda
 enable_flambda_invariants
 with_target_bindir
+with_target_sh
+with_stublibs
 enable_reserved_header_bits
 enable_stdlib_manpages
 enable_warn_error
 enable_force_safe_string
 enable_flat_float_array
 enable_function_sections
+with_relative_libdir
+enable_suffixing
+enable_runtime_search
+enable_runtime_search_target
 with_afl
+with_flexdll
 enable_shared
 enable_static
 with_pic
@@ -1587,6 +1618,13 @@ Optional Features:
                           do not use flat float arrays
   --disable-function-sections
                           do not emit each function in a separate section
+  --enable-suffixing      enable suffixing of runtime executables and shared
+                          libraries
+  --enable-runtime-search allow the distribution's bytecode executables to
+                          search for ocamlrun
+  --enable-runtime-search-target
+                          allow bytecode executables produced by ocamlc to
+                          search for ocamlrun
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -1596,8 +1634,15 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-target-bindir    location of binary programs on target system
+  --with-target-bindir    location of the runtime binaries on the target
+                          system
+  --with-target-sh        location of Posix sh on the target system
+  --with-stublibs         additional directory for searching for bytecode stub
+                          libraries
+  --with-relative-libdir  location of the Standard Library, specified relative
+                          to --bindir
   --with-afl              use the AFL fuzzer
+  --with-flexdll          bootstrap FlexDLL from the given sources
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
   --with-aix-soname=aix|svr4|both
@@ -2786,7 +2831,6 @@ oc_ldflags=""
 oc_dll_ldflags=""
 with_sharedlibs=true
 ostype="Unix"
-iflexdir=""
 SO="so"
 toolchain="cc"
 profinfo=false
@@ -2794,6 +2838,13 @@ profinfo_width=0
 extralibs=
 instrumented_runtime=false
 instrumented_runtime_ldlibs=""
+bootstrapping_flexdll=false
+target_libdir_is_relative=false
+srcdir_abs=''
+srcdir_abs_real=''
+build_map_flags=''
+runtime_search=''
+runtime_search_target=''
 
 # Information about the package
 
@@ -2838,9 +2889,15 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 VERSION=4.12.2+relocatable
 
 
+
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
+
+
+
+
 
 
 
@@ -2928,7 +2985,26 @@ VERSION=4.12.2+relocatable
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Generated files
+
+ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
 
 ac_config_files="$ac_config_files Makefile.build_config"
 
@@ -2936,9 +3012,16 @@ ac_config_files="$ac_config_files Makefile.config"
 
 ac_config_files="$ac_config_files tools/eventlog_metadata"
 
+ac_config_files="$ac_config_files ocamltest/ocamltest_config.mlp"
+
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
 ac_config_headers="$ac_config_headers runtime/caml/s.h"
+
+ac_config_headers="$ac_config_headers runtime/caml_internal_config.h"
+
+
+# Works out how many "o"s are needed in quoted strings
 
 
 # Checks for system types
@@ -3053,6 +3136,40 @@ test -n "$target_alias" &&
   test "$program_prefix$program_suffix$program_transform_name" = \
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
+
+# $cygwin_build_env=true if the build is taking place in any kind of Cygwin-like
+# environment (which may include cross-compiling _from_ Cygwin)
+# All patterns end with * (cf. build-aux/config.sub)
+#
+# In Cygwin itself, the mingw-w64 compilers are cross-compilers
+# (host=x86_64-pc-cygwin; target=*-w64-mingw32) and $build when running from
+# within Cygwin is always *-pc-cygwin.
+#
+# In MSYS2, the mingw-w64 compiler are normal host compilers, which MSYS2 makes
+# available through different Environments (in a similar to the Microsoft Visual
+# Studio Tools Command Prompts; see https://www.msys2.org/docs/environments/).
+# It is possible to use MSYS2's "Cygwin" gcc (the equivalent of compiling native
+# Cygwin), in which case $build is *-*-msys*.
+# The mingw-w64 Environments manually set $build to *-w64-mingw32, but the
+# _native_ value inferred by config.guess (which uses uname -s) will be
+# *-pc-mingw32 (for the 32-bit _target_ environments, even though MSYS2 is a
+# 64-bit build environment) and *-pc-mingw64 (for the 64-bit _target_
+# environments).
+#
+# This leads to the four patterns below, all of which imply that the build is
+# taking place on a system where Cygwin's utilities (cygpath, etc.) can be
+# expected to be found and semantics (CYGWIN=winsymlinks:native, etc.) expected
+# to apply.
+#
+# Note that although build=x86_64-pc-mingw64 will be accepted here, it is highly
+# likely that that's a misconfigured environment, and the script will
+# subsequently fail if host has not been altered to x86_64-w64-mingw32.
+case $build in #(
+  *-*-cygwin*|*-*-msys*|*-*-mingw32*|*-*-mingw64*) :
+    cygwin_build_env=true ;; #(
+  *) :
+    cygwin_build_env=false ;;
+esac
 
 case $host in #(
   *-pc-windows) :
@@ -3229,7 +3346,38 @@ fi
 
 # Check whether --with-target-bindir was given.
 if test "${with_target_bindir+set}" = set; then :
-  withval=$with_target_bindir;
+  withval=$with_target_bindir; TARGET_BINDIR=$withval
+else
+  TARGET_BINDIR=''
+fi
+
+
+
+# Check whether --with-target-sh was given.
+if test "${with_target_sh+set}" = set; then :
+  withval=$with_target_sh; if test x"$withval" = 'xno'; then :
+  target_launch_method='exe'
+else
+  target_launch_method="$withval"
+fi
+else
+  target_launch_method=''
+fi
+
+
+
+# Check whether --with-stublibs was given.
+if test "${with_stublibs+set}" = set; then :
+  withval=$with_stublibs; if test x"$withval" = 'xno'; then :
+  ocaml_additional_stublibs_dir=''
+else
+           if test x"$withval" = 'xyes'; then :
+  as_fn_error $? "--with-stublibs needs an argument" "$LINENO" 5
+fi
+    ocaml_additional_stublibs_dir="$withval"
+fi
+else
+  ocaml_additional_stublibs_dir=''
 fi
 
 
@@ -3310,9 +3458,86 @@ fi
 
 
 
+# Check whether --with-relative-libdir was given.
+if test "${with_relative_libdir+set}" = set; then :
+  withval=$with_relative_libdir; if test x"$withval" = 'xno'; then :
+  bindir_to_libdir=''
+else
+  bindir_to_libdir="$withval"
+fi
+else
+  bindir_to_libdir=''
+fi
+
+
+# Check whether --enable-suffixing was given.
+if test "${enable_suffixing+set}" = set; then :
+  enableval=$enable_suffixing; if test "x$enableval" = 'xno'; then :
+  suffixing=false
+else
+  suffixing=true
+fi
+else
+  suffixing=auto
+fi
+
+
+# Check whether --enable-runtime-search was given.
+if test "${enable_runtime_search+set}" = set; then :
+  enableval=$enable_runtime_search; case $enableval in #(
+  no) :
+     ;; #(
+  yes) :
+    runtime_search='enable' ;; #(
+  always) :
+    runtime_search='always' ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
+esac
+fi
+
+
+# Check whether --enable-runtime-search-target was given.
+if test "${enable_runtime_search_target+set}" = set; then :
+  enableval=$enable_runtime_search_target; case $enableval in #(
+  no) :
+     ;; #(
+  yes) :
+    runtime_search_target='enable' ;; #(
+  always) :
+    runtime_search_target='always' ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search-target" "$LINENO" 5 ;;
+esac
+fi
+
+
+case $suffixing,$runtime_search,$runtime_search_target in #(
+  true,*,*|false,,) :
+     ;; #(
+  auto,,) :
+    suffixing=false ;; #(
+  auto,*,*) :
+    suffixing=true ;; #(
+  false,*,*) :
+    as_fn_error $? "--disable-suffixed cannot be used with --enable-runtime-search or --enable-runtime-search-target" "$LINENO" 5 ;; #(
+  *) :
+     ;;
+esac
+
+
 # Check whether --with-afl was given.
 if test "${with_afl+set}" = set; then :
   withval=$with_afl;
+fi
+
+
+
+# Check whether --with-flexdll was given.
+if test "${with_flexdll+set}" = set; then :
+  withval=$with_flexdll; if test x"$withval" = 'xyes'; then :
+  with_flexdll=flexdll
+fi
 fi
 
 
@@ -12491,7 +12716,8 @@ if ac_fn_c_try_cpp "$LINENO"; then :
   if ${ocaml_cv_cc_vendor+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ocaml_cv_cc_vendor=`grep '^[a-z]' conftest.i | tr -s ' ' '-'`
+  ocaml_cv_cc_vendor=`grep '^[a-z]' conftest.i | tr -s ' ' '-' \
+                                                      | tr -d '\r'`
 fi
 
 else
@@ -12529,17 +12755,50 @@ case $ocaml_cv_cc_vendor in #(
      ;;
 esac
 
+# Absolute path to the toplevel source directory
+
+# A sentinel character (X) is added at the end of the directory name
+# and then removed, in case the directory name finishes with an odd character.
+# (The $(...) construct strips trailing \n characters.)
+# Also, it is important to use `printf` rather than `echo` because the
+# behaviour of `echo` is indeterminate and uncontrollable if the
+# absolute path contains backslashes, which will definitely be the case
+# on Windows
+# See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
+# for the detailed explanation.
+
+srcdir_abs=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+srcdir_abs=${srcdir_abs%X}
+
 # Libraries to build depending on the host
 
-case $host in #(
-  *-*-mingw32|*-pc-windows) :
+case $cygwin_build_env,$host in #(
+  true,*-w64-mingw32*|true,*-pc-windows) :
     unix_or_win32="win32"
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
+$as_echo_n "checking for a workable solution for ln -sf... " >&6; }
+  if MSYS=winsymlinks:nativestrict CYGWIN=winsymlinks:nativestrict ln -sf configure conftestLink 2>/dev/null; then :
+  ln='ln -sf'
+else
+  ln='cp -pf'
+
+fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
+$as_echo "$ln" >&6; }
+
+    default_separator='\'
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$srcdir_abs")"
     unixlib="win32unix"
      ;; #(
   *) :
     unix_or_win32="unix"
+  ln='ln -sf'
+  ocamlsrcdir="$srcdir_abs"
+  default_separator='/'
   unixlib="unix" ;;
 esac
+
 case $host in #(
   *-*-cygwin*|*-*-mingw32|*-pc-windows) :
     exeext=".exe" ;; #(
@@ -12585,29 +12844,27 @@ $as_echo "$ac_cv_sys_interpreter" >&6; }
 interpval=$ac_cv_sys_interpreter
 
 
-long_shebang=false
+shebangscripts=false
+launch_method='exe'
 if test "x$interpval" = "xyes"; then :
   case $host in #(
-  *-cygwin|*-*-mingw32|*-pc-windows) :
-    shebangscripts=false ;; #(
+  *-cygwin) :
+    # Cygwin supports shebangs, which we use for the compiler itself, but
+      # partially for legacy, and partially so that executables can be easily
+      # run from outside Cygwin, the executables ocamlc and ocamlopt produce do
+      # not use shebang scripts
+      shebangscripts=true
+      launch_method='sh'
+      if test x"$target_launch_method" = 'x'; then :
+  target_launch_method='exe'
+fi ;; #(
+  *-*-mingw32*|*-pc-windows) :
+     ;; #(
   *) :
     shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       if test "x$exec_prefix" = "xNONE"; then :
-  exec_prefix="$prefix"
-fi
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       if test "${#expanded_bindir}" -gt 115; then :
-  long_shebang=true
-fi
-
-     ;;
+    launch_method='sh'
+   ;;
 esac
-else
-  shebangscripts=false
 
 fi
 
@@ -12765,6 +13022,356 @@ esac
 
 if test x"$enable_shared" = "xno"; then :
   with_sharedlibs=false
+  case $host in #(
+  *-pc-windows|*-w64-mingw32) :
+    as_fn_error $? "Cannot build native Win32 with --disable-shared" "$LINENO" 5 ;; #(
+  *) :
+     ;;
+esac
+fi
+
+# Define flexlink chain and flags correctly for the different Windows ports
+case $host in #(
+  i686-*-cygwin) :
+    flexdll_chain='cygwin'
+    flexlink_flags="-chain $flexdll_chain -merge-manifest -stack 16777216" ;; #(
+  x86_64-*-cygwin) :
+    flexdll_chain='cygwin64'
+    flexlink_flags="-chain $flexdll_chain -merge-manifest -stack 16777216" ;; #(
+  *-*-cygwin*) :
+    as_fn_error $? "unknown cygwin variant" "$LINENO" 5 ;; #(
+  i686-w64-mingw32) :
+    flexdll_chain='mingw'
+    flexlink_flags="-chain $flexdll_chain -stack 16777216" ;; #(
+  x86_64-w64-mingw32) :
+    flexdll_chain='mingw64'
+    flexlink_flags="-chain $flexdll_chain -stack 33554432" ;; #(
+  i686-pc-windows) :
+    flexdll_chain='msvc'
+    flexlink_flags="-merge-manifest -stack 16777216" ;; #(
+  x86_64-pc-windows) :
+    flexdll_chain='msvc64'
+    flexlink_flags="-x64 -merge-manifest -stack 33554432" ;; #(
+  *) :
+     ;;
+esac
+
+if test x"$enable_shared" != 'xno'; then :
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for flexdll sources" >&5
+$as_echo_n "checking for flexdll sources... " >&6; }
+  if test x"$with_flexdll" = "xno"; then :
+  flexdir=''
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
+$as_echo "disabled" >&6; }
+else
+  flexmsg=''
+    case $target in #(
+  *-*-cygwin*|*-w64-mingw32|*-pc-windows) :
+    if test x"$with_flexdll" = 'x' -o x"$with_flexdll" = 'xflexdll'; then :
+  if test -f 'flexdll/flexdll.h'; then :
+  flexdir=flexdll
+          iflexdir='$(ROOTDIR)/flexdll'
+          with_flexdll="$iflexdir"
+else
+  if test x"$with_flexdll" != 'x'; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: requested but not available" >&5
+$as_echo "requested but not available" >&6; }
+            as_fn_error $? "exiting" "$LINENO" 5
+fi
+fi
+else
+  rm -rf flexdll-sources
+        if test -f "$with_flexdll/flexdll.h"; then :
+  mkdir -p flexdll-sources
+          cp -r "$with_flexdll"/* flexdll-sources/
+          flexdir='flexdll-sources'
+          iflexdir='$(ROOTDIR)/flexdll-sources'
+          flexmsg=" (from $with_flexdll)"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: requested but not available" >&5
+$as_echo "requested but not available" >&6; }
+          as_fn_error $? "exiting" "$LINENO" 5
+fi
+fi
+      if test x"$flexdir" = 'x'; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $iflexdir$flexmsg" >&5
+$as_echo "$iflexdir$flexmsg" >&6; }
+        bootstrapping_flexdll=true
+        # The submodule should be searched *before* any other -I paths
+        internal_cppflags="-I $iflexdir $internal_cppflags"
+fi ;; #(
+  *) :
+    if test x"$with_flexdll" != 'x'; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: requested but not supported" >&5
+$as_echo "requested but not supported" >&6; }
+        as_fn_error $? "exiting" "$LINENO" 5
+fi ;;
+esac
+fi
+
+  # Extract the first word of "flexlink", so it can be a program name with args.
+set dummy flexlink; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_flexlink+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$flexlink"; then
+  ac_cv_prog_flexlink="$flexlink" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_flexlink="flexlink"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+flexlink=$ac_cv_prog_flexlink
+if test -n "$flexlink"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $flexlink" >&5
+$as_echo "$flexlink" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+
+  if test -n "$flexlink" -a -z "$flexdir"; then :
+
+
+
+  saved_CC="$CC"
+  saved_CFLAGS="$CFLAGS"
+  saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
+  saved_ac_ext="$ac_ext"
+  saved_ac_compile="$ac_compile"
+  # Move the content of confdefs.h to another file so it does not
+  # get included
+  mv confdefs.h confdefs.h.bak
+  touch confdefs.h
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $flexlink works" >&5
+$as_echo_n "checking whether $flexlink works... " >&6; }
+
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+int answer = 42;
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  # Create conftest1.$ac_objext as a symlink on Cygwin to ensure that native
+    # flexlink can cope. The reverse test is unnecessary (a Cygwin-compiled
+    # flexlink can read anything).
+    mv conftest.$ac_objext conftest1.$ac_objext
+    case $host in #(
+  *-pc-cygwin) :
+    ln -s conftest1.$ac_objext conftest2.$ac_objext ;; #(
+  *) :
+    cp conftest1.$ac_objext conftest2.$ac_objext ;;
+esac
+
+    CC="$flexlink -chain $flexdll_chain -exe"
+    LIBS="conftest2.$ac_objext"
+    CPPFLAGS="$internal_cppflags $CPPFLAGS"
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+int main() { return 0; }
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      as_fn_error $? "$flexlink does not work" "$LINENO" 5
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: unexpected compile error" >&5
+$as_echo "unexpected compile error" >&6; }
+    as_fn_error $? "error calling the C compiler" "$LINENO" 5
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
+  # Restore the content of confdefs.h
+  mv confdefs.h.bak confdefs.h
+  ac_compile="$saved_ac_compile"
+  ac_ext="$saved_ac_ext"
+  CPPFLAGS="$saved_CPPFLAGS"
+  CFLAGS="$saved_CFLAGS"
+  CC="$saved_CC"
+  LIBS="$saved_LIBS"
+
+
+
+    # When building on Cygwin/MSYS2, flexlink may be a shell script which
+    # then cannot be executed by ocamlc/ocamlopt. Having located flexlink,
+    # ensure it can be executed from a native Windows process. The check
+    # is only necessary when cross-compiling.
+    if test x"$build" != x"$host"; then :
+
+      if $cygwin_build_env; then :
+  flexlink_where="$(cmd /c "$flexlink" -where 2>/dev/null)"
+        if test -z "$flexlink_where"; then :
+  as_fn_error $? "$flexlink is not executable from a native Win32 process" "$LINENO" 5
+fi
+fi
+
+fi
+
+fi
+
+
+
+  saved_CC="$CC"
+  saved_CFLAGS="$CFLAGS"
+  saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
+  saved_ac_ext="$ac_ext"
+  saved_ac_compile="$ac_compile"
+  # Move the content of confdefs.h to another file so it does not
+  # get included
+  mv confdefs.h confdefs.h.bak
+  touch confdefs.h
+
+
+  if test -n "$flexdir"; then :
+  CPPFLAGS="-I $flexdir $CPPFLAGS"
+fi
+  have_flexdll_h=no
+  ac_fn_c_check_header_mongrel "$LINENO" "flexdll.h" "ac_cv_header_flexdll_h" "$ac_includes_default"
+if test "x$ac_cv_header_flexdll_h" = xyes; then :
+  have_flexdll_h=yes
+else
+  have_flexdll_h=no
+fi
+
+
+  if test x"$have_flexdll_h" = 'xno'; then :
+  if test -n "$flexdir"; then :
+  as_fn_error $? "$flexdir/flexdll.h appears unusable" "$LINENO" 5
+fi
+fi
+
+
+  # Restore the content of confdefs.h
+  mv confdefs.h.bak confdefs.h
+  ac_compile="$saved_ac_compile"
+  ac_ext="$saved_ac_ext"
+  CPPFLAGS="$saved_CPPFLAGS"
+  CFLAGS="$saved_CFLAGS"
+  CC="$saved_CC"
+  LIBS="$saved_LIBS"
+
+
+
+  if test -n "$flexlink" -a x"$have_flexdll_h" = 'xno'; then :
+
+
+  saved_CC="$CC"
+  saved_CFLAGS="$CFLAGS"
+  saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
+  saved_ac_ext="$ac_ext"
+  saved_ac_compile="$ac_compile"
+  # Move the content of confdefs.h to another file so it does not
+  # get included
+  mv confdefs.h confdefs.h.bak
+  touch confdefs.h
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if \"$flexlink -where\" includes flexdll.h" >&5
+$as_echo_n "checking if \"$flexlink -where\" includes flexdll.h... " >&6; }
+  flexlink_where="$($flexlink -where | tr -d '\r')"
+  CPPFLAGS="$CPPFLAGS -I \"$flexlink_where\""
+  cat > conftest.c <<"EOF"
+#include <flexdll.h>
+int main (void) {return 0;}
+EOF
+  cat > conftest.Makefile <<EOF
+all:
+	$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.c $LIBS
+EOF
+  if make -f conftest.Makefile >/dev/null 2>/dev/null; then :
+  have_flexdll_h=yes
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  # Restore the content of confdefs.h
+  mv confdefs.h.bak confdefs.h
+  ac_compile="$saved_ac_compile"
+  ac_ext="$saved_ac_ext"
+  CPPFLAGS="$saved_CPPFLAGS"
+  CFLAGS="$saved_CFLAGS"
+  CC="$saved_CC"
+  LIBS="$saved_LIBS"
+
+
+    if test "x$have_flexdll_h" = 'xyes'; then :
+  internal_cppflags="$internal_cppflags -I \"$flexlink_where\""
+fi
+
+fi
+
+fi
+
+if test x"$have_flexdll_h" = 'xno'; then :
+  case $host in #(
+  *-*-cygwin*) :
+    if $with_sharedlibs; then :
+  with_sharedlibs=false
+        { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: flexdll.h not found: shared library support disabled." >&5
+$as_echo "$as_me: WARNING: flexdll.h not found: shared library support disabled." >&2;}
+
+fi ;; #(
+  *-w64-mingw32|*-pc-windows) :
+    as_fn_error $? "flexdll.h is required for native Win32" "$LINENO" 5 ;; #(
+  *) :
+     ;;
+esac
+fi
+
+if test -z "$flexdir" -o x"$have_flexdll_h" = 'xno'; then :
+  case $host in #(
+  *-*-cygwin*) :
+    if $with_sharedlibs; then :
+  if test -z "$flexlink"; then :
+  with_sharedlibs=false
+          { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: flexlink/flexdll.h not found: shared library support disabled." >&5
+$as_echo "$as_me: WARNING: flexlink/flexdll.h not found: shared library support disabled." >&2;}
+
+fi
+fi ;; #(
+  *-w64-mingw32|*-pc-windows) :
+    if test -z "$flexlink"; then :
+  as_fn_error $? "flexlink is required for native Win32" "$LINENO" 5
+fi ;; #(
+  *) :
+     ;;
+esac
 fi
 
 case $CC,$host in #(
@@ -12775,56 +13382,24 @@ case $CC,$host in #(
   *,*-*-haiku*) :
     mathlib="" ;; #(
   *,*-*-cygwin*) :
-    case $target in #(
-  i686-*) :
-    flavor=cygwin ;; #(
-  x86_64-*) :
-    flavor=cygwin64 ;; #(
-  *) :
-    as_fn_error $? "unknown cygwin variant" "$LINENO" 5 ;;
-esac
     common_cppflags="$common_cppflags -U_WIN32"
     if $with_sharedlibs; then :
-  flexlink="flexlink -chain $flavor -merge-manifest -stack 16777216"
-      flexdir=`$flexlink -where | tr -d '\015'`
-      if test -z "$flexdir"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: flexlink not found: native shared libraries won't be available.
-        " >&5
-$as_echo "$as_me: WARNING: flexlink not found: native shared libraries won't be available.
-        " >&2;}
-        with_sharedlibs=false
+  mkexe='$(FLEXLINK) -exe $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
+      mkexedebugflag="-link -g"
 else
-  iflexdir="-I\"$flexdir\""
-        mkexe="$flexlink -exe"
-        mkexedebugflag="-link -g"
-
-fi
-
-fi
-    if ! $with_sharedlibs; then :
   mkexe="$mkexe -Wl,--stack,16777216"
       oc_ldflags="-Wl,--stack,16777216"
 
 fi
     ostype="Cygwin" ;; #(
   *,*-*-mingw32) :
-    if $with_sharedlibs; then :
-  case $host in #(
+    case $host in #(
   i686-*-*) :
-    flexdll_chain="mingw"; oc_dll_ldflags="-static-libgcc" ;; #(
-  x86_64-*-*) :
-    flexdll_chain="mingw64" ;; #(
+    oc_dll_ldflags="-static-libgcc" ;; #(
   *) :
      ;;
 esac
-      flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
-      flexdir=`$flexlink -where | tr -d '\015'`
-      if test -z "$flexdir"; then :
-  flexdir='$(ROOTDIR)/flexdll'
-fi
-      iflexdir="-I\"$flexdir\""
-      mkexedebugflag="-link -g"
-fi
+    mkexedebugflag="-link -g"
     ostype="Win32"
     toolchain="mingw"
     mkexe='$(FLEXLINK) -exe $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
@@ -12835,26 +13410,13 @@ fi
     ostype="Win32"
     mkexe='$(FLEXLINK) -exe $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
     oc_ldflags='/ENTRY:wmainCRTStartup'
-    case $host in #(
-  i686-pc-windows) :
-    flexdll_chain=msvc ;; #(
-  x86_64-pc-windows) :
-    flexdll_chain=msvc64 ;; #(
-  *) :
-     ;;
-esac
-    if $with_sharedlibs; then :
-  flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
-      flexdir=`$flexlink -where | tr -d '\015'`
-      if test -z "$flexdir"; then :
-  flexdir='$(ROOTDIR)/flexdll'
-fi
-      iflexdir="-I\"$flexdir\""
-      mkexedebugflag=''
-fi ;; #(
+    mkexedebugflag='' ;; #(
   *,x86_64-*-linux*) :
     $as_echo "#define HAS_ARCH_CODE32 1" >>confdefs.h
  ;; #(
+  *,i[3456]86-*) :
+    # Explicitly disable PIE executables on Linux and *BSD x86_32
+    mkexe="$mkexe -no-pie " ;; #(
   xlc*,powerpc-ibm-aix*) :
     mkexe="$mkexe "
      oc_ldflags="-brtl -bexpfull"
@@ -13037,6 +13599,13 @@ _ACEOF
 fi
 
 done
+
+ac_fn_c_check_header_mongrel "$LINENO" "libgen.h" "ac_cv_header_libgen_h" "$ac_includes_default"
+if test "x$ac_cv_header_libgen_h" = xyes; then :
+  $as_echo "#define HAS_LIBGEN_H 1" >>confdefs.h
+
+fi
+
 
 ac_fn_c_check_header_mongrel "$LINENO" "stdint.h" "ac_cv_header_stdint_h" "$ac_includes_default"
 if test "x$ac_cv_header_stdint_h" = xyes; then :
@@ -13651,8 +14220,8 @@ natdynlinkopts=""
 if test x"$enable_shared" != "xno"; then :
   case $host in #(
   *-apple-darwin*) :
-    mksharedlib="$CC -shared -flat_namespace -undefined suppress \
-                   -Wl,-no_compact_unwind"
+    mksharedlib="$CC -shared \
+                   -undefined dynamic_lookup -Wl,-no_compact_unwind"
       shared_libraries_supported=true ;; #(
   *-*-mingw32) :
     mksharedlib='$(FLEXLINK)'
@@ -13668,8 +14237,8 @@ fi
       mkmaindll='$(FLEXLINK) -maindll'
       shared_libraries_supported=$with_sharedlibs ;; #(
   *-*-cygwin*) :
-    mksharedlib="$flexlink"
-      mkmaindll="$flexlink -maindll"
+    mksharedlib='$(FLEXLINK)'
+      mkmaindll='$(FLEXLINK) -maindll'
       shared_libraries_supported=true ;; #(
   powerpc-ibm-aix*) :
     case $ocaml_cv_cc_vendor in #(
@@ -13691,6 +14260,10 @@ esac ;; #(
        case $CC,$host in #(
   gcc*,powerpc-*-linux*) :
     mksharedlib="$CC -shared -mbss-plt" ;; #(
+  *,i[3456]86-*) :
+    # Disable DT_TEXTREL warnings on Linux and BSD i386
+           # See https://github.com/ocaml/ocaml/issues/9800
+           mksharedlib="$CC -shared -Wl,-z,notext" ;; #(
   *) :
     mksharedlib="$CC -shared" ;;
 esac
@@ -14227,6 +14800,9 @@ else
 fi
 
 
+as_is_cc=false
+default_as=''
+
 case "$arch,$system" in #(
   i386,win32) :
     default_as="ml -nologo -coff -Cp -c -Fo" ;; #(
@@ -14236,7 +14812,8 @@ case "$arch,$system" in #(
     case $ocaml_cv_cc_vendor in #(
   clang-*) :
     default_as='clang -arch x86_64 -Wno-trigraphs -c'
-        default_aspp='clang -arch x86_64 -Wno-trigraphs -c' ;; #(
+        default_aspp='clang -arch x86_64 -Wno-trigraphs -c'
+        as_is_cc=true ;; #(
   *) :
     default_as="${toolpref}as -arch x86_64"
       default_aspp="${toolpref}gcc -arch x86_64 -c" ;;
@@ -14254,6 +14831,7 @@ fi ;; #(
     if test x"$SYSTEM_AS" = "x"; then :
   default_as="${toolpref}gcc -m64 -c"
           default_aspp="${toolpref}gcc -m64 -c"
+          as_is_cc=true
 else
   default_as="${toolpref}as --64"
           default_aspp="${toolpref}gcc -m64 -c"
@@ -14280,7 +14858,8 @@ esac ;; #(
     default_aspp="${toolpref}gcc -c -Wa,-march=$model" ;; #(
   *,freebsd) :
     default_as="${toolpref}cc -c -Wno-trigraphs"
-    default_aspp="${toolpref}cc -c -Wno-trigraphs" ;; #(
+    default_aspp="${toolpref}cc -c -Wno-trigraphs"
+    as_is_cc=true ;; #(
   *,dragonfly) :
     default_as="${toolpref}as"
     default_aspp="${toolpref}cc -c" ;; #(
@@ -14288,7 +14867,8 @@ esac ;; #(
     case $ocaml_cv_cc_vendor in #(
   clang-*) :
     default_as="${toolpref}clang -c -Wno-trigraphs"
-                  default_aspp="${toolpref}clang -c -Wno-trigraphs" ;; #(
+                  default_aspp="${toolpref}clang -c -Wno-trigraphs"
+                  as_is_cc=true ;; #(
   *) :
     default_as="${toolpref}as"
       default_aspp="${toolpref}gcc -c" ;;
@@ -14296,6 +14876,13 @@ esac ;; #(
   *) :
      ;;
 esac
+
+if test -z "$default_as"; then :
+  default_as="$CC -c"; as_is_cc=true
+fi
+if test -z "$default_aspp"; then :
+  default_aspp="$CC -c"
+fi
 
 if test "$with_pic"; then :
   fpic=true
@@ -14470,6 +15057,14 @@ fi
 ac_fn_c_check_func "$LINENO" "times" "ac_cv_func_times"
 if test "x$ac_cv_func_times" = xyes; then :
   $as_echo "#define HAS_TIMES 1" >>confdefs.h
+
+fi
+
+
+## strlcpy
+ac_fn_c_check_func "$LINENO" "strlcpy" "ac_cv_func_strlcpy"
+if test "x$ac_cv_func_strlcpy" = xyes; then :
+  $as_echo "#define HAS_STRLCPY 1" >>confdefs.h
 
 fi
 
@@ -14949,6 +15544,13 @@ fi
 fi
 
 
+ac_fn_c_check_func "$LINENO" "realpath" "ac_cv_func_realpath"
+if test "x$ac_cv_func_realpath" = xyes; then :
+  $as_echo "#define HAS_REALPATH 1" >>confdefs.h
+
+fi
+
+
 # wait
 ac_fn_c_check_func "$LINENO" "waitpid" "ac_cv_func_waitpid"
 if test "x$ac_cv_func_waitpid" = xyes; then :
@@ -15292,8 +15894,6 @@ fi
 
 ## -fdebug-prefix-map support by the C compiler
 case $ocaml_cv_cc_vendor,$host in #(
-  *,*-*-mingw32) :
-    cc_has_debug_prefix_map=false ;; #(
   *,*-pc-windows) :
     cc_has_debug_prefix_map=false ;; #(
   xlc*,powerpc-ibm-aix*) :
@@ -15323,6 +15923,91 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   CFLAGS="$saved_CFLAGS"
  ;;
 esac
+
+## -ffile-prefix-map support by the C compiler - used in the build, not by
+## the compiler
+if test x"$bindir_to_libdir" != 'x'; then :
+  srcdir_abs_real="$(realpath "$srcdir_abs" 2>/dev/null)"
+  if test x"$srcdir_abs_real" = "x$srcdir_abs"; then :
+  srcdir_abs_real=''
+fi
+  as_CACHEVAR=`$as_echo "ax_cv_check_cflags_$warn_error_flag_-Wa,--debug-prefix-map=old=new" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the C compiler accepts -Wa,--debug-prefix-map=old=new" >&5
+$as_echo_n "checking whether the C compiler accepts -Wa,--debug-prefix-map=old=new... " >&6; }
+if eval \${$as_CACHEVAR+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS $warn_error_flag -Wa,--debug-prefix-map=old=new"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval "$as_CACHEVAR=yes"
+else
+  eval "$as_CACHEVAR=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+eval ac_res=\$$as_CACHEVAR
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
+  build_map_flags='-Wa,--debug-prefix-map='
+else
+  :
+fi
+
+  as_CACHEVAR=`$as_echo "ax_cv_check_cflags_$warn_error_flag_-ffile-prefix-map=old=new" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the C compiler accepts -ffile-prefix-map=old=new" >&5
+$as_echo_n "checking whether the C compiler accepts -ffile-prefix-map=old=new... " >&6; }
+if eval \${$as_CACHEVAR+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS $warn_error_flag -ffile-prefix-map=old=new"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval "$as_CACHEVAR=yes"
+else
+  eval "$as_CACHEVAR=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+eval ac_res=\$$as_CACHEVAR
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
+  build_map_flags="$build_map_flags -ffile-prefix-map="
+else
+  if $cc_has_debug_prefix_map; then :
+  build_map_flags="$build_map_flags -fdebug-prefix-map="
+fi
+fi
+
+fi
 
 ## Does stat support nanosecond precision
 
@@ -16636,6 +17321,7 @@ $as_echo_n "checking whether the assembler supports --debug-prefix-map... " >&6;
   saved_CC="$CC"
   saved_CFLAGS="$CFLAGS"
   saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
   saved_ac_ext="$ac_ext"
   saved_ac_compile="$ac_compile"
   # Move the content of confdefs.h to another file so it does not
@@ -16678,6 +17364,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   CPPFLAGS="$saved_CPPFLAGS"
   CFLAGS="$saved_CFLAGS"
   CC="$saved_CC"
+  LIBS="$saved_LIBS"
 
 
 
@@ -16692,6 +17379,7 @@ else
   saved_CC="$CC"
   saved_CFLAGS="$CFLAGS"
   saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
   saved_ac_ext="$ac_ext"
   saved_ac_compile="$ac_compile"
   # Move the content of confdefs.h to another file so it does not
@@ -16757,6 +17445,7 @@ fi
   CPPFLAGS="$saved_CPPFLAGS"
   CFLAGS="$saved_CFLAGS"
   CC="$saved_CC"
+  LIBS="$saved_LIBS"
 
 
     if $aspp_ok && $as_ok; then :
@@ -17071,24 +17760,6 @@ esac ;; #(
     windows_unicode=0 ;;
 esac
 
-# Define flexlink chain and flags correctly for the different Windows ports
-case $host in #(
-  i686-w64-mingw32) :
-    flexdll_chain='mingw'
-    flexlink_flags="-chain $flexdll_chain -stack 16777216" ;; #(
-  x86_64-w64-mingw32) :
-    flexdll_chain='mingw64'
-    flexlink_flags="-chain $flexdll_chain -stack 33554432" ;; #(
-  i686-pc-windows) :
-    flexdll_chain='msvc'
-    flexlink_flags="-merge-manifest -stack 16777216" ;; #(
-  x86_64-pc-windows) :
-    flexdll_chain='msvc64'
-    flexlink_flags="-x64 -merge-manifest -stack 33554432" ;; #(
-  *) :
-     ;;
-esac
-
 # Define default prefix correctly for the different Windows ports
 if test x"$prefix" = "xNONE"; then :
   case $host in #(
@@ -17103,15 +17774,83 @@ if test x"$prefix" = "xNONE"; then :
   *) :
      ;;
 esac
+fi
+
+# Normalise $prefix, if necessary, on Windows. There are 9 variables to be
+# considered:
+# - $prefix and $exec_prefix. These are autoconf variables containing the values
+#   specified for --prefix and --exec-prefix respectively, or NONE if these
+#   flags were not given on the command line. These two variables are written to
+#   Makefile.config and are in _build_ format. On native Windows, the values
+#   must be suitable to pass to _both_ native Windows processes and Cygwin/MSYS2
+#   commands. The values are ultimately converted to Windows paths using slashes
+#   (i.e. C:/foo)
+# - $bindir and $libdir. These similarly contain the values specified for
+#   --bindir and --libdir, or defaults relative to $exec_prefix otherwise.
+#   Unlike --prefix, values specified to configure for --bindir and --libdir are
+#   assumed to be suitable for both native Windows processes and Cygwin/MSYS2.
+#   These two variables ultimately end up in Makefile.config as $(BINDIR) and
+#   $(LIBDIR) and are used for installation commands only.
+# - $ocaml_prefix, $ocaml_bindir and $ocaml_libdir are the _expanded_ values of
+#   $prefix, $bindir and $libdir so that the values can be inserted into OCaml
+#   strings (typically in utils/config.generated.ml). On Windows, these preserve
+#   the backslashes present in the value passed to --prefix.
+# - $TARGET_BINDIR and $TARGET_LIBDIR. These are both precious environment
+#   variables (meaning their value is recorded by configure) but they default to
+#   $ocaml_bindir and $ocaml_libdir respectively.
+ocaml_bindir="$bindir"
+ocaml_libdir="$libdir"
+ocaml_prefix="$prefix"
+case $cygwin_build_env,$host in #(
+  true,*-w64-mingw32*|true,*-pc-windows) :
+    prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")"
+    if test "x${ocaml_prefix%%/*}" != "x$ocaml_prefix"; then :
+  # $prefix contained a slash - normalise it with cygpath. The rationale for
+      # this allows both `./configure --prefix $PWD/install` (which will be a
+      # Cygwin path) and also systems lazily using slashes instead of
+      # backslashes (i.e. C:/Backslashes/Scare/Us) to work.
+      ocaml_prefix="$prefix"
 else
-  if test x"$unix_or_win32" = "xwin32" \
-          && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ; then :
-  case $build in #(
-  *-pc-cygwin) :
-    prefix=`cygpath -m "$prefix"` ;; #(
+  # $prefix was using backslashes - preserve these in the build, but
+      # continue to use slashes for the Makefile variables.
+      if test "x$bindir" = 'x${exec_prefix}/bin'; then :
+  ocaml_bindir='${exec_prefix}\bin'
+else
+  ocaml_bindir="$bindir"
+fi
+      if test "x$libdir" = 'x${exec_prefix}/lib/ocaml'; then :
+  ocaml_libdir='${exec_prefix}\lib\ocaml'
+else
+  ocaml_libdir="$libdir"
+fi
+fi ;; #(
   *) :
      ;;
 esac
+
+if test x"$libdir" = x'${exec_prefix}/lib/ocaml'; then :
+  if test x"$bindir_to_libdir" != 'x'; then :
+  ocaml_libdir="$bindir_to_libdir"
+    target_libdir_is_relative=true
+    case $cygwin_build_env,$host in #(
+  true,*-w64-mingw32*|true,*-pc-windows) :
+    build_bindir_to_libdir="$(LC_ALL=C.UTF-8 cygpath \
+                                   "$bindir_to_libdir")" ;; #(
+  *) :
+    build_bindir_to_libdir="$bindir_to_libdir" ;;
+esac
+    case $build_bindir_to_libdir in #(
+  ./*) :
+    libdir="$bindir${build_bindir_to_libdir#.}" ;; #(
+  ../*) :
+    libdir="$bindir/$build_bindir_to_libdir" ;; #(
+  *) :
+    as_fn_error $? "--with-relative-libdir requires a relative path" "$LINENO" 5 ;;
+esac
+fi
+else
+  if test x"$bindir_to_libdir" != 'x'; then :
+  as_fn_error $? "--with-relative-libdir and --libdir cannot both be specified" "$LINENO" 5
 fi
 fi
 
@@ -17142,6 +17881,98 @@ if test x"$enable_stdlib_manpages" != "xno"; then :
 else
   stdlib_manpages=false
 fi
+
+# Determine the three Runtime IDs (see runtime/Mangling.md)
+
+alphabet='0123456789abcdefghijklmnopqrstuv'
+
+
+
+
+
+# Bits 0-4 (dev + low 4 bits of release)
+
+
+# Bits 5-6 (high 2 bits of release)
+
+
+# Bits 7-9 (low 3 bits of reserved)
+quintet1="0 + $(expr \( $profinfo_width \* 4 \) % 32)"
+quintet1="$(echo "$alphabet" | cut -c $(expr $quintet1 + 1))"
+
+# Bits 10-11 (high 2 bits of reserved)
+quintet2_byte=\
+"$(echo "$alphabet" | cut -c $(expr \( $profinfo_width / 8 \) + 1))"
+
+# Bit 12 (no-flat-float-array)
+if $flat_float_array; then :
+  quintet2_zinc='0'
+else
+  quintet2_byte="4 + $quintet2_byte"
+  quintet2_zinc='4'
+fi
+# Bit 13 (fp)
+if $frame_pointers; then :
+  quintet2_native="8 + $quintet2_byte"
+else
+  quintet2_native="$quintet2_byte"
+fi
+# Bit 14 (tsan) cannot be set until OCaml 5.2
+
+quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
+quintet2_byte="$(echo "$alphabet" | cut -c $(expr $quintet2_byte + 1))"
+quintet2_native="$(echo "$alphabet" | cut -c $(expr $quintet2_native + 1))"
+
+# Bit 15 (int31)
+if $arch64; then :
+  quintet3_zinc='0'
+else
+  quintet3_zinc='1'
+fi
+# Bit 16 (static)
+if ! $supports_shared_libraries; then :
+  quintet3_zinc="2 + $quintet3_zinc"
+fi
+# Bit 17 (naked-pointers)
+if $naked_pointers; then :
+  quintet3="4 + $quintet3_zinc"
+else
+  quintet3="$quintet3_zinc"
+fi
+# Bit 18 (ansi)
+case $target,$windows_unicode in #(
+  *-*-mingw32,0|*-pc-windows,0) :
+    quintet3="8 + $quintet3" ;; #(
+  *) :
+     ;;
+esac
+# Bit 19 (mutable-string)
+if ! $force_safe_string; then :
+  quintet3="16 + $quintet3"
+fi
+
+quintet3_zinc="$(echo "$alphabet" | cut -c $(expr $quintet3_zinc + 1))"
+quintet3="$(echo "$alphabet" | cut -c $(expr $quintet3 + 1))"
+
+zinc_runtime_id_lo="q0"
+zinc_runtime_id_hi="${quintet2_zinc}${quintet3_zinc}"
+bytecode_runtime_id="q${quintet1}${quintet2_byte}${quintet3}"
+native_runtime_id="q${quintet1}${quintet2_native}${quintet3}"
+
+# Update the values for is_release, release_number and zinc_runtime_id in
+# utils/config.mlp (this is done when tools/autogen is run, not each time
+# configure is run!)
+
+
+# Do not permanently cache the result of flexdll.h
+unset ac_cv_header_flexdll_h
+
+# Evaluate install directories
+
+
+# Create ld.conf
+ac_config_commands="$ac_config_commands runtime/ld.conf"
+
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -17252,6 +18083,71 @@ LIBOBJS=$ac_libobjs
 LTLIBOBJS=$ac_ltlibobjs
 
 
+
+  # Go through ac_subst_vars and put all the values to be substituted in
+  # $all_values.
+  QS=''
+  all_values=''
+  for name in $ac_subst_vars; do
+    eval "value=\$${name}"
+    all_values="$all_values $value"
+  done
+
+  # Keep adding 'o' to $QS until |$QS} doesn't appear in any substitution.
+  test_string=''
+  while test "x${test_string}" != "x${all_values}"; do
+    test_string="$all_values"
+    eval "test_string=\"\${test_string##*\|${QS}\}}\""
+    if test "x${test_string}" != "x${all_values}"; then
+      QS="o${QS}"
+    fi
+  done
+
+
+  saved_exec_prefix="$exec_prefix"
+  saved_prefix="$prefix"
+  prefix="$ocaml_prefix"
+  if test "x$prefix" = "xNONE"; then :
+  prefix="$ac_default_prefix"
+fi
+  if test "x$exec_prefix" = "xNONE"; then :
+  exec_prefix="$prefix"
+fi
+  eval "exec_prefix=\"$exec_prefix\""
+  # Set variables necessary to create utils/config.generated.ml.
+  # $HOST_BINDIR is always the absolute path to the binary directory, in host
+  #   format (i.e. potentially with backslashes on Windows).
+  # $TARGET_BINDIR can be specified by the caller when building cross-compilers,
+  #   and the value then is used unaltered. Otherwise, $TARGET_BINDIR is set to
+  #   '.' when the compiler is configured with --with-relative-libdir or the
+  #   value of $HOST_BINDIR otherwise.
+  # $ocaml_bindir is used in utils/config.generated.ml and is _empty_ if the
+  #   compiler is configured with --with-relative-libdir (otherwise the path
+  #   would be embedded in config.cmo)
+  eval "HOST_BINDIR=\"$ocaml_bindir\""
+  if test "x$bindir_to_libdir" = 'x'; then :
+  ocaml_bindir="$HOST_BINDIR"
+else
+  ocaml_bindir=''
+fi
+  if test x"$TARGET_BINDIR" = 'x'; then :
+  if test "x$bindir_to_libdir" = 'x'; then :
+  TARGET_BINDIR="$HOST_BINDIR"
+else
+  TARGET_BINDIR='.'
+fi
+fi
+  eval "ocaml_libdir=\"$ocaml_libdir\""
+  if test "x$bindir_to_libdir" = 'x'; then :
+  TARGET_LIBDIR="$ocaml_libdir"
+else
+  TARGET_LIBDIR="$bindir_to_libdir"
+fi
+  if test x"$target_launch_method" = 'x'; then :
+  target_launch_method="$launch_method"
+fi
+  prefix="$saved_prefix"
+  exec_prefix="$saved_exec_prefix"
 
 : "${CONFIG_STATUS=./config.status}"
 ac_write_fail=0
@@ -18117,6 +19013,11 @@ fi
 
 
 
+ocaml_additional_stublibs_dir=\
+'$(echo "$ocaml_additional_stublibs_dir" | sed -e "s/'/'\"'\"'/g")'
+  ocaml_libdir='$(echo "$ocaml_libdir" | sed -e "s/'/'\"'\"'/g")'
+  default_separator='$default_separator'
+  supports_shared_libraries='$supports_shared_libraries'
 
 _ACEOF
 
@@ -18126,12 +19027,16 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
+    "testsuite/tools/toolchain.ml") CONFIG_FILES="$CONFIG_FILES testsuite/tools/toolchain.ml" ;;
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
+    "ocamltest/ocamltest_config.mlp") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.mlp" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
+    "runtime/caml_internal_config.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml_internal_config.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
+    "runtime/ld.conf") CONFIG_COMMANDS="$CONFIG_COMMANDS runtime/ld.conf" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
@@ -19229,6 +20134,13 @@ ltmain=$ac_aux_dir/ltmain.sh
   chmod +x "$ofile"
 
  ;;
+    "runtime/ld.conf":C) rm -f runtime/ld.conf
+  test x"$ocaml_additional_stublibs_dir" = 'x' || \
+    echo "$ocaml_additional_stublibs_dir" > runtime/ld.conf
+  if $supports_shared_libraries; then
+    echo ".${default_separator}stublibs" >> runtime/ld.conf
+  fi
+  echo "." >> runtime/ld.conf ;;
 
   esac
 done # for ac_tag

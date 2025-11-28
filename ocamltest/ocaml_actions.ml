@@ -612,7 +612,9 @@ let mklib log env =
     Ocaml_commands.ocamlrun_ocamlmklib;
     "-ocamlc '" ^ ocamlc_command ^ "'";
     "-o " ^ program
-  ] @ modules env in
+  ] @ (if Ocamltest_config.suffixing then ["-suffixed"] else [])
+    @ modules env
+  in
   let expected_exit_status = 0 in
   let exit_status =
     Actions_helpers.run_cmd
@@ -1080,7 +1082,8 @@ let config_variables _log env =
     Ocaml_variables.nativecc_libs, Ocamltest_config.nativecc_libs;
     Ocaml_variables.mkdll,
       Sys.getenv_with_default_value "MKDLL" Ocamltest_config.mkdll;
-    Ocaml_variables.mkexe, Ocamltest_config.mkexe;
+    Ocaml_variables.mkexe,
+      Sys.getenv_with_default_value "MKEXE" Ocamltest_config.mkexe;
     Ocaml_variables.c_preprocessor, Ocamltest_config.c_preprocessor;
     Ocaml_variables.cc, Ocamltest_config.cc;
     Ocaml_variables.csc, Ocamltest_config.csc;

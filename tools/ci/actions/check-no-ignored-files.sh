@@ -1,11 +1,11 @@
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*              Anil Madhavapeddy, OCaml Labs                             *
+#*                        David Allsopp, Tarides                          *
 #*                                                                        *
-#*   Copyright 2014 Institut National de Recherche en Informatique et     *
-#*     en Automatique.                                                    *
+#*   Copyright 2022 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -13,18 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 
-dist: bionic
-language: c
-git:
-  submodules: false
-script: tools/ci/travis/travis-ci.sh
-matrix:
-  include:
-  - env: CI_KIND=check-depend
-  - env: CI_KIND=changes
-  - env: CI_KIND=manual
-  - env: CI_KIND=check-typo
-
-notifications:
-  email:
-    - ocaml-ci-notifications@inria.fr
+if git ls-tree HEAD --name-only -r | git check-ignore --stdin --no-index; then
+  echo These files are matched by .gitignore and should not be committed
+  exit 1
+fi
