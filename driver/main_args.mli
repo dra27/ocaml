@@ -96,9 +96,11 @@ module type Compiler_options = sig
   val _no_principal : unit -> unit
   val _rectypes : unit -> unit
   val _runtime_variant : string -> unit
+  val _set_runtime_default : string -> unit
   val _with_runtime : unit -> unit
   val _without_runtime : unit -> unit
   val _safe_string : unit -> unit
+  val _set_runtime_default : string -> unit
   val _short_paths : unit -> unit
   val _thread : unit -> unit
   val _v : unit -> unit
@@ -140,10 +142,13 @@ module type Bytecomp_options = sig
   val _custom : unit -> unit
   val _no_check_prims : unit -> unit
   val _dllib : string -> unit
+  val _dllib_suffixed : string -> unit
   val _dllpath : string -> unit
   val _make_runtime : unit -> unit
   val _vmthread : unit -> unit
   val _use_runtime : string -> unit
+  val _launch_method : string -> unit
+  val _search_method : string -> unit
 
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit

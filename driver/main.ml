@@ -44,7 +44,8 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _config_var = Misc.show_config_variable_and_exit
   let _custom = set custom_runtime
   let _no_check_prims = set no_check_prims
-  let _dllib s = defer (ProcessDLLs (Misc.rev_split_words s))
+  let _dllib s = defer (ProcessDLLs (false, Misc.rev_split_words s))
+  let _dllib_suffixed s = defer (ProcessDLLs (true, Misc.rev_split_words s))
   let _dllpath s = dllpaths := !dllpaths @ [s]
   let _for_pack s = for_package := Some s
   let _g = set debug
@@ -101,6 +102,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _rectypes = set recursive_types
   let _no_rectypes = unset recursive_types
   let _runtime_variant s = runtime_variant := s
+  let _set_runtime_default s = Compenv.parse_runtime_parameter s
   let _with_runtime = set with_runtime
   let _without_runtime = unset with_runtime
   let _safe_string = unset unsafe_string
@@ -117,6 +119,31 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _unsafe_string = set unsafe_string
   let _use_prims s = use_prims := s
   let _use_runtime s = use_runtime := s
+  let _launch_method s =
+    let s, bindir =
+      try Misc.cut_at s ' '
+      with Not_found ->
+        s, Config.target_bindir
+    in
+    match s with
+    | "exe" ->
+        launch_method := (Config.Executable, bindir)
+    | "sh" ->
+        launch_method := (Config.Shebang None, bindir)
+    | s when s <> "" && s.[0] = '/' ->
+        launch_method := (Config.Shebang (Some s), bindir)
+    | _ ->
+        Compenv.fatal
+          "-launch-method: expect sh, exe or an absolute path for <method>"
+  let _search_method = function
+  | "disable" ->
+      search_method := Config.Absolute
+  | "enable" ->
+      search_method := Config.Absolute_then_search
+  | "always" ->
+      search_method := Config.Search
+  | _ ->
+      assert false
   let _v () = print_version_and_library "compiler"
   let _version = print_version_string
   let _vnum = print_version_string

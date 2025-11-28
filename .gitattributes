@@ -27,9 +27,9 @@
 *.png binary
 *.tfm binary
 
-# configure is declared as binary so that it doesn't get included in diffs.
-# This also means it will have the correct Unix line-endings, even on Windows.
-/configure binary
+# configure is a shell-script; the linguist-generated attribute suppresses
+# changes being displayed by default in pull requests.
+/configure text eol=lf -diff linguist-generated
 
 # 'union' merge driver just unions textual content in case of conflict
 #   http://krlmlr.github.io/using-gitattributes-to-avoid-merge-conflicts/
@@ -40,6 +40,20 @@
 # the lines involved in the conflict, which is arguably worse
 #/Changes                 merge=union
 
+testsuite/Makefile       export-subst
+
+# Files and directories excluded from git-generated tarballs.
+.github                  export-ignore
+release-info             export-ignore
+testsuite/tests          export-ignore
+tools/ci                 export-ignore
+.gitattributes           export-ignore
+.gitignore               export-ignore
+.gitmodules              export-ignore
+.mailmap                 export-ignore
+ocaml-variants.install   export-ignore
+ocaml-variants.opam      export-ignore
+
 # No header for text files (would be too obtrusive).
 *.md                     typo.missing-header
 README*                  typo.missing-header
@@ -48,6 +62,9 @@ stdlib/*.mld             typo.missing-header
 tools/mantis2gh_stripped.csv typo.missing-header
 
 *.adoc                   typo.long-line=may
+
+# Github templates and scripts lack headers, have long lines
+/.github/**              typo.missing-header typo.long-line=may typo.very-long-line=may
 
 /.mailmap                typo.long-line typo.missing-header typo.non-ascii
 /.merlin                 typo.missing-header
@@ -58,7 +75,6 @@ tools/mantis2gh_stripped.csv typo.missing-header
 # tools/ci/appveyor/appveyor_build.cmd only has missing-header because
 # dra27 too lazy to update check-typo to interpret Cmd-style comments!
 /tools/ci/appveyor/appveyor_build.cmd       typo.very-long-line typo.missing-header typo.non-ascii
-/tools/ci/appveyor/appveyor_build.sh        typo.non-ascii
 /tools/ci/inria/remove-sinh-primitive.patch typo.white-at-eol typo.missing-header typo.long-line
 /tools/release-checklist                    typo.missing-header typo.very-long-line
 
@@ -76,6 +92,8 @@ build-aux                typo.prune
 
 /manual                  typo.prune
 /manual/**               typo.prune
+
+tools/ci/appveyor/parallel linguist-vendored typo.prune
 
 # configure is generated so do not check it
 configure                typo.prune
@@ -95,6 +113,8 @@ ocamldoc/odoc_index.html typo.missing-header
 otherlibs/win32unix/readlink.c    typo.long-line
 otherlibs/win32unix/stat.c        typo.long-line
 otherlibs/win32unix/symlink.c     typo.long-line
+
+runtime/sak.c            typo.non-ascii
 
 stdlib/hashbang     typo.white-at-eol typo.missing-lf
 
@@ -139,11 +159,12 @@ menhir-bench.bash typo.missing-header typo.utf8
 
 /tools/ci/appveyor/appveyor_build.cmd text eol=crlf
 
+aclocal.m4 typo.tab
 configure.ac text eol=lf
 build-aux/compile text eol=lf
-build-aux/config.guess text eol=lf
-build-aux/config.sub text eol=lf
-build-aux/install text eol=lf
+build-aux/config.guess linguist-generated text eol=lf
+build-aux/config.sub linguist-generated text eol=lf
+build-aux/install-sh text eol=lf
 build-aux/missing text eol=lf
 ocamldoc/remove_DEBUG text eol=lf
 ocamltest/getocamloptdefaultflags text eol=lf

@@ -1,21 +1,17 @@
 OCaml 4.09 maintenance branch
 -----------------------------
 
-### Build system:
+### Supported platforms:
 
-- #9383: Don't assume that AWKPATH includes .
-  (David Allsopp, report by Ian Zimmerman)
+- #9699, #10026: add support for iOS and macOS on ARM 64 bits
+  Backported from OCaml 4.12.0
+  (Eduardo Rafael, review by Xavier Leroy, Nicolás Ojeda Bär
+   and Anil Madhavapeddy, additional testing by Michael Schmidt)
 
-- #9938, #9939: Define __USE_MINGW_ANSI_STDIO=0 for the mingw-w64 ports to
-  prevent their C99-compliant snprintf conflicting with ours.
-  (David Allsopp, report by Michael Soegtrop, review by Xavier Leroy)
+### Runtime system:
 
-### Bug fixes:
-
-- #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
-  causing a performance regression
-  (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
-   code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
+- #10062: set ARCH_INT64_PRINTF_FORMAT correctly for both modes of mingw-w64
+  (David Allsopp, review by Xavier Leroy)
 
 - #10250, #10266: Dynamically allocate alternate signal stacks to
   accommodate changes in Glibc 2.34.
@@ -25,6 +21,208 @@ OCaml 4.09 maintenance branch
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
+
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
+* #11449, #13497: Add caml_stat_char_array_{to,of}_os functions allowing
+  conversion of string data which may contain NUL characters. Correct
+  implementation of caml_stat_strdup_to_utf16 to raise Out_of_memory instead of
+  returning of NULL (the behaviour of caml_stat_strdup_to_os was inconsistent
+  between Unix/Windows).
+  (David Allsopp, review by Nick Barnes, Antonin Décimo and Miod Vallat)
+
+- #11763, #11759, #11861, #12509, #12577: Use strict prototypes on primitives.
+  (Antonin Décimo, review by Xavier Leroy, David Allsopp, Sébastien
+   Hinderer and Nick Barnes)
+
+- #11764: Add prototypes to old-style C function definitions.
+  (Antonin Décimo, review by Xavier Leroy)
+
+- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
+  shared_libs_path item in `ocamlrun -config` in addition to displaying the
+  entries found in ld.conf.
+  (David Allsopp, review by Stephen Dolan)
+
+* #14???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
+  "../<path...>") are interpreted as being relative to the directory ld.conf
+  was loaded from, and the default ld.conf now uses relative paths, rather than
+  embedding the absolute path to the Standard Library. The brave may continue to
+  put implicit paths in ld.conf. The interpretation of CAML_LD_LIBRARY_PATH is
+  unaltered. Additionally, ld.conf is loaded from all of $OCAMLLIB/ld.conf,
+  $CAMLLIB/ld.conf and standard_library_default/ld.conf rather than just the
+  first one found. ld.conf files with CRLF line endings are now consistently on
+  both Windows and Unix.
+  (David Allsopp, review by ???)
+
+- #14???: Added --with-relative-bindir which allows the runtime and the
+  compilers to locate the Standard Library relative to where the binaries
+  themselves are installed, removing the absolute path previously embedded in
+  caml_standard_library_default. Executables linked with `ocamlc -custom` now
+  always attempt to load bytecode from the executable itself, rather than first
+  trying `argv[0]`.
+  (David Allsopp, review by ???)
+
+- #14???: Introduce Runtime IDs for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system. The IDs are used, along with the host
+  triplet, to provide mangled names for the ocamlrun executable and its variants
+  and the DLL versions of both the bytecode and native runtimes, with symlinks
+  created for the original names. They are also used to mangle the names of stub
+  libraries so that stub libraries compiled for a given configuration of the
+  runtime will only be sought by that runtime. The behaviour is disabled by
+  configuring with --disable-suffixing.
+  (David Allsopp, review by ???)
+
+### Tools:
+
+- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by ???)
+
+### Code generation and optimization
+
+- #9752, #10026: Revised handling of calling conventions for external
+  C functions. Provide a more precise description of the types of unboxed
+  arguments, so that the ARM64 iOS/macOS calling conventions can be honored.
+  Backported from OCaml 4.12.0
+  (Xavier Leroy, review by Mark Shinwell and Eduardo Rafael)
+
+### Manual and documentation:
+
+- #10668, #10669: the changelog (this file), LICENSE and README files are now
+  installed as part of the distribution. The destination directory can be
+  customized using the `--docdir` argument to `./configure`.
+  (Nicolás Ojeda Bär, report by Daniel Bünzli, review by David Allsopp,
+  Sébastien Hinderer, and Daniel Bünzli)
+
+### Compiler user-interface and warnings:
+
+- #10046: Link all DLLs with -static-libgcc on mingw32 to prevent dependency
+  on libgcc_s_sjlj-1.dll with mingw-w64 runtime 8.0.0 (previously this was
+  only needed for dllunix.dll).
+  (David Allsopp, report by Andreas Hauptmann, review by Xavier Leroy)
+
+- #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
+  Makefile.config.
+  (Damien Doligez, review by Mark Shinwell and Gabriel Scherer)
+
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
+- #14???: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix. New option -runtime-search extends the bytecode executable
+  header to be able to search for the runtime interpreter in the directory
+  containing the executable and in PATH rather than relying on a single
+  hard-coded path.
+  (David Allsopp, review by ???)
+
+### Internal/compiler-libs changes:
+
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
+- #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by ???)
+
+### Build system:
+
+- #8650: ensure that "make" variables are defined before use;
+  revise generation of config/util.ml to better quote special characters
+  (Xavier Leroy, review by David Allsopp)
+
+- #9383: Don't assume that AWKPATH includes .
+  (David Allsopp, report by Ian Zimmerman)
+
+- #9938, #9939: Define __USE_MINGW_ANSI_STDIO=0 for the mingw-w64 ports to
+  prevent their C99-compliant snprintf conflicting with ours.
+  (David Allsopp, report by Michael Soegtrop, review by Xavier Leroy)
+
+- #10135: Overhaul the FlexDLL bootstrap process. It's now fully integrated
+  with the default build target and controlled by --with-flexdll which allows
+  externally downloaded sources for FlexDLL to be specified. A separate
+  non-shared version of the runtime is built, and shared artefacts are no longer
+  built twice. When bootstrapping, any flexlink in PATH is now ignored and the
+  Cygwin port also supports bootstrapping FlexDLL. flexlink.opt is automatically
+  built and installed as part of opt.opt/world.opt.
+  (David Allsopp, review by Sébastien Hinderer)
+
+- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
+  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
+  in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
+  (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
+
+- #11184: Stop calling ranlib on installed libraries
+  (Sébastien Hinderer, review by Xavier Leroy)
+
+* #12751: --with-target-bindir configure option implemented. This option
+  refers to the location of the runtime binaries on the target system for a
+  cross-compiler and is embedded in executables produced by ocamlc. It does
+  not affect the bytecode executables installed as part of the build. The old
+  mechanism `make TARGET_BINDIR=..` no longer works.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
+
+- #13494: Use native symlinks on Windows for the OCaml installation, reducing
+  disk usage considerably.
+  (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
+
+- #13789: Harden the escaping of backslashes when generating
+  runtime/build_config.h (in particular, if the underlying implementation of sh
+  is dash, rather than bash, this now works correctly).
+  (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
+
+- #14???: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf. Additionally, the stublibs subdirectory
+  is no longer created, nor added to ld.conf, when building OCaml with
+  --disable-shared.
+  (David Allsopp, review by ???)
+
+- #14???: When targeting native Windows on Cygwin or MSYS2, preserve
+  backslashes in the supplied `--prefix` (in particular, backslashes instead of
+  slashes will then be displayed by `ocamlopt -config-var standard_library`).
+  If the supplied prefix contains a slash, then it is normalised, as
+  previously.
+  (David Allsopp, review by ???)
+
+- #14???: New --enable-runtime-search configure option controls the
+  -runtime-search option used to build the bytecode binaries in the compiler
+  distribution. --enable-runtime-search-target controls the default value of
+  -runtime-search used for bytecode executables produced by the compiler.
+  (David Allsopp, review by ???)
+
+### Bug fixes:
+
+- #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
+  causing a performance regression
+  (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
+   code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
+
+- #10380: Correct handling of UTF-8 paths in configure on Windows
+  (David Allsopp, review by Sébastien Hinderer)
+
+- #12166, #12993: explicitly build non PIE executables on x86 32bits
+  architectures
+  (Florian Angeletti, review by David Allsopp)
+
+- #12726: fix segmentation fault under Windows when executing a bytecode file if
+  the runtime (`ocamlrun.exe`) cannot be found.
+  (Vadim Zborovskii, Nicolás Ojeda Bär, report by Vadim Zborovskii, review by
+  David Allsopp)
+
+* #12751: Always keep within the 128 character limit for shebang lines. Previous
+  fix in #8622 handled building the compiler with a long prefix; this patch
+  extends this to the bytecode executables emitted by that compiler.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
+
+* #13070: On Windows, when configured with bootstrapped flexdll, don't add
+  +flexdll to the search path when -nostdlib is specified (which then means
+  -L <path-to-flexdll> no longer gets passed to the system linker).
+  (David Allsopp, review by Florian Angeletti)
 
 OCaml 4.09.1 (16 Mars 2020):
 ----------------------------

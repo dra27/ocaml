@@ -38,13 +38,15 @@ module Float_arg_helper = Arg_helper.Make (struct
   end
 end)
 
-let objfiles = ref ([] : string list)   (* .cmo and .cma files *)
-and ccobjs = ref ([] : string list)     (* .o, .a, .so and -cclib -lxxx *)
-and dllibs = ref ([] : string list)     (* .so and -dllib -lxxx *)
+let objfiles = ref ([] : string list)         (* .cmo and .cma files *)
+and ccobjs = ref ([] : string list)           (* .o, .a, .so and -cclib -lxxx *)
+and dllibs = ref ([] : (bool * string) list)  (* .so, -dllib -lxxx and
+                                                 '-dllib-suffixed -lxxx *)
 
 let compile_only = ref false            (* -c *)
 and output_name = ref (None : string option) (* -o *)
 and include_dirs = ref ([] : string list)(* -I *)
+and standard_library_default = ref None (* -set-runtime-default *)
 and no_std_include = ref false          (* -nostdlib *)
 and print_types = ref false             (* -i *)
 and make_archive = ref false            (* -a *)
@@ -78,6 +80,10 @@ and noinit = ref false                  (* -noinit *)
 and open_modules = ref []               (* -open *)
 and use_prims = ref ""                  (* -use-prims ... *)
 and use_runtime = ref ""                (* -use-runtime ... *)
+and launch_method =                     (* -launch-method ... *)
+  ref (Config.launch_method, Config.target_bindir)
+and search_method =                     (* -search-method ... *)
+  ref Config.search_method
 and plugin = ref false                  (* -plugin ... *)
 and principal = ref false               (* -principal *)
 and real_paths = ref true               (* -short-paths *)

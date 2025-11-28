@@ -89,6 +89,11 @@ let mk_dllib f =
   "-dllib", Arg.String f, "<lib>  Use the dynamically-loaded library <lib>"
 ;;
 
+let mk_dllib_suffixed f =
+  "-dllib-suffixed", Arg.String f,
+  "<lib>  Use the dynamically-loaded library <lib>, with the runtime suffix \
+          appended to the name"
+
 let mk_dllpath f =
   "-dllpath", Arg.String f,
   "<dir>  Add <dir> to the run-time search path for shared libraries"
@@ -130,6 +135,10 @@ let mk_i f =
 let mk_I f =
   "-I", Arg.String f, "<dir>  Add <dir> to the list of include directories"
 ;;
+
+let mk_set_runtime_default f =
+  "-set-runtime-default", Arg.String f, "<param>=<value>  Set the default for \
+      runtime parameter <param> to <value>"
 
 let mk_impl f =
   "-impl", Arg.String f, "<file>  Compile <file> as a .ml file"
@@ -551,6 +560,24 @@ let mk_unsafe_string f =
     "-unsafe-string", Arg.Unit f, " Make strings mutable (default)"
 ;;
 
+let mk_launch_method f =
+  "-launch-method", Arg.String f,
+  "<method>  Specify the mechanism for the bytecode launcher:\n\
+  \          exe - use the executable launcher in runtime-launch-info\n\
+  \          sh - use a #!, using sh if the interpreter path cannot be used\n\
+  \          /path/interpreter - use #!, or the given sh-compatible \
+  \            interpreter if the interpreter path cannot be used"
+
+let mk_search_method f =
+  "-runtime-search", Arg.Symbol (["disable"; "enable"; "always"], f),
+  Printf.sprintf
+    "  Control the way the bytecode header searches for the interpreter\n\
+    \    The following settings are supported:\n\
+    \      disable  use a fixed absolute path to the runtime\n\
+    \      enable   search for runtime only if not found at the absolute path\n\
+    \      always   always search for the runtime\n\
+    \    The default setting is 'disable'."
+
 let mk_use_runtime f =
   "-use-runtime", Arg.String f,
   "<file>  Generate bytecode for the given runtime system"
@@ -943,6 +970,7 @@ module type Compiler_options = sig
   val _with_runtime : unit -> unit
   val _without_runtime : unit -> unit
   val _safe_string : unit -> unit
+  val _set_runtime_default : string -> unit
   val _short_paths : unit -> unit
   val _thread : unit -> unit
   val _v : unit -> unit
@@ -983,10 +1011,13 @@ module type Bytecomp_options = sig
   val _custom : unit -> unit
   val _no_check_prims : unit -> unit
   val _dllib : string -> unit
+  val _dllib_suffixed : string -> unit
   val _dllpath : string -> unit
   val _make_runtime : unit -> unit
   val _vmthread : unit -> unit
   val _use_runtime : string -> unit
+  val _launch_method : string -> unit
+  val _search_method : string -> unit
 
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit
@@ -1112,6 +1143,7 @@ struct
     mk_config_var F._config_var;
     mk_custom F._custom;
     mk_dllib F._dllib;
+    mk_dllib_suffixed F._dllib_suffixed;
     mk_dllpath F._dllpath;
     mk_dtypes F._annot;
     mk_for_pack_byt F._for_pack;
@@ -1159,6 +1191,7 @@ struct
     mk_with_runtime F._with_runtime;
     mk_without_runtime F._without_runtime;
     mk_safe_string F._safe_string;
+    mk_set_runtime_default F._set_runtime_default;
     mk_short_paths F._short_paths;
     mk_strict_sequence F._strict_sequence;
     mk_no_strict_sequence F._no_strict_sequence;
@@ -1171,6 +1204,8 @@ struct
     mk_unsafe_string F._unsafe_string;
     mk_use_runtime F._use_runtime;
     mk_use_runtime_2 F._use_runtime;
+    mk_launch_method F._launch_method;
+    mk_search_method F._search_method;
     mk_v F._v;
     mk_verbose F._verbose;
     mk_version F._version;
@@ -1350,6 +1385,7 @@ struct
     mk_without_runtime F._without_runtime;
     mk_S F._S;
     mk_safe_string F._safe_string;
+    mk_set_runtime_default F._set_runtime_default;
     mk_shared F._shared;
     mk_short_paths F._short_paths;
     mk_strict_sequence F._strict_sequence;

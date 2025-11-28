@@ -20,9 +20,10 @@
 # FIXME reduce redundancy by including ../Makefile
 
 ROOTDIR = ../..
+SUBDIR_NAME = otherlibs/dynlink
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 
@@ -135,6 +136,9 @@ $(LOCAL_SRC)/Makefile: $(LOCAL_SRC)/Makefile.copy-sources
             >> $@; \
         done
 
+$(LOCAL_SRC)/dll.ml:
+	sed -e '/caml_dynlink_parse/s/_parse_/_parse_runtime_/' $< > $@
+
 # Rules to automatically generate dependencies for the local copy of the
 # compilerlibs sources.
 
@@ -227,38 +231,35 @@ dynlink_platform_intf.mli: dynlink_platform_intf.ml
 	cp $< $@
 
 extract_crc: dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
-	$(OCAMLC) -o $@ $^
+	$(OCAMLC) -o $@ $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, \
+	                  $(OC_COMMON_LINKFLAGS)) $(OC_COMMON_LINKFLAGS) $^
 
 install:
-	$(INSTALL_DATA) \
-	  dynlink.cmi dynlink.cma \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmi dynlink.cma, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  dynlink.cmti dynlink.mli \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmti dynlink.mli, lib)
 endif
-	$(INSTALL_PROG) \
-	  extract_crc "$(INSTALL_LIBDIR)/extract_crc$(EXE)"
+	$(call INSTALL_ITEM, extract_crc, libexec, , extract_crc$(EXE))
 
 installopt:
-	if $(NATDYNLINK); then \
-	  $(INSTALL_DATA) \
-	    $(NATOBJS) dynlink.cmxa dynlink.$(A) \
-	    "$(INSTALL_LIBDIR)" && \
-	  cd "$(INSTALL_LIBDIR)" && $(RANLIB) dynlink.$(A); \
-	fi
+ifeq "$(NATDYNLINK)" "true"
+	$(call INSTALL_ITEMS, $(NATOBJS) dynlink.cmxa dynlink.$(A), lib)
+endif
 
 partialclean:
 	rm -f extract_crc *.cm[ioaxt] *.cmti *.cmxa \
 	      byte/*.cm[iot] byte/*.cmti \
-	      native/*.cm[ixt] native/*.cmti native/*.$(O) \
-	      $(LOCAL_SRC)/*.cm[ioaxt] $(LOCAL_SRC)/*.cmti $(LOCAL_SRC)/*.$(O)
+	      native/*.cm[ixt] native/*.cmti native/*.o native/*.obj \
+	      $(LOCAL_SRC)/*.cm[ioaxt] $(LOCAL_SRC)/*.cmti \
+        $(LOCAL_SRC)/*.o $(LOCAL_SRC)/*.obj
 
 clean: partialclean
-	rm -f *.$(A) *.$(O) *.so *.dll dynlink_platform_intf.mli \
+	rm -f *.a *.lib *.o *.obj *.so *.dll dynlink_platform_intf.mli \
 	      $(LOCAL_SRC)/*.ml $(LOCAL_SRC)/*.mli $(LOCAL_SRC)/Makefile \
 	      $(LOCAL_SRC)/.depend byte/dynlink.mli native/dynlink.mli
+
+.PHONY: beforedepend
+beforedepend: dynlink_platform_intf.mli
 
 .PHONY: depend
 ifeq "$(TOOLCHAIN)" "msvc"
@@ -269,15 +270,14 @@ DEPEND_DUMMY_FILES=\
   native/dynlink_compilerlibs.ml \
   byte/dynlink_compilerlibs.mli \
   byte/dynlink.mli \
-  native/dynlink.mli \
-  dynlink_platform_intf.mli
+  native/dynlink.mli
 
-depend:
+depend: beforedepend
 	touch $(DEPEND_DUMMY_FILES)
 	$(CAMLRUN) $(ROOTDIR)/boot/ocamlc -depend -slash \
-    -I byte -bytecode *.mli *.ml byte/dynlink.ml > .depend
+	  -I byte -bytecode *.mli *.ml byte/dynlink.ml > .depend
 	$(CAMLRUN) $(ROOTDIR)/boot/ocamlc -depend -slash \
-    -I native -native *.ml native/dynlink.ml >> .depend
+	  -I native -native *.ml native/dynlink.ml >> .depend
 	rm -f $(DEPEND_DUMMY_FILES)
 endif
 
