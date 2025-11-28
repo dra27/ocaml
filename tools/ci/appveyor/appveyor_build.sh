@@ -13,24 +13,31 @@
 #*                                                                        *
 #**************************************************************************
 
+set -e
+
 BUILD_PID=0
 
+# This must correspond with the entry in appveyor.yml
+CACHE_DIRECTORY=/cygdrive/c/projects/cache
+
+MAKE="make -j$NUMBER_OF_PROCESSORS"
+
 function run {
-    NAME=$1
-    shift
-    echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    $@
-    CODE=$?
-    if [ $CODE -ne 0 ]; then
-        echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-        if [ $BUILD_PID -ne 0 ] ; then
-          kill -KILL $BUILD_PID 2>/dev/null
-          wait $BUILD_PID 2>/dev/null
-        fi
-        exit $CODE
-    else
-        echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  NAME=$1
+  shift
+  echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  "$@"
+  CODE=$?
+  if [[ $CODE -ne 0 ]] ; then
+    echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    if [[ $BUILD_PID -ne 0 ]] ; then
+      kill -KILL $BUILD_PID 2>/dev/null
+      wait $BUILD_PID 2>/dev/null
     fi
+    exit $CODE
+  else
+    echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  fi
 }
 
 # Function: set_configuration
@@ -39,111 +46,201 @@ function run {
 # $2: the prefix to use to install
 # $3: C compiler flags to use to turn warnings into errors
 function set_configuration {
-    case "$1" in
-        mingw)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-w64-mingw32'
-        ;;
-        msvc)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-pc-windows'
-        ;;
-        msvc64)
-            build='--build=x86_64-unknown-cygwin'
-            host='--host=x86_64-pc-windows'
-        ;;
-    esac
+  args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
+        '--prefix' "$2/_opam" \
+        '--docdir' "$2/_opam/doc/ocaml")
 
-    ./configure $build $host --prefix="$2"
+  case "$1" in
+    cygwin*)
+      ;;
+    mingw32)
+      args+=('--host=i686-w64-mingw32');;
+    mingw64)
+      args+=('--host=x86_64-w64-mingw32');;
+    msvc32)
+      args+=('--host=i686-pc-windows');;
+    msvc64)
+      args+=('--host=x86_64-pc-windows');;
+  esac
+  case "$RELOCATABLE,$1" in
+    true,cygwin*)
+      args+=('--with-relative-libdir=../lib/ocaml');;
+    true,*)
+      args+=('--with-relative-libdir=..\lib\ocaml');;
+  esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--enable-runtime-search=always' '--enable-runtime-search-target')
+  fi
 
-    FILE=$(pwd | cygpath -f - -m)/Makefile.config
-    echo "Edit $FILE to turn C compiler warnings into errors"
-    sed -i -e "/^ *OC_CFLAGS *=/s/\r\?$/ $3\0/" $FILE
-#    run "Content of $FILE" cat Makefile.config
+  mkdir -p "$CACHE_DIRECTORY"
+  echo './configure' "${args[@]@Q}"
+  if ! ./configure "${args[@]}"; then
+    rm -f "$CACHE_DIRECTORY/config.cache-$1"
+    ./configure "${args[@]}"
+  fi
+
+  cp "$CACHE_DIRECTORY/config.cache-$1" config.cache
+
+  FILE=$(pwd | cygpath -f - -m)/Makefile.config
+  echo "Edit $FILE to turn C compiler warnings into errors"
+  sed -i -e '/^ *OC_CFLAGS *=/s/\r\?$/ '"$3"'\0/' "$FILE"
+
+#  run "Content of $FILE" cat Makefile.config
 }
 
-APPVEYOR_BUILD_FOLDER=$(echo $APPVEYOR_BUILD_FOLDER| cygpath -f -)
-# These directory names are specified here, because getting UTF-8 correctly
-# through appveyor.yml -> Command Script -> Bash is quite painful...
-OCAMLROOT=$(echo $PROGRAMFILES/Бактріан🐫| cygpath -f - -m)
+APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
+FLEXDLLROOT="$PROGRAMFILES/flexdll"
+export OPAMSWITCH="$OCAMLROOT"
 
-# This must be kept in sync with appveyor_build.cmd
-BUILD_PREFIX=🐫реализация
-
-export PATH=$(echo $OCAMLROOT| cygpath -f -)/bin/flexdll:$PATH
+if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
+  case "$PORT" in
+    cygwin*) ;;
+    *) export PATH="$FLEXDLLROOT:$PATH";;
+  esac
+fi
 
 case "$1" in
   install)
-    mkdir -p "$OCAMLROOT/bin/flexdll"
-    cd $APPVEYOR_BUILD_FOLDER/../flexdll
-    # msvc64 objects need to be compiled with VS2015, so are copied later from
-    # a source build.
-    for f in flexdll.h flexlink.exe flexdll*_msvc.obj default*.manifest ; do
-      cp $f "$OCAMLROOT/bin/flexdll/"
-    done
-    if [ "$PORT" = "msvc64" ] ; then
-      echo 'eval $($APPVEYOR_BUILD_FOLDER/tools/msvs-promote-path)' \
-        >> ~/.bash_profile
+    if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
+      mkdir -p "$FLEXDLLROOT"
+      cd "$APPVEYOR_BUILD_FOLDER/../flexdll"
+      # The objects are always built from the sources
+      for f in flexdll.h flexlink.exe default*.manifest ; do
+        cp "$f" "$FLEXDLLROOT/"
+      done
     fi
-    ;;
-  msvc32-only)
-    cd $APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-msvc32
-
-    set_configuration msvc "$OCAMLROOT-msvc32" -WX
-
-    run "make world" make world
-    run "make runtimeopt" make runtimeopt
-    run "make -C otherlibs/systhreads libthreadsnat.lib" \
-         make -C otherlibs/systhreads libthreadsnat.lib
-
-    exit 0
+    case "$PORT" in
+      msvc*)
+        echo 'eval $($APPVEYOR_BUILD_FOLDER/tools/msvs-promote-path)' \
+          >> ~/.bash_profile
+        ;;
+    esac
     ;;
   test)
-    FULL_BUILD_PREFIX=$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX
-    run "ocamlc.opt -version" $FULL_BUILD_PREFIX-$PORT/ocamlc.opt -version
-    run "test $PORT" make -C $FULL_BUILD_PREFIX-$PORT tests
-    run "install $PORT" make -C $FULL_BUILD_PREFIX-$PORT install
-    if [ "$PORT" = "msvc64" ] ; then
-      run "check_all_arches" make -C $FULL_BUILD_PREFIX-$PORT check_all_arches
+    FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+    if [[ $PORT = 'mingw32' ]] ; then
+      run "Check runtime symbols" \
+          "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+          $FULL_BUILD_PREFIX-$PORT/runtime/*.a
+    fi
+    if [[ $PORT = 'mingw64' ]] ; then
+      export PATH="$PATH:/usr/x86_64-w64-mingw32/sys-root/mingw/bin"
+    elif [[ $PORT = 'mingw32' ]] ; then
+      export PATH="$PATH:/usr/i686-w64-mingw32/sys-root/mingw/bin"
+    fi
+    run_testsuite=$TESTSUITE
+    if [[ -n $APPVEYOR_PULL_REQUEST_NUMBER ]]; then
+      API_URL="https://api.github.com/repos/$APPVEYOR_REPO_NAME/issues/$APPVEYOR_PULL_REQUEST_NUMBER"
+      if curl --silent "$API_URL/labels" | grep -q 'CI: Skip testsuite'; then
+        run_testsuite=false
+      fi
+    fi
+    if $run_testsuite; then
+      run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
+    fi
+    run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    make -C "$FULL_BUILD_PREFIX-$PORT" INSTALL_MODE=clone install
+    (
+      cd "$OCAMLROOT"
+      mv _opam destdir
+      #ret="$PWD"
+      #script="$PWD/ocaml-compiler-clone.sh"
+      #cd "$(find $PWD/install -name _opam -type d)"
+      mkdir -p "destdir/share/ocaml"
+      cp "$FULL_BUILD_PREFIX-$PORT/config."{cache,status} 'destdir/share/ocaml/'
+      cp "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" \
+           'destdir/share/ocaml/clone'
+      cd destdir
+      sh "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" "$OCAMLROOT/_opam"
+    )
+    rm -rf "$OCAMLROOT"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" OPAM_PACKAGE_NAME=ocaml-variants \
+      INSTALL_MODE=opam install
+    (
+      cd "$FULL_BUILD_PREFIX-$PORT"
+      export PATH="$FLEXDLLROOT:$PATH"
+      opam init --bare --yes --disable-sandboxing --auto-setup \
+                --no-cygwin-setup --no-git-location --bypass-checks
+      opam repository add --all --set-default dra27 \
+        git+https://github.com/dra27/opam-repository.git#a987c4995d15d9ff825ca65fcf4d41ee61c50a94
+      opam switch create "$OPAMSWITCH" --empty
+      opam pin add --no-action --kind=path ocaml-variants .
+      opam pin add --no-action flexdll flexdll
+      opam install --yes flexdll
+      opam install --yes --assume-built ocaml-variants
+      rm -f config.cache ocaml-variants.install ocaml-variants-fixup.sh \
+            ocaml-compiler-clone.sh
+      opam exec -- ocamlc -v
+    )
+    run "test $PORT in prefix" \
+      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
+            test-in-prefix
+    if [[ $PORT = 'msvc64' ]] ; then
+      run "$MAKE check_all_arches" \
+           $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
     fi
     ;;
   *)
-    cd $APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT
+    cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 
-    if [ "$PORT" = "msvc64" ] ; then
-      tar -xzf $APPVEYOR_BUILD_FOLDER/flexdll.tar.gz
-      cd flexdll-$FLEXDLL_VERSION
-      make MSVC_DETECT=0 CHAINS=msvc64 support
-      cp flexdll*_msvc64.obj "$OCAMLROOT/bin/flexdll/"
+    if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
+      tar -xzf "$APPVEYOR_BUILD_FOLDER/flexdll.tar.gz"
+      cd "flexdll-$FLEXDLL_VERSION"
+      $MAKE MSVC_DETECT=0 CHAINS=${PORT%32} support
+      cp -f *.obj "$FLEXDLLROOT/" 2>/dev/null || \
+      cp -f *.o "$FLEXDLLROOT/"
       cd ..
     fi
 
-    if [ "$PORT" = "msvc64" ] ; then
-      set_configuration msvc64 "$OCAMLROOT" -WX
-    else
-      set_configuration mingw "$OCAMLROOT-mingw32" -Werror
-    fi
-
-    cd $APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT
+    case "$PORT" in
+      msvc*) WERROR='-WX';;
+      *) WERROR='-Werror';;
+    esac
+    set_configuration "$PORT" "$OCAMLROOT" "$WERROR"
 
     export TERM=ansi
 
-    if [ "$PORT" = "mingw32" ] ; then
-      set -o pipefail
-      # For an explanation of the sed command, see
-      # https://github.com/appveyor/ci/issues/1824
-      script --quiet --return --command \
-        "make -C ../$BUILD_PREFIX-mingw32 flexdll world.opt" \
-        ../$BUILD_PREFIX-mingw32/build.log |
-          sed -e 's/\d027\[K//g' \
-              -e 's/\d027\[m/\d027[0m/g' \
-              -e 's/\d027\[01\([m;]\)/\d027[1\1/g'
-    else
-      run "make world" make world
-      run "make bootstrap" make bootstrap
-      run "make opt" make opt
-      run "make opt.opt" make opt.opt
-    fi
+    case "$BUILD_MODE" in
+      world.opt)
+        set -o pipefail
+        # For an explanation of the sed command, see
+        # https://github.com/appveyor/ci/issues/1824
+        script --quiet --return --command \
+          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt && \
+$MAKE -C ../$BUILD_PREFIX-$PORT ocamlnat" \
+          "../$BUILD_PREFIX-$PORT/build.log" |
+            sed -e 's/\d027\[K//g' \
+                -e 's/\d027\[m/\d027[0m/g' \
+                -e 's/\d027\[01\([m;]\)/\d027[1\1/g'
+        rm -f build.log;;
+    steps)
+      run "C deps: runtime" make -j64 -C runtime setup-depend
+      run "C deps: win32unix" make -j64 -C otherlibs/win32unix setup-depend
+      run "$MAKE world" $MAKE world
+      run "$MAKE bootstrap" $MAKE bootstrap
+      run "$MAKE opt" $MAKE opt
+      run "$MAKE opt.opt" $MAKE opt.opt
+      run "$MAKE ocamlnat" $MAKE ocamlnat;;
+    C)
+      run "$MAKE world" $MAKE world
+      run "$MAKE runtimeopt" $MAKE runtimeopt
+      run "$MAKE -C otherlibs/systhreads libthreadsnat.lib" \
+           $MAKE -C otherlibs/systhreads libthreadsnat.lib;;
+    *)
+      echo "Unrecognised build: $BUILD_MODE"
+      exit 1
+    esac
+
+    echo DLL base addresses
+    case "$PORT" in
+      *32)
+        ARG='-4';;
+      *64)
+        ARG='-8';;
+    esac
+    find "../$BUILD_PREFIX-$PORT" -type f \( -name \*.dll -o -name \*.so \) | \
+      xargs rebase -i "$ARG"
 
     ;;
 esac

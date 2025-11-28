@@ -23,6 +23,7 @@ val print_version_and_library : string -> 'a
 val print_version_string : unit -> 'a
 val print_standard_library : unit -> 'a
 val fatal : string -> 'a
+val fatalf : ('a, unit, string, 'b) format4 -> 'a
 
 val first_ccopts : string list ref
 val first_ppx : string list ref
@@ -59,7 +60,7 @@ type deferred_action =
   | ProcessCFile of string
   | ProcessOtherFile of string
   | ProcessObjects of string list
-  | ProcessDLLs of string list
+  | ProcessDLLs of bool * string list
 
 val c_object_of_filename : string -> string
 
@@ -77,3 +78,6 @@ val process_deferred_actions :
   string * (* ocaml module extension *)
   string -> (* ocaml library extension *)
   unit
+
+(** Validate a single -set-runtime-default parameter specification. *)
+val parse_runtime_parameter : string -> unit

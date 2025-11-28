@@ -18,9 +18,10 @@
 # FIXME reduce redundancy by including ../Makefile
 
 ROOTDIR = ../..
+SUBDIR_NAME = otherlibs/dynlink
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 
@@ -141,33 +142,26 @@ extract_crc.cmo: extract_crc.ml dynlink.cmi
 	$(OCAMLC) -c $(COMPFLAGS) extract_crc.ml
 
 extract_crc: $(COMPILEROBJS) dynlink.cma extract_crc.cmo
-	$(OCAMLC) -o $@ $^
+	$(OCAMLC) -o $@ $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, \
+	                  $(OC_COMMON_LINKFLAGS)) $(OC_COMMON_LINKFLAGS) $^
 
 install:
-	$(INSTALL_DATA) \
-	  dynlink.cmi dynlink.cma \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmi dynlink.cma, lib)
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	  dynlink.cmti dynlink.mli \
-	  "$(INSTALL_LIBDIR)"
+	$(call INSTALL_ITEMS, dynlink.cmti dynlink.mli, lib)
 endif
-	$(INSTALL_PROG) \
-	  extract_crc "$(INSTALL_LIBDIR)/extract_crc$(EXE)"
+	$(call INSTALL_ITEM, extract_crc, libexec, , extract_crc$(EXE))
 
 installopt:
-	if $(NATDYNLINK); then \
-	  $(INSTALL_DATA) \
-	    $(NATOBJS) dynlink.cmxa dynlink.$(A) \
-	    "$(INSTALL_LIBDIR)" && \
-	  cd "$(INSTALL_LIBDIR)" && $(RANLIB) dynlink.$(A); \
-	fi
+ifeq "$(NATDYNLINK)" "true"
+	$(call INSTALL_ITEMS, $(NATOBJS) dynlink.cmxa dynlink.$(A), lib)
+endif
 
 partialclean:
 	rm -f extract_crc *.cm[ioaxt] *.cmti *.cmxa
 
 clean: partialclean
-	rm -f *.$(A) *.$(O) *.so *.dll dynlink.mlopt \
+	rm -f *.a *.lib *.o *.obj *.so *.dll dynlink.mlopt \
 	      dynlink_platform_intf.mli
 
 depend:

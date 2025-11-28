@@ -44,10 +44,6 @@
 #define LACKS_VSCPRINTF
 #endif
 
-#ifdef BOOTSTRAPPING_FLEXLINK
-#undef SUPPORT_DYNAMIC_LINKING
-#endif
-
 #ifndef CAML_NAME_SPACE
 #include "compatibility.h"
 #endif
@@ -102,7 +98,7 @@
 #endif
 #endif
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !__USE_MINGW_ANSI_STDIO
   #define ARCH_INT64_TYPE long long
   #define ARCH_UINT64_TYPE unsigned long long
   #define ARCH_INT64_PRINTF_FORMAT "I64"

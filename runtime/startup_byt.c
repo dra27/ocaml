@@ -58,6 +58,8 @@
 #include "caml/startup_aux.h"
 #include "caml/version.h"
 
+#include "build_config.h"
+
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
@@ -66,8 +68,11 @@
 #define SEEK_END 2
 #endif
 
+const char_os * caml_runtime_standard_library_effective = NULL;
+
 static char magicstr[EXEC_MAGIC_LENGTH+1];
 static int print_magic = 0;
+static int print_config = 0;
 
 /* Read the trailer of a bytecode file */
 
@@ -260,48 +265,137 @@ static int parse_command_line(char_os **argv)
 {
   int i, j;
 
-  for(i = 1; argv[i] != NULL && argv[i][0] == _T('-'); i++) {
-    switch(argv[i][1]) {
-    case _T('t'):
-      ++ caml_trace_level; /* ignored unless DEBUG mode */
-      break;
-    case _T('v'):
-      if (!strcmp_os (argv[i], _T("-version"))){
-        printf ("%s\n", "The OCaml runtime, version " OCAML_VERSION_STRING);
-        exit (0);
-      }else if (!strcmp_os (argv[i], _T("-vnum"))){
-        printf ("%s\n", OCAML_VERSION_STRING);
-        exit (0);
-      }else{
-        caml_verb_gc = 0x001+0x004+0x008+0x010+0x020;
+  for(i = 1; argv[i] != NULL && argv[i][0] == '-'; i++) {
+    if (!strcmp_os(argv[i], T("-config"))) {
+      print_config = 1;
+    } else {
+      switch(argv[i][1]) {
+      case 't':
+        ++ caml_trace_level; /* ignored unless DEBUG mode */
+        break;
+      case 'v':
+        if (!strcmp_os (argv[i], T("-version"))){
+          printf ("%s\n", "The OCaml runtime, version " OCAML_VERSION_STRING);
+          exit (0);
+        }else if (!strcmp_os (argv[i], T("-vnum"))){
+          printf ("%s\n", OCAML_VERSION_STRING);
+          exit (0);
+        }else{
+          caml_verb_gc = 0x001+0x004+0x008+0x010+0x020;
+        }
+        break;
+      case 'p':
+        for (j = 0; caml_names_of_builtin_cprim[j] != NULL; j++)
+          printf("%s\n", caml_names_of_builtin_cprim[j]);
+        exit(0);
+        break;
+      case 'b':
+        caml_record_backtrace(Val_true);
+        break;
+      case 'I':
+        if (argv[i + 1] != NULL) {
+          caml_ext_table_add(&caml_shared_libs_path, argv[i + 1]);
+          i++;
+        }
+        break;
+      case 'm':
+        print_magic = 1;
+        break;
+      case 'M':
+        printf ( "%s\n", EXEC_MAGIC);
+        exit(0);
+        break;
+      default:
+        caml_fatal_error("unknown option %s", caml_stat_strdup_of_os(argv[i]));
       }
-      break;
-    case _T('p'):
-      for (j = 0; caml_names_of_builtin_cprim[j] != NULL; j++)
-        printf("%s\n", caml_names_of_builtin_cprim[j]);
-      exit(0);
-      break;
-    case _T('b'):
-      caml_record_backtrace(Val_true);
-      break;
-    case _T('I'):
-      if (argv[i + 1] != NULL) {
-        caml_ext_table_add(&caml_shared_libs_path, argv[i + 1]);
-        i++;
-      }
-      break;
-    case _T('m'):
-      print_magic = 1;
-      break;
-    case _T('M'):
-      printf ( "%s\n", EXEC_MAGIC);
-      exit(0);
-      break;
-    default:
-      caml_fatal_error("unknown option %s", caml_stat_strdup_of_os(argv[i]));
     }
   }
   return i;
+}
+
+static const char_os * get_stdlib_location(void)
+{
+  const char_os * stdlib;
+  stdlib = caml_secure_getenv(T("OCAMLLIB"));
+  if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
+  if (stdlib == NULL) stdlib = caml_runtime_standard_library_effective;
+  return stdlib;
+}
+
+/* Print the configuration of the runtime to stdout; memory allocated is not
+   freed, since the runtime will terminate after calling this. */
+static void do_print_config(void)
+{
+  int i;
+  char_os * dir;
+
+  /* Print the runtime configuration */
+  printf("version: %s\n", OCAML_VERSION_STRING);
+  printf("standard_library_default: %s\n",
+         caml_stat_strdup_of_os(caml_runtime_standard_library_default));
+  printf("standard_library: %s\n",
+         caml_stat_strdup_of_os(get_stdlib_location()));
+  printf("int_size: %d\n", 8 * (int)sizeof(value));
+  printf("word_size: %d\n", 8 * (int)sizeof(value) - 1);
+  printf("os_type: %s\n", OCAML_OS_TYPE);
+  printf("host: %s\n", HOST);
+  printf("bytecode_runtime_id: %s\n", BYTECODE_RUNTIME_ID);
+  printf("flat_float_array: %s\n",
+#ifdef FLAT_FLOAT_ARRAY
+         "true");
+#else
+         "false");
+#endif
+  printf("supports_afl: %s\n",
+#ifdef HAS_SYS_SHM_H
+         "true");
+#else
+         "false");
+#endif
+  printf("windows_unicode: %s\n",
+#if WINDOWS_UNICODE
+         "true");
+#else
+         "false");
+#endif
+  printf("supports_shared_libraries: %s\n",
+#ifdef SUPPORT_DYNAMIC_LINKING
+         "true");
+#else
+         "false");
+#endif
+  printf("no_naked_pointers: %s\n",
+#ifdef NO_NAKED_POINTERS
+         "true");
+#else
+         "false");
+#endif
+  printf("profinfo: %s\n"
+         "profinfo_width: %d\n",
+#ifdef WITH_PROFINFO
+         "true", PROFINFO_WIDTH);
+#else
+         "false", 0);
+#endif
+  printf("exec_magic_number: %s\n", EXEC_MAGIC);
+
+  /* Parse ld.conf and print the effective search path */
+  puts("shared_libs_path:");
+  caml_decompose_path(&caml_shared_libs_path,
+                      caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
+  caml_parse_ld_conf(caml_runtime_standard_library_effective,
+                     &caml_shared_libs_path);
+  for (i = 0; i < caml_shared_libs_path.size; i++) {
+    dir = caml_shared_libs_path.contents[i];
+    if (dir[0] == 0)
+#ifdef _WIN32
+      /* See caml_search_in_path in win32.c */
+      continue;
+#else
+      dir = ".";
+#endif
+    printf("  %s\n", caml_stat_strdup_of_os(dir));
+  }
 }
 
 extern void caml_init_ieee_floats (void);
@@ -323,13 +417,14 @@ extern int caml_ensure_spacetime_dot_o_is_included;
 
 CAMLexport void caml_main(char_os **argv)
 {
-  int fd, pos;
+  int fd = -1, pos;
   struct exec_trailer trail;
   struct channel * chan;
   value res;
   char * req_prims;
   char_os * shared_lib_path, * shared_libs;
-  char_os * exe_name, * proc_self_exe;
+  char_os * exe_name, * proc_self_exe, * argv0;
+  char_os * image_standard_library_default;
 
   caml_ensure_spacetime_dot_o_is_included++;
 
@@ -358,9 +453,13 @@ CAMLexport void caml_main(char_os **argv)
   /* Determine position of bytecode file */
   pos = 0;
 
-  /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
-  exe_name = argv[0];
-  fd = caml_attempt_open(&exe_name, &trail, 0);
+  argv0 = proc_self_exe = caml_executable_name();
+
+  if (caml_byte_program_mode != APPENDED || proc_self_exe == NULL) {
+    /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
+    exe_name = argv[0];
+    fd = caml_attempt_open(&exe_name, &trail, 0);
+  }
 
   /* Little grasshopper wonders why we do that at all, since
      "The current executable is ocamlrun itself, it's never a bytecode
@@ -368,13 +467,38 @@ CAMLexport void caml_main(char_os **argv)
      With -custom, we have an executable that is ocamlrun itself
      concatenated with the bytecode.  So, if the attempt with argv[0]
      failed, it is worth trying again with executable_name. */
-  if (fd < 0 && (proc_self_exe = caml_executable_name()) != NULL) {
-    exe_name = proc_self_exe;
-    fd = caml_attempt_open(&exe_name, &trail, 0);
+  if (caml_byte_program_mode == APPENDED || fd < 0) {
+    if (proc_self_exe != NULL) {
+      exe_name = proc_self_exe;
+      fd = caml_attempt_open(&exe_name, &trail, 0);
+    }
+    if (fd < 0 && caml_byte_program_mode == APPENDED) {
+      fprintf(stderr, "unable to open file '%s'",
+                       caml_stat_strdup_of_os(exe_name));
+      exit(127);
+    }
   }
+
+  if (argv0 == NULL) {
+    if (exe_name != proc_self_exe)
+      free(proc_self_exe);
+    argv0 = caml_search_exe_in_path(exe_name);
+  }
+
+  if (argv0 == NULL)
+    argv0 = caml_search_exe_in_path(exe_name);
 
   if (fd < 0) {
     pos = parse_command_line(argv);
+    if (print_config) {
+      caml_runtime_standard_library_effective =
+        caml_locate_standard_library(argv0,
+                                     caml_runtime_standard_library_default,
+                                     NULL);
+
+      do_print_config();
+      exit(0);
+    }
     if (argv[pos] == 0)
       caml_fatal_error("no bytecode file specified");
     exe_name = argv[pos];
@@ -401,6 +525,22 @@ CAMLexport void caml_main(char_os **argv)
   }
   /* Read the table of contents (section descriptors) */
   caml_read_section_descriptors(fd, &trail);
+
+  caml_runtime_standard_library_effective =
+    caml_locate_standard_library(argv0,
+                                 caml_runtime_standard_library_default, NULL);
+  caml_stat_free(argv0);
+
+  /* Load the embedded overridden caml_standard_library_default value, if one is
+     available. Note that although -custom executables come through this
+     mechanism, they don't define OSLD sections because
+     caml_runtime_standard_library_default and caml_standard_library_default are
+     fundamentally equal and caml_runtime_standard_library_default is set when
+     the -custom executable is linked. */
+  image_standard_library_default = read_section_to_os(fd, &trail, "OSLD");
+  if (image_standard_library_default != NULL)
+    caml_standard_library_default = image_standard_library_default;
+
   /* Initialize the abstract machine */
   caml_init_gc (caml_init_minor_heap_wsz, caml_init_heap_wsz,
                 caml_init_heap_chunk_sz, caml_init_percent_free,
@@ -440,7 +580,7 @@ CAMLexport void caml_main(char_os **argv)
   caml_sys_init(exe_name, argv + pos);
 #ifdef _WIN32
   /* Start a thread to handle signals */
-  if (caml_secure_getenv(_T("CAMLSIGPIPE")))
+  if (caml_secure_getenv(T("CAMLSIGPIPE")))
     _beginthread(caml_signal_thread, 4096, NULL);
 #endif
   /* Execute the program */
@@ -467,7 +607,7 @@ CAMLexport value caml_startup_code_exn(
            char_os **argv)
 {
   char_os * cds_file;
-  char_os * exe_name;
+  char_os * exe_name, * proc_self_exe;
 
   /* Determine options */
 #ifdef DEBUG
@@ -488,13 +628,26 @@ CAMLexport value caml_startup_code_exn(
   caml_install_invalid_parameter_handler();
 #endif
   caml_init_custom_operations();
-  cds_file = caml_secure_getenv(_T("CAML_DEBUG_FILE"));
+  cds_file = caml_secure_getenv(T("CAML_DEBUG_FILE"));
   if (cds_file != NULL) {
     caml_cds_file = caml_stat_strdup_os(cds_file);
   }
-  exe_name = caml_executable_name();
-  if (exe_name == NULL) exe_name = caml_search_exe_in_path(argv[0]);
+  proc_self_exe = caml_executable_name();
+  if (proc_self_exe == NULL)
+    exe_name = caml_search_exe_in_path(argv[0]);
+  else
+    exe_name = proc_self_exe;
+
+  caml_runtime_standard_library_effective =
+    caml_locate_standard_library(exe_name,
+                                 caml_runtime_standard_library_default, NULL);
+
+  caml_runtime_standard_library_effective =
+    caml_locate_standard_library(exe_name,
+                                 caml_runtime_standard_library_default, NULL);
+
   caml_external_raise = NULL;
+
   /* Initialize the abstract machine */
   caml_init_gc (caml_init_minor_heap_wsz, caml_init_heap_wsz,
                 caml_init_heap_chunk_sz, caml_init_percent_free,

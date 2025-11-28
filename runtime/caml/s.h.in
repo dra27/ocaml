@@ -60,6 +60,8 @@
 
 #undef HAS_TIMES
 
+#undef HAS_STRLCPY
+
 #undef HAS_SECURE_GETENV
 
 #undef HAS___SECURE_GETENV
@@ -87,6 +89,10 @@
 
 /* Define HAS_UNISTD if you have /usr/include/unistd.h. */
 
+#undef HAS_LIBGEN_H
+
+/* Define HAS_LIBGEN_H if you have /usr/include/libgen.h. */
+
 #undef HAS_DIRENT
 
 /* Define HAS_DIRENT if you have /usr/include/dirent.h and the result of
@@ -109,6 +115,10 @@
 #undef HAS_GETCWD
 
 /* Define HAS_GETCWD if the library provides the getcwd() function. */
+
+#undef HAS_SYSTEM
+
+/* Define HAS_SYSTEM if the library provides the system() function. */
 
 #undef HAS_GETPRIORITY
 

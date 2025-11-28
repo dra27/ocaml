@@ -82,6 +82,21 @@ let ge_component comp1 comp2 =
   | Float, (Int | Addr | Val) ->
     assert false
 
+type exttype =
+  | XInt
+  | XInt32
+  | XInt64
+  | XFloat
+
+let machtype_of_exttype = function
+  | XInt -> typ_int
+  | XInt32 -> typ_int
+  | XInt64 -> if Arch.size_int = 4 then [|Int;Int|] else typ_int
+  | XFloat -> typ_float
+
+let machtype_of_exttype_list xtl =
+  Array.concat (List.map machtype_of_exttype xtl)
+
 let size_machtype mty =
   let size = ref 0 in
   for i = 0 to Array.length mty - 1 do
@@ -140,7 +155,7 @@ type memory_chunk =
 
 and operation =
     Capply of machtype
-  | Cextcall of string * machtype * bool * label option
+  | Cextcall of string * machtype * exttype list * bool * label option
     (** If specified, the given label will be placed immediately after the
         call (at the same place as any frame descriptor would reference). *)
   | Cload of memory_chunk * Asttypes.mutable_flag

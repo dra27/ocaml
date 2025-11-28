@@ -14,9 +14,10 @@
 #**************************************************************************
 
 ROOTDIR = ..
+SUBDIR_NAME = debugger
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 UNIXDIR=$(ROOTDIR)/otherlibs/$(UNIXLIB)
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
@@ -25,7 +26,18 @@ CAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc$(EXE)
 CAMLC=$(CAMLRUN) $(ROOTDIR)/ocamlc -g -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48 -warn-error A \
           -safe-string -strict-sequence -strict-formats
-LINKFLAGS=-linkall -I $(UNIXDIR)
+LINKFLAGS=-linkall -I $(UNIXDIR) -I $(ROOTDIR)/runtime \
+          -set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+  # ocamldebug is linked with -g which will result in a -custom executable when
+  # shared libraries are not available. Ensure that the primitives object is
+  # compiled with the correct flags
+  LINKFLAGS += $(addprefix -ccopt$(SPACE), $(BUILD_MAP_CFLAGS))
+endif
+else
+LINKFLAGS += $(BYTECODE_LAUNCHER_FLAGS)
+endif
 YACCFLAGS=
 CAMLLEX=$(CAMLRUN) $(ROOTDIR)/boot/ocamllex
 CAMLDEP=$(CAMLRUN) $(ROOTDIR)/boot/ocamlc -depend
@@ -77,10 +89,10 @@ ocamldebug$(EXE): $(UNIXDIR)/unix.cma $(all_objects)
 	$(CAMLC) $(LINKFLAGS) -o $@ -linkall $^
 
 install:
-	$(INSTALL_PROG) ocamldebug$(EXE) "$(INSTALL_BINDIR)/ocamldebug$(EXE)"
+	$(call INSTALL_ITEMS, ocamldebug$(EXE), bin)
 
 clean::
-	rm -f ocamldebug$(EXE)
+	rm -f ocamldebug ocamldebug.exe
 	rm -f *.cmo *.cmi
 
 .SUFFIXES:
