@@ -144,20 +144,30 @@ let () =
 
      For the compiler's files to be reproducible, the compiler needs to be both
      relocatable and also required support from the assembler and C compiler. *)
-  let relocatable = false in
+  (* XXX This would work better if _both_ properties were being returned by the ruleset? *)
+  let relocatable =
+    (* XXX Double-check this against the final version! *)
+    (* XXX Is this the actual bug here? *)
+    config.has_relative_libdir <> None && config.launcher_searches_for_ocamlrun in
   let reproducible =
     relocatable
     (* At present, the compiler build doesn't actually take advantage of this
        configuration, but this does not matter because the compiler cannot yet
        be relocatable! *)
+    (* XXX This should be coming from the ruleset? *)
+    && TestRelocation.is_relocatable_config config
+(*
     && (not config.has_ocamlopt
         || not Toolchain.assembler_embeds_build_path
         || Config.as_has_debug_prefix_map && Config.architecture <> "riscv")
     && not Toolchain.linker_embeds_build_path
     && (not Toolchain.c_compiler_always_embeds_build_path
         || not Toolchain.c_compiler_debug_paths_can_be_absolute)
+*)
   in
-  let target_relocatable = false in
+  let target_relocatable =
+    (* XXX Final value? *)
+    config.has_relative_libdir <> None && config.target_launcher_searches_for_ocamlrun in
   (* Use Harness.pp_path unless --verbose was specified *)
   let pp_path =
     if verbose then

@@ -15,6 +15,10 @@
 (** Relocation Test - which files contain the installation prefix and/or build
     path. *)
 
+(* XXX Right place for this? *)
+val is_relocatable_config : Harness.Import.config -> bool
+(* XXX Doc comment *)
+
 val run : reproducible:bool -> Harness.Import.config -> Environment.t -> unit
 (** If [~reproducible:true] then an additional check is added to the base rule
     set. Only {v Makefile.config v} is permitted to contain the prefix and

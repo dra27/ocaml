@@ -24,17 +24,23 @@ end)
 (* Augment toolchain properties with information from the configuration (this
    essentially goes from "is foo capable of doing bar" to "foo does bar in this
    context". *)
+let c_compiler_debug_paths_are_absolute config =
+  Toolchain.c_compiler_debug_paths_can_be_absolute
+  && (not Config.c_has_debug_prefix_map || config.has_relative_libdir = None)
+
+let assembler_embeds_build_path config =
+  Toolchain.assembler_embeds_build_path
+  && (not Config.as_has_debug_prefix_map
+      || Config.architecture = "riscv"
+      || Config.as_is_cc
+      || config.has_relative_libdir = None)
+
 let effective_toolchain config =
   let c_compiler_debug_paths_are_absolute =
-    Toolchain.c_compiler_debug_paths_can_be_absolute
-    && (not Config.c_has_debug_prefix_map || config.has_relative_libdir = None)
+    c_compiler_debug_paths_are_absolute config
   in
   let assembler_embeds_build_path =
-    Toolchain.assembler_embeds_build_path
-    && (not Config.as_has_debug_prefix_map
-        || Config.architecture = "riscv"
-        || Config.as_is_cc
-        || config.has_relative_libdir = None)
+    assembler_embeds_build_path config
   in
   ~c_compiler_debug_paths_are_absolute, ~assembler_embeds_build_path
 
@@ -46,6 +52,252 @@ let reproducible_rules file =
     LocationSet.of_list [Relative; Prefix]
   else
     LocationSet.empty
+
+(* XXX Rules constructed where the derived properties are at the moment a disjunction
+   and all files must match _at least_ one rule_
+   XXX Actually the all files bit is _not_ being reflected in the flexdll rules *)
+let is_msvc _ = Config.ccomp_type = "msvc"
+let has_absolute_libdir config = config.has_relative_libdir = None
+let has_absolute_launcher config = not config.launcher_searches_for_ocamlrun
+let has_ext exts ~file:_ ~basename _ =
+  List.mem (Filename.extension basename) exts
+let extension ext ~file ~basename:_ _ = Filename.extension file = ext
+let basename_among candidates ~file:_ ~basename _ = List.mem basename candidates
+let tool name rest =
+  let rest =
+(* XXX Maybe this is just OK?
+    if config.has_ocamlopt then
+*)
+      (name ^ ".opt") :: rest
+(*
+    else
+      rest
+*)
+  in
+  name :: (name ^ ".byte") :: rest
+let is_tendered = function Some (Tendered _) -> true | _ -> false
+let is_basename base ~file:_ ~basename _ = basename = base
+
+let rules = [
+  (* Executable manifests installed as part of flexlink for the MSVC port *)
+  (* XXX Assumes flexlink is bootstrapped - do we know that? *)
+  (is_msvc, extension ".manifest", ~prefix:false, ~build:false);
+  (* If the compiler is configured with an absolute libdir, the runtime binaries
+     all contain OCAML_STDLIB_DIR and everything except flexlink and ocamllex
+     link with the Config module, either directly or via ocamlcommon *)
+  (has_absolute_libdir,
+   basename_among (tool "flexlink" @@ tool "ocamllex" ["ocamlyacc"]),
+   ~prefix:true, ~build:false);
+  (* If the launcher doesn't search for ocamlrun, then either the #! stub will
+     include the absolute path or the RNTM section will *)
+  (has_absolute_launcher,
+   (fun ~file:_ ~basename:_ -> is_tendered),
+   ~prefix:true, ~build:false);
+  (* As it happens, all ocamlopt-produced executables end with .opt or are
+     ocamlnat. Other mechanisms (in particular looking for the
+     caml_start_program symbol) are available, but are a bit more complex to
+     make portable, and we don't need them at the moment, since -output-obj,
+     -output-complete-obj or -output-complete-exe are not used by the compiler
+     distribution. *)
+  (* XXX This isn't right if symlinks aren't available (Windows: but this
+         possibly doesn't matter? *)
+  ((fun config ->
+      let ~c_compiler_debug_paths_are_absolute, ~assembler_embeds_build_path =
+        effective_toolchain config in
+      config.has_ocamlopt &&
+      (Toolchain.linker_embeds_build_path
+       || (Toolchain.linker_propagates_debug_information
+           && (c_compiler_debug_paths_are_absolute
+               || assembler_embeds_build_path)))),
+   (fun ~file:_ ~basename classification ->
+     classification = Some Vanilla
+     && (String.ends_with ~suffix:".opt" basename || basename = "ocamlnat")),
+   ~prefix:false, ~build:true);
+  (* ocamlrund is linked with -g *)
+  (* XXX The selector should be false if the tree is configured without the debug runtime *)
+  ((fun config ->
+      let ~c_compiler_debug_paths_are_absolute, .. =
+        effective_toolchain config in
+      (Toolchain.linker_embeds_build_path
+       || (c_compiler_debug_paths_are_absolute
+           && Toolchain.linker_propagates_debug_information))),
+   (fun ~file:_ ~basename classification ->
+     classification = Some Vanilla && basename = "ocamlrund"),
+   ~prefix:false, ~build:true);
+  (* ocaml is linked with -g and not stripped *)
+  (has_absolute_libdir,
+   (fun ~file:_ ~basename classification ->
+     is_tendered classification && basename = "ocaml"),
+   ~prefix:false, ~build:true);
+  (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g. However,
+     since the C objects in libcamlrun are compiled with -g, this will still
+     result in debug information for -custom runtime executables. *)
+  ((fun config ->
+      let ~c_compiler_debug_paths_are_absolute, .. =
+        effective_toolchain config in
+      not Config.supports_shared_libraries
+      && Toolchain.linker_propagates_debug_information
+      && c_compiler_debug_paths_are_absolute),
+   (fun ~file:_ ~basename:_ classification -> classification = Some Custom),
+   ~prefix:false, ~build:true);
+(* XXX This can't be here because of the relocation test!
+  (* Makefile.config embeds the prefix *)
+  (Fun.const true, is_basename "Makefile.config", ~prefix:true, ~build:false);
+*)
+  (* config.cmx contains Config.standard_library for inlining *)
+  (* XXX Also not Config.flambda and has_ocamlopt - can we do this with combinators?
+         Something a la has_absolute_libdir $ has_ocamlopt true $ has_flambda false *)
+  ((fun config ->
+      config.has_ocamlopt
+      && config.has_relative_libdir = None
+      && not Config.flambda),
+   is_basename "config.cmx",
+   ~prefix:true, ~build:false);
+  (* Contain the prefix via Config.standard_library. When the compiler is
+     configured with a relative libdir, runtime-launch-info just contains ".",
+     rather than the prefix. *)
+  (has_absolute_libdir,
+   basename_among ["config.cmt"; "config_main.cmt";
+                   "ocamlcommon.cma"; "ocamlcommon" ^ Config.ext_lib;
+                   "runtime-launch-info"],
+   ~prefix:true, ~build:false);
+  (has_absolute_libdir, has_ext [".cma"; ".cmo"; ".cmt"; ".cmti"],
+   ~prefix:false, ~build:true);
+  ((fun config ->
+      config.has_ocamlopt
+      && Config.supports_shared_libraries
+      && (not Toolchain.linker_propagates_debug_information
+          || Toolchain.linker_embeds_build_path)),
+   has_ext [".cmxs"],
+   ~prefix:false, ~build:true);
+  (* XXX This should also only trigger when flexdll is actually being bootstrapped *)
+  (* All C objects compiled by OCaml's build system are compiled with -g, but
+     the FlexDLL support objects are not. *)
+  (Fun.const ((Sys.win32 || Sys.cygwin)
+              && Toolchain.c_compiler_always_embeds_build_path),
+   (fun ~file:_ ~basename _ -> String.starts_with ~prefix:"flexdll_" basename),
+   ~prefix:false, ~build:true);
+  (* Any object/archive produced by ocamlopt will have a .cmx/.cmxa file with
+     it *)
+  ((fun config ->
+      let ~assembler_embeds_build_path, .. =
+        effective_toolchain config in
+      config.has_ocamlopt
+      && assembler_embeds_build_path),
+   (fun ~file ~basename _ ->
+     let ext = Filename.extension basename in
+     let file = Filename.remove_extension file in
+     ext = Config.ext_obj && Sys.file_exists (file ^ ".cmx")
+     || ext = Config.ext_lib && Sys.file_exists (file ^ ".cmxa")),
+   ~prefix:false, ~build:true);
+  ((fun config ->
+      let ~c_compiler_debug_paths_are_absolute, .. =
+        effective_toolchain config in
+      c_compiler_debug_paths_are_absolute),
+   (fun ~file ~basename _ ->
+     Filename.extension basename = Config.ext_lib
+     && not (Sys.file_exists (Filename.remove_extension file ^ ".cmxa"))),
+   ~prefix:false, ~build:true);
+  (* libasmrun_shared *)
+  ((fun config ->
+      config.has_ocamlopt
+      && Config.supports_shared_libraries
+      && Toolchain.linker_embeds_build_path),
+   is_basename ("libasmrun_shared" ^ Config.ext_dll),
+   ~prefix:false, ~build:true);
+  (* libasmrun and variants *)
+  ((fun config ->
+      let ~c_compiler_debug_paths_are_absolute, ~assembler_embeds_build_path =
+        effective_toolchain config in
+      config.has_ocamlopt
+      && ((c_compiler_debug_paths_are_absolute
+           && Toolchain.asmrun_assembled_with_cc)
+          || (assembler_embeds_build_path
+              && not (Toolchain.asmrun_assembled_with_cc)))),
+   (fun ~file:_ ~basename _ ->
+     String.starts_with ~prefix:"libasmrun" basename
+     && Filename.extension basename = Config.ext_lib),
+   ~prefix:false, ~build:true);
+  ((fun _ ->
+      Config.supports_shared_libraries
+      && (not Toolchain.linker_propagates_debug_information
+          || Toolchain.linker_embeds_build_path)),
+   (fun ~file:_ ~basename _ ->
+     (* XXX Can this be simplified if the first rule to apply is the only one?! Perhaps if we split the stdlib and build rules? *)
+     String.starts_with ~prefix:"libasmrun" basename),
+   ~prefix:false, ~build:true);
+]
+
+(* Executable basenames (without .exe) installed in $libdir *)
+let is_libdir_executable = function
+| "expunge" -> true
+| _ -> false
+
+let ruleset config section file =
+  let basename = Filename.basename file in
+  let basename =
+    (* Remove .exe from any basename in $bindir, or from the known executables
+       in $libdir *)
+    match Filename.chop_suffix_opt ~suffix:".exe" basename with
+    | Some basename_without_exe
+      when section = `Bin || is_libdir_executable basename_without_exe ->
+         basename_without_exe
+    | _ ->
+        basename
+  in
+  let classification =
+    if section = `Bin || is_libdir_executable basename then
+      Some (Environment.classify_executable file)
+    else
+      None
+  in
+  (* XXX No check as yet that the file matched at least one rule and that each dominant rule was used at least once *)
+  let f ((~has_prefix, ~has_build) as acc)
+        (selector, filter, ~prefix, ~build) =
+    if selector config && filter ~file ~basename classification then
+      let has_prefix = has_prefix || prefix in
+      let has_build = has_build || build in
+      (~has_prefix, ~has_build)
+    else
+      acc
+  in
+  let ~has_prefix, ~has_build =
+    List.fold_left f (~has_prefix:false, ~has_build:false) rules
+  in
+  let relative =
+    if config.has_relative_libdir <> None && basename = "Makefile.config" then
+      LocationSet.singleton Relative
+    else
+      LocationSet.empty
+  in
+  let prefix =
+    (* XXX Comment why Makefile.config ends up as an exception *)
+    if has_prefix || basename = "Makefile.config" then
+      LocationSet.add Prefix relative
+    else
+      relative
+  in
+  if has_build then
+    LocationSet.add Build prefix
+  else
+    prefix
+
+let is_relocatable_config config =
+  (* XXX Code duplication over this folder with the one above - it's just
+         what we do with the filter *)
+  let f ((~has_prefix, ~has_build) as acc)
+        (selector, _filter, ~prefix, ~build) =
+    if selector config then
+      let has_prefix = has_prefix || prefix in
+      let has_build = has_build || build in
+      (~has_prefix, ~has_build)
+    else
+      acc
+  in
+  let ~has_prefix, ~has_build =
+    List.fold_left f (~has_prefix:false, ~has_build:false) rules
+  in
+  not has_prefix && (has_prefix = has_build)
 
 (* The ruleset for files in bindir *)
 let bindir_rules config file =
@@ -149,7 +401,7 @@ let bindir_rules config file =
     else
       prefix
 
-let libdir_rules config file =
+let _libdir_rules config file =
   let ~c_compiler_debug_paths_are_absolute, ~assembler_embeds_build_path =
     effective_toolchain config in
   let basename = Filename.basename file in
@@ -489,8 +741,8 @@ let run ~reproducible config env =
   (* Analyse files in bindir and libdir and collect all the results *)
   let ~failed, ~results, ~reproducible:results_are_reproducible, ~consistent =
     ~failed:false, ~results:[], ~reproducible:true, ~consistent:true
-    |> scan Environment.bindir "$bindir" bindir_rules
-    |> scan Environment.libdir "$libdir" libdir_rules
+    |> scan Environment.bindir "$bindir" (*bindir_rules*) (fun config -> ruleset config `Bin)
+    |> scan Environment.libdir "$libdir" (*libdir_rules*) (fun config -> ruleset config `Lib)
   in
   flush stderr;
   (* Abort the harness if there are files which didn't match a ruleset *)
