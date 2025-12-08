@@ -166,46 +166,28 @@ let libdir_rules config file =
        - contains OCaml debug information
        - contains C debug information
        - contains objects which have been created by the assembler *)
-<<<<<<< HEAD
     let (embeds_stdlib_location, has_ocaml_debug_info, has_c_debug_info,
          contains_assembled_objects) =
-      if basename = "Makefile.config" || basename = "runtime-launch-info" then
-        (* These files all embed the Standard Library location *)
-        (true, false, false, false)
-      else if basename = "config.cmx" then
-        (* config.cmx contains Config.standard_library for inlining *)
-        (true, false, false, false)
-      else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
-        let stdlib = (* via Config.standard_library *)
-          List.mem basename ["config.cmt"; "config_main.cmt";
-                             "ocamlcommon.cma"] in
-        (stdlib, true, false, false)
-=======
-    let (~stdlib:embeds_stdlib_location,
-         ~ocaml_debug:has_ocaml_debug_info,
-         ~c_debug:has_c_debug_info,
-         ~s:contains_assembled_objects) =
       if basename = "Makefile.config" then
         (* Embeds the Standard Library location *)
-        (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+        (true, false, false, false)
       else if basename = "config.cmx" then
         (* config.cmx contains Config.standard_library for inlining *)
         let stdlib =
           config.has_relative_libdir = None && not Config.flambda in
-        (~stdlib, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+        (stdlib, false, false, false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
         let stdlib = (* via Config.standard_library *)
           config.has_relative_libdir = None
           && List.mem basename ["config.cmt"; "config_main.cmt";
                                 "ocamlcommon.cma"] in
         (* The compiler's artefacts are all compiled with -g *)
-        (~stdlib, ~ocaml_debug:true, ~c_debug:false, ~s:false)
+        (stdlib, true, false, false)
       else if basename = "runtime-launch-info" then
         (* When the compiler is configured with a relative libdir,
            runtime-launch-info just contains ".", rather than the prefix *)
         let stdlib = (config.has_relative_libdir = None) in
-        (~stdlib, ~ocaml_debug:false, ~c_debug:false, ~s:false)
->>>>>>> cfbf2105cfe
+        (stdlib, false, false, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. *)
@@ -227,24 +209,13 @@ let libdir_rules config file =
           (* Config.standard_library is in ocamlcommon and the bytecode runtime
              embeds the Standard Library location *)
           let stdlib =
-<<<<<<< HEAD
-            is_camlrun
-            || Filename.remove_extension basename = "ocamlcommon"
-          in
+            config.has_relative_libdir = None
+            && Filename.remove_extension basename = "ocamlcommon" in
           (stdlib, false, (not is_ocaml), is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
-          (is_camlrun, false, true, false)
-=======
-            config.has_relative_libdir = None
-            && Filename.remove_extension basename = "ocamlcommon" in
-          (~stdlib, ~ocaml_debug:false, ~c_debug:(not is_ocaml), ~s:is_ocaml)
-        else
-          (* DLLs are either the shared versions of the runtime libraries or
-             C stubs. All of these are compiled with -g *)
-          (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:false)
->>>>>>> cfbf2105cfe
+          (false, false, true, false)
       else
         (false, false, false, false)
     in
