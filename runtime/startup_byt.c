@@ -492,8 +492,6 @@ CAMLexport void caml_main(char_os **argv)
 
   argv0 = proc_self_exe = caml_executable_name();
 
-<<<<<<< HEAD
-=======
   /* In APPENDED mode (i.e. with -custom), we always want to load the bytecode
      from the running executable, and argv[0] should never be used. However,
      some platforms still don't implement caml_executable_name, so there is an
@@ -508,18 +506,12 @@ CAMLexport void caml_main(char_os **argv)
     fd = caml_attempt_open(&exe_name, &trail, 0);
   }
 
->>>>>>> cfbf2105cfe
   /* Little grasshopper wonders why we do that at all, since
      "The current executable is ocamlrun itself, it's never a bytecode
      program".  Little grasshopper "ocamlc -custom" in mind should keep.
      With -custom, we have an executable that is ocamlrun itself
      concatenated with the bytecode.  So, if the attempt with argv[0]
      failed, it is worth trying again with executable_name. */
-<<<<<<< HEAD
-  if (fd < 0 && (proc_self_exe = caml_executable_name()) != NULL) {
-    exe_name = proc_self_exe;
-    fd = caml_attempt_open(&exe_name, &trail, 0);
-=======
   if (caml_byte_program_mode == APPENDED || fd < 0) {
     if (proc_self_exe != NULL) {
       exe_name = proc_self_exe;
@@ -527,7 +519,6 @@ CAMLexport void caml_main(char_os **argv)
     }
     if (fd < 0 && caml_byte_program_mode == APPENDED)
       error("unable to open file '%s'", caml_stat_strdup_of_os(exe_name));
->>>>>>> cfbf2105cfe
   }
 
   if (argv0 == NULL)

@@ -83,14 +83,10 @@ ocamltest_libunix=None
 ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
-<<<<<<< HEAD
-=======
-diff_supports_color=false
 target_libdir_is_relative=false
 srcdir_abs=''
 srcdir_abs_real=''
 build_map_flags=''
->>>>>>> cfbf2105cfe
 
 # Information about the package
 
