@@ -95,7 +95,7 @@ and search_method =                     (* -search-method ... *)
   if Config.target_win32 then
     (* Historically, the native Windows ports are assumed to be finding ocamlrun
        using a PATH search. *)
-    ref Config.Always
+    ref Config.Enable
   else
     ref Config.Disable
 and plugin = ref false                  (* -plugin ... *)

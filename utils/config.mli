@@ -385,10 +385,10 @@ val launch_method : launch_method
 type search_method =
 | Disable
     (** Interpreter searching disabled - check fixed absolute location only *)
-| Enable
+| Fallback
     (** Check fixed absolute location first, but fall back to a search if that
         fails *)
-| Always
+| Enable
     (** Always search for the interpreter *)
 
 val shebangscripts : bool

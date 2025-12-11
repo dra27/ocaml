@@ -27,13 +27,13 @@ foreach $f (@ARGV) {
         # runtime isn't valid as a #! line.
         if ($path =~ s/^exec '(.*)' "\$0" "\$@\"$/$1/ > 0) {
           $path =~ s/'\\''/'/g;
-        # Both -runtime-search enable and -runtime-search always define a
+        # Both -runtime-search fallback and -runtime-search enable define a
         # variable r with the name of the runtime (see bytecomp/bytelink.ml)
         } elsif ($path =~ s/^r='(.*)'$/$1/ > 0) {
           $path =~ s/'\\''/'/g;
           chomp($dir = <FILE>);
-          # In -runtime-search enable, there will also be a path to the runtime
-          # defined the variable c.
+          # In -runtime-search fallback, there will also be a path to the
+          # runtime defined the variable c.
           if ($dir =~ s/^c='(.*)'"\$r"$/$1/ > 0) {
             $dir =~ s/'\\''/'/g;
             $path = "[$dir]$path";
@@ -60,10 +60,10 @@ foreach $f (@ARGV) {
     if (not defined $path) {
       if ($length{'RNTM'} > 0) {
         $path = &read_section('RNTM');
-        # RNTM is "\0ocamlrun" for -runtime-search always
+        # RNTM is "\0ocamlrun" for -runtime-search enable
         if ($path !~ s/^\0//) {
           # RNTM is "/path/to/ocamlrun" for -runtime-search disable and
-          # "/path/to\0ocamlrun" for -runtime-search enable. Transform the
+          # "/path/to\0ocamlrun" for -runtime-search fallback. Transform the
           # embedded "\0" into a directory separator and display the directory
           # in square brackets (as above for the sh-case)
           $path =~ s/^([^\/\\]*)([\\\/])([^\0]*)\0(.*)$/[$1$2$3$2]$4/

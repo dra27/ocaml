@@ -15,8 +15,8 @@
 {
 type search_method =
 | Disable of string
-| Enable of string
-| Always
+| Fallback of string
+| Enable
 
 (* First word of the current line being analysed - [exec ...], [r=...], or
    [c=...] *)
@@ -31,9 +31,9 @@ rule analyze = parse
     ([^ '\\' '/' '\000']+ as runtime) eof           (* Runtime portion *)
       { if sep = '\000' then
           if dir = "" then
-            Some (runtime, Always)
+            Some (runtime, Enable)
           else
-            Some (runtime, Enable (Filename.concat dir ""))
+            Some (runtime, Fallback (Filename.concat dir ""))
         else
           Some (runtime, Disable (dir ^ String.make 1 sep)) }
 
@@ -41,7 +41,7 @@ rule analyze = parse
   | (([^ '\000']* ['/' '\\']) as dir)
     ([^ '\\' '/' '\000']+ as runtime) '\000' eof
       { if dir = "" then
-          Some (runtime, Always)
+          Some (runtime, Enable)
         else
           Some (runtime, Disable dir) }
 
@@ -74,22 +74,22 @@ and analyze_sh_launcher state b = parse
         else
           None }
 
-(* r= line for -runtime-search {always,enable} *)
+(* r= line for -runtime-search {fallback,enable} *)
   | "'\n" ("c='" as c)?
       { if state = R then
           let runtime = Buffer.contents b in
           if c = None then
-            Some (runtime, Always)
+            Some (runtime, Enable)
           else
             analyze_sh_launcher (C runtime) (Buffer.clear b; b) lexbuf
         else
           None }
 
-(* c= line for -runtime-search enable *)
+(* c= line for -runtime-search fallback *)
   | "'\"$r\"\n"
       { match state with
         | C runtime ->
-            Some (runtime, Enable (Buffer.contents b))
+            Some (runtime, Fallback (Buffer.contents b))
         | _ ->
             None }
 

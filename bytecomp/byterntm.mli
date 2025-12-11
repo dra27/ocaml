@@ -19,9 +19,10 @@
 type search_method =
 | Disable of string
     (** Check fixed location only *)
-| Enable of string
-    (** Check given location first then search for the interpreter *)
-| Always
+| Fallback of string
+    (** Check given location first then fallback to searching for the
+        interpreter *)
+| Enable
     (** Always search for the interpreter *)
 
 val read_runtime :

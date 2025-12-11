@@ -347,7 +347,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
   while (*rntm_bindir_end != 0)
     rntm_bindir_end++;
 
-  /* The first character of rntm is NUL for Always mode */
+  /* The first character of rntm is NUL for Enable mode */
   if (*rntm != 0) {
     /* boot/ocamlc writes a NUL-terminated string to RNTM. In this case,
        rntm_bindir_end points to that NUL (which will have been included in the
@@ -355,20 +355,20 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
        it is the extra NUL character required by this function.
        Interpret this as Disable. For Windows, where the RNTM written by
        boot/ocamlc will have just been "ocamlrun\0", this maintains the required
-       Always behaviour! This can be removed after a bootstrap. */
+       Enable behaviour! This can be removed after a bootstrap. */
     if (rntm_bindir_end + 1 == rntm_end)
       rntm_bindir_end++;
     /* For Disable mode, there is no NUL in RNTM, so rntm_bindir_end points to
-       the terminator pointed to by rntm_end. For Enable, there is a NUL in the
-       middle of the RNTM "string", which rntm_bindir_end points at. Change that
-       to a directory separator, so that rntm now points to a NUL-terminated
-       full path we can attempt to exec. */
+       the terminator pointed to by rntm_end. For Fallback, there is a NUL in
+       the middle of the RNTM "string", which rntm_bindir_end points at. Change
+       that to a directory separator, so that rntm now points to a
+       NUL-terminated full path we can attempt to exec. */
     if (rntm_bindir_end != rntm_end)
       *rntm_bindir_end = Directory_separator_character;
     int status = exec_file(rntm, argv);
     /* exec failed. For Disable mode, there's nothing else to be tried. For
-       Enable, if the failure was for any other reason than ENOENT then there is
-       also nothing else to be tried. */
+       Fallback, if the failure was for any other reason than ENOENT then there
+       is also nothing else to be tried. */
     if (rntm_bindir_end == rntm_end || status != ENOENT)
       exit_with_error(T("Cannot exec "), rntm, NULL);
   }

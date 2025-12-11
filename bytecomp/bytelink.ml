@@ -333,13 +333,13 @@ let find_bin_sh () =
 
 (* Writes the shell script version of the bytecode launcher to outchan *)
 let write_sh_launcher outchan bin_sh bindir search runtime =
-  let open struct type tag = DEA | E | EA end in
+  let open struct type tag = DFE | F | FE end in
   let l tag fmt =
     let output s =
       match tag, search with
-      | DEA, _
-      | E, Config.Enable
-      | EA, (Config.Enable | Config.Always) ->
+      | DFE, _
+      | F, Config.Fallback
+      | FE, (Config.Fallback | Config.Enable) ->
           output_string outchan (String.trim s);
           output_char outchan '\n'
       | _ ->
@@ -360,11 +360,11 @@ let write_sh_launcher outchan bin_sh bindir search runtime =
   in
   (* Each of the three search modes requires a slightly different shell script.
      However, these shell scripts do have one very useful property: the script
-     for Enable adds lines to the script for Always which adds lines to the
+     for Fallback adds lines to the script for Enable which adds lines to the
      script for Disable, but none of them change lines (apart from a trivial
      tweak to the exec line for the Disable script).
      The lines below are laid out to reflect this, with the tag letters
-     D(isable), E(nable) and A(lways) for the lines in each script. If a line
+     D(isable), F(allback) and E(nable) for the lines in each script. If a line
      is emitted, it is first passed to String.trim, which allows indentation and
      a column-based layout to be used.
 
@@ -377,7 +377,7 @@ let write_sh_launcher outchan bin_sh bindir search runtime =
      - $d is calculated in the script as $(dirname "$0") - i.e. the directory
        containing the bytecode executable itself
      - $c will ultimately be the runtime to exec. If it is empty, then the
-       script displays an error message. For Enable, $c will be the first
+       script displays an error message. For Fallback, $c will be the first
        runtime to try (i.e. the runtime in bindir), and the bindir passed must
        end with a separator (which is ensured by Filename.concat above)
 
@@ -390,22 +390,22 @@ let write_sh_launcher outchan bin_sh bindir search runtime =
      If the script fails to find an interpreter, $c will always be empty
        (since [command -v] will have returned an empty string) and an
        error message can be displayed. *)
-  l DEA {|#!%s                                                     |} bin_sh;
-  l  EA {|r=%s                                                     |} runtime;
-  l  E  {|c=%s"$r"                                                 |} bin;
-  l  E  {|if ! test -f "$c"; then                                  |};
-  l  EA {|  d="$(dirname "$0" 2>/dev/null)"                        |};
-  l  EA {|  test -z "$d" || d="${d%%/}/"                           |};
-  l  EA {|  c="$(command -v "$d$r")"                               |};
-  l  EA {|  test -n "$c" || c="$(command -v "$r")"                 |};
-  l  E  {|fi                                                       |};
-  l  EA {|if test -z "$c"; then                                    |};
-  l  EA {|  echo 'This program requires an OCaml %s interpreter'>&2|} release;
-  l  EA {|  echo "$r not found either alongside $0 or in \$PATH">&2|};
-  l  EA {|else                                                     |};
-  l DEA {|  exec %s "$0" "$@"                                      |} exec;
-  l  EA {|fi                                                       |};
-  l  EA {|exit 126                                                 |}
+  l DFE {|#!%s                                                     |} bin_sh;
+  l  FE {|r=%s                                                     |} runtime;
+  l  F  {|c=%s"$r"                                                 |} bin;
+  l  F  {|if ! test -f "$c"; then                                  |};
+  l  FE {|  d="$(dirname "$0" 2>/dev/null)"                        |};
+  l  FE {|  test -z "$d" || d="${d%%/}/"                           |};
+  l  FE {|  c="$(command -v "$d$r")"                               |};
+  l  FE {|  test -n "$c" || c="$(command -v "$r")"                 |};
+  l  F  {|fi                                                       |};
+  l  FE {|if test -z "$c"; then                                    |};
+  l  FE {|  echo 'This program requires an OCaml %s interpreter'>&2|} release;
+  l  FE {|  echo "$r not found either alongside $0 or in \$PATH">&2|};
+  l  FE {|else                                                     |};
+  l DFE {|  exec %s "$0" "$@"                                      |} exec;
+  l  FE {|fi                                                       |};
+  l  FE {|exit 126                                                 |}
 
 (* Writes the executable header to outchan and writes the RNTM section, if
    needed. Returns a toc_writer (i.e. Bytesections.init_record is always
@@ -492,12 +492,12 @@ let write_header outchan =
       (* stdlib/header.c determines which mode is needed based on whether the
          RNTM section contains an embedded NUL character. For Disable, the path
          is written verbatim (no extra NUL), otherwise the directory separator
-         just before the basename is effectively turned into a NUL (for Always,
+         just before the basename is effectively turned into a NUL (for Enable,
          there is no dirname, so the string "begins" with a NUL character). *)
       if search = Disable then
         output_string outchan runtime
       else begin
-        if search = Enable then
+        if search = Fallback then
           (* Ensure bindir does _not_ end up with a separator *)
           output_string outchan
             (Filename.(dirname (concat bindir current_dir_name)));

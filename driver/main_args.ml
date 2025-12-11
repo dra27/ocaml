@@ -533,14 +533,14 @@ let mk_launch_method f =
   \            interpreter if the interpreter path cannot be used"
 
 let mk_search_method f =
-  "-runtime-search", Arg.Symbol (["disable"; "enable"; "always"], f),
+  "-runtime-search", Arg.Symbol (["disable"; "fallback"; "enable"], f),
   Printf.sprintf
     "  Control the way the bytecode header searches for the interpreter\n\
     \    The following settings are supported:\n\
     \      disable  use a fixed absolute path to the interpreter\n\
-    \      enable   search for interpreter only if not found at the absolute \
+    \      fallback search for interpreter only if not found at the absolute \
                     path\n\
-    \      always   always search for the interpreter\n\
+    \      enable   always search for the interpreter\n\
     \    The default setting is 'disable'."
 
 let mk_use_runtime f =
@@ -2035,10 +2035,10 @@ third-party libraries such as Lwt, but with a different API."
     let _search_method = function
     | "disable" ->
         search_method := Config.Disable
+    | "fallback" ->
+        search_method := Config.Fallback
     | "enable" ->
         search_method := Config.Enable
-    | "always" ->
-        search_method := Config.Always
     | _ ->
         assert false
     let _v () = Compenv.print_version_and_library "compiler"

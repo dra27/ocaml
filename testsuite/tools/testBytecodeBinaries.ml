@@ -88,14 +88,14 @@ let run config env =
                       match search with
                       | Disable dir ->
                           dir ^ runtime
-                      | Enable dir ->
+                      | Fallback dir ->
                           Printf.sprintf "[%s/]%s" dir runtime
-                      | Always ->
+                      | Enable ->
                           runtime
                     in
                     let expected_search =
                       if Sys.win32 then
-                        Byterntm.Always
+                        Byterntm.Enable
                       else
                         Byterntm.Disable
                           (Filename.concat (Environment.bindir env) "")
@@ -109,10 +109,10 @@ let run config env =
                     let pp_search f = function
                     | Byterntm.Disable _ ->
                         Format.pp_print_string f "disable"
-                    | Byterntm.Enable _ ->
+                    | Byterntm.Fallback _ ->
+                        Format.pp_print_string f "fallback"
+                    | Byterntm.Enable ->
                         Format.pp_print_string f "enable"
-                    | Byterntm.Always ->
-                        Format.pp_print_string f "always"
                     in
                     let pp_launch f = function
                     | Header_shebang -> Format.pp_print_string f "shebang"
