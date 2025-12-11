@@ -4448,15 +4448,15 @@ then :
      ;; #(
   yes) :
     runtime_search='enable' ;; #(
-  always) :
-    runtime_search='always' ;; #(
+  fallback) :
+    runtime_search='fallback' ;; #(
   *) :
-    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
+    as_fn_error $? "valid values are yes, no or fallback for --enable-runtime-search" "$LINENO" 5 ;;
 esac
 else $as_nop
   case $host in #(
       *-w64-mingw32*|*-pc-windows) :
-    runtime_search='always' ;; #(
+    runtime_search='enable' ;; #(
   *) :
      ;;
 esac
@@ -4471,15 +4471,15 @@ then :
      ;; #(
   yes) :
     runtime_search_target='enable' ;; #(
-  always) :
-    runtime_search_target='always' ;; #(
+  fallback) :
+    runtime_search_target='fallback' ;; #(
   *) :
-    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search-target" "$LINENO" 5 ;;
+    as_fn_error $? "valid values are yes, no or fallback for --enable-runtime-search-target" "$LINENO" 5 ;;
 esac
 else $as_nop
   case $host in #(
       *-w64-mingw32*|*-pc-windows) :
-    runtime_search_target='always' ;; #(
+    runtime_search_target='enable' ;; #(
   *) :
      ;;
 esac

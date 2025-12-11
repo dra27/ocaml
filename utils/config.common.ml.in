@@ -86,8 +86,8 @@ let launch_method =
 
 let search_method =
   match search_method with
-  | "always" -> Enable
-  | "enable" -> Fallback
+  | "enable" -> Enable
+  | "fallback" -> Fallback
   | _ -> Disable
 
 let interface_suffix = ref ".mli"
