@@ -200,7 +200,7 @@ Re-Test-In-Prefix () {
     echo '::group::Re-building the compiler with a relative libdir'
     $MAKE COMPUTE_DEPS=false reconfigure \
           'ADDITIONAL_CONFIGURE_ARGS=--with-relative-libdir=../lib/ocaml-lib \
---enable-runtime-search=always --enable-runtime-search-target \
+--enable-runtime-search --enable-runtime-search-target=fallback \
 --prefix='"$PREFIX"'.new'
   else
     # Compiler configured relatively - reconfigure absolutely

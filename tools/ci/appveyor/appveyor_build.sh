@@ -78,7 +78,7 @@ function set_configuration {
   esac
   if [[ $RELOCATABLE = 'true' ]]; then
     args+=('--with-relative-libdir' \
-           '--enable-runtime-search=always' '--enable-runtime-search-target')
+           '--enable-runtime-search' '--enable-runtime-search-target=fallback')
   fi
 
   # Remove old configure cache if the configure script or the OS
