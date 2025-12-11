@@ -66,6 +66,9 @@ build: [
     "--prefix=%{prefix}%"
     "--docdir=%{doc}%/ocaml"
     "--with-additional-stublibsdir"
+    "--with-relative-libdir"
+    "--enable-runtime-search"
+    "--enable-runtime-search-target=fallback"
     "--with-flexdll=%{flexdll:share}%" {os = "win32" & flexdll:installed}
     "-C"
     "--with-afl" {ocaml-option-afl:installed}
