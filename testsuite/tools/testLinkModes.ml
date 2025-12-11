@@ -506,8 +506,8 @@ let compile_test usr_bin_sh config env test test_program description =
           let param =
             match search_method with
             | Disable -> "disable"
+            | Fallback -> "fallback"
             | Enable -> "enable"
-            | Always -> "always"
           in
           let args = "-runtime-search" :: param :: args in
           f ~target_launcher_searches_for_ocamlrun ~tendered:true args
@@ -737,10 +737,10 @@ let run ~sh config env =
   let tests = [
     compile_test (Default_ocamlc(Header_exe, Disable))
       "byt_default_exe_disable" "with absolute tender";
+    compile_test (Default_ocamlc(Header_exe, Fallback))
+      "byt_default_exe_fallback" "with fallback tender";
     compile_test (Default_ocamlc(Header_exe, Enable))
-      "byt_default_exe_enable" "with fallback tender";
-    compile_test (Default_ocamlc(Header_exe, Always))
-      "byt_default_exe_always" "with relocatable tender";
+      "byt_default_exe_enable" "with relocatable tender";
     compile_test (Custom_runtime Static)
       "custom_static" "-custom static runtime";
     compile_test (Custom_runtime Shared)
@@ -772,10 +772,10 @@ let run ~sh config env =
     if Config.shebangscripts then
       (compile_test (Default_ocamlc(Header_shebang, Disable))
         "byt_default_sh_disable" "with absolute #!") ::
+      (compile_test (Default_ocamlc(Header_shebang, Fallback))
+        "byt_default_sh_fallback" "with fallback #!") ::
       (compile_test (Default_ocamlc(Header_shebang, Enable))
-        "byt_default_sh_enable" "with fallback #!") ::
-      (compile_test (Default_ocamlc(Header_shebang, Always))
-        "byt_default_sh_always" "with relocatable #!") ::
+        "byt_default_sh_enable" "with relocatable #!") ::
       tests
     else
       tests in
