@@ -104,10 +104,10 @@ let parse argv =
   in
   let config =
     ref {has_ocamlnat = false; has_ocamlopt = false; has_relative_libdir = None;
-         has_runtime_search = None; launcher_searches_for_ocamlrun = false;
+         has_runtime_search = Disable; launcher_searches_for_ocamlrun = false;
          target_launcher_searches_for_ocamlrun = false;
          bytecode_shebangs_by_default = false; shebangscripts = false;
-         libraries = []}
+         filename_mangling = false; libraries = []}
   in
   let error fmt = Printf.ksprintf (fun s -> raise (Arg.Bad s)) fmt in
   let check_tree () =
@@ -164,16 +164,15 @@ let parse argv =
     config := {!config with shebangscripts}
   in
   let parse_search = function
-  | "enable" -> true
-  | "always" -> false
+  | Some "fallback" -> Config.Fallback
+  | Some "enable" -> Config.Enable
+  | None -> Config.Disable
   | _ ->
       raise (Arg.Bad
-        "--with-runtime-search: argument should be either enable or always")
+        "--with-runtime-search: argument should be either fallback or enable")
   in
   let has_runtime_search arg =
-    let has_runtime_search = Option.map parse_search arg in
-    if has_runtime_search <> None then
-      error "--with-runtime-search is not implemented!";
+    let has_runtime_search = parse_search arg in
     config := {!config with has_runtime_search}
   in
   let args = Arg.align [
