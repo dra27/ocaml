@@ -332,7 +332,6 @@ case $confoptions in
     $make -f Makefile.test -C testsuite/in_prefix test-in-prefix
     ;;
 esac
-rm -rf "$instdir"
 
 cd testsuite
 if test -n "$jobs" && test -x /usr/bin/parallel
@@ -340,7 +339,37 @@ then PARALLEL="$jobs $PARALLEL" $make --warn-undefined-variables \
                                       SHOW_TIMINGS=1 parallel
 else $make --warn-undefined-variables SHOW_TIMINGS=1 all
 fi
+cd ..
+
+git clean -q -f -d -x
+find "$instdir" | sort > install-list.new
+rm -rf "$instdir"
+return_to="$(git rev-parse HEAD)"
+git checkout da60a2e7920fd441decc950de55c4d10a63f5878
+eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
+$make $jobs
+$make install
+find "$instdir" | sort > install-list.old
+rm -rf "$instdir"
+diff install-list.old install-list.new
+
+git clean -q -f -d -x
+eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions \
+                  --disable-suffixing
+$make $jobs
+$make install
+git clean -q -f -d -x
+find "$instdir" | sort > install-list.old
+rm -rf "$instdir"
+git checkout "$return_to"
+eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions \
+                  --disable-suffixing
+$make $jobs
+$make install
+find "$instdir" | sort > install-list.new
+rm -rf "$instdir"
+diff install-list.old install-list.new
 
 if $bootstrap; then
-  git checkout ../boot/ocamlc ../boot/ocamllex
+  git checkout boot/ocamlc boot/ocamllex
 fi
