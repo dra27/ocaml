@@ -206,6 +206,7 @@ ocamlcommon_SOURCES = \
   $(lambda_SOURCES) $(comp_SOURCES)
 
 ocamlbytecomp_SOURCES = \
+  bytecomp/byterntm.mll \
   bytecomp/instruct.mli bytecomp/instruct.ml \
   bytecomp/bytegen.mli bytecomp/bytegen.ml \
   bytecomp/printinstr.mli bytecomp/printinstr.ml \
@@ -643,7 +644,10 @@ flexlink.byte$(EXE): $(FLEXDLL_SOURCES)
 	rm -f $(FLEXDLL_SOURCE_DIR)/flexlink.exe
 	$(MAKE) -C $(FLEXDLL_SOURCE_DIR) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlrun$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
+	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) \
+	                                 $(USE_RUNTIME_PRIMS) \
+	                                 $(BYTECODE_LAUNCHER_FLAGS) \
+	                                 $(USE_STDLIB)) \
 	  flexlink.exe support
 	cp $(FLEXDLL_SOURCE_DIR)/flexlink.exe $@
 	cp $(addprefix $(FLEXDLL_SOURCE_DIR)/, $(FLEXDLL_OBJECTS)) $(ROOTDIR)
@@ -1101,12 +1105,12 @@ otherlibs/dynlink.depend: beforedepend
 	  otherlibs/dynlink/native/dynlink.ml \
 	  >> $@
 
-# Cleanup the lexer
+# Cleanup the lexers
 
 partialclean::
-	rm -f parsing/lexer.ml
+	rm -f bytecomp/byterntm.ml parsing/lexer.ml
 
-beforedepend:: parsing/lexer.ml
+beforedepend:: bytecomp/byterntm.ml parsing/lexer.ml
 
 # The predefined exceptions and primitives
 
@@ -1273,7 +1277,7 @@ runtime_BUILT_HEADERS = $(addprefix runtime/, \
 
 ## Targets to build and install
 
-runtime_PROGRAMS = runtime/ocamlrun$(EXE)
+runtime_PROGRAMS = ocamlrun
 runtime_BYTECODE_STATIC_LIBRARIES = runtime/libcamlrun.$(A)
 runtime_BYTECODE_SHARED_LIBRARIES =
 runtime_NATIVE_STATIC_LIBRARIES = \
@@ -1281,13 +1285,13 @@ runtime_NATIVE_STATIC_LIBRARIES = \
 runtime_NATIVE_SHARED_LIBRARIES =
 
 ifeq "$(RUNTIMED)" "true"
-runtime_PROGRAMS += runtime/ocamlrund$(EXE)
+runtime_PROGRAMS += ocamlrund
 runtime_BYTECODE_STATIC_LIBRARIES += runtime/libcamlrund.$(A)
 runtime_NATIVE_STATIC_LIBRARIES += runtime/libasmrund.$(A)
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-runtime_PROGRAMS += runtime/ocamlruni$(EXE)
+runtime_PROGRAMS += ocamlruni
 runtime_BYTECODE_STATIC_LIBRARIES += runtime/libcamlruni.$(A)
 runtime_NATIVE_STATIC_LIBRARIES += runtime/libasmruni.$(A)
 endif
@@ -1295,9 +1299,9 @@ endif
 ifeq "$(UNIX_OR_WIN32)" "unix"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 runtime_BYTECODE_STATIC_LIBRARIES += runtime/libcamlrun_pic.$(A)
-runtime_BYTECODE_SHARED_LIBRARIES += runtime/libcamlrun_shared.$(SO)
+runtime_BYTECODE_SHARED_LIBRARIES += camlrun
 runtime_NATIVE_STATIC_LIBRARIES += runtime/libasmrun_pic.$(A)
-runtime_NATIVE_SHARED_LIBRARIES += runtime/libasmrun_shared.$(SO)
+runtime_NATIVE_SHARED_LIBRARIES += asmrun
 endif
 endif
 
@@ -1348,13 +1352,15 @@ ocamlruni_CPPFLAGS = $(runtime_CPPFLAGS) -DCAML_INSTR
 
 .PHONY: runtime-all
 runtime-all: \
-  $(runtime_BYTECODE_STATIC_LIBRARIES) $(runtime_BYTECODE_SHARED_LIBRARIES) \
-  $(runtime_PROGRAMS) $(SAK)
+  $(runtime_BYTECODE_STATIC_LIBRARIES) \
+  $(runtime_BYTECODE_SHARED_LIBRARIES:%=runtime/lib%_shared$(EXT_DLL)) \
+  $(runtime_PROGRAMS:%=runtime/%$(EXE)) $(SAK)
 
 .PHONY: runtime-allopt
 ifeq "$(NATIVE_COMPILER)" "true"
 runtime-allopt: \
-  $(runtime_NATIVE_STATIC_LIBRARIES) $(runtime_NATIVE_SHARED_LIBRARIES)
+  $(runtime_NATIVE_STATIC_LIBRARIES) \
+  $(runtime_NATIVE_SHARED_LIBRARIES:%=runtime/lib%_shared$(EXT_DLL))
 else
 runtime-allopt:
 	$(error The build has been configured with --disable-native-compiler)
@@ -1397,15 +1403,16 @@ $(SAK): runtime/sak.$(O)
 runtime/sak.$(O): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
 	$(V_CC)$(SAK_CC) $(SAK_CFLAGS) $(OUTPUTOBJ)$@ -c $<
 
-C_LITERAL = $(shell $(SAK) encode-C-literal '$(1)')
+C_LITERAL = $(shell $(SAK) encode-C-literal $(call QUOTE_SINGLE,$(1)))
 
 runtime/build_config.h: $(ROOTDIR)/Makefile.config \
                         $(ROOTDIR)/Makefile.build_config $(SAK)
 	$(V_GEN){ \
 	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
 	  printf '#define OCAML_STDLIB_DIR %s\n' \
-	         '$(call C_LITERAL,$(TARGET_LIBDIR))'; \
+	         $(call QUOTE_SINGLE,$(call C_LITERAL,$(TARGET_LIBDIR))); \
 	  echo '#define HOST "$(HOST)"'; \
+	  echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"'; \
 	} > $@
 
 runtime/prims.$(O): runtime/build_config.h
@@ -1872,6 +1879,13 @@ OCAMLDOC_LIBCMTS=$(OCAMLDOC_LIBMLIS:.mli=.cmt) $(OCAMLDOC_LIBMLIS:.mli=.cmti)
 ocamldoc/%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 ocamldoc/%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+# ocamldoc needs a custom runtime when building statically owing to the C stubs
+# in unix.cma and str.cma. This is specified explicitly to suppress the default
+# linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
+ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += -custom
+endif
+
 .PHONY: ocamldoc
 ocamldoc: ocamldoc/ocamldoc$(EXE) ocamldoc/odoc_test.cmo
 
@@ -2040,6 +2054,9 @@ testsuite/tools/dump_load_path$(EXE): \
   testsuite/tools/dump_load_path.$(O) runtime/prims.$(O) runtime/libcamlrun.$(A)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 
+testsuite/tools/poisonedruntime$(EXE): testsuite/tools/poisonedruntime.$(O)
+	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
+
 ocamltest_BYTECODE_LINKFLAGS = -custom -g
 
 ocamltest/ocamltest$(EXE): ocamlc ocamlyacc ocamllex
@@ -2087,6 +2104,7 @@ partialclean::
 	rm -f $(addprefix testsuite/tools/*.,cm* o obj a lib)
 	rm -f testsuite/tools/codegen testsuite/tools/codegen.exe
 	rm -f testsuite/tools/dump_load_path testsuite/tools/dump_load_path.exe
+	rm -f testsuite/tools/poisonedruntime testsuite/tools/poisonedruntime.exe
 	rm -f testsuite/tools/expect testsuite/tools/expect.exe
 	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
 	rm -f testsuite/tools/test_in_prefix.opt \
@@ -2239,6 +2257,13 @@ debugger/ocamldebug.cmo: $(ocamldebug_DEBUGGER_OBJECTS)
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
 
 debugger/ocamldebug_entry.cmo: debugger/ocamldebug.cmo
+
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+# ocamldebug needs a custom runtime when building statically owing to the
+# C stubs in unix.cma. This is specified explicitly to suppress the default
+# linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
+debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += -custom
+endif
 
 clean::
 	rm -f debugger/ocamldebug debugger/ocamldebug.exe
@@ -2508,6 +2533,13 @@ $(ocamltex): VPATH += $(addprefix otherlibs/,str unix)
 
 tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+# ocamltex needs a custom runtime when building statically owing to the C stubs
+# in unix.cma and str.cma. This is specified explicitly to suppress the default
+# linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
+tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += -custom
+endif
+
 # we need str and unix which depend on the bytecode version of other tools
 # thus we use the othertools target
 ## Test compilation of backend-specific parts
@@ -2710,8 +2742,9 @@ endif
 INSTALL_LIBDIR_DYNLINK = $(INSTALL_LIBDIR)/dynlink
 
 # Installation
+
 .PHONY: install
-install:
+install::
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
@@ -2721,13 +2754,55 @@ endif
 	$(MKDIR) "$(INSTALL_DOCDIR)"
 	$(MKDIR) "$(INSTALL_INCDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
-	$(INSTALL_PROG) $(runtime_PROGRAMS) "$(INSTALL_BINDIR)"
+
+ifeq "$(SUFFIXING)" "true"
+MANGLE_RUNTIME_NAME = $(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)
+MANGLE_RUNTIME_DLL_NAME = lib$(1)-$(TARGET)-$($(2)_RUNTIME_ID)$(EXT_DLL)
+else
+MANGLE_RUNTIME_NAME = $(1)$(EXE)
+MANGLE_RUNTIME_DLL_NAME = lib$(1)_shared$(EXT_DLL)
+endif
+
+define INSTALL_RUNTIME
+install::
+	$(INSTALL_PROG) \
+	  runtime/$(1)$(EXE) \
+	    "$(INSTALL_BINDIR)/$(call MANGLE_RUNTIME_NAME,$(1))"
+ifeq "$(SUFFIXING)" "true"
+	cd "$(INSTALL_BINDIR)" && \
+	  $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
+	cd "$(INSTALL_BINDIR)" && \
+	  $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
+	    "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
+endif
+endef
+define INSTALL_RUNTIME_LIB
+ifeq "$(2)" "BYTECODE"
+install::
+else
+installopt::
+endif
+	$(INSTALL_PROG) \
+	  runtime/lib$(1)_shared$(EXT_DLL) \
+	    "$(INSTALL_LIBDIR)/$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))"
+ifeq "$(SUFFIXING)" "true"
+	cd "$(INSTALL_LIBDIR)" && \
+	  $(LN) "$(call MANGLE_RUNTIME_DLL_NAME,$(1),$(2))" \
+	  "lib$(1)_shared$(EXT_DLL)"
+endif
+endef
+
+$(foreach runtime, $(runtime_PROGRAMS), \
+  $(eval $(call INSTALL_RUNTIME,$(runtime))))
+
+install::
 	$(INSTALL_DATA) runtime/ld.conf $(runtime_BYTECODE_STATIC_LIBRARIES) \
 	  "$(INSTALL_LIBDIR)"
-ifneq "$(runtime_BYTECODE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(runtime_BYTECODE_SHARED_LIBRARIES) \
-	  "$(INSTALL_LIBDIR)"
-endif
+
+$(foreach shared_runtime, $(runtime_BYTECODE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),BYTECODE)))
+
+install::
 	$(INSTALL_DATA) runtime/caml/domain_state.tbl runtime/caml/*.h \
 	  "$(INSTALL_INCDIR)"
 	$(INSTALL_PROG) ocaml$(EXE) "$(INSTALL_BINDIR)"
@@ -2879,11 +2954,13 @@ endif
 
 # Installation of the native-code compiler
 .PHONY: installopt
-installopt:
+installopt::
 	$(INSTALL_DATA) $(runtime_NATIVE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
-ifneq "$(runtime_NATIVE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(runtime_NATIVE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
-endif
+
+$(foreach shared_runtime, $(runtime_NATIVE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),NATIVE)))
+
+installopt::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(call INSTALL_STRIPPED_BYTE_PROG,\
                ocamlopt$(EXE),"$(INSTALL_BINDIR)/ocamlopt.byte$(EXE)")
