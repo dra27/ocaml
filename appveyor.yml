@@ -34,7 +34,7 @@ environment:
     CYG_CACHE: C:/cygwin64/var/cache/setup
     FLEXDLL_VERSION: 0.43
     OCAMLRUNPARAM: v=0,b
-    FORCE_CYGWIN_UPGRADE: 0
+    FORCE_CYGWIN_UPGRADE: 1
     BUILD_MODE: world.opt
     # Fully print commands executed by Make
     # MAKEFLAGS: V=1
