@@ -15,6 +15,15 @@
 
 set -e
 
+time x86_64-w64-mingw32-gcc --version
+cat > t.c <<"EOF"
+#include <stdio.h>
+int main(void){printf("Hello, world\n");}
+EOF
+time x86_64-w64-mingw32-gcc -c t.c
+time x86_64-w64-mingw32-gcc -o hello.exe t.o
+rm -f t.* hello.exe
+
 BUILD_PID=0
 
 # This must correspond with the entry in appveyor.yml
