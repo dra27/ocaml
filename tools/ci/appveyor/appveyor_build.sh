@@ -225,7 +225,7 @@ case "$1" in
         script --quiet --return --command \
           "$MAKE -C ../$BUILD_PREFIX-$PORT" \
           "../$BUILD_PREFIX-$PORT/build.log" |
-            sed -e 's/\d027\[K//g' \
+            sed -u -e 's/\d027\[K//g' \
                 -e 's/\d027\[m/\d027[0m/g' \
                 -e 's/\d027\[01\([m;]\)/\d027[1\1/g'
         rm -f build.log;;
