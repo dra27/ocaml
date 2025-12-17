@@ -153,7 +153,6 @@ NORETURN static void exit_with_error(const wchar_t *wstr1,
 #include <libgen.h>
 #endif
 #include <sys/types.h>
-#include <sys/stat.h>
 
 /* O_BINARY is defined in Gnulib, but is not POSIX */
 #ifndef O_BINARY
@@ -180,86 +179,11 @@ typedef char ** argv_t;
 #define unsafe_copy(dst, src, dstsize) strcpy(dst, src)
 #endif
 
-#ifndef __CYGWIN__
-
-/* Normal Unix search path function */
-
-static char * searchpath(char * name)
+/* caml_search_in_system_path uses caml_stat_alloc */
+void *caml_stat_alloc(size_t size)
 {
-  static char fullname[PATH_MAX + 1];
-  char * path;
-  struct stat st;
-
-  for (char *p = name; *p != 0; p++) {
-    if (*p == '/') return name;
-  }
-  path = getenv("PATH");
-  if (path == NULL) return name;
-  while(1) {
-    char * p;
-    for (p = fullname; *path != 0 && *path != ':'; p++, path++)
-      if (p < fullname + PATH_MAX) *p = *path;
-    if (p != fullname && p < fullname + PATH_MAX)
-      *p++ = '/';
-    for (char *q = name; *q != 0; p++, q++)
-      if (p < fullname + PATH_MAX) *p = *q;
-    *p = 0;
-    if (stat(fullname, &st) == 0 && S_ISREG(st.st_mode)) break;
-    if (*path == 0) return name;
-    path++;
-  }
-  return fullname;
+  return malloc(size);
 }
-
-#else
-
-/* Special version for Cygwin32: takes care of the ".exe" implicit suffix */
-
-static int file_ok(char * name)
-{
-  int fd;
-  /* Cannot use stat() here because it adds ".exe" implicitly */
-  fd = open(name, O_RDONLY);
-  if (fd == -1) return 0;
-  close(fd);
-  return 1;
-}
-
-static char * searchpath(char * name)
-{
-  char * path, * fullname;
-
-  path = getenv("PATH");
-  fullname = malloc(strlen(name) + (path == NULL ? 0 : strlen(path)) + 6);
-  /* 6 = "/" plus ".exe" plus final "\0" */
-  if (fullname == NULL) return name;
-  /* Check for absolute path name */
-  for (char *p = name; *p != 0; p++) {
-    if (*p == '/' || *p == '\\') {
-      if (file_ok(name)) return name;
-      strcpy(fullname, name);
-      strcat(fullname, ".exe");
-      if (file_ok(fullname)) return fullname;
-      return name;
-    }
-  }
-  /* Search in path */
-  if (path == NULL) return name;
-  while(1) {
-    char * p;
-    for (p = fullname; *path != 0 && *path != ':'; p++, path++) *p = *path;
-    if (p != fullname) *p++ = '/';
-    strcpy(p, name);
-    if (file_ok(fullname)) return fullname;
-    strcat(fullname, ".exe");
-    if (file_ok(fullname)) return fullname;
-    if (*path == 0) break;
-    path++;
-  }
-  return name;
-}
-
-#endif
 
 NORETURN static void exit_with_error(const char *str1,
                                      const char *str2,
@@ -450,13 +374,17 @@ NORETURN void __cdecl wmainCRTStartup(void)
 
 #else
 
+/* Borrowed from libcamlrun */
+char * caml_search_in_system_path(const char *);
+
 int main(int argc, char *argv[])
 {
   char *truename, *runtime_path, *argv0_dirname;
   uint32_t rntm_strlen = 0;
   int fd;
 
-  truename = searchpath(argv[0]);
+  truename = caml_search_in_system_path(argv[0]);
+  if (truename == NULL) truename = argv[0];
   fd = open(truename, O_RDONLY | O_BINARY);
   if (fd == -1 || (runtime_path = read_runtime_path(fd, &rntm_strlen)) == NULL)
     exit_with_error(NULL, truename,
