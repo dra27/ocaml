@@ -63,7 +63,8 @@ static void init_startup_params(void)
 #endif
 #ifndef NATIVE_CODE
   cds_file = caml_secure_getenv(T("CAML_DEBUG_FILE"));
-  if (cds_file != NULL) {
+  /* Ignore CAML_DEBUG_FILE if it's "Set But Null" */
+  if (cds_file != NULL && *cds_file != '\0') {
     params.cds_file = caml_stat_strdup_os(cds_file);
   }
 #endif
