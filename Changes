@@ -103,6 +103,9 @@ OCaml 5.3 maintenance version
   demarshaling.
   (Benoît Vaugon, review by David Allsopp and Gabriel Scherer)
 
+- #14871, #14914: Ignore OCAMLTOP_INCLUDE_PATH during the build.
+  (David Allsopp, report by Andreas Rossberg, review by Florian Angeletti)
+
 OCaml 5.3.0 (8 January 2025)
 ----------------------------
 
