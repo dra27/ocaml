@@ -372,15 +372,30 @@ CAMLprim value caml_runtime_variant (value unit)
 #endif
 }
 
+atomic_bool caml_runtime_randomized = false;
+
+CAMLprim value caml_runtime_randomize(value vunit)
+{
+  caml_runtime_randomized = true;
+  return Val_unit;
+}
+
+CAMLprim value caml_runtime_is_randomized(value vunit)
+{
+  return Val_bool(caml_runtime_randomized);
+}
+
 CAMLprim value caml_runtime_parameters (value unit)
 {
 #define F_Z CAML_PRIuNAT
 #define F_S CAML_PRIuSZT
 
   CAMLassert (unit == Val_unit);
+  /* Parameters in alphabetical order; if an option has both upper/lower then
+     upper first cf. Compenv.overridden_runtime_parameters */
   return caml_alloc_sprintf
       ("b=%d,c=%"F_Z",e=%"F_Z",l=%"F_Z",M=%"F_Z",m=%"F_Z",n=%"F_Z","
-       "o=%"F_Z",p=%d,s=%"F_S",t=%"F_Z",v=%"F_Z",V=%"F_Z",W=%"F_Z"",
+       "o=%"F_Z",p=%d,R=%u,s=%"F_S",t=%"F_Z",V=%"F_Z",v=%"F_Z",W=%"F_Z"",
        /* b */ (int) Caml_state->backtrace_active,
        /* c */ caml_params->cleanup_on_exit,
        /* e */ caml_params->runtime_events_log_wsize,
@@ -390,11 +405,11 @@ CAMLprim value caml_runtime_parameters (value unit)
        /* n */ caml_custom_minor_max_bsz,
        /* o */ caml_percent_free,
        /* p */ Caml_state->parser_trace,
-       /* R */ /* missing */
+       /* R */ caml_runtime_randomized,
        /* s */ Caml_state->minor_heap_wsz,
        /* t */ caml_params->trace_level,
-       /* v */ caml_verb_gc,
        /* V */ caml_params->verify_heap,
+       /* v */ caml_verb_gc,
        /* W */ caml_runtime_warnings
        );
 #undef F_Z

@@ -27,12 +27,14 @@
 #ifndef NATIVE_CODE
 #include "caml/dynlink.h"
 #endif
+#include "caml/gc_ctrl.h"
 #include "caml/gc_stats.h"
 #include "caml/osdeps.h"
 #include "caml/shared_heap.h"
 #include "caml/startup_aux.h"
 #include "caml/prims.h"
 #include "caml/signals.h"
+#include "caml/platform.h"
 
 #ifdef _WIN32
 extern void caml_win32_unregister_overflow_detection (void);
@@ -69,12 +71,10 @@ static void init_startup_params(void)
 #endif
   params.trace_level = 0;
   params.cleanup_on_exit = 0;
-  params.print_magic = 0;
-  params.print_config = 0;
   params.event_trace = 0;
 }
 
-static void scanmult (char_os *opt, uintnat *var)
+static void scanmult (const char_os *opt, uintnat *var)
 {
   char_os mult = ' ';
   unsigned int val = 1;
@@ -88,14 +88,10 @@ static void scanmult (char_os *opt, uintnat *var)
   }
 }
 
-void caml_parse_ocamlrunparam(void)
+/* To keep in sync with Compenv.parse_runtime_parameter */
+static void parse_ocamlrunparam(const char_os *opt)
 {
-  init_startup_params();
   uintnat val;
-
-  char_os *opt = caml_secure_getenv (T("OCAMLRUNPARAM"));
-  if (opt == NULL) opt = caml_secure_getenv (T("CAMLRUNPARAM"));
-
   if (opt != NULL){
     while (*opt != '\0'){
       switch (*opt++){
@@ -109,7 +105,10 @@ void caml_parse_ocamlrunparam(void)
       case 'n': scanmult (opt, &params.init_custom_minor_max_bsz); break;
       case 'o': scanmult (opt, &params.init_percent_free); break;
       case 'p': scanmult (opt, &params.parser_trace); break;
-      case 'R': break; /*  see stdlib/hashtbl.mli */
+      case 'R':
+        scanmult (opt, &val);
+        caml_runtime_randomized = !!val;
+        break;
       case 's': scanmult (opt, &params.init_minor_heap_wsz); break;
       case 't': scanmult (opt, &params.trace_level); break;
       case 'v':
@@ -136,6 +135,19 @@ void caml_parse_ocamlrunparam(void)
   }
 }
 
+void caml_parse_ocamlrunparam(void)
+{
+  init_startup_params();
+
+  /* Update any of this runtime's default parameter values with the defaults
+     specified in the executable/image */
+  parse_ocamlrunparam(caml_executable_ocamlrunparam);
+
+  /* Now parse OCAMLRUNPARAM/CAMLRUNPARAM for values specified by the user */
+  const char_os *opt = caml_secure_getenv (T("OCAMLRUNPARAM"));
+  if (opt == NULL) opt = caml_secure_getenv (T("CAMLRUNPARAM"));
+  parse_ocamlrunparam(opt);
+}
 
 /* The number of outstanding calls to caml_startup */
 static int startup_count = 0;

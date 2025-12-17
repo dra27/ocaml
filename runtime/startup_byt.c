@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
+#include <stdbool.h>
 #include "caml/config.h"
 #ifndef _WIN32
 #include <unistd.h>
@@ -74,6 +75,9 @@
 
 const char_os * caml_runtime_standard_library_effective = NULL;
 
+static bool print_magic = false;
+static bool print_config = false;
+
 static char magicstr[EXEC_MAGIC_LENGTH+1];
 
 /* Print the specified error message followed by an end-of-line and exit */
@@ -106,7 +110,7 @@ int caml_read_trailer(int fd, struct exec_trailer *trail)
   memcpy(magicstr, trail->magic, EXEC_MAGIC_LENGTH);
   magicstr[EXEC_MAGIC_LENGTH] = 0;
 
-  if (caml_params->print_magic) {
+  if (print_magic) {
     printf("%s\n", magicstr);
     exit(0);
   }
@@ -300,12 +304,12 @@ static void do_print_help(void)
 
 /* Parse options on the command line */
 
-static int parse_command_line(char_os **argv)
+static int parse_command_line(char_os **argv,
+                              uintnat *trace_level,
+                              uintnat *backtrace_enabled,
+                              uintnat *event_trace)
 {
   int i, len, parsed;
-  /* cast to make caml_params mutable; this assumes we are only called
-     by one thread at startup */
-  struct caml_params* params = (struct caml_params*)caml_params;
 
   for(i = 1; argv[i] != NULL && argv[i][0] == '-'; i++) {
     len = strlen_os(argv[i]);
@@ -317,7 +321,7 @@ static int parse_command_line(char_os **argv)
         return i + 1;
         break;
       case 't':
-        params->trace_level += 1; /* ignored unless DEBUG mode */
+        *trace_level += 1; /* ignored unless DEBUG mode */
         break;
       case 'v':
         atomic_store_relaxed(&caml_verb_gc, CAML_GC_MSG_VERBOSE);
@@ -328,7 +332,7 @@ static int parse_command_line(char_os **argv)
         exit(0);
         break;
       case 'b':
-        params->backtrace_enabled = 1;
+        *backtrace_enabled = 1;
         break;
       case 'I':
         if (argv[i + 1] != NULL) {
@@ -339,7 +343,7 @@ static int parse_command_line(char_os **argv)
         }
         break;
       case 'm':
-        params->print_magic = 1;
+        print_magic = true;
         break;
       case 'M':
         printf("%s\n", EXEC_MAGIC);
@@ -357,13 +361,13 @@ static int parse_command_line(char_os **argv)
         printf("%s\n", OCAML_VERSION_STRING);
         exit(0);
       } else if (!strcmp_os(argv[i], T("-events"))) {
-        params->event_trace = 1; /* Ignored unless DEBUG mode */
+        *event_trace = 1; /* Ignored unless DEBUG mode */
       } else if (!strcmp_os(argv[i], T("-help")) ||
                  !strcmp_os(argv[i], T("--help"))) {
         do_print_help();
         exit(0);
       } else if (!strcmp_os(argv[i], T("-config"))) {
-        params->print_config = 1;
+        print_config = true;
       } else {
         parsed = 0;
       }
@@ -472,26 +476,34 @@ CAMLexport void caml_main(char_os **argv)
   char_os * shared_lib_path, * shared_libs;
   char_os * exe_name, * proc_self_exe, * argv0;
 
-  /* Determine options */
+  /* Only one thread at startup - caml_params won't be mutated once the VM
+     starts */
+  struct caml_params* params = (struct caml_params*)caml_params;
+  uintnat trace_level = 0, backtrace_enabled = 0, event_trace = 0;
+
+#ifdef _MSC_VER
+  caml_install_invalid_parameter_handler();
+#endif
+
+  /* Parse OCAMLRUNPARAM - for -custom, -output-obj, etc. this will take
+     caml_executable_ocamlrunparam into account, but for tendered bytecode
+     images (or for explicit invocation as ocamlrun ./foo.byte) the ORUN section
+     has not yet been read. The only relevant setting between here and ORUN
+     being read is c=1 (pooling). If ORUN includes c=1 and OCAMLRUNPARAM does
+     not include c=0, then a brief memory dance is done to re-initialise the
+     runtime in pooling mode. */
   caml_parse_ocamlrunparam();
 
   if (!caml_startup_aux(/* pooling */ caml_params->cleanup_on_exit))
     return;
 
-  caml_init_codefrag();
-
-  caml_init_locale();
-#ifdef _MSC_VER
-  caml_install_invalid_parameter_handler();
-#endif
-  caml_init_custom_operations();
-  caml_init_os_params();
-  caml_ext_table_init(&caml_shared_libs_path, 8);
-
   /* Determine position of bytecode file */
   pos = 0;
 
   argv0 = proc_self_exe = caml_executable_name();
+
+  /* caml_shared_libs_path is used by parse_command_line */
+  caml_ext_table_init(&caml_shared_libs_path, 8);
 
   /* In APPENDED mode (i.e. with -custom), we always want to load the bytecode
      from the running executable, and argv[0] should never be used. However,
@@ -526,8 +538,9 @@ CAMLexport void caml_main(char_os **argv)
     argv0 = caml_search_exe_in_path(exe_name);
 
   if (fd < 0) {
-    pos = parse_command_line(argv);
-    if (caml_params->print_config) {
+    pos =
+      parse_command_line(argv, &trace_level, &backtrace_enabled, &event_trace);
+    if (print_config) {
       caml_runtime_standard_library_effective =
         caml_locate_standard_library(argv0,
                                      caml_runtime_standard_library_default,
@@ -539,6 +552,11 @@ CAMLexport void caml_main(char_os **argv)
     if (argv[pos] == 0) {
       error("no bytecode file specified");
     }
+    params->trace_level += trace_level;
+    if (backtrace_enabled)
+      params->backtrace_enabled = 1;
+    if (event_trace)
+      params->event_trace = 1;
     exe_name = argv[pos];
     fd = caml_attempt_open(&exe_name, &trail, 1);
     switch(fd) {
@@ -564,6 +582,75 @@ CAMLexport void caml_main(char_os **argv)
   /* Read the table of contents (section descriptors) */
   caml_read_section_descriptors(fd, &trail);
 
+  /* If caml_executable_ocamlrunparam was set, don't also process ORUN */
+  if (!caml_executable_ocamlrunparam) {
+    /* Load the embedded runtime parameters */
+    char_os *orun = read_section_to_os(fd, &trail, "ORUN");
+    /* Re-parse options, taking these defaults into account (see note when
+       caml_parse-ocamlrunparam was previously called in this function) */
+    if (orun != NULL) {
+      int pooling = caml_params->cleanup_on_exit;
+      caml_executable_ocamlrunparam = orun;
+      caml_parse_ocamlrunparam();
+
+      /* caml_parse_ocamlrunparam resets the params fields: re-apply the three
+         which are affected by command-line parsing. */
+      params->trace_level += trace_level;
+      if (backtrace_enabled)
+        params->backtrace_enabled = 1;
+      if (event_trace)
+        params->event_trace = 1;
+
+      /* c=1 was specified in ORUN, but c not included in OCAMLRUNPARAM */
+      if (caml_params->cleanup_on_exit && !pooling) {
+        /* In order to re-start with pooling, everything which has been
+           allocated with caml_stat_alloc (i.e. malloc) must be passed to
+           caml_stat_free (i.e. free) and then reallocated */
+        char_os *old_proc_self_exe = NULL;
+        char_os *old_exe_name = strdup_os(exe_name);
+        if (proc_self_exe)
+          old_proc_self_exe = strdup_os(proc_self_exe);
+        int search_path_size = caml_shared_libs_path.size;
+        char_os **search_path =
+          (char_os **)malloc(sizeof(char_os *) * search_path_size);
+        if (search_path)
+          memcpy(search_path, caml_shared_libs_path.contents,
+                 sizeof(char_os *) * search_path_size);
+        else
+          search_path_size = 0;
+
+        /* caml_stat_free everything which is currently allocated */
+        caml_stat_free(orun);
+        caml_stat_free(proc_self_exe);
+        caml_stat_free(exe_name);
+        caml_stat_free(trail.section);
+        caml_ext_table_free(&caml_shared_libs_path, 0);
+
+        /* Enable pooling */
+        caml_stat_create_pool();
+
+        /* Re-initialise state with pooled memory */
+        if (old_proc_self_exe) {
+          proc_self_exe = caml_stat_strdup_os(old_proc_self_exe);
+          free(old_proc_self_exe);
+        }
+        exe_name = caml_stat_strdup_os(old_exe_name);
+        free(old_exe_name);
+
+        /* Re-read the table of contents (section descriptors) */
+        caml_read_section_descriptors(fd, &trail);
+        caml_executable_ocamlrunparam = read_section_to_os(fd, &trail, "ORUN");
+
+        /* Re-initialise caml_shared_libs_path */
+        caml_ext_table_init(&caml_shared_libs_path, 8);
+        for (int i = 0; i < search_path_size; i++) {
+          caml_ext_table_add(&caml_shared_libs_path, search_path[i]);
+        }
+        free(search_path);
+      }
+    }
+  }
+
   caml_runtime_standard_library_effective =
     caml_locate_standard_library(argv0,
                                  caml_runtime_standard_library_default, NULL);
@@ -580,6 +667,12 @@ CAMLexport void caml_main(char_os **argv)
     read_section_to_os(fd, &trail, "OSLD");
   if (image_standard_library_default != NULL)
     caml_standard_library_default = image_standard_library_default;
+
+  caml_init_codefrag();
+
+  caml_init_locale();
+  caml_init_custom_operations();
+  caml_init_os_params();
 
   /* Initialize the abstract machine */
   caml_init_gc ();
@@ -652,6 +745,10 @@ CAMLexport value caml_startup_code_exn(
   char_os * exe_name, * proc_self_exe;
   value res;
 
+#ifdef _MSC_VER
+  caml_install_invalid_parameter_handler();
+#endif
+
   /* Determine options */
   caml_parse_ocamlrunparam();
 
@@ -663,9 +760,6 @@ CAMLexport value caml_startup_code_exn(
   caml_init_codefrag();
 
   caml_init_locale();
-#ifdef _MSC_VER
-  caml_install_invalid_parameter_handler();
-#endif
   caml_init_custom_operations();
   caml_init_os_params();
   caml_ext_table_init(&caml_shared_libs_path, 8);
