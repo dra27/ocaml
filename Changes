@@ -120,6 +120,11 @@ Working version
   continuations without calling `caml_continuation_use`.
   (Max Slater, review by Nick Barnes and Stephen Dolan)
 
+* #14???: Windows and Unix. When configured with --disable-shared, the runtime
+  now rejects bytecode executables which require DLLs to be loaded earlier, and
+  with a less unclear error message.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 ### Standard library:
@@ -242,6 +247,14 @@ Working version
 - #14391: unload native dynlinked objects when an error occurs and it is safe to
   do so. (Fixes #14323)
   (Nicolás Ojeda Bär, review by Vincent Laviron)
+
+- #14???: Improved the error message when bytecode Dynlink is asked to load an
+  archive which needs dynamic loading on a runtime which doesn't support it.
+  Previously, the full machinery to search for DLLs was invoked, and the error
+  confusingly included the name of a non-existent DLL. The entire process is now
+  skipped, with a general message that dynamic loading is needed and is
+  unavailable.
+  (David Allsopp, review by ???)
 
 ### Tools:
 
