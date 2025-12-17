@@ -69,6 +69,16 @@ include Topcommon.MakeEvalPrinter(EvalBase)
 
 (* Load in-core and execute a lambda term *)
 
+module Meta = struct
+  type closure = unit -> Obj.t
+  type bytecode
+  external reify_bytecode :
+    (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t ->
+    Instruct.debug_event list array -> string option ->      bytecode * closure
+      = "caml_reify_bytecode"
+  external release_bytecode : bytecode -> unit = "caml_static_release_bytecode"
+end
+
 let may_trace = ref false (* Global lock on tracing *)
 
 let load_lambda ppf lam =
@@ -240,6 +250,8 @@ let load_compunit ic filename ppf compunit =
     raise Load_failed
   end
 
+external supports_shared_libraries : unit -> bool = "%shared_libraries"
+
 let rec load_file recursive ppf name =
   let filename =
     try Some (Load_path.find name) with Not_found -> None
@@ -283,6 +295,17 @@ and really_load_file recursive ppf name filename ic =
         let toc_pos = input_binary_int ic in  (* Go to table of contents *)
         seek_in ic toc_pos;
         let lib = (input_value ic : library) in
+        if lib.lib_dllibs <> [] && not (supports_shared_libraries ()) then begin
+          let detail =
+            match lib.lib_dllibs with
+            | [_] -> "a shared library"
+            | _ -> "shared libraries"
+          in
+          fprintf ppf
+            "File %s requires %s to be loaded, which the runtime executing \
+             this toplevel does not support.@." name detail;
+          raise Load_failed
+        end;
         List.iter
           (fun dllib ->
             let name = Dll.extract_dll_name dllib in

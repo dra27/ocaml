@@ -44,6 +44,21 @@
 # the lines involved in the conflict, which is arguably worse
 #/Changes                 merge=union
 
+testsuite/Makefile       export-subst
+
+# Files and directories excluded from git-generated tarballs.
+.github                  export-ignore
+manual                   export-ignore
+release-info             export-ignore
+testsuite/tests          export-ignore
+tools/ci                 export-ignore
+.gitattributes           export-ignore
+.gitignore               export-ignore
+.gitmodules              export-ignore
+.mailmap                 export-ignore
+ocaml-variants.install   export-ignore
+ocaml-variants.opam      export-ignore
+
 # No header for text and META files (would be too obtrusive).
 *.md                     typo.missing-header
 README*                  typo.missing-header
@@ -92,6 +107,8 @@ build-aux                typo.prune
 /manual                  typo.prune
 /manual/**               typo.prune
 
+tools/ci/appveyor/parallel linguist-vendored typo.prune
+
 # configure is generated so do not check it
 configure                typo.prune
 
@@ -109,6 +126,7 @@ otherlibs/unix/symlink_win32.c     typo.long-line
 # Some Unicode characters here and there
 utils/misc.ml            typo.non-ascii
 runtime/sak.c            typo.non-ascii
+tools/opam/process.sh    typo.non-ascii
 
 testsuite/tests/**                                      typo.missing-header typo.long-line=may
 testsuite/tests/lib-bigarray-2/bigarrf.f                typo.tab linguist-language=Fortran
@@ -215,7 +233,6 @@ runtime/caml/sizeclasses.h typo.missing-header
 /tools/gdb_ocamlrun.py typo.long-line
 
 /tools/opam/gen_ocaml-system_config.ml.in typo.missing-header
-/tools/opam/gen_ocaml_config.ml.in typo.very-long-line typo.missing-header
 
 # Tests which include references spanning multiple lines fail with \r\n
 # endings, so use \n endings only, even on Windows.

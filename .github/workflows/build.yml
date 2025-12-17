@@ -78,6 +78,7 @@ jobs:
 #        debug runtime and minor heap verification.
 # debug-s4096: select testsuite run with the debug runtime and a small
 #              minor heap.
+# opam: constructs an opam local switch from the compiler.
   normal:
     name: ${{ matrix.name }}
     needs: [build, config]
@@ -88,11 +89,13 @@ jobs:
           - id: normal
             name: normal
             dependencies: texlive-latex-extra texlive-fonts-recommended texlive-luatex hevea sass gdb lldb
+          - id: opam
+            name: opam installation
           - id: debug
             name: extra (debug)
           - id: debug-s4096
             name: extra (debug-s4096)
-      fail-fast: true
+      fail-fast: false
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
@@ -134,15 +137,19 @@ jobs:
       - name: Install
         if: matrix.id == 'normal'
         run: |
-         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
-      - name: Test in prefix
-        if: matrix.id == 'normal'
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
+      - name: Create opam switch
+        if: matrix.id == 'opam'
         run: |
-         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh opam
+      - name: Test in prefix
+        if: matrix.id == 'normal' || matrix.id == 'opam'
+        run: |
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
       - name: Test in prefix (alternate configuration)
         if: matrix.id == 'normal' && needs.config.outputs.full-matrix == 'true'
         run: |
-         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh re-test-in-prefix
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh re-test-in-prefix
       - name: Build the manual
         if: matrix.id == 'normal' && needs.build.outputs.manual_changed == 'true'
         run: |
@@ -186,6 +193,7 @@ jobs:
                config_arg: '--with-target-sh=exe --enable-runtime-search-target=fallback',
                'test-in-prefix': true},
               {name: 'macos-x86_64', os: 'macos-15-intel',
+               config_arg: '--with-target-sh=exe',
                'test-in-prefix': true},
               {name: 'macos-arm64', os: 'macos-latest',
                config_arg: '--with-relative-libdir --enable-runtime-search',
@@ -236,7 +244,7 @@ jobs:
     strategy:
       matrix:
         include: ${{ fromJSON(needs.config.outputs.jobs) }}
-      fail-fast: true
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -304,7 +312,7 @@ jobs:
       - name: configure tree
         run: |
           chown -R ocaml:ocaml .
-          MAKE_ARG=-j CONFIG_ARG='--disable-native-toplevel' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
+          MAKE_ARG=-j CONFIG_ARG='--disable-native-toplevel --with-target-sh=exe' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
       - name: Build
         run: |
           MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh build"

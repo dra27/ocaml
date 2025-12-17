@@ -300,21 +300,13 @@ let test_runs usr_bin_sh test_program_path test_program
             Success {executable_name = test_program_path;
                      argv0 = test_program_path}
         | Tendered {header = Header_exe; _} ->
-            if argv0_not_ocaml then
-              if Sys.win32 then
-                (* stdlib/header.c will find ocamlrun (because it effectively
-                   uses caml_executable_name) but fails to hand off the bytecode
-                   image, which causes ocamlrun to exit with code 127 *)
-                Fail 127
-              else
-                (* stdlib/header.c will fail to find ocamlrun, because it never
-                   uses caml_executable_name and so will either fail to find the
-                   executable or will identify that it is not a bytecode
-                   executable. Somewhat confusingly, it exits with code 2 *)
-                Fail 2
-            else if Sys.win32 then
-              (* stdlib/header.c correctly preserves argv[0] for Windows *)
-              Success {executable_name = test_program_path; argv0}
+            if argv0_not_ocaml
+               && Harness.no_caml_executable_name then
+              (* stdlib/header.c will fail to find ocamlrun because
+                 caml_executable_name isn't implemented so will either fail to
+                 find the executable or will identify that it is not a bytecode
+                 executable. Somewhat confusingly, it exits with code 2 *)
+              Fail 2
             else if Harness.no_caml_executable_name
                     && config.has_relative_libdir <> None then
               (* Without caml_executable_name, ocamlrun will be forced to
@@ -322,9 +314,13 @@ let test_runs usr_bin_sh test_program_path test_program
                  which will fail. *)
               Fail 134
             else
-              (* stdlib/header.c does not preserve argv[0] for Unix *)
-              Success {executable_name = argv0_resolved;
-                       argv0 = argv0_resolved}
+              let executable_name =
+                if Harness.no_caml_executable_name then
+                  argv0_resolved
+                else
+                  test_program_path
+              in
+              Success {executable_name; argv0}
         | Custom ->
             if Harness.no_caml_executable_name then
               if argv0_not_ocaml then
@@ -552,22 +548,13 @@ let compile_test usr_bin_sh config env test test_program description =
             ~clibs:["-lcomprmarsh"; "-lunixnat"; Config.compression_c_libraries]
             ~linker_exit_code ["-output-obj"]
       | Output_complete_obj(C_ocamlc, Static) ->
-          (* At the moment, the partial linker will pass -lws2_32 and -ladvapi32
-             on to the partial linker on mingw-w64 which causes a failure. Until
-             this is fixed, pass the libraries manually, using -noautolink. *)
-          f ~clibs:[]
-            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixbyt"]
+          f ~clibs:[] ["-output-complete-obj"]
       | Output_complete_obj(C_ocamlc, Shared) ->
-          (* The partial linker doesn't correctly process
-             -runtime-variant _shared, as the .so gets passed to the partial
-             linker. On macOS, this causes a warning; on other systems, it's an
-             error. *)
-          let compilation_exit_code = fails_if (Config.system <> "macosx") in
           (* Shared compilation isn't available on native Windows and fails on
              Cygwin *)
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
-          f ~use_shared_runtime:true ~clibs:[] ~compilation_exit_code
-            ~linker_exit_code ["-output-complete-obj"]
+          f ~use_shared_runtime:true ~clibs:[] ~linker_exit_code
+            ["-output-complete-obj"]
       | Output_complete_obj(C_ocamlopt, Static) ->
           let linker_exit_code =
             (* cf. ocaml/ocaml#13692 - linking fails on ppc64 *)
@@ -576,21 +563,18 @@ let compile_test usr_bin_sh config env test test_program description =
             else
               0
           in
-          (* At the moment, the partial linker will pass -lzstd to ld -r which
-             will (normally) fail). Until this is done, pass the libraries
-             manually, using -noautolink. *)
           f ~mode:Native ~clibs:[Config.compression_c_libraries]
-            ~linker_exit_code
-            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
-                                                    "-cclib"; "-lcomprmarsh"]
+            ~linker_exit_code ["-output-complete-obj"]
       | Output_complete_obj(C_ocamlopt, Shared) ->
-          (* ocamlopt allows the .so to be passed to the partial linker which
-             fails with GNU ld, but not with the macOS linker *)
-          let compilation_exit_code = fails_if (Config.system <> "macosx") in
-          f ~mode:Native ~use_shared_runtime:true
-            ~compilation_exit_code ~clibs:[Config.compression_c_libraries]
-            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
-                                                    "-cclib"; "-lcomprmarsh"]
+          (* cf. ocaml/ocaml#13693 - on Fedora/RHEL, this executable
+             segfaults *)
+          let may_segfault = List.mem Config.architecture ["s390x"; "riscv"] in
+          (* Shared compilation isn't available on native Windows and fails on
+             Cygwin *)
+          let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
+          f ~mode:Native ~use_shared_runtime:true ~may_segfault
+            ~linker_exit_code ~clibs:[Config.compression_c_libraries]
+            ["-output-complete-obj"]
       | Output_complete_exe Static ->
           f ~calls_linker:true ["-output-complete-exe"]
       | Output_complete_exe Shared ->
@@ -616,7 +600,7 @@ let compile_test usr_bin_sh config env test test_program description =
           test_program_path
       in
       let with_unix = (Config.supports_shared_libraries || not tendered) in
-      let is_randomized = false in
+      let is_randomized = Environment.is_renamed env in
       let verbose = Environment.verbose env in
       write_test_program ~verbose ~is_randomized ~with_unix description;
       let options =
@@ -652,6 +636,12 @@ let compile_test usr_bin_sh config env test test_program description =
       in
       let args =
         "-I" :: "+compiler-libs" :: Harness.lib mode "ocamlcommon" :: args
+      in
+      let args =
+        if is_randomized then
+          "-set-runtime-default" :: "R" :: args
+        else
+          args
       in
       let args =
         if verbose then

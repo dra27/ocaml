@@ -120,6 +120,35 @@ Working version
   continuations without calling `caml_continuation_use`.
   (Max Slater, review by Nick Barnes and Stephen Dolan)
 
+- #14???: The Windows version of the executable launcher (stdlib/header.c) no
+  longer assumes that paths are limited to 260 (MAX_PATH) characters.
+  (David Allsopp, review by ???)
+
+- #14???: Change semantics of the internal caml_attempt_open bytecode runtime
+  function to require the caller to perform PATH-resolution prior to calling the
+  function. Affects the resolution of CAML_DEBUG_FILE, which is still searched
+  in PATH, but at program startup instead of when the debug information is first
+  loaded.
+  (David Allsopp, review by ???)
+
+- #14???: The CAML_DEBUG_FILE environment variable is now ignored if it set to
+  the empty string.
+  (David Allsopp, review by ???)
+
+* #14???: When set to the empty string, OCAMLRUNPARAM, OCAMLLIB and CAMLLIB are
+  now ignored (i.e. treated as if they were unset). In particular, this means
+  that a blank value for OCAMLLIB no longer prevents the compiler's default
+  Standard Library from being used. CAML_LD_LIBRARY_PATH now ignores empty
+  segments (instead of interpreting them as being ".") which also means that
+  CAML_LD_LIBRARY_PATH is ignored if it is just set to the empty string. Blank
+  lines in ld.conf are now likewise ignored.
+  (David Allsopp, review by ???)
+
+* #14???: Windows and Unix. When configured with --disable-shared, the runtime
+  now rejects bytecode executables which require DLLs to be loaded earlier, and
+  with a less unclear error message.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 ### Standard library:
@@ -177,6 +206,11 @@ Working version
 - #14227: Add List.filter_mapi.
   (Émile Trotignon, review by Nicolás Ojeda Bär, Jan Midtgaard and
    Damien Doligez)
+
+- #14???: On Unix, the Filename module now treats TMPDIR='' (i.e. TMPDIR set,
+  but to an empty string) as TMPDIR=/tmp (as it already does if TMPDIR is not
+  set at all).
+  (David Allsopp, review by ???)
 
 ### Type system:
 
@@ -243,6 +277,24 @@ Working version
   do so. (Fixes #14323)
   (Nicolás Ojeda Bär, review by Vincent Laviron)
 
+- #14???: Improved the error message when bytecode Dynlink is asked to load an
+  archive which needs dynamic loading on a runtime which doesn't support it.
+  Previously, the full machinery to search for DLLs was invoked, and the error
+  confusingly included the name of a non-existent DLL. The entire process is now
+  skipped, with a general message that dynamic loading is needed and is
+  unavailable.
+  (David Allsopp, review by ???)
+
+- #14???: Remove duplicated linker options from unix.cma and unix.cmxa on
+  Windows.
+  (David Allsopp, review by ???)
+
+- #14???: Build and install threads.cmxs.
+  (David Allsopp, review by ???)
+
+- #14???: Stop installing "nat" versions of the stubs DLLs.
+  (David Allsopp, review by ???)
+
 ### Tools:
 
 - #14055: Invert BUILD_PATH_PREFIX_MAP in directories loaded at startup
@@ -281,6 +333,17 @@ Working version
 - #14245: ocamlobjinfo now displays the runtime invoked by a bytecode
   executable (either from the RNTM section or by analysing the shebang lines)
   (David Allsopp, review by Damien Doligez and Samuel Hym)
+
+- #14???: ocamlyacc treats TMPDIR='' (i.e. set, but to the empty string) as
+  TMPDIR=/tmp (as it already does if TMPDIR is not set at all).
+  (David Allsopp, review by ???)
+
+### Toplevel:
+
+- #14???: Empty segments in OCAMLTOP_INCLUDE_PATH are no longer interpreted as
+  adding the current working directory to the search path. The current working
+  directory can of course still be included in the search path by adding ".".
+  (David Allsopp, review by ???)
 
 ### Manual and documentation:
 
@@ -379,6 +442,10 @@ Working version
   hard-coded path.
   (David Allsopp, review by Damien Doligez and Samuel Hym)
 
+- #14???: Extend -set-runtime-default to allow the default values of all runtime
+  parameters to be overridden for any given binary.
+  (David Allsopp and Antonin Décimo, review by ???)
+
 - #14190: `ocaml -e` now also processes `-init` (previously it was ignored).
   (Emile Trotignon, review by David Allsopp and @ygrek)
 
@@ -455,6 +522,12 @@ Working version
 
 * #14388: Remove support for `let rec (module M : S) = e1 in e2`.
   (Alistair O'Brien, review by Vincent Laviron and Gabriel Scherer)
+
+- #14???: `-l` libraries are no longer given to the partial linker (for
+  `-output-complete-obj`) if `ocamlc`/`ocamlopt` cannot resolve them in the
+  current search path. Allows system libraries (e.g. `-lzstd`) to be specified
+  in .cma or .cmxa files without breaking `-output-complete-obj`.
+  (David Allsopp, review by ???)
 
 ### Build system:
 
@@ -546,6 +619,11 @@ Working version
 
 - #14370: Fix headers for C++ inclusion.
   (Antonin Décimo, review by Gabriel Scherer)
+
+- #14???: Fix the hand-off of the bytecode image to the runtime from the
+  executable header. In particular, running `ocamlc.byte` rather than
+  `ocamlc.byte.exe` now invokes the compiler instead of ocamlrun itself!
+  (David Allsopp, review by ???)
 
 OCaml 5.4.0 (9 October 2025)
 ----------------------------

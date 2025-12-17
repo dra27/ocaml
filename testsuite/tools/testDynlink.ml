@@ -107,10 +107,7 @@ let () =
       | None ->
           (* Systems configured with --disable-shared can't load bytecode
              libraries which need C stubs *)
-          if (Sys.cygwin && mode = Native && List.mem "unix" libraries)
-             || (not Config.supports_shared_libraries && has_c_stubs) then
-            (* cf. ocaml/flexdll#146 - Cygwin's natdynlink can't load
-                   unix.cmxs *)
+          if not Config.supports_shared_libraries && has_c_stubs then
             2
           else
             0
@@ -123,19 +120,6 @@ let () =
     if exit_code <> expected_exit_code then
       Harness.fail_because "%s is expected to return with exit code %d"
                            test_program expected_exit_code;
-  in
-  let test_libraries_in_prog ?expected_exit_code env libraries =
-    if mode = Native && List.mem "threads" libraries then
-      (* cf. ocaml/ocaml#12250 - no threads.cmxs *)
-      let threads_plugin =
-        Environment.in_libdir env (Filename.concat "threads" "threads.cmxs")
-      in
-      if Sys.file_exists threads_plugin then
-        Harness.fail_because "threads.cmxs is not expected to exist"
-      else
-        ()
-    else
-      test_libraries_in_prog ?expected_exit_code env libraries
   in
   let not_dynlink l = not (List.mem "dynlink" l) in
   let files, re_compile = compile_test_program () in

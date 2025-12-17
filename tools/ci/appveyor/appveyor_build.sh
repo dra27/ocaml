@@ -59,7 +59,10 @@ function set_configuration {
   CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
   CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
 
-  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2" '--enable-ocamltest')
+  args=('--cache-file' "$CACHE_FILE" \
+        '--prefix' "$2/_opam" \
+        '--docdir' "$2/_opam/doc/ocaml" \
+        '--enable-ocamltest')
 
   case "$1" in
     cygwin*)
@@ -96,13 +99,17 @@ function set_configuration {
     if ((failed)) ; then cat config.log ; exit $failed ; fi
   fi
 
+  cp "$CACHE_FILE" config.cache
+
 #  FILE=$(pwd | cygpath -f - -m)/Makefile.config
 #  run "Content of $FILE" cat Makefile.config
 }
 
-PARALLEL_URL='https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel'
+PARALLEL_URL=\
+'https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel?h=20241222'
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 FLEXDLLROOT="$PROGRAMFILES/flexdll"
+export OPAMSWITCH="$OCAMLROOT"
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
@@ -118,14 +125,7 @@ fi
 
 case "$1" in
   install)
-    mkdir -p "$CACHE_DIRECTORY"
-    if [ ! -e "$CACHE_DIRECTORY/parallel-source" ] || \
-       [ "$PARALLEL_URL" != "$(cat "$CACHE_DIRECTORY/parallel-source")" ] ; then
-      # Download latest version directly from the repo
-      curl -Ls $PARALLEL_URL -o "$CACHE_DIRECTORY/parallel"
-      echo "$PARALLEL_URL" > "$CACHE_DIRECTORY/parallel-source"
-    fi
-    cp "$CACHE_DIRECTORY/parallel" /usr/bin
+    cp "$APPVEYOR_BUILD_FOLDER/tools/ci/appveyor/parallel" /usr/bin
     chmod +x /usr/bin/parallel
     parallel --version
     if [[ $install_flexdll = 'true' ]] ; then
@@ -145,7 +145,7 @@ case "$1" in
     ;;
   test)
     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+    #run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
     if [[ $PORT =~ mingw* ]] ; then
       run "Check runtime symbols" \
           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
@@ -164,15 +164,50 @@ case "$1" in
       # tests now (to include natdynlink)
       run "test dynlink $PORT" \
           $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-      # Now reconfigure ocamltest to run in bytecode-only mode
-      sed -i '/native_/s/true/false/' \
-             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+      case "$PORT" in
+        *64)
+          # Now reconfigure ocamltest to run in bytecode-only mode
+          sed -i '/native_/s/true/false/' \
+                 "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+          $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt;;
+      esac
       # And run the entire testsuite, skipping all the native-code tests
       run "test $PORT" \
           make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    make -C "$FULL_BUILD_PREFIX-$PORT" INSTALL_MODE=clone install
+    (
+      cd "$OCAMLROOT"
+      mv _opam destdir
+      #ret="$PWD"
+      #script="$PWD/ocaml-compiler-clone.sh"
+      #cd "$(find $PWD/install -name _opam -type d)"
+      mkdir -p "destdir/share/ocaml"
+      cp "$FULL_BUILD_PREFIX-$PORT/config."{cache,status} 'destdir/share/ocaml/'
+      cp "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" \
+           'destdir/share/ocaml/clone'
+      cd destdir
+      sh "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" "$OCAMLROOT/_opam"
+    )
+    rm -rf "$OCAMLROOT"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" OPAM_PACKAGE_NAME=ocaml-variants \
+      INSTALL_MODE=opam install
+    (
+      cd "$FULL_BUILD_PREFIX-$PORT"
+      export PATH="$FLEXDLLROOT:$PATH"
+      opam init --cli=2.4 --bare --yes --disable-sandboxing --auto-setup \
+                --cygwin-local-install
+      # These commands intentionally run using opam's "default" CLI
+      opam switch create "$OPAMSWITCH" --empty
+      opam pin add --no-action --kind=path ocaml-variants .
+      opam pin add --no-action flexdll flexdll
+      opam install --yes flexdll winpthreads
+      opam install --yes --assume-built ocaml-variants
+      git checkout -- ocaml-variants.install
+      rm -f config.cache ocaml-variants-fixup.sh ocaml-compiler-clone.sh
+      opam exec -- ocamlc -v
+    )
     run "test $PORT in prefix" \
       $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
             test-in-prefix

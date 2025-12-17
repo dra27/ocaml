@@ -141,8 +141,12 @@ wchar_t * caml_decompose_path(struct ext_table * tbl, wchar_t * path)
   p = caml_stat_wcsdup(path);
   q = p;
   while (1) {
+    /* Don't include blank entries */
+    while (*q == ';')
+      q++;
     for (n = 0; q[n] != 0 && q[n] != L';'; n++) /*nothing*/;
-    caml_ext_table_add(tbl, q);
+    if (n > 0)
+      caml_ext_table_add(tbl, q);
     q = q + n;
     if (*q == 0) break;
     *q = 0;
@@ -210,15 +214,15 @@ CAMLexport wchar_t * caml_search_exe_in_path(const wchar_t * name)
   }
 }
 
-wchar_t * caml_search_dll_in_path(struct ext_table * path, const wchar_t * name)
+/* Primitive is defined here rather than sys.c as otherwise sys.c would need
+   duplicating for libcamlrun_non_shared */
+CAMLprim value caml_sys_const_shared_libraries(value unit)
 {
-  wchar_t * dllname;
-  wchar_t * res;
-
-  dllname = caml_stat_wcsconcat(2, name, L".dll");
-  res = caml_search_in_path(path, dllname);
-  caml_stat_free(dllname);
-  return res;
+#ifdef WITH_DYNAMIC_LINKING
+  return Val_true;
+#else
+  return Val_false;
+#endif
 }
 
 #ifdef WITH_DYNAMIC_LINKING
@@ -451,7 +455,10 @@ CAMLexport int caml_read_directory(wchar_t * dirname,
 
 #ifndef NATIVE_CODE
 
-/* Set up a new thread for control-C emulation and termination */
+/* Set up a new thread for control-C emulation and termination. This mechanism
+   is used by the ocamlbrowser program which was part of the OCaml distribution
+   until OCaml 4.02 but now lives at https://github.com/garrigue/labltk. The
+   mechanism isn't known to be used by any other software. */
 
 void caml_signal_thread(void * lpParam)
 {

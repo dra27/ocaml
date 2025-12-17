@@ -156,11 +156,17 @@ CAMLextern value caml_win32_get_temp_path(void);
 
 #define CAML_DIR_SEP T("\\")
 #define Is_separator(c) (c == '\\' || c == '/')
+#define EXT_DLL L".dll"
 
 #else
 
 #define CAML_DIR_SEP T("/")
 #define Is_separator(c) (c == '/')
+#define EXT_DLL ".so"
+
+/* As caml_search_exe_in_path, but returns NULL if the file cannot be found in
+   any of the directories specified in PATH. Used by stdlib/header.c */
+caml_stat_string caml_search_in_system_path(const char *);
 
 #endif /* _WIN32 */
 
