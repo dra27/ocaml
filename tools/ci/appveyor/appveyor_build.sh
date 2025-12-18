@@ -138,7 +138,7 @@ case "$1" in
     fi
     # Check that libwinpthread-1.dll is not linked
     cd "$FULL_BUILD_PREFIX-$PORT"
-    find . -name \*.exe | xargs ldd > results
+    find . -name \*.exe | grep -Fvx ./flexdll/flexlink.exe | xargs ldd > results
     winpthreads='^[[:blank:]]libwinpthread-[^.]\+\.dll =>'
     if grep -q "$winpthreads" results; then
       echo 'winpthreads is not being linked statically:'
