@@ -268,39 +268,46 @@ if $flambda; then
 --disable-naked-pointers"
 fi
 
-eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
+main_build() {
+  eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
-grep -q '^NATIVE_COMPILER=false' Makefile.config && make_native=false
+  grep -q '^NATIVE_COMPILER=false' Makefile.config && make_native=false
 
-if $init_submodule; then
-  $make $jobs --warn-undefined-variables flexdll
-fi
+  if $init_submodule; then
+    $make $jobs --warn-undefined-variables flexdll
+  fi
 
-if $bootstrap; then
-  $make $jobs --warn-undefined-variables core
-  $make $jobs --warn-undefined-variables coreboot
-  if $make_native; then
-    $make $jobs --warn-undefined-variables opt.opt
-    if $init_submodule; then
-      $make $jobs --warn-undefined-variables flexlink.opt
+  if $bootstrap; then
+    $make $jobs --warn-undefined-variables core
+    $make $jobs --warn-undefined-variables coreboot
+    if $make_native; then
+      $make $jobs --warn-undefined-variables opt.opt
+      if $init_submodule; then
+        $make $jobs --warn-undefined-variables flexlink.opt
+      fi
+    else
+      $make $jobs --warn-undefined-variables all
     fi
   else
-    $make $jobs --warn-undefined-variables all
+    $make $jobs --warn-undefined-variables
+    if $make_native && $init_submodule; then
+      $make $jobs --warn-undefined-variables flexlink.opt
+    fi
   fi
-else
-  $make $jobs --warn-undefined-variables
-  if $make_native && $init_submodule; then
-    $make $jobs --warn-undefined-variables flexlink.opt
+
+  if $make_native && $check_make_alldepend; then
+    $make --warn-undefined-variables alldepend
   fi
-fi
 
+  $make --warn-undefined-variables install
+  rm -rf "$instdir"
+}
 
-if $make_native && $check_make_alldepend; then
-  $make --warn-undefined-variables alldepend
-fi
+# PATH, but without any homebrew additions (tests vanilla macOS in the build,
+# while still allowing full utilities later in the testsuite)
+CLEAN_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vF '/homebrew/' | paste -sd: -)
 
-$make --warn-undefined-variables install
-rm -rf "$instdir"
+PATH="$CLEAN_PATH" main_build
 
 cd testsuite
 if test -n "$jobs" && test -x /usr/bin/parallel
