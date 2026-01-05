@@ -24,6 +24,8 @@ type location = {
   end_pos : int;
   start_line : int;
   start_col : int;
+  end_line : int;
+  end_col : int;
 }
 
 let location_of_positions (a : Lexing.position) (b : Lexing.position)
@@ -38,7 +40,9 @@ let location_of_positions (a : Lexing.position) (b : Lexing.position)
     start_pos = n1;
     end_pos = n2;
     start_line = l1;
-    start_col = n1 - s1
+    start_col = n1 - s1;
+    end_line = b.pos_lnum;
+    end_col = n2 - b.pos_bol;
   }
 
 type regular_expression =
@@ -66,11 +70,19 @@ type lexer_definition = {
 }
 
 let show_location loc =
-  Printf.sprintf "File %S, line %d, characters %d-%d"
-    loc.loc_file
-    loc.start_line
-    loc.start_col
-    (loc.start_col + loc.end_pos - loc.start_pos)
+  if loc.start_line = loc.end_line then
+    Printf.sprintf "File %S, line %d, characters %d-%d"
+      loc.loc_file
+      loc.start_line
+      loc.start_col
+      loc.end_col
+  else
+    Printf.sprintf "File %S, lines %d-%d, characters %d-%d"
+      loc.loc_file
+      loc.start_line
+      loc.end_line
+      loc.start_col
+      loc.end_col
 
 (*
    Roughly the same format as Lexer.warning.

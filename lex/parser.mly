@@ -101,7 +101,7 @@ header:
         { fst $1 }
   | /*epsilon*/
         { { loc_file = ""; start_pos = 0; end_pos = 0; start_line = 1;
-            start_col = 0 } }
+            start_col = 0; end_line = 1; end_col = 0; } }
 ;
 named_regexps:
     named_regexps Tlet Tident Tequal regexp
@@ -204,7 +204,9 @@ regexp:
            start_pos = p1.Lexing.pos_cnum ;
            end_pos = p2.Lexing.pos_cnum ;
            start_line = p1.Lexing.pos_lnum ;
-           start_col = p1.Lexing.pos_cnum - p1.Lexing.pos_bol ; } in
+           start_col = p1.Lexing.pos_cnum - p1.Lexing.pos_bol ;
+           end_line = p2.Lexing.pos_lnum ;
+           end_col = p2.Lexing.pos_cnum - p2.Lexing.pos_bol ; } in
          Bind ($1, ($3, p))}
 ;
 

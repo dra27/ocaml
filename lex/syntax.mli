@@ -26,6 +26,8 @@ type location = {
   end_pos : int;
   start_line : int;
   start_col : int;
+  end_line : int;
+  end_col : int;
 }
 
 val location_of_positions : Lexing.position -> Lexing.position -> location
