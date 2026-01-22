@@ -3049,6 +3049,9 @@ rebuild: install/lib/ocaml/stdlib.cma
 	rm -f stdlib/*.cmi $(addsuffix /*.cmi,$(DEP_DIRS))
 	$(OCAMLRUN) tools/builder.byte
 
+uncmi:
+	rm -f stdlib/*.cmi $(addsuffix /*.cmi,$(DEP_DIRS))
+
 install/lib/ocaml/stdlib.cma:
 	@echo 'The rebuild target needs to be set-up with:'
 	@echo '$$ ./configure --prefix $$PWD/install'
