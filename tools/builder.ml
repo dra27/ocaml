@@ -995,6 +995,7 @@ let rec execute task =
         with Not_found ->
           if Filename.basename (Filename.dirname path) <> "boot" then begin
             let file = Filename.chop_extension path ^ ".mli" in
+            Status.note "  -> Compiling %s on-demand" file;
             execute (compile_file file)
           end;
           let cmi = Cmi_format.read_cmi path in
@@ -1006,7 +1007,7 @@ let rec execute task =
 
 let compile_files files =
   Clflags.compile_only := true;
-  List.iter execute (List.map compile_file files);
+  List.iter execute (List.map (fun file () -> Status.note "Compiling %s" file; compile_file file ()) files);
   Clflags.compile_only := false
 
 let compare this that =
@@ -1015,7 +1016,7 @@ let compare this that =
   let that_md5 = In_channel.with_open_bin that (fun ic -> Digest.channel ic (-1)) in
   Status.note "Comparing %s and %s" this that;
   if this_md5 <> that_md5 then begin
-    Status.complete "%s and %s differ!\n" this that;
+    Status.complete "%s and %s differ!" this that;
     exit 1
   end
 
@@ -1068,6 +1069,7 @@ let rec stdlib_execute task =
             else
               file
           in
+          Status.note "  -> Compiling %s on-demand" file;
           stdlib_execute (compile_stdlib_module (file, stdlib_compflags path));
           let cmi = Cmi_format.read_cmi path in
           Hashtbl.add cmis path cmi;
@@ -1094,7 +1096,7 @@ let compile_stdlib modules =
     in
     List.map f modules @ [(*("std_exit.mli", []);*) ("std_exit.ml", [])]
   in
-  List.iter stdlib_execute (List.map compile_stdlib_module modules); (* XXX Bad sign that std_exit.ml needed to be last - presumably a flag being reset for the compilation. This should be at the start of the list *)
+  List.iter stdlib_execute (List.map (fun ((file, _) as module_) () -> Status.note "Compiling %s" file; compile_stdlib_module module_ ()) modules); (* XXX Bad sign that std_exit.ml needed to be last - presumably a flag being reset for the compilation. This should be at the start of the list *)
   Clflags.compile_only := false;
   (* XXX Dreadful duplication... *)
   Bytelibrarian.reset ();
