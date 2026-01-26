@@ -1,11 +1,15 @@
 (* TEST
  has-cxx;
- readonly_files = "sockaddr_cxx_aux.cpp cxx.sh";
+ readonly_files = "sockaddr_cxx_aux.cpp";
  hasunix;
  include unix;
  {
    setup-ocamlopt.byte-build-env;
-   script = "sh cxx.sh";
+   script = "${cxx} ${cppflags} ${cflags} \
+     -I ${ocamlsrcdir}/runtime \
+     -I ${ocamlsrcdir}/otherlibs/unix \
+     ${outputobj}${test_build_directory}/sockaddr_cxx_aux.${objext} \
+     -c ${test_source_directory}/sockaddr_cxx_aux.cpp";
    script;
    all_modules = "sockaddr_cxx_aux.${objext} sockaddr_cxx.ml";
    ocamlopt.byte;
@@ -16,7 +20,11 @@
  }
  {
    setup-ocamlc.byte-build-env;
-   script = "sh cxx.sh";
+   script = "${cxx} ${cppflags} ${cflags} \
+     -I ${ocamlsrcdir}/runtime \
+     -I ${ocamlsrcdir}/otherlibs/unix \
+     ${outputobj}${test_build_directory}/sockaddr_cxx_aux.${objext} \
+     -c ${test_source_directory}/sockaddr_cxx_aux.cpp";
    script;
    all_modules = "sockaddr_cxx_aux.${objext} sockaddr_cxx.ml";
    flags = "-output-complete-exe -cclib -lunixbyt";
