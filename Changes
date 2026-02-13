@@ -25,6 +25,10 @@ Working version
   disable the change in a backward-compatible way.
   (Gabriel Scherer, review by Vincent Laviron)
 
+- #14534: Fix bytecode peehole optimization for PUSHENVACC4
+  (Hugo heuzard, review by Nicolás Ojeda Bär, Vincent Laviron
+  and Gabriel Scherer)
+
 ### Standard library:
 
 - #14487: Add String.drop_{prefix,suffix}
