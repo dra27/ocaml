@@ -12728,7 +12728,7 @@ case $ocaml_cv_cc_vendor in #(
 esac
 
 case $enable_warn_error,4.13.2+relocatable in #(
-  yes,*|,*+dev*) :
+  yes,*|,*+dev*|,*+relocatable) :
     cc_warnings="$cc_warnings $warn_error_flag" ;; #(
   *) :
      ;;
@@ -17603,7 +17603,7 @@ fi
 
 
 case $enable_ocamltest,4.13.2+relocatable in #(
-  yes,*|,*+dev*) :
+  yes,*|,*+dev*|,*+relocatable) :
     ocamltest='ocamltest' ;; #(
   *) :
     ocamltest='' ;;
