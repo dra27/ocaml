@@ -491,7 +491,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
   [msvc-*],
     [outputobj=-Fo; CPP="cl -nologo -EP"; gcc_warnings=""],
   [outputobj='-o $(EMPTY)'; AS_CASE([AC_PACKAGE_VERSION],
-    [*+dev*],
+    [*+dev*|*+relocatable],
       [gcc_warnings="-Wall -Werror"],
     [gcc_warnings="-Wall"]
   )]
