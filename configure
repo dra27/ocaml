@@ -12476,7 +12476,7 @@ case $ocaml_cv_cc_vendor in #(
     outputobj='-o $(EMPTY)'
   gcc_warnings='-Wall -Wdeclaration-after-statement'
   case 4.11.3+relocatable in #(
-  *+dev*) :
+  *+dev*|*+relocatable) :
     gcc_warnings="$gcc_warnings -Werror" ;; #(
   *) :
      ;;
@@ -16894,7 +16894,7 @@ else
 fi
 
 case $enable_ocamltest,4.11.3+relocatable in #(
-  yes,*|,*+dev*) :
+  yes,*|,*+dev*|,*+relocatable) :
     ocamltest='ocamltest' ;; #(
   *) :
     ocamltest='' ;;
