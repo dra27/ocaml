@@ -12508,7 +12508,7 @@ case $ocaml_cv_cc_vendor in #(
     outputobj=-Fo; gcc_warnings="" ;; #(
   *) :
     outputobj='-o $(EMPTY)'; case 4.10.3+relocatable in #(
-  *+dev*) :
+  *+dev*|*+relocatable) :
     gcc_warnings="-Wall -Werror" ;; #(
   *) :
     gcc_warnings="-Wall"
