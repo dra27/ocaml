@@ -11,6 +11,10 @@ OCaml 4.13 maintenance branch
   This avoids a "dangling pointer" warning of GCC 12.1.
   (Xavier Leroy, report by Armaël Guéneau, review by Gabriel Scherer)
 
+- #14607: Fix linking with libasmrun_shared.so on Risc-V (undefined symbol
+  declared riscv.o)
+  (David Allsopp, review by Nicolás Ojeda Bär)
+
 
 OCaml 4.13.1 (01 October 2021)
 --------------------------------
