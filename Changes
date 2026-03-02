@@ -52,6 +52,10 @@ OCaml 4.13 maintenance branch
   and when using systhreads (new versions of lld emit a warning).
   (David Allsopp, review by Nicolás Ojeda Bär)
 
+- #14607: Fix linking with libasmrun_shared.so on Risc-V (undefined symbol
+  declared riscv.o)
+  (David Allsopp, review by Nicolás Ojeda Bär)
+
 OCaml 4.13.1 (01 October 2021)
 --------------------------------
 
