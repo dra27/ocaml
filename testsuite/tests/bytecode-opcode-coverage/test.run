@@ -3,7 +3,7 @@ if [ ${os_type} = 'Win32' ]; then
 fi
 
 "${ocamlrun}" "${ocamlsrcdir}/tools/dumpobj" -nobanners "${program}" \
-  | grep '^ *[0-9]' | awk '{print $2}' | sort -u > emitted.txt
+  | tr -d '\r' | grep '^ *[0-9]' | awk '{print $2}' | sort -u > emitted.txt
 
 grep 'OPCODE(' "${ocamlsrcdir}/runtime/caml/opcodes.h" \
   | sed 's/.*OPCODE(\([A-Z0-9_]*\)).*/\1/' | sort > all.txt
