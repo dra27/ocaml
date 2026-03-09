@@ -22,7 +22,6 @@
    - PUSHATOM: same, in push context
    - PUSHATOM0: requires Kconst(Const_block(0,[])) after Kpush; no OCaml
      construct produces this (empty arrays go through Kmakeblock, not Kconst)
-   - C_CALLN: requires an external with 6+ args; none exist in the stdlib
    - ENVACC1 / PUSHENVACC1: env[1] is the closure info field; free
      variables start at env[2], so ENVACC1 is never emitted *)
 
