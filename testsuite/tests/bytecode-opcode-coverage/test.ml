@@ -1,15 +1,6 @@
-(* TEST
- include unix;
- flags = "-w -a";
- setup-ocamlc.byte-build-env;
- ocamlc.byte;
- run;
- check-program-output;
-*)
-
-(* This test exercises comprehensive OCaml code to cover all bytecode opcodes.
-   The companion test.run script compiles this, disassembles with dumpobj, and
-   checks which opcodes from runtime/caml/opcodes.h were never emitted.
+(* This module exercises comprehensive OCaml code to cover all bytecode opcodes.
+   It is linked with run.ml which analyses the bytecode image to find which
+   opcodes were never emitted.
 
    Opcodes that are structurally impossible to emit:
    - EVENT / BREAK: debugging opcodes patched in at runtime by the debugger
@@ -347,44 +338,3 @@ let test_effects () =
             continue k (n + 1))
         | _ -> None }
 
-(* Main: call everything to ensure it's compiled *)
-let () =
-  test_acc ();
-  test_assign ();
-  test_envacc ();
-  test_const ();
-  test_atom ();
-  test_makeblock ();
-  test_float_record ();
-  test_fields ();
-  test_closure ();
-  test_mutrec_bare ();
-  test_mutrec_generic ();
-  test_mutrec_push ();
-  test_mutrec3_push ();
-  test_apply ();
-  ignore (tailcall1 succ 0);
-  ignore (tailcall2 ( + ) 1 2);
-  ignore (tailcall3 (fun a b c -> a + b + c) 1 2 3);
-  ignore (tailcall4 (fun a b c d -> a + b + c + d) 1 2 3 4);
-  ignore (multi_arg 1 2 3);
-  test_globals ();
-  ignore (test_branch true);
-  ignore (test_switch X);
-  ignore (test_switch (Y 1));
-  ignore (test_switch (Z (1, 2)));
-  ignore (test_boolnot true);
-  test_exceptions ();
-  test_signals ();
-  test_ccalls ();
-  test_arith 10 3;
-  test_comp 1 2;
-  ignore (test_branch_comp 5);
-  ignore (test_range_check 1);
-  test_offset ();
-  ignore (test_isint Leaf);
-  test_array ();
-  test_string_bytes ();
-  test_objects ();
-  test_dynmet (new myclass) 0;
-  ignore (test_effects ())
