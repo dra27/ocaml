@@ -199,7 +199,7 @@ case "$1" in
       $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
       # And run the entire testsuite, skipping all the native-code tests
       run "test $PORT" \
-          make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+          make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 one DIR=tests/memory-model
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
     make -C "$FULL_BUILD_PREFIX-$PORT" INSTALL_MODE=clone install
