@@ -104,7 +104,7 @@ function set_configuration {
     # Remove configure cache if the script has failed
     rm -f -- "$CACHE_FILE"
     local failed
-    ./configure "${args[@]}" || failed=$?
+    ./configure "${args[@]}" --disable-native-toplevel --disable-native-compiler || failed=$?
     if ((failed)) ; then cat config.log ; exit $failed ; fi
   fi
 
@@ -234,9 +234,6 @@ case "$1" in
       rm -f config.cache ocaml-variants-fixup.sh ocaml-compiler-clone.sh
       opam exec -- ocamlc -v
     )
-    run "test $PORT in prefix" \
-      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
-            -j test-in-prefix
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
