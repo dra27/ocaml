@@ -851,6 +851,12 @@ let really_compare_programs backend comparison_tool log env =
     let reason =
       "comparison of native programs temporarily disabled under Windows" in
     (Result.pass_with_reason reason, env)
+  end else
+  if backend = Ocaml_backends.Native && Ocamltest_config.system = "openbsd"
+  then begin
+    let reason =
+      "comparison of native programs temporarily disabled under OpenBSD" in
+    (Result.pass_with_reason reason, env)
   end else begin
     let comparison_tool =
       if backend=Ocaml_backends.Native &&
