@@ -135,7 +135,7 @@ ifeq "$(UNIX_OR_WIN32)" "win32"
 # than \UXXXXXXXX). The \u is then translated to \x in order to accommodate
 # pre-Visual Studio 2013 compilers where \x is a non-standard alias for \u.
 OCAML_STDLIB_DIR = $(shell echo $(LIBDIR)| iconv -t JAVA | sed -e 's/\\u/\\x/g')
-OC_CPPFLAGS += -DOCAML_STDLIB_DIR='L"$(OCAML_STDLIB_DIR)"'
+OC_CPPFLAGS += -DOCAML_STDLIB_DIR='L"$(or $(OCAML_STDLIB_DIR),$(LIBDIR))"'
 else # Unix
 OCAML_STDLIB_DIR = $(LIBDIR)
 OC_CPPFLAGS += -DOCAML_STDLIB_DIR='"$(OCAML_STDLIB_DIR)"'
