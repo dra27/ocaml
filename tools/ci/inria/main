@@ -106,6 +106,8 @@ set -ex
 # we leave it with its legacy value and override it here.
 CCOMP=
 case $NODE_NAME in
+  ocaml-macos-m1)
+    OCAML_CONFIGURE_OPTIONS='--disable-native-compiler';;
   ocaml-ppc-32)
     CCOMP="CC='gcc -m32'"
     OCAML_CONFIGURE_OPTIONS=;;
@@ -129,6 +131,7 @@ cleanup=false
 check_make_alldepend=false
 dorebase=false
 jobs=''
+bootstrap=false
 
 case "${OCAML_ARCH}" in
   bsd) make=gmake ;;
@@ -205,6 +208,7 @@ while [ $# -gt 0 ]; do
     -patch1) patch -f -p1 <"$2"; shift;;
     -no-native) make_native=false;;
     -j[1-9]|-j[1-9][0-9]) jobs="$1";;
+    -with-bootstrap) bootstrap=true;;
     *) error "unknown option $1";;
   esac
   shift
@@ -216,35 +220,52 @@ done
 # Tell gcc to use only ASCII in its diagnostic outputs.
 export LC_ALL=C
 
-$make -s distclean || :
-
-# `make distclean` does not clean the files from previous versions that
-# are not produced by the current version, so use `git clean` in addition.
-git clean -f -d -x
+git clean -q -f -d -x
 
 if $flambda; then
-  confoptions="$confoptions --enable-flambda --enable-flambda-invariants"
+  confoptions="$confoptions --enable-flambda --enable-flambda-invariants \
+--disable-naked-pointers"
 fi
 
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
-if $make_native; then
-  $make $jobs world.opt
-  if $check_make_alldepend; then $make alldepend; fi
+if $bootstrap; then
+  $make $jobs --warn-undefined-variables core
+  $make $jobs --warn-undefined-variables coreboot
+  if $make_native; then
+    $make $jobs --warn-undefined-variables opt.opt
+  else
+    $make $jobs --warn-undefined-variables all
+  fi
 else
-  $make $jobs world
+  if $make_native; then
+    $make $jobs --warn-undefined-variables world.opt
+  else
+    $make $jobs --warn-undefined-variables world
+  fi
 fi
+
+
+if $make_native && $check_make_alldepend; then
+  $make --warn-undefined-variables alldepend
+fi
+
 if $dorebase; then
     # temporary solution to the cygwin fork problem
     # see https://github.com/alainfrisch/flexdll/issues/50
     rebase -b 0x7cd20000 otherlibs/unix/dllunix.so
     rebase -b 0x7cdc0000 otherlibs/systhreads/dllthreads.so
 fi
-$make install
 
+$make --warn-undefined-variables install
 rm -rf "$instdir"
+
 cd testsuite
 if test -n "$jobs" && test -x /usr/bin/parallel
-then PARALLEL="$jobs $PARALLEL" $make parallel
-else $make all
+then PARALLEL="$jobs $PARALLEL" $make --warn-undefined-variables parallel
+else $make --warn-undefined-variables all
+fi
+
+if $bootstrap; then
+  git checkout ../boot/ocamlc ../boot/ocamllex
 fi
