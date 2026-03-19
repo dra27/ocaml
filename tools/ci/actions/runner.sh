@@ -109,6 +109,15 @@ Test () {
   fi
 }
 
+# By default, TestPrefix will attempt to run the tests
+# in the given directory in parallel.
+TestPrefix () {
+  TO_RUN=parallel-"$1"
+  echo Running single testsuite directory with $TO_RUN
+  $MAKE -C testsuite $TO_RUN
+  cd ..
+}
+
 API_Docs () {
   echo Ensuring that all library documentation compiles
   $MAKE -C api_docgen html pdf texi
@@ -205,6 +214,7 @@ configure) Configure;;
 build) Build;;
 test) Test parallel;;
 test_sequential) Test sequential;;
+test_prefix) TestPrefix $2;;
 api-docs) API_Docs;;
 install) Install;;
 manual) BuildManual;;
