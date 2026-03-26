@@ -18,6 +18,9 @@ branches:
     - /5\.*/
     - trunk
 
+# Do not build feature branch with open Pull Requests
+skip_branch_with_pr: true
+
 # Compile the 64 bits version
 platform:
   - x64
