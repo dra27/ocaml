@@ -25,57 +25,90 @@ MAKE_WARN="$MAKE --warn-undefined-variables"
 
 export PATH=$PREFIX/bin:$PATH
 
+call-configure () {
+  local failed
+  ./configure "$@" || failed=$?
+  if ((failed)); then
+    # Output seems to be a little unpredictable in GitHub Actions: ensure that
+    # the fold is definitely on a new line
+    echo
+    echo "::group::config.log content ($(wc -l config.log) lines)"
+    cat config.log
+    echo '::endgroup::'
+    exit $failed
+  fi
+}
+
 Configure () {
   mkdir -p $PREFIX
   cat<<EOF
 ------------------------------------------------------------------------
 This test builds the OCaml compiler distribution with your pull request
 and runs its testsuite.
-
 Failing to build the compiler distribution, or testsuite failures are
 critical errors that must be understood and fixed before your pull
 request can be merged.
 ------------------------------------------------------------------------
 EOF
 
-  configure_flags="\
-    --prefix=$PREFIX \
-    --enable-flambda-invariants \
-    --enable-ocamltest \
-    --disable-dependency-generation \
-    $CONFIG_ARG"
-
-  case $XARCH in
-  x64)
-    ./configure $configure_flags
-    ;;
-  i386)
-    ./configure --build=x86_64-pc-linux-gnu --host=i386-linux \
-      CC='gcc -m32' AS='as --32' ASPP='gcc -m32 -c' \
-      PARTIALLD='ld -r -melf_i386' \
-      $configure_flags
-    ;;
-  *)
-    echo unknown arch
-    exit 1
-    ;;
-  esac
+  # $CONFIG_ARG will be intentionally word-split - there is no way to pass
+  # arguments requiring spaces from the workflows.
+  # $CONFIG_ARG also appears last to allow settings specified here to be
+  # overridden by the workflows.
+  call-configure --prefix="$PREFIX" \
+                 --enable-flambda-invariants \
+                 --enable-ocamltest \
+                 --disable-dependency-generation \
+                 $CONFIG_ARG
 }
 
 Build () {
-  script --return --command "$MAKE_WARN world.opt" build.log
-  script --return --append --command "$MAKE_WARN ocamlnat" build.log
+  local failed
+  export TERM=ansi
+  if [ "$(uname)" = 'Darwin' ]; then
+    script -q build.log $MAKE_WARN || failed=$?
+    if ((failed)); then
+      script -q build.log $MAKE_WARN -j1 V=1
+      exit $failed
+    fi
+    script -qa build.log $MAKE_WARN ocamlnat
+  else
+    script --return --command "$MAKE_WARN" build.log || failed=$?
+    if ((failed)); then
+      script --return --command "$MAKE_WARN -j1 V=1" build.log
+      exit $failed
+    fi
+    script --return --append --command "$MAKE_WARN ocamlnat" build.log
+  fi
+  if grep -Fq ' warning: undefined variable ' build.log; then
+    echo Undefined Makefile variables detected:
+    grep -F ' warning: undefined variable ' build.log
+    failed=1
+  fi
+  rm build.log
   echo Ensuring that all names are prefixed in the runtime
-  ./tools/check-symbol-names runtime/*.a
+  if ! ./tools/check-symbol-names runtime/*.a ; then
+    failed=1
+  fi
+  if ((failed)); then
+    exit $failed
+  fi
 }
 
 Test () {
-  cd testsuite
-  echo Running the testsuite with the normal runtime
-  $MAKE all
-  echo Running the testsuite with the debug runtime
-  $MAKE USE_RUNTIME='d' OCAMLTESTDIR="$(pwd)/_ocamltestd" TESTLOG=_logd all
-  cd ..
+  if [ "$1" = "sequential" ]; then
+    echo Running the testsuite sequentially
+    $MAKE -C testsuite all
+    cd ..
+  elif [ "$1" = "parallel" ]; then
+    echo Running the testsuite in parallel
+    $MAKE -C testsuite parallel
+    cd ..
+  else
+    echo "Error: unexpected argument '$1' to function Test(). " \
+         "It should be 'sequential' or 'parallel'."
+    exit 1
+  fi
 }
 
 API_Docs () {
@@ -88,15 +121,6 @@ Install () {
 }
 
 Checks () {
-  set +x
-  STATUS=0
-  if grep -Fq ' warning: undefined variable ' build.log; then
-    echo -e '\e[31mERROR\e[0m Undefined Makefile variables detected!'
-    grep -F ' warning: undefined variable ' build.log | sort | uniq
-    STATUS=1
-  fi
-  rm build.log
-  set -x
   if fgrep 'SUPPORTS_SHARED_LIBRARIES=true' Makefile.config &>/dev/null ; then
     echo Check the code examples in the manual
     $MAKE manual-pregen
@@ -118,7 +142,6 @@ Checks () {
   test -z "$(git status --porcelain)"
   # Check that there are no ignored files
   test -z "$(git ls-files --others -i --exclude-standard)"
-  exit $STATUS
 }
 
 CheckManual () {
@@ -129,7 +152,7 @@ This test checks the global structure of the reference manual
 --------------------------------------------------------------------------
 EOF
   # we need some of the configuration data provided by configure
-  ./configure
+  call-configure
   $MAKE check-stdlib check-case-collision -C manual/tests
 
 }
@@ -150,21 +173,31 @@ ReportBuildStatus () {
   else
     STATUS='success'
   fi
-  echo "::set-output name=build-status::$STATUS"
+  echo "build-status=$STATUS" >>"$GITHUB_OUTPUT"
   exit $CODE
 }
 
 BasicCompiler () {
+  local failed
   trap ReportBuildStatus ERR
 
-  ./configure --disable-dependency-generation \
-              --disable-debug-runtime \
-              --disable-instrumented-runtime
+  call-configure --disable-dependency-generation \
+                 --disable-debug-runtime \
+                 --disable-instrumented-runtime \
+                 --enable-ocamltest \
 
   # Need a runtime
-  make -j coldstart
+  make -j coldstart || failed=$?
+  if ((failed)) ; then
+    make -j1 V=1 coldstart
+    exit $failed
+  fi
   # And generated files (ocamllex compiles ocamlyacc)
-  make -j ocamllex
+  make -j ocamllex || failed=$?
+  if ((failed)) ; then
+    make -j1 V=1 ocamllex
+    exit $failed
+  fi
 
   ReportBuildStatus 0
 }
@@ -172,7 +205,8 @@ BasicCompiler () {
 case $1 in
 configure) Configure;;
 build) Build;;
-test) Test;;
+test) Test parallel;;
+test_sequential) Test sequential;;
 api-docs) API_Docs;;
 install) Install;;
 manual) BuildManual;;
