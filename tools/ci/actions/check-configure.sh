@@ -57,7 +57,26 @@ CheckTree () {
   git checkout -qB 'return'
   git checkout -q "$COMMIT"
   mv configure configure.ref
-  tools/autogen autoconf2.69
+  if [[ -e tools/autogen ]]; then
+    autogen=tools/autogen
+  else
+    autogen=./autogen
+  fi
+  if [[ $(sed -ne 's/^AC_PREREQ(\[\(.*\)\])$/\1/p' configure.ac) =~ \
+      ^(2.69)?$ ]]; then
+    if grep -q '^autoconf ' $autogen; then
+      restore="sed -i -e 's/^\${1-autoconf}/autoconf/' $autogen"
+      sed -i -e 's/^autoconf/${1-autoconf}/' $autogen
+    elif grep -q '[^$]autoconf -' $autogen; then
+      restore="sed -i -e 's/\${1-autoconf}/autoconf/' $autogen"
+      sed -i -e 's/autoconf -/${1-autoconf} -/' $autogen
+    else
+      restore=''
+    fi
+    autogen="$autogen autoconf2.69"
+  fi
+  $autogen
+  eval $restore
   if diff -q configure configure.ref >/dev/null ; then
     printf "$COMMIT: \e[32mconfigure.ac generates configure\e[0m\n"
   else
