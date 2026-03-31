@@ -54,7 +54,7 @@ fi
 CheckTree () {
   local RET=0
   COMMIT="$1"
-  git branch -qf 'return'
+  git checkout -qB 'return'
   git checkout -q "$COMMIT"
   mv configure configure.ref
   tools/autogen autoconf2.69
@@ -66,6 +66,7 @@ CheckTree () {
       "$COMMIT: \e[${COLOR}mconfigure.ac doesn't generate configure\e[0m\n"
   fi
   mv configure.ref configure
+  git reset --hard -q HEAD
   git checkout -q 'return'
   return $RET
 }
