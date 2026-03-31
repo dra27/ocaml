@@ -1,7 +1,23 @@
 OCaml 4.09 maintenance branch
 -----------------------------
 
+### Runtime system:
+
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
+- #11763, #11759, #11861, #12509, #12577: Use strict prototypes on primitives.
+  (Antonin Décimo, review by Xavier Leroy, David Allsopp, Sébastien
+   Hinderer and Nick Barnes)
+
+- #11764: Add prototypes to old-style C function definitions.
+  (Antonin Décimo, review by Xavier Leroy)
+
 ### Build system:
+
+- #8650: ensure that "make" variables are defined before use;
+  revise generation of config/util.ml to better quote special characters
+  (Xavier Leroy, review by David Allsopp)
 
 - #9383: Don't assume that AWKPATH includes .
   (David Allsopp, report by Ian Zimmerman)
@@ -9,6 +25,11 @@ OCaml 4.09 maintenance branch
 - #9938, #9939: Define __USE_MINGW_ANSI_STDIO=0 for the mingw-w64 ports to
   prevent their C99-compliant snprintf conflicting with ours.
   (David Allsopp, report by Michael Soegtrop, review by Xavier Leroy)
+
+- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
+  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
+  in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
+  (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
 
 ### Bug fixes:
 
@@ -25,6 +46,10 @@ OCaml 4.09 maintenance branch
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
+
+- #12116, #12993: explicitly build non PIE executables on x86 32bits
+  architectures
+  (Florian Angeletti, review by David Allsopp)
 
 OCaml 4.09.1 (16 Mars 2020):
 ----------------------------

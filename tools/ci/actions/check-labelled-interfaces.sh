@@ -1,11 +1,11 @@
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*            Gabriel Scherer, projet Parsifal, INRIA Saclay              *
+#*                 David Allsopp, OCaml Labs, Cambridge.                  *
 #*                                                                        *
-#*   Copyright 2018 Institut National de Recherche en Informatique et     *
-#*     en Automatique.                                                    *
+#*   Copyright 2021 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -13,26 +13,26 @@
 #*                                                                        *
 #**************************************************************************
 
-ROOTDIR=..
--include $(ROOTDIR)/Makefile.config
--include $(ROOTDIR)/Makefile.common
+set -e
 
-OTHERLIBRARIES ?= bigarray dynlink raw_spacetime_lib str systhreads \
-                  unix win32unix
+# Hygiene Checks: Ensure that *Labels module docs are in sync with the
+# unlabelled version.
 
-# $1: target name to dispatch to all otherlibs/*/Makefile
-define dispatch_
-$1:
-	@for lib in $$(OTHERLIBRARIES); do \
-	  ($$(MAKE) -C $$$$lib $1) || exit $$$$?; \
-	done
-endef
-define dispatch
-$(eval $(call dispatch_,$1))
-endef
+MSG='CheckSyncStdlibDocs is a no-op'
 
-.PHONY: all allopt clean partialclean
-$(call dispatch,all)
-$(call dispatch,allopt)
-$(call dispatch,clean)
-$(call dispatch,partialclean)
+tools/sync_stdlib_docs
+if git diff --quiet --exit-code; then
+  echo -e "$MSG: \e[32mYES\e[0m"
+else
+  echo -e "$MSG: \e[31mNO\e[0m"
+  echo "CheckSyncStdlibDocs: failure with the following differences:"
+  git --no-pager diff
+  cat<<EOF
+------------------------------------------------------------------------
+This should be fixable by just running tools/sync_stdlib_docs and
+eviewing the changes it makes.
+------------------------------------------------------------------------
+EOF
+  git checkout .
+  exit 1
+fi
