@@ -17,8 +17,21 @@
 
 ROOTDIR = .
 
+# The configure and *clean targets can all be run without running ./configure
+# first.
+# If no goals were specified (i.e. `make`), add defaultentry (since it requires
+# ./configure to be run)
+MAKECMDGOALS ?= defaultentry
+CAN_BE_UNCONFIGURED := $(strip \
+  $(filter-out partialclean clean distclean configure, $(MAKECMDGOALS)))
+
+ifeq "$(CAN_BE_UNCONFIGURED)" ""
+-include Makefile.config
+-include Makefile.common
+else
 include Makefile.config
 include Makefile.common
+endif
 
 .PHONY: defaultentry
 ifeq "$(NATIVE_COMPILER)" "true"
@@ -328,6 +341,11 @@ utils/domainstate.ml: utils/domainstate.ml.c runtime/caml/domain_state.tbl
 
 utils/domainstate.mli: utils/domainstate.mli.c runtime/caml/domain_state.tbl
 	$(CPP) -I runtime/caml $< > $@
+
+AUTOCONF_TOOL_NAME ?=
+
+configure: configure.ac aclocal.m4 VERSION tools/autogen
+	tools/autogen $(AUTOCONF_TOOL_NAME)
 
 .PHONY: partialclean
 partialclean::
@@ -877,18 +895,20 @@ beforedepend:: parsing/lexer.ml
 compilerlibs/ocamlcommon.cmxa: $(COMMON:.cmo=.cmx)
 	$(CAMLOPT) -a -linkall -o $@ $^
 partialclean::
-	rm -f compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlcommon.$(A)
+	rm -f compilerlibs/ocamlcommon.cmxa \
+	      compilerlibs/ocamlcommon.a compilerlibs/ocamlcommon.lib
 
 # The bytecode compiler compiled with the native-code compiler
 
 compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP:.cmo=.cmx)
 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $^
 partialclean::
-	rm -f compilerlibs/ocamlbytecomp.cmxa compilerlibs/ocamlbytecomp.$(A)
+	rm -f compilerlibs/ocamlbytecomp.cmxa \
+	      compilerlibs/ocamlbytecomp.a compilerlibs/ocamlbytecomp.lib
 
 ocamlc.opt: compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlbytecomp.cmxa \
             $(BYTESTART:.cmo=.cmx)
-	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^ -cclib "$(BYTECCLIBS)"
+	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^ $(PTHREAD_CAML_LINK)
 
 partialclean::
 	rm -f ocamlc.opt
@@ -898,7 +918,8 @@ partialclean::
 compilerlibs/ocamloptcomp.cmxa: $(OPTCOMP:.cmo=.cmx)
 	$(CAMLOPT) -a -o $@ $^
 partialclean::
-	rm -f compilerlibs/ocamloptcomp.cmxa compilerlibs/ocamloptcomp.$(A)
+	rm -f compilerlibs/ocamloptcomp.cmxa \
+	      compilerlibs/ocamloptcomp.a compilerlibs/ocamloptcomp.lib
 
 ocamlopt.opt: compilerlibs/ocamlcommon.cmxa compilerlibs/ocamloptcomp.cmxa \
               $(OPTSTART:.cmo=.cmx)
@@ -980,7 +1001,7 @@ stdlib/libcamlrun.$(A): runtime/libcamlrun.$(A)
 	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
 clean::
 	$(MAKE) -C runtime clean
-	rm -f stdlib/libcamlrun.$(A)
+	rm -f stdlib/libcamlrun.a stdlib/libcamlrun.lib
 
 otherlibs_all := bigarray dynlink raw_spacetime_lib \
   str systhreads unix win32unix
@@ -1010,7 +1031,7 @@ runtime/libasmrun.$(A): makeruntimeopt ;
 stdlib/libasmrun.$(A): runtime/libasmrun.$(A)
 	cp $< $@
 clean::
-	rm -f stdlib/libasmrun.$(A)
+	rm -f stdlib/libasmrun.a stdlib/libasmrun.lib
 
 # The standard library
 
@@ -1193,7 +1214,8 @@ compilerlibs/ocamlmiddleend.cmxa: $(MIDDLE_END:%.cmo=%.cmx)
 partialclean::
 	rm -f compilerlibs/ocamlmiddleend.cma \
 	      compilerlibs/ocamlmiddleend.cmxa \
-	      compilerlibs/ocamlmiddleend.$(A)
+	      compilerlibs/ocamlmiddleend.a \
+	      compilerlibs/ocamlmiddleend.lib \
 
 # Tools
 
@@ -1247,7 +1269,8 @@ endif
 compilerlibs/ocamlopttoplevel.cmxa: $(OPTTOPLEVEL:.cmo=.cmx)
 	$(CAMLOPT) -a -o $@ $^
 partialclean::
-	rm -f compilerlibs/ocamlopttoplevel.cmxa
+	rm -f compilerlibs/ocamlopttoplevel.cmxa \
+	      compilerlibs/ocamlopttoplevel.a compilerlibs/ocamlopttoplevel.lib
 
 # When the native toplevel executable has an extension (e.g. ".exe"),
 # provide a phony 'ocamlnat' synonym
@@ -1265,7 +1288,7 @@ ocamlnat$(EXE): compilerlibs/ocamlcommon.cmxa compilerlibs/ocamloptcomp.cmxa \
 	$(CAMLOPT_CMD) $(LINKFLAGS) -linkall -o $@ $^
 
 partialclean::
-	rm -f ocamlnat$(EXE)
+	rm -f ocamlnat ocamlnat.exe
 
 toplevel/opttoploop.cmx: otherlibs/dynlink/dynlink.cmxa
 
@@ -1308,8 +1331,8 @@ partialclean::
            lambda middle_end/closure middle_end/flambda \
            middle_end/flambda/base_types asmcomp/debug \
            driver toplevel tools; do \
-	  rm -f $$d/*.cm[ioxt] $$d/*.cmti $$d/*.annot $$d/*.$(S) \
-	    $$d/*.$(O) $$d/*.$(SO); \
+	  rm -f $$d/*.cm[ioxt] $$d/*.cmti $$d/*.annot $$d/*.s $$d/*.asm \
+	    $$d/*.o $$d/*.obj $$d/*.so $$d/*.dll; \
 	done
 
 .PHONY: depend
@@ -1323,16 +1346,21 @@ depend: beforedepend
 
 .PHONY: distclean
 distclean: clean
-	rm -f boot/ocamlrun boot/ocamlrun$(EXE) boot/camlheader \
-	boot/*.cm* boot/libcamlrun.$(A) boot/ocamlc.opt
-	rm -f Makefile.config runtime/caml/m.h runtime/caml/s.h
+	rm -f boot/ocamlrun boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
+	boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
+	rm -f Makefile.config Makefile.common runtime/caml/m.h runtime/caml/s.h
+	rm -rf autom4te.cache
+	rm -f config.log config.status libtool
 	rm -f tools/*.bak
 	rm -f ocaml ocamlc
 	rm -f testsuite/_log*
 
 include .depend
 
-Makefile.config Makefile.common:
+ifneq "$(strip $(CAN_BE_UNCONFIGURED))" ""
+Makefile.config Makefile.common: config.status
+
+config.status:
 	@echo "Please refer to the installation instructions:"
 	@echo "- In file INSTALL for Unix systems."
 	@echo "- In file README.win32.adoc for Windows systems."
@@ -1343,3 +1371,4 @@ Makefile.config Makefile.common:
 	@echo "	make install"
 	@echo "should work."
 	@false
+endif

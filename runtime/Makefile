@@ -15,8 +15,8 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 # Lists of source files
 
@@ -201,8 +201,10 @@ endif
 
 .PHONY: clean
 clean:
-	rm -f $(PROGRAMS) *.$(O) *.$(A) *.$(SO) ld.conf
-	rm -f primitives prims.c caml/opnames.h caml/jumptbl.h
+	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
+	rm -f ocamlrun ocamlrund ocamlruni
+	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe
+	rm -f primitives primitives.new prims.c caml/opnames.h caml/jumptbl.h
 	rm -f caml/version.h domain_state*.inc
 
 .PHONY: distclean
@@ -240,16 +242,20 @@ primitives: $(shell ./gen_primitives.sh > primitives.new; \
 	cp $^ $@
 
 prims.c : primitives
-	(echo '#define CAML_INTERNALS'; \
-         echo '#include "caml/mlvalues.h"'; \
-	 echo '#include "caml/prims.h"'; \
-	 sed -e 's/.*/extern value &();/' primitives; \
+	export LC_ALL=C; \
+	(echo '#include "caml/config.h"'; \
+	 echo 'typedef intnat value;'; \
+	 echo 'typedef value (*c_primitive)(void);'; \
+	 echo; \
+	 sed -e 's/.*/extern value &(void);/' $<; \
+	 echo; \
 	 echo 'c_primitive caml_builtin_cprim[] = {'; \
 	 sed -e 's/.*/	&,/' primitives; \
-	 echo '	 0 };'; \
+	 echo '  0 };'; \
+	 echo; \
 	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
-	 sed -e 's/.*/	"&",/' primitives; \
-	 echo '	 0 };') > prims.c
+	 sed -e 's/.*/  "&",/' $<; \
+	 echo '  0 };') > prims.c
 
 caml/opnames.h : caml/instruct.h
 	cat $^ | tr -d '\r' | \
@@ -382,24 +388,29 @@ depend:
 else
 
 NATIVE_DEP_CPPFLAGS := $(OC_CPPFLAGS) $(OC_NATIVE_CPPFLAGS)
+BYTECODE_DEP_FILES := $(BYTECODE_C_SOURCES) $(other_files) instrtrace.c
 NATIVE_DEP_FILES := $(NATIVE_C_SOURCES) $(other_files)
 
 depend: *.c caml/opnames.h caml/jumptbl.h caml/version.h
-	$(CC) -MM $(OC_CPPFLAGS) *.c | \
+	$(CC) -MM $(OC_CPPFLAGS) $(BYTECODE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_b.$$(O)/' > .depend
-	$(CC) -MM $(OC_CPPFLAGS) $(OC_DEBUG_CPPFLAGS) *.c | \
+	$(CC) -MM $(OC_CPPFLAGS) $(OC_DEBUG_CPPFLAGS) \
+                  $(BYTECODE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_bd.$$(O)/' >> .depend
-	$(CC) -MM $(OC_CPPFLAGS) $(OC_INSTR_CPPFLAGS) *.c | \
+	$(CC) -MM $(OC_CPPFLAGS) $(OC_INSTR_CPPFLAGS) \
+               $(BYTECODE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_bi.$$(O)/' >> .depend
-	$(CC) -MM $(OC_CPPFLAGS) *.c | \
+	$(CC) -MM $(OC_CPPFLAGS) $(BYTECODE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_bpic.$$(O)/' >> .depend
-	$(CC) -MM $(NATIVE_DEP_CPPFLAGS) *.c | \
+	$(CC) -MM $(NATIVE_DEP_CPPFLAGS) $(NATIVE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_n.$$(O)/' >> .depend
-	$(CC) -MM $(NATIVE_DEP_CPPFLAGS) $(OC_DEBUG_CPPFLAGS) *.c | \
+	$(CC) -MM $(NATIVE_DEP_CPPFLAGS) $(OC_DEBUG_CPPFLAGS) \
+                  $(NATIVE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_nd.$$(O)/' >> .depend
-	$(CC) -MM $(NATIVE_DEP_CPPFLAGS) $(OC_INSTR_CPPFLAGS) *.c | \
+	$(CC) -MM $(NATIVE_DEP_CPPFLAGS) $(OC_INSTR_CPPFLAGS) \
+                  $(NATIVE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_ni.$$(O)/' >> .depend
-	$(CC) -MM $(NATIVE_DEP_CPPFLAGS) *.c | \
+	$(CC) -MM $(NATIVE_DEP_CPPFLAGS) $(NATIVE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_npic.$$(O)/' >> .depend
 endif
 

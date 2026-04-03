@@ -1,11 +1,11 @@
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*                 Xavier Clerc, SED, INRIA Rocquencourt                  *
+#*                        David Allsopp, Tarides                          *
 #*                                                                        *
-#*   Copyright 2010 Institut National de Recherche en Informatique et     *
-#*     en Automatique.                                                    *
+#*   Copyright 2022 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -13,40 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 
-.NOTPARALLEL:
-
-TOPDIR = ../..
-COMPFLAGS ?=
-RUNTIME_VARIANT ?=
-
-include $(TOPDIR)/Makefile.tools
-
-libraries := testing.cmi testing.cma lib.cmo
-
-# If the native compiler is enabled, then also compile testing.cmxa
-ifeq "$(NATIVE_COMPILER)" "true"
-libraries += testing.cmxa
-endif
-
-all: $(libraries)
-
-testing.cma: testing.cmo
-	$(OCAMLC) -a -linkall -o $@ $<
-
-testing.cmxa: testing.cmx
-	$(OCAMLOPT) -a -linkall -o $@ $<
-
-testing.cmo : testing.cmi
-
-%.cmi: %.mli
-	$(OCAMLC) -c $<
-
-%.cmo: %.ml
-	$(OCAMLC) -c $<
-
-%.cmx: %.ml
-	$(OCAMLOPT) -c $<
-
-.PHONY: clean
-clean:
-	rm -f *.cm* *.o *.obj *.a *.lib
+if git ls-tree HEAD --name-only -r | git check-ignore --stdin --no-index; then
+  echo These files are matched by .gitignore and should not be committed
+  exit 1
+fi
