@@ -1,4 +1,4 @@
-name: main
+name: Build
 
 on: [push, pull_request]
 
@@ -44,6 +44,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 50
     - name: Packages
       run: |
         sudo apt-get update -y && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended
