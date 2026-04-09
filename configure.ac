@@ -939,7 +939,9 @@ AS_IF([test x"$ocamltest_system" = 'xunknown'],[ocamltest_system="$system"])
 AS_IF([test x"$enable_native_compiler" = "xno"],
   [arch=none; model=default; system=unknown; native_compiler=false
   AC_MSG_NOTICE([the native compiler is disabled])],
-  [native_compiler=true])
+  [AS_IF([test x"$arch" = 'xnone'],
+    [native_compiler=false],
+    [native_compiler=true])])
 
 AS_IF([! $native_compiler], [natdynlink=false])
 
