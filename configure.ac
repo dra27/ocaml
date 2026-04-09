@@ -1149,7 +1149,9 @@ AS_CASE([$host],
 AS_IF([test x"$enable_native_compiler" = "xno"],
   [native_compiler=false
   AC_MSG_NOTICE([the native compiler is disabled])],
-  [native_compiler=true])
+  [AS_IF([test x"$arch" = 'xnone'],
+    [native_compiler=false],
+    [native_compiler=true])])
 
 AS_IF([! $native_compiler], [natdynlink=false])
 
