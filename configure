@@ -690,6 +690,7 @@ build_os
 build_vendor
 build_cpu
 build
+QS
 PACKLD
 flexlink_flags
 flexdll_chain
@@ -718,6 +719,7 @@ mkmaindll
 mksharedlib
 rpath
 sharedlib_cflags
+asm_dwarf_version
 asm_cfi_supported
 AS
 ASPP
@@ -769,6 +771,7 @@ outputexe
 graphlib
 unixlib
 unix_or_win32
+ocamlsrcdir
 systhread_support
 ocamltest_system
 system
@@ -782,8 +785,10 @@ OBJEXT
 exeext
 ac_tool_prefix
 DIRECT_CPP
+ocaml_cv_cc_vendor
 CC
 VERSION
+native_compiler
 CONFIGURE_ARGS
 target_alias
 host_alias
@@ -2736,12 +2741,15 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 ## Output variables
 
 
+
 VERSION=4.08.2+dev0
+
 
 
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -2835,15 +2843,24 @@ VERSION=4.08.2+dev0
 
 
 
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
 
 ac_config_files="$ac_config_files Makefile.config"
 
+ac_config_files="$ac_config_files ocamltest/ocamltest_config.mlp"
+
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
 ac_config_headers="$ac_config_headers runtime/caml/s.h"
+
+ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
+
+
+# Works out how many "o"s are needed in quoted strings
 
 
 # Checks for system types
@@ -12219,11 +12236,27 @@ case $host in #(
      ;;
 esac
 
+# Absolute path to the toplevel source directory
+
+# A sentinel character (X) is added at the end of the directory name
+# and then removed, in case the directory name finishes with an odd character.
+# (The $(...) construct strips trailing \n characters.)
+# Also, it is important to use `printf` rather than `echo` because the
+# behaviour of `echo` is indeterminate and uncontrollable if the
+# absolute path contains backslashes, which will definitely be the case
+# on Windows
+# See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
+# for the detailed explanation.
+
+ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+ocamlsrcdir=${ocamlsrcdir%X}
+
 # Libraries to build depending on the host
 
 case $host in #(
   *-*-mingw32|*-pc-windows) :
     unix_or_win32="win32"
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     unixlib="win32unix"
     graphlib="win32graph"
     cc_profile='' ;; #(
@@ -13867,6 +13900,18 @@ fi
 if test -z "$ASPP"; then :
   ASPP="$default_aspp"
 fi
+
+case $ocaml_cv_cc_vendor in #(
+  clang-*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking DWARF version of $AS" >&5
+$as_echo_n "checking DWARF version of $AS... " >&6; }
+    asm_dwarf_version="$( $AS -### -g -c -x c /dev/null -o /dev/null 2>&1 | sed -ne "s/.*dwarf-version=\([0-9]*\).*/Some \1/p")"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $asm_dwarf_version" >&5
+$as_echo "$asm_dwarf_version" >&6; }
+    test -n "$asm_dwarf_version" || asm_dwarf_version='None' ;; #(
+  *) :
+    asm_dwarf_version='None' ;;
+esac
 
 # Checks for library functions
 
@@ -17205,6 +17250,26 @@ LTLIBOBJS=$ac_ltlibobjs
 
 
 
+  # Go through ac_subst_vars and put all the values to be substituted in
+  # $all_values.
+  QS=''
+  all_values=''
+  for name in $ac_subst_vars; do
+    eval "value=\$${name}"
+    all_values="$all_values $value"
+  done
+
+  # Keep adding 'o' to $QS until |$QS} doesn't appear in any substitution.
+  test_string=''
+  while test "x${test_string}" != "x${all_values}"; do
+    test_string="$all_values"
+    eval "test_string=\"\${test_string##*\|${QS}\}}\""
+    if test "x${test_string}" != "x${all_values}"; then
+      QS="o${QS}"
+    fi
+  done
+
+
 : "${CONFIG_STATUS=./config.status}"
 ac_write_fail=0
 ac_clean_files_save=$ac_clean_files
@@ -18080,8 +18145,10 @@ do
   case $ac_config_target in
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
+    "ocamltest/ocamltest_config.mlp") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.mlp" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
+    "testsuite/tools/toolchain.ml") CONFIG_FILES="$CONFIG_FILES testsuite/tools/toolchain.ml" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

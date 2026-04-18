@@ -71,8 +71,10 @@ AC_CONFIG_AUX_DIR([build-aux])
 ## Output variables
 
 AC_SUBST([CONFIGURE_ARGS])
+AC_SUBST([native_compiler])
 AC_SUBST([VERSION], [AC_PACKAGE_VERSION])
 AC_SUBST([CC])
+AC_SUBST([ocaml_cv_cc_vendor])
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
@@ -89,6 +91,7 @@ AC_SUBST([model])
 AC_SUBST([system])
 AC_SUBST([ocamltest_system])
 AC_SUBST([systhread_support])
+AC_SUBST([ocamlsrcdir])
 AC_SUBST([unix_or_win32])
 AC_SUBST([unixlib])
 AC_SUBST([graphlib])
@@ -140,6 +143,7 @@ AC_SUBST([asppprofflags])
 AC_SUBST([ASPP])
 AC_SUBST([AS])
 AC_SUBST([asm_cfi_supported])
+AC_SUBST([asm_dwarf_version])
 AC_SUBST([sharedlib_cflags])
 AC_SUBST([rpath])
 AC_SUBST([mksharedlib])
@@ -168,13 +172,19 @@ AC_SUBST([default_safe_string])
 AC_SUBST([flexdll_chain])
 AC_SUBST([flexlink_flags])
 AC_SUBST([PACKLD])
+AC_SUBST([QS])
 
 ## Generated files
 
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
+AC_CONFIG_FILES([ocamltest/ocamltest_config.mlp])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
+AC_CONFIG_FILES([testsuite/tools/toolchain.ml])
+
+# Works out how many "o"s are needed in quoted strings
+AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
 
 # Checks for system types
 
@@ -427,11 +437,27 @@ AS_CASE([$host],
   [*-pc-windows],
     [CPP="$CC -nologo -EP"])
 
+# Absolute path to the toplevel source directory
+
+# A sentinel character (X) is added at the end of the directory name
+# and then removed, in case the directory name finishes with an odd character.
+# (The $(...) construct strips trailing \n characters.)
+# Also, it is important to use `printf` rather than `echo` because the
+# behaviour of `echo` is indeterminate and uncontrollable if the
+# absolute path contains backslashes, which will definitely be the case
+# on Windows
+# See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
+# for the detailed explanation.
+
+ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+ocamlsrcdir=${ocamlsrcdir%X}
+
 # Libraries to build depending on the host
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     unixlib="win32unix"
     graphlib="win32graph"
     cc_profile=''],
@@ -1054,6 +1080,16 @@ AS_IF([test "$with_pic"],
 AS_IF([test -z "$AS"], [AS="$default_as"])
 
 AS_IF([test -z "$ASPP"], [ASPP="$default_aspp"])
+
+AS_CASE([$ocaml_cv_cc_vendor],
+  [clang-*],
+    [AC_MSG_CHECKING([DWARF version of $AS])
+    m4_normalize([asm_dwarf_version="$(\
+      $AS -### -g -c -x c /dev/null -o /dev/null 2>&1
+        | sed -ne "s/.*dwarf-version=\([0-9]*\).*/Some \1/p")"])
+    AC_MSG_RESULT([$asm_dwarf_version])
+    test -n "$asm_dwarf_version" || asm_dwarf_version='None'],
+  [asm_dwarf_version='None'])
 
 # Checks for library functions
 
