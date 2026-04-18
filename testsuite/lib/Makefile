@@ -13,25 +13,40 @@
 #*                                                                        *
 #**************************************************************************
 
-.PHONY: compile
-compile: compile-targets
+.NOTPARALLEL:
 
-.PHONY: promote
-promote: defaultpromote
+TOPDIR = ../..
+COMPFLAGS ?=
+RUNTIME_VARIANT ?=
 
-.PHONY: clean
-clean: defaultclean
+include $(TOPDIR)/Makefile.tools
 
-include ../makefiles/Makefile.common
+libraries := testing.cmi testing.cma lib.cmo
 
-.PHONY: compile-targets
-compile-targets: testing.cmi testing.cma lib.cmo
-	@if $(BYTECODE_ONLY); then : ; else \
-	  $(MAKE) testing.cmxa; \
-	fi
+# If the native compiler is enabled, then also compile testing.cmxa
+ifneq "$(ARCH)" "none"
+libraries += testing.cmxa
+endif
+
+all: $(libraries)
 
 testing.cma: testing.cmo
-	$(OCAMLC) -a -linkall $(ADD_COMPFLAGS) -o $@ $<
+	$(OCAMLC) -a -linkall -o $@ $<
 
 testing.cmxa: testing.cmx
-	$(OCAMLOPT) -a -linkall $(ADD_COMPFLAGS) -o $@ $<
+	$(OCAMLOPT) -a -linkall -o $@ $<
+
+testing.cmo : testing.cmi
+
+%.cmi: %.mli
+	$(OCAMLC) -c $<
+
+%.cmo: %.ml
+	$(OCAMLC) -c $<
+
+%.cmx: %.ml
+	$(OCAMLOPT) -c $<
+
+.PHONY: clean
+clean:
+	rm -f *.cm* *.o *.obj *.a *.lib
