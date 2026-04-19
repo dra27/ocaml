@@ -16,8 +16,8 @@
 MAKEFLAGS := -r -R
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 ifeq ($(SYSTEM),unix)
 override define shellquote
@@ -30,8 +30,11 @@ DESTDIR ?=
 # Setup GNU make variables storing per-target source and target,
 # a list of installed tools, and a function to quote a filename for
 # the shell.
-override installed_tools := ocamldep ocamlprof ocamlcp ocamloptp \
+override installed_tools := ocamldep ocamlprof ocamlcp \
                    ocamlmktop ocamlmklib ocamlobjinfo
+ifeq "$(NATIVE_COMPILER)" "true"
+installed_tools += ocamloptp
+endif
 
 install_files :=
 define byte2native
@@ -311,11 +314,12 @@ lintapidiff.opt: INCLUDES+= -I $(ROOTDIR)/otherlibs/str
 lintapidiff.opt: $(LINTAPIDIFF)
 	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
 clean::
-	rm -f -- lintapidiff.opt lintapidiff.cm? lintapidiff.o
+	rm -f -- lintapidiff.opt lintapidiff.cm? lintapidiff.o lintapidiff.obj
 
 
 clean::
-	rm -f "objinfo_helper$(EXE)" "objinfo_helper$(EXE).manifest"
+	rm -f "objinfo_helper" "objinfo_helper.manifest"
+	rm -f "objinfo_helper.exe" "objinfo_helper.exe.manifest"
 
 
 # Copy a bytecode executable, stripping debug info

@@ -1,12 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*            Sebastien Hinderer, projet Gallium, INRIA Paris             *
+#*                        David Allsopp, Tarides                          *
 #*                                                                        *
-#*   Copyright 2017 Institut National de Recherche en Informatique et     *
-#*     en Automatique.                                                    *
+#*   Copyright 2022 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -14,16 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 
-# Commands to run for the 'other-configs' job on Inria's CI
-
-# Stop on error
-set -e
-
-mainjob=./tools/ci/inria/main
-main="${mainjob} -j8"
-
-${main} -conf --disable-native-compiler -no-native
-${main} -conf --disable-naked-pointers
-${main} -conf --disable-flat-float-array
-${main} -conf --enable-flambda -conf --disable-naked-pointers
-OCAMLRUNPARAM="c=1" ${main}
+if git ls-tree HEAD --name-only -r | git check-ignore --stdin --no-index; then
+  echo These files are matched by .gitignore and should not be committed
+  exit 1
+fi

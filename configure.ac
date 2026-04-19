@@ -50,6 +50,7 @@ ocamlc_cppflags=""
 ocamlopt_cflags=""
 ocamlopt_cppflags=""
 oc_ldflags=""
+oc_dll_ldflags=""
 with_sharedlibs=true
 ostype="Unix"
 iflexdir=""
@@ -64,7 +65,7 @@ extralibs=
 ## Source directory
 AC_CONFIG_SRCDIR([runtime/interp.c])
 
-## Directory containing auxiliary scripts used dugring build
+## Directory containing auxiliary scripts used during build
 AC_CONFIG_AUX_DIR([build-aux])
 
 ## Output variables
@@ -87,6 +88,7 @@ AC_SUBST([arch])
 AC_SUBST([arch64])
 AC_SUBST([model])
 AC_SUBST([system])
+AC_SUBST([ocamltest_system])
 AC_SUBST([systhread_support])
 AC_SUBST([unix_or_win32])
 AC_SUBST([unixlib])
@@ -104,6 +106,7 @@ AC_SUBST([toolchain])
 AC_SUBST([oc_cflags])
 AC_SUBST([oc_cppflags])
 AC_SUBST([oc_ldflags])
+AC_SUBST([oc_dll_ldflags])
 AC_SUBST([bytecclibs])
 AC_SUBST([nativecclibs])
 AC_SUBST([ocamlc_cflags])
@@ -169,7 +172,7 @@ AC_SUBST([stdlib_manpages])
 
 ## Generated files
 
-AC_CONFIG_FILES([Makefile.common])
+AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
@@ -646,7 +649,7 @@ AS_CASE([$CC,$host],
   [*,*-*-mingw32],
     [AS_IF([$with_sharedlibs],
       [AS_CASE([$host],
-        [i686-*-*], [flexdll_chain="mingw"],
+        [i686-*-*], [flexdll_chain="mingw"; oc_dll_ldflags="-static-libgcc"],
         [x86_64-*-*], [flexdll_chain="mingw64"])
       flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
       flexdir=`$flexlink -where | tr -d '\015'`
@@ -674,6 +677,9 @@ AS_CASE([$CC,$host],
       mkexedebugflag=''])],
   [*,x86_64-*-linux*],
     AC_DEFINE([HAS_ARCH_CODE32], [1]),
+  [[*,i[3456]86-*]],
+    # Explicitly disable PIE executables on Linux and *BSD x86_32
+    [mkexe="$mkexe -no-pie "],
   [xlc*,powerpc-ibm-aix*],
     [mkexe="$mkexe "
      oc_ldflags="-brtl -bexpfull"
@@ -774,12 +780,15 @@ natdynlinkopts=""
 AS_IF([test x"$enable_shared" != "xno"],
   [AS_CASE([$host],
     [*-apple-darwin*],
-      [mksharedlib="$CC -shared -flat_namespace -undefined suppress \
-                   -Wl,-no_compact_unwind"
+      [mksharedlib="$CC -shared \
+                   -undefined dynamic_lookup -Wl,-no_compact_unwind"
       shared_libraries_supported=true],
     [*-*-mingw32],
       [mksharedlib='$(FLEXLINK)'
       mkmaindll='$(FLEXLINK) -maindll'
+      AS_IF([test -n "$oc_dll_ldflags"],[
+        mksharedlib="$mksharedlib -link \"$oc_dll_ldflags\""
+        mkmaindll="$mkmaindll -link \"$oc_dll_ldflags\""])
       shared_libraries_supported=$with_sharedlibs],
     [*-pc-windows],
       [mksharedlib='$(FLEXLINK)'
@@ -797,7 +806,15 @@ AS_IF([test x"$enable_shared" != "xno"],
     [[*-*-linux*|*-*-freebsd[3-9]*|*-*-freebsd[1-9][0-9]*\
     |*-*-openbsd*|*-*-netbsd*|*-*-dragonfly*|*-*-gnu*|*-*-haiku*]],
       [sharedlib_cflags="-fPIC"
-      mksharedlib="$CC -shared"
+       AS_CASE([$CC,$host],
+           [[*,i[3456]86-*]],
+           # Disable DT_TEXTREL warnings on Linux and BSD i386
+           # See https://github.com/ocaml/ocaml/issues/9800
+           [mksharedlib="$CC -shared -Wl,-z,notext"],
+           [mksharedlib="$CC -shared"])
+       AS_CASE([$host],
+           [[*-*-openbsd7.[3-9]|*-*-openbsd[89].*]],
+           [mksharedlib="${mksharedlib} -Wl,--no-execute-only"])
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
@@ -805,6 +822,14 @@ AS_IF([test x"$enable_shared" != "xno"],
       shared_libraries_supported=true])])
 
 AS_IF([test -z "$mkmaindll"], [mkmaindll=$mksharedlib])
+
+# Make sure code sections in OCaml-generated executables are readable
+# (required for marshaling of function closures)
+
+AS_CASE([$host],
+  [[*-*-openbsd7.[3-9]|*-*-openbsd[89].*]],
+    [oc_ldflags="$oc_ldflags -Wl,--no-execute-only"
+     natdynlinkopts="$natdynlinkopts -Wl,--no-execute-only"])
 
 # Configure native dynlink
 
@@ -854,6 +879,7 @@ OCAML_CC_SUPPORTS_ALIGNED
 arch=none
 model=default
 system=unknown
+ocamltest_system=unknown
 
 AS_CASE([$host],
   [[i[3456]86-*-linux*]],
@@ -938,10 +964,14 @@ AS_CASE([$host],
     [arch=amd64; system=cygwin]
 )
 
+AS_IF([test x"$ocamltest_system" = 'xunknown'],[ocamltest_system="$system"])
+
 AS_IF([test x"$enable_native_compiler" = "xno"],
   [arch=none; model=default; system=unknown; native_compiler=false
   AC_MSG_NOTICE([the native compiler is disabled])],
-  [native_compiler=true])
+  [AS_IF([test x"$arch" = 'xnone'],
+    [native_compiler=false],
+    [native_compiler=true])])
 
 AS_IF([! $native_compiler], [natdynlink=false])
 
@@ -1787,7 +1817,11 @@ AS_CASE([$host],
     flexlink_flags="-chain $flexdll_chain -stack 16777216"],
   [x86_64-w64-mingw32],
     [flexdll_chain='mingw64'
-    flexlink_flags="-chain $flexdll_chain -stack 33554432"],
+    # Ensure --image-base 0x10000 gets to the linker to work-around binutils
+    # 2.36+ using a random address base. See #10351 for the actual fix in
+    # 4.12+.
+    flexlink_flags="-chain $flexdll_chain -stack 33554432 \
+-link -Xlinker -link --image-base -link -Xlinker -link 0x10000"],
   [i686-pc-windows],
     [flexdll_chain='msvc'
     flexlink_flags="-merge-manifest -stack 16777216"],
@@ -1805,7 +1839,7 @@ AS_IF([test x"$prefix" = "xNONE"],
   [AS_IF([test x"$unix_or_win32" = "xwin32" \
           && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ],
     [AS_CASE([$build],
-      [*-pc-cygwin], [prefix=`cygpath -m "$prefix"`])])])
+      [*-pc-cygwin], [prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")"])])])
 
 # Define a few macros that were defined in config/m-nt.h
 # but whose value is not guessed properly by configure
