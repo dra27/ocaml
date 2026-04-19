@@ -47,6 +47,7 @@ _build
 /config.cache
 /config.log
 /config.status
+/flexlink.opt
 /libtool
 /ocamlc.opt
 /expunge
@@ -66,7 +67,9 @@ _build
 /asmcomp/CSE.ml
 
 /boot/ocamlrun
+/boot/ocamlruns
 /boot/camlheader
+/boot/flexlink.byte
 
 /bytecomp/runtimedef.ml
 /bytecomp/opcodes.ml
@@ -87,6 +90,8 @@ _build
 
 /emacs/ocamltags
 /emacs/*.elc
+
+/flexdll-sources
 
 /lex/parser.ml
 /lex/parser.mli
