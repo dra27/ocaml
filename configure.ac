@@ -726,6 +726,9 @@ AS_CASE([$CC,$host],
       mkexedebugflag=''])],
   [*,x86_64-*-linux*],
     AC_DEFINE([HAS_ARCH_CODE32], [1]),
+  [[*,i[3456]86-*]],
+    # Explicitly disable PIE executables on Linux and *BSD x86_32
+    [mkexe="$mkexe -no-pie "],
   [xlc*,powerpc-ibm-aix*],
     [mkexe="$mkexe "
      oc_ldflags="-brtl -bexpfull"
@@ -835,8 +838,8 @@ natdynlinkopts=""
 AS_IF([test x"$enable_shared" != "xno"],
   [AS_CASE([$host],
     [*-apple-darwin*],
-      [mksharedlib="$CC -shared -flat_namespace -undefined suppress \
-                   -Wl,-no_compact_unwind"
+      [mksharedlib="$CC -shared \
+                   -undefined dynamic_lookup -Wl,-no_compact_unwind"
       shared_libraries_supported=true],
     [*-*-mingw32],
       [mksharedlib='$(FLEXLINK)'
@@ -869,7 +872,14 @@ AS_IF([test x"$enable_shared" != "xno"],
       [sharedlib_cflags="-fPIC"
        AS_CASE([$CC,$host],
            [gcc*,powerpc-*-linux*], [mksharedlib="$CC -shared -mbss-plt"],
+           [[*,i[3456]86-*]],
+           # Disable DT_TEXTREL warnings on Linux and BSD i386
+           # See https://github.com/ocaml/ocaml/issues/9800
+           [mksharedlib="$CC -shared -Wl,-z,notext"],
            [mksharedlib="$CC -shared"])
+       AS_CASE([$host],
+           [[*-*-openbsd7.[3-9]|*-*-openbsd[89].*]],
+           [mksharedlib="${mksharedlib} -Wl,--no-execute-only"])
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
@@ -877,6 +887,14 @@ AS_IF([test x"$enable_shared" != "xno"],
       shared_libraries_supported=true])])
 
 AS_IF([test -z "$mkmaindll"], [mkmaindll=$mksharedlib])
+
+# Make sure code sections in OCaml-generated executables are readable
+# (required for marshaling of function closures)
+
+AS_CASE([$host],
+  [[*-*-openbsd7.[3-9]|*-*-openbsd[89].*]],
+    [oc_ldflags="$oc_ldflags -Wl,--no-execute-only"
+     natdynlinkopts="$natdynlinkopts -Wl,--no-execute-only"])
 
 # Configure native dynlink
 
@@ -1022,7 +1040,9 @@ AS_CASE([$host],
 AS_IF([test x"$enable_native_compiler" = "xno"],
   [native_compiler=false
   AC_MSG_NOTICE([the native compiler is disabled])],
-  [native_compiler=true])
+  [AS_IF([test x"$arch" = 'xnone'],
+    [native_compiler=false],
+    [native_compiler=true])])
 
 AS_IF([! $native_compiler], [natdynlink=false])
 
@@ -1877,7 +1897,7 @@ AS_IF([test x"$prefix" = "xNONE"],
   [AS_IF([test x"$unix_or_win32" = "xwin32" \
           && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ],
     [AS_CASE([$build],
-      [*-pc-cygwin], [prefix=`cygpath -m "$prefix"`])])])
+      [*-pc-cygwin], [prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")"])])])
 
 # Define a few macros that were defined in config/m-nt.h
 # but whose value is not guessed properly by configure
