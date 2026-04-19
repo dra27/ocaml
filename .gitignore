@@ -127,6 +127,7 @@ META
 /ocamltest/ocamltest
 /ocamltest/ocamltest.opt
 /ocamltest/ocamltest_config.ml
+/ocamltest/ocamltest_config.mlp
 /ocamltest/ocamltest_unix.ml
 /ocamltest/tsl_lexer.ml
 /ocamltest/tsl_parser.ml
@@ -197,10 +198,14 @@ META
 
 
 /testsuite/tools/codegen
+/testsuite/tools/dump_load_path
 /testsuite/tools/expect_test
 /testsuite/tools/lexcmm.ml
 /testsuite/tools/parsecmm.ml
 /testsuite/tools/parsecmm.mli
+/testsuite/tools/test_in_prefix
+/testsuite/tools/test_in_prefix.opt
+/testsuite/tools/toolchain.ml
 
 /tools/ocamldep
 /tools/ocamldep.opt
