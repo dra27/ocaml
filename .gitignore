@@ -269,11 +269,15 @@ META
 /testsuite/_retries
 
 /testsuite/tools/codegen
+/testsuite/tools/dump_load_path
 /testsuite/tools/expect
 /testsuite/tools/lexcmm.ml
 /testsuite/tools/parsecmm.ml
 /testsuite/tools/parsecmm.mli
 /testsuite/tools/parsecmm.output
+/testsuite/tools/test_in_prefix
+/testsuite/tools/test_in_prefix.opt
+/testsuite/tools/toolchain.ml
 
 /tools/ocamldep
 /tools/ocamldep.opt

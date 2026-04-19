@@ -122,6 +122,7 @@ AC_SUBST([CMXS_MAGIC_NUMBER], [CMXS__MAGIC_NUMBER])
 AC_SUBST([CMT_MAGIC_NUMBER], [CMT__MAGIC_NUMBER])
 AC_SUBST([LINEAR_MAGIC_NUMBER], [LINEAR__MAGIC_NUMBER])
 AC_SUBST([CC])
+AC_SUBST([ocaml_cc_vendor])
 AC_SUBST([DIFF_FLAGS])
 AC_SUBST([CSC])
 AC_SUBST([CSCFLAGS])
@@ -218,6 +219,7 @@ AC_SUBST([ASPP])
 AC_SUBST([endianness])
 AC_SUBST([AS])
 AC_SUBST([asm_cfi_supported])
+AC_SUBST([asm_dwarf_version])
 AC_SUBST([sharedlib_cflags])
 AC_SUBST([rpath])
 AC_SUBST([mkdll])
@@ -268,6 +270,7 @@ AC_CONFIG_FILES([compilerlibs/META])
 AC_CONFIG_FILES([otherlibs/dynlink/META])
 AC_CONFIG_FILES([otherlibs/runtime_events/META])
 AC_CONFIG_FILES([stdlib/META])
+AC_CONFIG_FILES([testsuite/tools/toolchain.ml])
 
 # Definitions related to the version of OCaml
 AC_DEFINE([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
@@ -1551,6 +1554,16 @@ AS_IF([test -z "$AS"], [AS="$default_as"])
 
 AS_IF([test -z "$ASPP"], [ASPP="$default_aspp"])
 
+AS_CASE([$ocaml_cc_vendor],
+  [clang-*],
+    [AC_MSG_CHECKING([DWARF version of $AS])
+    m4_normalize([asm_dwarf_version="$(\
+      $AS -### -g -c -x c /dev/null -o /dev/null 2>&1
+        | sed -ne "s/.*dwarf-version=\([0-9]*\).*/Some \1/p")"])
+    AC_MSG_RESULT([$asm_dwarf_version])
+    test -n "$asm_dwarf_version" || asm_dwarf_version='None'],
+  [asm_dwarf_version='None'])
+
 # Utilities
 AC_CHECK_PROG([rlwrap],[rlwrap],[rlwrap])
 AS_CASE([$rlwrap,$system],
@@ -2428,6 +2441,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
     ocamltest_target=ocamltest
     ocamltest_opt_target=ocamltest.opt
     ocamltest='ocamltest'
+    AS_IF([$native_compiler],
+      [optional_native_tools="$optional_native_tools \
+testsuite/tools/test_in_prefix.opt"],
+      [optional_bytecode_tools="$optional_bytecode_tools \
+testsuite/tools/test_in_prefix"])
     testsuite_tools='testsuite/tools/codegen testsuite/tools/expect'
     optional_bytecode_tools="$optional_bytecode_tools $testsuite_tools"],
   [build_ocamltest=false
