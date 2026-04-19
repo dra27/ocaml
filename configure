@@ -810,6 +810,7 @@ ocamlc_cppflags
 ocamlc_cflags
 nativecclibs
 bytecclibs
+oc_dll_ldflags
 oc_ldflags
 oc_cppflags
 oc_cflags
@@ -827,6 +828,7 @@ outputexe
 unixlib
 unix_or_win32
 systhread_support
+ocamltest_system
 system
 model
 arch64
@@ -2749,6 +2751,7 @@ internal_cppflags=""
 ocamlc_cflags=""
 ocamlc_cppflags=""
 oc_ldflags=""
+oc_dll_ldflags=""
 with_sharedlibs=true
 ostype="Unix"
 iflexdir=""
@@ -2765,7 +2768,7 @@ instrumented_runtime_ldlibs=""
 ## Source directory
 
 
-## Directory containing auxiliary scripts used dugring build
+## Directory containing auxiliary scripts used during build
 ac_aux_dir=
 for ac_dir in build-aux "$srcdir"/build-aux; do
   if test -f "$ac_dir/install-sh"; then
@@ -2806,6 +2809,8 @@ VERSION=4.11.3+dev0-2021-02-24
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
+
 
 
 
@@ -2900,7 +2905,7 @@ VERSION=4.11.3+dev0-2021-02-24
 
 ## Generated files
 
-ac_config_files="$ac_config_files Makefile.common"
+ac_config_files="$ac_config_files Makefile.build_config"
 
 ac_config_files="$ac_config_files Makefile.config"
 
@@ -12331,7 +12336,8 @@ if ac_fn_c_try_cpp "$LINENO"; then :
   if ${ocaml_cv_cc_vendor+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ocaml_cv_cc_vendor=`grep '^[a-z]' conftest.i | tr -s ' ' '-'`
+  ocaml_cv_cc_vendor=`grep '^[a-z]' conftest.i | tr -s ' ' '-' \
+                                                      | tr -d '\r'`
 fi
 
 else
@@ -12636,7 +12642,7 @@ fi
     if $with_sharedlibs; then :
   case $host in #(
   i686-*-*) :
-    flexdll_chain="mingw" ;; #(
+    flexdll_chain="mingw"; oc_dll_ldflags="-static-libgcc" ;; #(
   x86_64-*-*) :
     flexdll_chain="mingw64" ;; #(
   *) :
@@ -12680,6 +12686,9 @@ fi ;; #(
   *,x86_64-*-linux*) :
     $as_echo "#define HAS_ARCH_CODE32 1" >>confdefs.h
  ;; #(
+  *,i[3456]86-*) :
+    # Explicitly disable PIE executables on Linux and *BSD x86_32
+    mkexe="$mkexe -no-pie " ;; #(
   xlc*,powerpc-ibm-aix*) :
     mkexe="$mkexe "
      oc_ldflags="-brtl -bexpfull"
@@ -13481,12 +13490,17 @@ natdynlinkopts=""
 if test x"$enable_shared" != "xno"; then :
   case $host in #(
   *-apple-darwin*) :
-    mksharedlib="$CC -shared -flat_namespace -undefined suppress \
-                   -Wl,-no_compact_unwind"
+    mksharedlib="$CC -shared \
+                   -undefined dynamic_lookup -Wl,-no_compact_unwind"
       shared_libraries_supported=true ;; #(
   *-*-mingw32) :
     mksharedlib='$(FLEXLINK)'
       mkmaindll='$(FLEXLINK) -maindll'
+      if test -n "$oc_dll_ldflags"; then :
+
+        mksharedlib="$mksharedlib -link \"$oc_dll_ldflags\""
+        mkmaindll="$mkmaindll -link \"$oc_dll_ldflags\""
+fi
       shared_libraries_supported=$with_sharedlibs ;; #(
   *-pc-windows) :
     mksharedlib='$(FLEXLINK)'
@@ -13507,7 +13521,20 @@ esac ;; #(
   *-*-linux*|*-*-freebsd[3-9]*|*-*-freebsd[1-9][0-9]*\
     |*-*-openbsd*|*-*-netbsd*|*-*-dragonfly*|*-*-gnu*|*-*-haiku*) :
     sharedlib_cflags="-fPIC"
-      mksharedlib="$CC -shared"
+       case $CC,$host in #(
+  *,i[3456]86-*) :
+    # Disable DT_TEXTREL warnings on Linux and BSD i386
+           # See https://github.com/ocaml/ocaml/issues/9800
+           mksharedlib="$CC -shared -Wl,-z,notext" ;; #(
+  *) :
+    mksharedlib="$CC -shared" ;;
+esac
+       case $host in #(
+  *-*-openbsd7.[3-9]|*-*-openbsd[89].*) :
+    mksharedlib="${mksharedlib} -Wl,--no-execute-only" ;; #(
+  *) :
+     ;;
+esac
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
@@ -13521,6 +13548,17 @@ fi
 if test -z "$mkmaindll"; then :
   mkmaindll=$mksharedlib
 fi
+
+# Make sure code sections in OCaml-generated executables are readable
+# (required for marshaling of function closures)
+
+case $host in #(
+  *-*-openbsd7.[3-9]|*-*-openbsd[89].*) :
+    oc_ldflags="$oc_ldflags -Wl,--no-execute-only"
+     natdynlinkopts="$natdynlinkopts -Wl,--no-execute-only" ;; #(
+  *) :
+     ;;
+esac
 
 # Configure native dynlink
 
@@ -13639,6 +13677,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 arch=none
 model=default
 system=unknown
+ocamltest_system=unknown
 
 case $host in #(
   i[3456]86-*-linux*) :
@@ -13711,6 +13750,10 @@ fi; system=elf ;; #(
     arch=amd64; system=netbsd ;; #(
   x86_64-*-openbsd*) :
     arch=amd64; system=openbsd ;; #(
+  arm64-*-darwin*) :
+    ocamltest_system=macosx ;; #(
+  aarch64-*-darwin*) :
+    ocamltest_system=macosx ;; #(
   x86_64-*-darwin*) :
     arch=amd64; system=macosx ;; #(
   x86_64-*-mingw32) :
@@ -13728,12 +13771,20 @@ fi; system=elf ;; #(
      ;;
 esac
 
+if test x"$ocamltest_system" = 'xunknown'; then :
+  ocamltest_system="$system"
+fi
+
 if test x"$enable_native_compiler" = "xno"; then :
   arch=none; model=default; system=unknown; native_compiler=false
   { $as_echo "$as_me:${as_lineno-$LINENO}: the native compiler is disabled" >&5
 $as_echo "$as_me: the native compiler is disabled" >&6;}
 else
+  if test x"$arch" = 'xnone'; then :
+  native_compiler=false
+else
   native_compiler=true
+fi
 fi
 
 if ! $native_compiler; then :
@@ -17044,7 +17095,11 @@ case $host in #(
     flexlink_flags="-chain $flexdll_chain -stack 16777216" ;; #(
   x86_64-w64-mingw32) :
     flexdll_chain='mingw64'
-    flexlink_flags="-chain $flexdll_chain -stack 33554432" ;; #(
+    # Ensure --image-base 0x10000 gets to the linker to work-around binutils
+    # 2.36+ using a random address base. See #10351 for the actual fix in
+    # 4.12+.
+    flexlink_flags="-chain $flexdll_chain -stack 33554432 \
+-link -Xlinker -link --image-base -link -Xlinker -link 0x10000" ;; #(
   i686-pc-windows) :
     flexdll_chain='msvc'
     flexlink_flags="-merge-manifest -stack 16777216" ;; #(
@@ -17074,7 +17129,7 @@ else
           && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ; then :
   case $build in #(
   *-pc-cygwin) :
-    prefix=`cygpath -m "$prefix"` ;; #(
+    prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")" ;; #(
   *) :
      ;;
 esac
@@ -18087,7 +18142,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "Makefile.common") CONFIG_FILES="$CONFIG_FILES Makefile.common" ;;
+    "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;

@@ -125,7 +125,7 @@ ifeq "$(UNIX_OR_WIN32)" "win32"
 # than \UXXXXXXXX). The \u is then translated to \x in order to accommodate
 # pre-Visual Studio 2013 compilers where \x is a non-standard alias for \u.
 OCAML_STDLIB_DIR = $(shell echo $(LIBDIR)| iconv -t JAVA | sed -e 's/\\u/\\x/g')
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='L"$(OCAML_STDLIB_DIR)"'
+STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='L"$(or $(OCAML_STDLIB_DIR),$(LIBDIR))"'
 else # Unix
 OCAML_STDLIB_DIR = $(LIBDIR)
 STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='"$(OCAML_STDLIB_DIR)"'
@@ -243,16 +243,20 @@ primitives: $(shell ./gen_primitives.sh > primitives.new; \
 	cp $^ $@
 
 prims.c : primitives
-	(echo '#define CAML_INTERNALS'; \
-         echo '#include "caml/mlvalues.h"'; \
-	 echo '#include "caml/prims.h"'; \
-	 sed -e 's/.*/extern value &();/' primitives; \
+	export LC_ALL=C; \
+	(echo '#include "caml/config.h"'; \
+	 echo 'typedef intnat value;'; \
+	 echo 'typedef value (*c_primitive)(void);'; \
+	 echo; \
+	 sed -e 's/.*/extern value &(void);/' $<; \
+	 echo; \
 	 echo 'c_primitive caml_builtin_cprim[] = {'; \
-	 sed -e 's/.*/	&,/' primitives; \
-	 echo '	 0 };'; \
+	 sed -e 's/.*/  &,/' $<; \
+	 echo '  0 };'; \
+	 echo; \
 	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
-	 sed -e 's/.*/	"&",/' primitives; \
-	 echo '	 0 };') > prims.c
+	 sed -e 's/.*/  "&",/' $<; \
+	 echo '  0 };') > $@
 
 caml/opnames.h : caml/instruct.h
 	tr -d '\r' < $< | \
@@ -412,3 +416,8 @@ depend: *.c caml/opnames.h caml/jumptbl.h caml/version.h
 endif
 
 include .depend
+
+# This empty target is here for AppVeyor to allow dependencies to be built
+# without doing anything else.
+.PHONY: setup-depend
+setup-depend:
