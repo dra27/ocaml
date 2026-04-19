@@ -13,24 +13,49 @@
 #*                                                                        *
 #**************************************************************************
 
+set -e
+
 BUILD_PID=0
 
+# This must correspond with the entry in appveyor.yml
+CACHE_DIRECTORY=/cygdrive/c/projects/cache
+
+MAKE=make
+
+# The environment is too large for xargs!
+unset ORIGINAL_PATH
+unset __VSCMD_PREINIT_PATH
+
+# There are some utilities on the AppVeyor runner which include mingw-w64
+# runtime DLLs which we don't want to be available in the build.
+export PATH="$(tr ':' '\n' <<<"$PATH" |
+               grep -vxFf <(which -a libwinpthread-1.dll |
+               xargs -r dirname) |
+               paste -sd:)"
+if which 'libwinpthread-1.dll' 2>/dev/null; then
+  echo 'Failed to remove libwinpthread-1.dll from PATH'
+  exit 1
+fi
+
+git config --global --add safe.directory '*'
+
 function run {
-    NAME=$1
-    shift
-    echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    $@
-    CODE=$?
-    if [ $CODE -ne 0 ]; then
-        echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-        if [ $BUILD_PID -ne 0 ] ; then
-          kill -KILL $BUILD_PID 2>/dev/null
-          wait $BUILD_PID 2>/dev/null
-        fi
-        exit $CODE
-    else
-        echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
+  NAME=$1
+  shift
+  echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ -n $SHOW_CMD ]]; then (set -x; "$@"); else "$@"; fi
+  CODE=$?
+  if [[ $CODE -ne 0 ]] ; then
+    echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    if [[ $BUILD_PID -ne 0 ]] ; then
+      kill -KILL $BUILD_PID 2>/dev/null
+      wait $BUILD_PID 2>/dev/null
     fi
+    exit $CODE
+  else
+    echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  fi
 }
 
 # Function: set_configuration
@@ -39,111 +64,204 @@ function run {
 # $2: the prefix to use to install
 # $3: C compiler flags to use to turn warnings into errors
 function set_configuration {
-    case "$1" in
-        mingw)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-w64-mingw32'
-        ;;
-        msvc)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-pc-windows'
-        ;;
-        msvc64)
-            build='--build=x86_64-unknown-cygwin'
-            host='--host=x86_64-pc-windows'
-        ;;
-    esac
+  mkdir -p "$CACHE_DIRECTORY"
 
-    ./configure $build $host --prefix="$2"
+  local CACHE_KEY CACHE_FILE_PREFIX CACHE_FILE
+  CACHE_KEY=$({ cat configure; uname; } | sha1sum | cut -c 1-7)
+  CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
+  CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
 
-    FILE=$(pwd | cygpath -f - -m)/Makefile.config
-    echo "Edit $FILE to turn C compiler warnings into errors"
-    sed -i -e "/^ *OC_CFLAGS *=/s/\r\?$/ $3\0/" $FILE
-#    run "Content of $FILE" cat Makefile.config
+  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2")
+
+  case "$1" in
+    mingw32)
+      args+=('--host=i686-w64-mingw32');;
+    mingw64)
+      args+=('--host=x86_64-w64-mingw32');;
+    msvc32)
+      args+=('--host=i686-pc-windows');;
+    msvc64)
+      # Explicitly test dependency generation on msvc64
+      args+=('--host=x86_64-pc-windows');;
+  esac
+
+  # Remove old configure cache if the configure script or the OS
+  # have changed
+  if [[ ! -f "$CACHE_FILE" ]] ; then
+      rm -f -- "$CACHE_FILE_PREFIX"*
+  fi
+
+  echo './configure' "${args[@]@Q}"
+  if ! ./configure "${args[@]}"; then
+    # Remove configure cache if the script has failed
+    rm -f -- "$CACHE_FILE"
+    local failed
+    ./configure "${args[@]}" || failed=$?
+    if ((failed)) ; then cat config.log ; exit $failed ; fi
+  fi
+
+  FILE=$(pwd | cygpath -f - -m)/Makefile.config
+  echo "Edit $FILE to turn C compiler warnings into errors"
+  sed -i -e '/^ *OC_CFLAGS *=/s/\r\?$/ '"$3"'\0/' "$FILE"
+#  run "Content of $FILE" cat Makefile.config
 }
 
-APPVEYOR_BUILD_FOLDER=$(echo $APPVEYOR_BUILD_FOLDER| cygpath -f -)
-# These directory names are specified here, because getting UTF-8 correctly
-# through appveyor.yml -> Command Script -> Bash is quite painful...
-OCAMLROOT=$(echo $PROGRAMFILES/Бактріан🐫| cygpath -f - -m)
+APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
+FLEXDLLROOT="$PROGRAMFILES/flexdll"
+OCAMLROOT=$(echo "$OCAMLROOT" | cygpath -f - -m)
 
-# This must be kept in sync with appveyor_build.cmd
-BUILD_PREFIX=🐫реализация
-
-export PATH=$(echo $OCAMLROOT| cygpath -f -)/bin/flexdll:$PATH
+if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
+  case "$PORT" in
+    cygwin*)
+      install_flexdll='false';;
+    *)
+      export PATH="$FLEXDLLROOT:$PATH"
+      install_flexdll='true';;
+  esac
+else
+  install_flexdll='false'
+fi
 
 case "$1" in
   install)
-    mkdir -p "$OCAMLROOT/bin/flexdll"
-    cd $APPVEYOR_BUILD_FOLDER/../flexdll
-    # msvc64 objects need to be compiled with VS2015, so are copied later from
-    # a source build.
-    for f in flexdll.h flexlink.exe flexdll*_msvc.obj default*.manifest ; do
-      cp $f "$OCAMLROOT/bin/flexdll/"
-    done
-    if [ "$PORT" = "msvc64" ] ; then
-      echo 'eval $($APPVEYOR_BUILD_FOLDER/tools/msvs-promote-path)' \
-        >> ~/.bash_profile
+    if [[ $install_flexdll = 'true' ]] ; then
+      mkdir -p "$FLEXDLLROOT"
+      cd "$APPVEYOR_BUILD_FOLDER/../flexdll"
+      # The objects are always built from the sources
+      for f in flexdll.h flexlink.exe default*.manifest ; do
+        cp "$f" "$FLEXDLLROOT/"
+      done
     fi
-    ;;
-  msvc32-only)
-    cd $APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-msvc32
-
-    set_configuration msvc "$OCAMLROOT-msvc32" -WX
-
-    run "make world" make world
-    run "make runtimeopt" make runtimeopt
-    run "make -C otherlibs/systhreads libthreadsnat.lib" \
-         make -C otherlibs/systhreads libthreadsnat.lib
-
-    exit 0
+    case "$PORT" in
+      msvc*)
+        echo 'eval $($APPVEYOR_BUILD_FOLDER/tools/msvs-promote-path)' \
+          >> ~/.bash_profile
+        ;;
+    esac
     ;;
   test)
-    FULL_BUILD_PREFIX=$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX
-    run "ocamlc.opt -version" $FULL_BUILD_PREFIX-$PORT/ocamlc.opt -version
-    run "test $PORT" make -C $FULL_BUILD_PREFIX-$PORT tests
-    run "install $PORT" make -C $FULL_BUILD_PREFIX-$PORT install
-    if [ "$PORT" = "msvc64" ] ; then
-      run "check_all_arches" make -C $FULL_BUILD_PREFIX-$PORT check_all_arches
+    FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+    if [[ $PORT = 'mingw32' ]] ; then
+      run "Check runtime symbols" \
+          "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+          $FULL_BUILD_PREFIX-$PORT/runtime/*.a
+    fi
+    if [[ $PORT = 'mingw64' ]] ; then
+      export PATH="$PATH:/usr/x86_64-w64-mingw32/sys-root/mingw/bin"
+    elif [[ $PORT = 'mingw32' ]] ; then
+      export PATH="$PATH:/usr/i686-w64-mingw32/sys-root/mingw/bin"
+    fi
+    # Check that libwinpthread-1.dll is not linked
+    cd "$FULL_BUILD_PREFIX-$PORT"
+    find . -name \*.exe | xargs ldd > results
+    winpthreads='^[[:blank:]]libwinpthread-[^.]\+\.dll =>'
+    if grep -q "$winpthreads" results; then
+      echo 'winpthreads is not being linked statically:'
+      grep ':$\|'"$winpthreads" results | grep -B 1 "$winpthreads"
+      exit 1
+    fi
+    rm -f results
+    run_testsuite=true
+    if [[ -n $APPVEYOR_PULL_REQUEST_NUMBER ]]; then
+      API_URL="https://api.github.com/repos/$APPVEYOR_REPO_NAME/issues/$APPVEYOR_PULL_REQUEST_NUMBER"
+      if curl --silent "$API_URL/labels" | grep -q 'CI: Skip testsuite'; then
+        run_testsuite=false
+      fi
+    fi
+    if $run_testsuite; then
+      run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
+    fi
+    run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    if [[ $PORT = 'msvc64' ]] ; then
+      run "$MAKE check_all_arches" \
+           $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+      cd "$FULL_BUILD_PREFIX-$PORT"
+      # Ensure that .gitignore is up-to-date - this will fail if any untracked
+      # or altered files exist. We revert the change from the bootstrap (that
+      # would have failed the build earlier if necessary)
+      git checkout -- boot/ocamlc boot/ocamllex
+      # Remove the FlexDLL sources placed earlier in the process
+      rm -rf "flexdll-$FLEXDLL_VERSION"
+      run --show "Check tree is tracked" test -z "$(git status --porcelain)"
+      # check that the `distclean` target definitely cleans the tree
+      run "$MAKE distclean" $MAKE distclean
+      # Check the working tree is clean
+      run --show "Check tree is tracked" test -z "$(git status --porcelain)"
+      # Check that there are no ignored files
+      run --show "Check tree is clean" \
+        test -z "$(git ls-files --others -i --exclude-standard)"
     fi
     ;;
   *)
-    cd $APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT
+    cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 
-    if [ "$PORT" = "msvc64" ] ; then
-      tar -xzf $APPVEYOR_BUILD_FOLDER/flexdll.tar.gz
-      cd flexdll-$FLEXDLL_VERSION
-      make MSVC_DETECT=0 CHAINS=msvc64 support
-      cp flexdll*_msvc64.obj "$OCAMLROOT/bin/flexdll/"
+    if [[ $PORT = 'msvc64' ]] ; then
+      # Ensure that make distclean can be run from an empty tree
+      run "$MAKE distclean" $MAKE distclean
+    fi
+
+    if [[ $install_flexdll = 'true' ]] ; then
+      tar -xzf "$APPVEYOR_BUILD_FOLDER/flexdll.tar.gz"
+      cd "flexdll-$FLEXDLL_VERSION"
+      $MAKE MSVC_DETECT=0 CHAINS=${PORT%32} support
+      cp -f *.obj "$FLEXDLLROOT/" 2>/dev/null || \
+      cp -f *.o "$FLEXDLLROOT/"
       cd ..
     fi
 
-    if [ "$PORT" = "msvc64" ] ; then
-      set_configuration msvc64 "$OCAMLROOT" -WX
-    else
-      set_configuration mingw "$OCAMLROOT-mingw32" -Werror
-    fi
-
-    cd $APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT
+    case "$PORT" in
+      msvc*) WERROR='-WX';;
+      *) WERROR='-Werror';;
+    esac
+    set_configuration "$PORT" "$OCAMLROOT" "$WERROR"
 
     export TERM=ansi
 
-    if [ "$PORT" = "mingw32" ] ; then
-      set -o pipefail
-      # For an explanation of the sed command, see
-      # https://github.com/appveyor/ci/issues/1824
-      script --quiet --return --command \
-        "make -C ../$BUILD_PREFIX-mingw32 flexdll world.opt" \
-        ../$BUILD_PREFIX-mingw32/build.log |
-          sed -e 's/\d027\[K//g' \
-              -e 's/\d027\[m/\d027[0m/g' \
-              -e 's/\d027\[01\([m;]\)/\d027[1\1/g'
-    else
-      run "make world" make world
-      run "make bootstrap" make bootstrap
-      run "make opt" make opt
-      run "make opt.opt" make opt.opt
-    fi
+    case "$BUILD_MODE" in
+      world.opt)
+        set -o pipefail
+        # For an explanation of the sed command, see
+        # https://github.com/appveyor/ci/issues/1824
+        build="-C ../$BUILD_PREFIX-$PORT world.opt"
+        script --quiet --return --command \
+          "( test "$BOOTSTRAP_FLEXDLL" = 'false' || "\
+"$MAKE -C ../$BUILD_PREFIX-$PORT flexdll ) && "\
+"if ! $MAKE -j $build; then $MAKE $build; exit 1; fi" \
+          "../$BUILD_PREFIX-$PORT/build.log" |
+            sed --unbuffered \
+                -e 's/\d027\[K//g' \
+                -e 's/\d027\[m/\d027[0m/g' \
+                -e 's/\d027\[01\([m;]\)/\d027[1\1/g'
+        rm -f build.log;;
+    steps)
+      run "C deps: runtime" make -j64 -C runtime setup-depend
+      run "C deps: win32unix" make -j64 -C otherlibs/win32unix setup-depend
+      run "$MAKE world" $MAKE world
+      run "$MAKE bootstrap" $MAKE bootstrap
+      run "$MAKE opt" $MAKE opt
+      run "$MAKE opt.opt" $MAKE opt.opt;;
+    C)
+      run "$MAKE world" $MAKE world
+      run "$MAKE runtimeopt" $MAKE runtimeopt
+      run "$MAKE -C otherlibs/systhreads libthreadsnat.lib" \
+           $MAKE -C otherlibs/systhreads libthreadsnat.lib;;
+    *)
+      echo "Unrecognised build: $BUILD_MODE"
+      exit 1
+    esac
+
+    echo DLL base addresses
+    case "$PORT" in
+      *32)
+        ARG='-4';;
+      *64)
+        ARG='-8';;
+    esac
+    find "../$BUILD_PREFIX-$PORT" -type f \( -name \*.dll -o -name \*.so \) | \
+      xargs rebase -i "$ARG"
+    find "../$BUILD_PREFIX-$PORT" -type f \( -name \*.dll -o -name \*.so \) | \
+      xargs ldd
 
     ;;
 esac

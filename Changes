@@ -1,21 +1,7 @@
 OCaml 4.09 maintenance branch
 -----------------------------
 
-### Build system:
-
-- #9383: Don't assume that AWKPATH includes .
-  (David Allsopp, report by Ian Zimmerman)
-
-- #9938, #9939: Define __USE_MINGW_ANSI_STDIO=0 for the mingw-w64 ports to
-  prevent their C99-compliant snprintf conflicting with ours.
-  (David Allsopp, report by Michael Soegtrop, review by Xavier Leroy)
-
-### Bug fixes:
-
-- #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
-  causing a performance regression
-  (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
-   code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
+### Runtime system:
 
 - #10250, #10266: Dynamically allocate alternate signal stacks to
   accommodate changes in Glibc 2.34.
@@ -25,6 +11,90 @@ OCaml 4.09 maintenance branch
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
+
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
+- #11763, #11759, #11861, #12509, #12577: Use strict prototypes on primitives.
+  (Antonin Décimo, review by Xavier Leroy, David Allsopp, Sébastien
+   Hinderer and Nick Barnes)
+
+- #11764: Add prototypes to old-style C function definitions.
+  (Antonin Décimo, review by Xavier Leroy)
+
+### Code generation and optimizations:
+
+- #9549, #9557: Make -flarge-toc the default for PowerPC and introduce
+  -fsmall-toc to enable the previous behaviour.
+  (David Allsopp, report by Nathaniel Wesley Filardo, review by Xavier Leroy)
+
+- #9969, #9981: Added mergeable flag to ELF sections containing mergeable
+  constants.  Fixes compatibility with the integrated assembler in clang 11.0.0.
+  (Jacob Young, review by Nicolás Ojeda Bär)
+
+### Tools:
+
+- #11100: Fix ocamltest to make sure failed tests are not counted as
+  "unexpected error".
+  (Damien Doligez, review by Sébastien Hinderer)
+
+### Compiler user-interface and warnings:
+
+- #10046: Link all DLLs with -static-libgcc on mingw32 to prevent dependency
+  on libgcc_s_sjlj-1.dll with mingw-w64 runtime 8.0.0 (previously this was
+  only needed for dllunix.dll).
+  (David Allsopp, report by Andreas Hauptmann, review by Xavier Leroy)
+
+### Internal/compiler-libs changes:
+
+- #9414: testsuite, ocamltest: keep test artifacts only on failure.
+  Use KEEP_TEST_DIR_ON_SUCCESS=1 to keep all artifacts.
+  (Gabriel Scherer, review by Sébastien Hinderer)
+
+- #10045: Add libext variable to ocamltest and enable C# tests on on mingw
+  (David Allsopp, review by Gabriel Scherer)
+
+### Build system:
+
+- #8650: ensure that "make" variables are defined before use;
+  revise generation of config/util.ml to better quote special characters
+  (Xavier Leroy, review by David Allsopp)
+
+- #9068, #9437: Call the assembler through the C compiler driver on all
+  architectures on FreeBSD.
+  (Xavier Leroy, report by Hannes Mehnert, review by Sébastien Hinderer)
+
+- #9383: Don't assume that AWKPATH includes .
+  (David Allsopp, report by Ian Zimmerman)
+
+- #9938, #9939: Define __USE_MINGW_ANSI_STDIO=0 for the mingw-w64 ports to
+  prevent their C99-compliant snprintf conflicting with ours.
+  (David Allsopp, report by Michael Soegtrop, review by Xavier Leroy)
+
+- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
+  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
+  in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
+  (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
+
+- #12372, #14572: Pass option -no-execute-only to the linker for OpenBSD >= 7.3
+  so that code sections remain readable, as needed for closure marshaling.
+  (Xavier Leroy and Anil Madhavapeddy, review by Anil Madhavapeddy and
+  Sébastien Hinderer)
+
+### Bug fixes:
+
+- #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
+  causing a performance regression
+  (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
+   code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
+
+- #12166, #12993: explicitly build non PIE executables on x86 32bits
+  architectures
+  (Florian Angeletti, review by David Allsopp)
+
+- #13018, #14661: Don't pass duplicate libraries to the linker when compiling
+  ocamlc.opt and when using systhreads (new versions of lld emit a warning).
+  (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
 
 OCaml 4.09.1 (16 Mars 2020):
 ----------------------------

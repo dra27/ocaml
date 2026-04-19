@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*                David Allsopp, MetaStack Solutions Ltd.                 *
+#*                        David Allsopp, Tarides                          *
 #*                                                                        *
-#*   Copyright 2019 MetaStack Solutions Ltd.                              *
+#*   Copyright 2022 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -13,17 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 
-version=$(autoconf --version | sed -ne 's/^autoconf .* \([0-9][^ ]*\)$/\1/p')
-if [ "$version" != '2.69' ] ; then
-  echo "autoconf 2.69 is required" >&2
+if git ls-tree HEAD --name-only -r | git check-ignore --stdin --no-index; then
+  echo These files are matched by .gitignore and should not be committed
   exit 1
-else
-  # Remove the autom4te.cache directory to make sure we start in a clean state
-  rm -rf autom4te.cache
-  autoconf -W all,error
-  # Some distros have this 2013 patch to autoconf, some don't...
-  sed -i -e '/^runstatedir/d' \
-         -e '/-runstatedir /,+8d' \
-         -e '/--runstatedir=DIR/d' \
-         -e 's/ runstatedir//' configure
 fi

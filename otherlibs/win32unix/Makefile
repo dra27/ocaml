@@ -52,11 +52,7 @@ HEADERS=unixsupport.h socketaddr.h
 
 include ../Makefile.otherlibs.common
 
-ifeq "$(SYSTEM)" "mingw"
-LDOPTS=-ldopt "-link -static-libgcc" $(addprefix -ldopt ,$(WIN32_LIBS))
-else
 LDOPTS=$(addprefix -ldopt ,$(WIN32_LIBS))
-endif
 
 clean::
 	rm -f $(UNIX_FILES) $(UNIX_CAML_FILES)
@@ -77,3 +73,8 @@ depend: $(ALL_FILES) $(UNIX_CAML_FILES) unix.ml
 endif
 
 include .depend
+
+# This empty target is here for AppVeyor to allow dependencies to be built
+# without doing anything else.
+.PHONY: setup-depend
+setup-depend:
