@@ -97,6 +97,7 @@ parsing_SOURCES = $(addprefix parsing/, \
   builtin_attributes.mli builtin_attributes.ml \
   camlinternalMenhirLib.mli camlinternalMenhirLib.ml \
   parser.mly \
+  keywords_token.mli keywords.mli keywords.ml \
   lexer.mll \
   pprintast.mli pprintast.ml \
   parse.mli parse.ml \
@@ -1654,10 +1655,22 @@ endif
 	$(V_GEN)sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
 parsing/parser.mli: boot/menhir/parser.mli
 	$(V_GEN)sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
+# The Keywords_token module is needed as an unfortunate indirection between
+# Keywords and Parser. It simply duplicates Parser.token but since it is in an
+# .mli-only module, doesn't cause a dependency between keywords.cmx and
+# parser.cmx.
+parsing/keywords_token.mli: boot/menhir/parser.mli
+	$(V_GEN){ \
+	  echo 'type token = Parser.token ='; \
+	  grep '^  |' boot/menhir/parser.mli; } > $@
 
 beforedepend:: parsing/camlinternalMenhirLib.ml \
   parsing/camlinternalMenhirLib.mli \
-  parsing/parser.ml parsing/parser.mli
+  parsing/parser.ml parsing/parser.mli \
+  parsing/keywords_token.mli
+
+partialclean::
+	rm -f parsing/keywords_token.mli
 
 partialclean:: partialclean-menhir
 
@@ -2182,6 +2195,7 @@ ocamlprof_SOURCES = \
   builtin_attributes.mli builtin_attributes.ml \
   camlinternalMenhirLib.mli camlinternalMenhirLib.ml \
   parser.mli parser.ml \
+  keywords.mli keywords.ml \
   lexer.mli lexer.ml \
   pprintast.mli pprintast.ml \
   parse.mli parse.ml \
