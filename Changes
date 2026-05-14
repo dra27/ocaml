@@ -88,6 +88,11 @@ OCaml 5.4.1 (17 February 2026)
   (Xavier Leroy and Nicolás Ojeda Bär, review by Olivier Nicole, Mindy Preston,
   and Edwin Török)
 
+- #14760, #14802: Correct the detection of argument defaults in configure,
+  fixing an incorrect error message when installing OCaml through opam on
+  OpenSUSE with the site-config package installed.
+  (David Allsopp, report by Edwin Török, review by ???)
+
 OCaml 5.4.0 (9 October 2025)
 ----------------------------
 
