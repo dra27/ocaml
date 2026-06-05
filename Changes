@@ -14,12 +14,12 @@ OCaml 5.4 maintenance version
   normalised on both Windows and Unix.
   (David Allsopp, review by Jonah Beckford, Damien Doligez and Hugo Heuzard)
 
-- #14244: Added --with-relative-libdir which allows the runtime and the
-  compilers to locate the Standard Library relative to where the binaries
-  themselves are installed, removing the absolute path previously embedded in
-  caml_standard_library_default. Executables linked with `ocamlc -custom` now
-  always attempt to load bytecode from the executable itself, rather than first
-  trying `argv[0]`.
+- #14244, #14802, #14846: Added --with-relative-libdir which allows the runtime
+  and the compilers to locate the Standard Library relative to where the
+  binaries themselves are installed, removing the absolute path previously
+  embedded in caml_standard_library_default. Executables linked with
+  `ocamlc -custom` now always attempt to load bytecode from the executable
+  itself, rather than first trying `argv[0]`.
   (David Allsopp, review by Jonah Beckford, Antonin Décimo, Damien Doligez,
    Samuel Hym and Vincent Laviron)
 
@@ -87,11 +87,6 @@ OCaml 5.4.1 (17 February 2026)
 - private: robustify intern.c
   (Xavier Leroy and Nicolás Ojeda Bär, review by Olivier Nicole, Mindy Preston,
   and Edwin Török)
-
-- #14760, #14802: Correct the detection of argument defaults in configure,
-  fixing an incorrect error message when installing OCaml through opam on
-  OpenSUSE with the site-config package installed.
-  (David Allsopp, report by Edwin Török, review by ???)
 
 OCaml 5.4.0 (9 October 2025)
 ----------------------------
