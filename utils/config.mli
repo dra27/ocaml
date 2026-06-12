@@ -33,14 +33,14 @@ val standard_library_relative: string option
     libraries directory if the compiler was configured with
     [--with-relative-libdir], or [None] otherwise.
 
-    @since 5.5 *)
+    @since 5.3.2 *)
 
 val standard_library_default: string
 (** The effective value for the default directory containing the standard
     libraries. This is always an absolute path, computed using
     {!standard_library_relative} if necessary.
 
-    @since 5.5 *)
+    @since 5.3.2 *)
 
 val standard_library: string
 (** The effective directory containing the standard libraries, taking CAMLLIB
@@ -68,7 +68,7 @@ val as_is_cc : bool
 (** Whether the assembler is actually an assembler, or whether we are really
     assembling files via the C compiler
 
-    @since 5.5 *)
+    @since 5.3.2 *)
 
 val bytecode_cflags : string
 (** The flags ocamlc should pass to the C compiler *)
@@ -189,7 +189,7 @@ val system: string
 val target_win32: bool
 (** True if [target_os_type = "Win32"]
 
-    @since 5.5 *)
+    @since 5.3.2 *)
 
 val asm: string
 (** The assembler (and flags) to use for assembling

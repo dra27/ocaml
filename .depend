@@ -10582,6 +10582,7 @@ testsuite/tools/testRelocation.cmo : \
     testsuite/tools/harness.cmi \
     testsuite/tools/environment.cmi \
     utils/config.cmi \
+    bytecomp/bytelink.cmi \
     testsuite/tools/testRelocation.cmi
 testsuite/tools/testRelocation.cmx : \
     otherlibs/unix/unix.cmx \
@@ -10589,6 +10590,7 @@ testsuite/tools/testRelocation.cmx : \
     testsuite/tools/harness.cmx \
     testsuite/tools/environment.cmx \
     utils/config.cmx \
+    bytecomp/bytelink.cmx \
     testsuite/tools/testRelocation.cmi
 testsuite/tools/testRelocation.cmi : \
     testsuite/tools/harness.cmi \

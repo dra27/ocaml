@@ -19,7 +19,6 @@ open Misc
 open Config
 open Cmo_format
 
-module String = Misc.Stdlib.String
 module Compunit = Symtable.Compunit
 
 module Dep = struct
@@ -607,6 +606,16 @@ let output_cds_file outfile =
        Bytesections.write_toc_and_trailer toc_writer;
     )
 
+let rec to_utf_8_seq b i () =
+  if i >= Bytes.length b then
+    Seq.Nil
+  else
+    let next = Bytes.get_utf_8_uchar b i in
+    let u = Uchar.utf_decode_uchar next in
+    Seq.Cons(u, to_utf_8_seq b (i + Uchar.utf_decode_length next))
+
+let to_utf_8_seq s = to_utf_8_seq (Bytes.unsafe_of_string s) 0
+
 (* [c_string_literal_of_string s] returns the C literal string representation of
    [s], suitable for embedding in a C source file with type [char_os *]. The
    result includes the quote markers. *)
@@ -638,7 +647,7 @@ let c_string_literal_of_string s =
   if Config.target_win32 then
     Buffer.add_char b 'L';
   Buffer.add_char b '"';
-  Seq.iter escape (String.to_utf_8_seq s);
+  Seq.iter escape (to_utf_8_seq s);
   Buffer.add_char b '"';
   Buffer.contents b
 
