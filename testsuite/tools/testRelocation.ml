@@ -297,18 +297,8 @@ let rec contains content content_len tests i seen =
         seen, i in
     contains content content_len tests (i + 1) seen
 
-let rec to_utf_8_seq b i () =
-  if i >= Bytes.length b then
-    Seq.Nil
-  else
-    let next = Bytes.get_utf_8_uchar b i in
-    let u = Uchar.utf_decode_uchar next in
-    Seq.Cons(u, to_utf_8_seq b (i + Uchar.utf_decode_length next))
-
-let to_utf_8_seq s = to_utf_8_seq (Bytes.unsafe_of_string s) 0
-
 let utf_16le_of_utf_8 s =
-  let s = to_utf_8_seq s in
+  let s = Bytelink.to_utf_8_seq s in
   let utf_16le_length =
     Seq.fold_left (fun acc u -> acc + Uchar.utf_16_byte_length u) 0 s in
   let b = Bytes.create utf_16le_length in
