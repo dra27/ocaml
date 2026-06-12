@@ -195,10 +195,6 @@ endif # ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
 # itself.
 HOST_LIBDIR ?= $(TARGET_LIBDIR)
 
-OC_COMMON_LINKFLAGS += \
-  -set-runtime-default \
-    $(call QUOTE_SINGLE,standard_library_default=$(HOST_LIBDIR))
-
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
