@@ -125,7 +125,7 @@ let () =
    around some problems with shared runtimes on s390x and riscv which don't
    reliably fail.
 *)
-let run_program env config =
+let run_program env _config =
   let prefix = Environment.prefix env in
   let libdir_suffix = Environment.libdir_suffix env in
   let prefix, libdir_suffix =
@@ -137,12 +137,8 @@ let run_program env config =
   in
   fun ~runtime ~stubs test_program expected_executable_name
       ~prefix_path_with_cwd expected_exit_code argv0 expected_argv0
-      ~may_segfault ~stdlib_exists_when_renamed ->
-    let stdlib_exists =
-      if Environment.is_renamed env then
-        stdlib_exists_when_renamed
-      else
-        config.has_relative_libdir <> None in
+      ~may_segfault ~stdlib_exists_when_renamed:_ ->
+    let stdlib_exists = not (Environment.is_renamed env) in
     let args = [string_of_bool stdlib_exists; prefix; libdir_suffix] in
     let argv0 =
       if argv0 = test_program then
