@@ -785,7 +785,7 @@ let run ~sh config env =
       "nat_complete_obj_shared" "-output-complete-obj shared runtime";
   ] in
   let tests =
-    if Config.shebangscripts then
+    if config.shebangscripts then
       (compile_test (Default_ocamlc(Header_shebang, Disable))
         "byt_default_sh_disable" "with absolute #!") ::
       (compile_test (Default_ocamlc(Header_shebang, Fallback))
