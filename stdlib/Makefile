@@ -58,7 +58,7 @@ NOSTDLIB= camlinternalFormatBasics.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
 
 .PHONY: all
-all: stdlib.cma std_exit.cmo $(HEADER_NAME) target_$(HEADER_NAME)
+all: stdlib.cma std_exit.cmo $(HEADER_NAME)
 
 .PHONY: allopt opt.opt # allopt and opt.opt are synonyms
 allopt: stdlib.cmxa std_exit.cmx
@@ -71,7 +71,7 @@ install::
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(call INSTALL_ITEMS, *.cmt *.cmti *.mli *.ml *.ml.in, lib)
 endif
-	$(call INSTALL_ITEM, target_$(HEADER_NAME), lib, , $(HEADER_NAME))
+	$(call INSTALL_ITEMS, $(HEADER_NAME), lib)
 
 .PHONY: installopt
 installopt: installopt-default
@@ -80,12 +80,8 @@ installopt: installopt-default
 installopt-default:
 	$(call INSTALL_ITEMS, stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx, lib)
 
-runtime-launch-info: runtime.info tmpheader.exe
-	@{ cat $^; \
-	   printf '$(if $(filter true,$(SUFFIXING)),$(ZINC_RUNTIME_ID))'; } > $@
-
 MANGLING = $(filter true,$(SUFFIXING))
-target_runtime-launch-info: tmpheader.exe
+runtime-launch-info: tmpheader.exe
 	@{ printf '$(if $(MANGLING),$(ZINC_RUNTIME_ID),\000)'; \
 	   cat $^; } > $@
 
@@ -137,11 +133,11 @@ stdlib.cmxa: $(OBJS:.cmo=.cmx)
 
 .PHONY: distclean
 distclean: clean
-	rm -f sys.ml META runtime.info target_runtime.info
+	rm -f sys.ml META
 
 .PHONY: clean
 clean::
-	rm -f $(HEADER_NAME) target_$(HEADER_NAME)
+	rm -f $(HEADER_NAME)
 
 export AWK
 
