@@ -56,7 +56,7 @@ let lib_ccobjs = ref []
 let lib_ccopts = ref []
 let lib_dllibs = ref []
 
-let add_ccobjs obj_name origin l =
+let add_ccobjs obj_name origin l dllibs =
   if not !Clflags.no_auto_link then begin
     if
       String.length !Clflags.use_runtime = 0
@@ -70,7 +70,7 @@ let add_ccobjs obj_name origin l =
       lib_ccopts := List.map replace_origin l.lib_ccopts @ !lib_ccopts;
     end else if l.lib_custom then
       raise(Error(Needs_custom_runtime obj_name));
-    lib_dllibs := l.lib_dllibs @ !lib_dllibs
+    lib_dllibs := dllibs @ !lib_dllibs
   end
 
 (* A note on ccobj ordering:
@@ -141,8 +141,9 @@ let scan_file ldeps obj_name tolink =
       let pos_toc = input_binary_int ic in    (* Go to table of contents *)
       seek_in ic pos_toc;
       let toc = (input_value ic : library) in
+      let dllibs = Dll.read_suffixed_dllibs_from_channel ic toc in
       close_in ic;
-      add_ccobjs obj_name (Filename.dirname file_name) toc;
+      add_ccobjs obj_name (Filename.dirname file_name) toc dllibs;
       let required =
         List.fold_right
           (fun compunit reqd ->

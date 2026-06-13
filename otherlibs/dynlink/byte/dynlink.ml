@@ -199,7 +199,7 @@ module Bytecode = struct
         let toc_pos = input_binary_int ic in  (* Go to table of contents *)
         seek_in ic toc_pos;
         let lib = (input_value ic : library) in
-        Symtable.open_dlls lib.lib_dllibs;
+        Symtable.open_dlls ic lib;
         handle, lib.lib_units
       end else begin
         raise (DT.Error (Not_a_bytecode_file file_name))

@@ -2365,6 +2365,7 @@ bytecomp/bytelibrarian.cmo : \
     utils/linkdeps.cmi \
     utils/format_doc.cmi \
     bytecomp/emitcode.cmi \
+    bytecomp/dll.cmi \
     utils/config.cmi \
     file_formats/cmo_format.cmi \
     utils/clflags.cmi \
@@ -2377,6 +2378,7 @@ bytecomp/bytelibrarian.cmx : \
     utils/linkdeps.cmx \
     utils/format_doc.cmx \
     bytecomp/emitcode.cmx \
+    bytecomp/dll.cmx \
     utils/config.cmx \
     file_formats/cmo_format.cmi \
     utils/clflags.cmx \
@@ -2491,14 +2493,17 @@ bytecomp/bytesections.cmi :
 bytecomp/dll.cmo : \
     utils/misc.cmi \
     utils/config.cmi \
+    file_formats/cmo_format.cmi \
     utils/binutils.cmi \
     bytecomp/dll.cmi
 bytecomp/dll.cmx : \
     utils/misc.cmx \
     utils/config.cmx \
+    file_formats/cmo_format.cmi \
     utils/binutils.cmx \
     bytecomp/dll.cmi
-bytecomp/dll.cmi :
+bytecomp/dll.cmi : \
+    file_formats/cmo_format.cmi
 bytecomp/emitcode.cmo : \
     parsing/unit_info.cmi \
     lambda/translmod.cmi \
@@ -8082,6 +8087,7 @@ tools/objinfo.cmo : \
     typing/ident.cmi \
     utils/format_doc.cmi \
     middle_end/flambda/export_info.cmi \
+    bytecomp/dll.cmi \
     utils/config.cmi \
     middle_end/compilation_unit.cmi \
     file_formats/cmxs_format.cmi \
@@ -8107,6 +8113,7 @@ tools/objinfo.cmx : \
     typing/ident.cmx \
     utils/format_doc.cmx \
     middle_end/flambda/export_info.cmx \
+    bytecomp/dll.cmx \
     utils/config.cmx \
     middle_end/compilation_unit.cmx \
     file_formats/cmxs_format.cmi \
