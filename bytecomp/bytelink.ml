@@ -713,6 +713,7 @@ let to_utf_8_seq s = to_utf_8_seq (Bytes.unsafe_of_string s) 0
 (* [c_string_literal_of_string s] returns the C literal string representation of
    [s], suitable for embedding in a C source file with type [char_os *]. The
    result includes the quote markers. *)
+let target_win32 = (target_os_type = "Win32")
 let c_string_literal_of_string s =
   let b = Buffer.create (String.length s * 2) in
   let utf16le = Bytes.create 4 in
@@ -729,7 +730,7 @@ let c_string_literal_of_string s =
          with the characters above converted to their C representations. On
          Windows, where the string is [wchar_t *], all characters for which
          iswprint returns 0 are escaped using the extended [\x] notation. *)
-    | c when Config.target_win32 && (c < 32 (* ' ' *) || c >= 127) ->
+    | c when target_win32 && (c < 32 (* ' ' *) || c >= 127) ->
         (* Convert u to UTF-16LE, allowing for surrogate pairs *)
         let len = Bytes.set_utf_16le_uchar utf16le 0 u in
         for i = 1 to len / 2 do
@@ -738,7 +739,7 @@ let c_string_literal_of_string s =
     | _ ->
         Buffer.add_utf_8_uchar b u
   in
-  if Config.target_win32 then
+  if target_win32 then
     Buffer.add_char b 'L';
   Buffer.add_char b '"';
   Seq.iter escape (to_utf_8_seq s);

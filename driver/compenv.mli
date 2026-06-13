@@ -23,7 +23,6 @@ val print_version_and_library : string -> 'a
 val print_version_string : unit -> 'a
 val print_standard_library : unit -> 'a
 val fatal : string -> 'a
-val fatalf : ('a, unit, string, 'b) format4 -> 'a
 
 val first_ccopts : string list ref
 val first_ppx : string list ref
@@ -77,6 +76,3 @@ val process_deferred_actions :
 *)
 val parse_arguments : ?current:(int ref)
       -> string array ref -> Arg.anon_fun -> string -> unit
-
-(** Validate a single -set-runtime-default parameter specification. *)
-val parse_runtime_parameter : string -> unit
