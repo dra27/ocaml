@@ -207,7 +207,6 @@ ocamlcommon_SOURCES = \
   $(lambda_SOURCES) $(comp_SOURCES)
 
 ocamlbytecomp_SOURCES = \
-  bytecomp/byterntm.mll \
   bytecomp/instruct.mli bytecomp/instruct.ml \
   bytecomp/bytegen.mli bytecomp/bytegen.ml \
   bytecomp/printinstr.mli bytecomp/printinstr.ml \
@@ -1109,9 +1108,9 @@ otherlibs/dynlink.depend: beforedepend
 # Cleanup the lexers
 
 partialclean::
-	rm -f bytecomp/byterntm.ml parsing/lexer.ml
+	rm -f tools/byterntm.ml parsing/lexer.ml
 
-beforedepend:: bytecomp/byterntm.ml parsing/lexer.ml
+beforedepend:: tools/byterntm.ml parsing/lexer.ml
 
 # The predefined exceptions and primitives
 
@@ -2009,7 +2008,7 @@ $(asmgen_OBJECT): $(asmgen_SOURCE)
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
 endif
 
-test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
+test_in_prefix_SOURCES = tools/byterntm.mll $(addprefix testsuite/tools/,\
   stubs.c \
   harness.mli harness.ml \
   toolchain.mli toolchain.ml \
@@ -2488,7 +2487,7 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
 
 ocamlobjinfo_LIBRARIES = \
   $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamlmiddleend)
-ocamlobjinfo_SOURCES = tools/objinfo.mli tools/objinfo.ml
+ocamlobjinfo_SOURCES = tools/byterntm.mll tools/objinfo.mli tools/objinfo.ml
 
 # Scan object files for required primitives
 

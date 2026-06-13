@@ -49,3 +49,7 @@ val linker_is_flexlink : bool
 val c_compiler_vendor : string
 (** The vendor and version of the C compiler, as determined by configure.ac
     (see Config.c_compiler_vendor in OCaml 5.5) *)
+
+val as_is_cc : bool
+(** Whether the assembler is actually an assembler, or whether we are really
+    assembling files via the C compiler (see Config.as_is_cc in OCaml 5.5) *)

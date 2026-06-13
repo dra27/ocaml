@@ -36,7 +36,7 @@ let effective_toolchain config =
     Toolchain.assembler_embeds_build_path
     && (not Config.as_has_debug_prefix_map
         || Config.architecture = "riscv"
-        || Config.as_is_cc
+        || Toolchain.as_is_cc
         || config.has_relative_libdir = None)
   in
   c_compiler_debug_paths_are_absolute, assembler_embeds_build_path
