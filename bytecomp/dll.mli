@@ -21,6 +21,9 @@
    extension or linking symbol (xxx.so or -lxxx) *)
 val extract_dll_name: (bool * string) -> string
 
+val read_suffixed_dllibs_from_channel:
+  in_channel -> Cmo_format.library -> (bool * string) list
+
 type dll_mode =
   | For_checking     (* will just check existence of symbols;
                         no need to do full symbol resolution *)
