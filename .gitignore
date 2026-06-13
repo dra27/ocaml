@@ -83,7 +83,6 @@ META
 
 /bytecomp/opcodes.ml
 /bytecomp/opcodes.mli
-/bytecomp/byterntm.ml
 
 /debugger/debugger_lexer.ml
 /debugger/debugger_parser.ml
@@ -282,6 +281,7 @@ META
 /testsuite/tools/test_in_prefix.opt
 /testsuite/tools/toolchain.ml
 
+/tools/byterntm.ml
 /tools/ocamldep
 /tools/ocamldep.opt
 /tools/ocamlprof

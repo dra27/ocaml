@@ -1430,6 +1430,7 @@ module RuntimeID = struct
     ansi: bool;
   }
 
+  let target_win32 = (Config.target_os_type = "Win32")
   let make fn ?(dev = not Config.is_official_release)
               ?(release = Config.release_number)
               ?(reserved = Config.reserved_header_bits)
@@ -1439,7 +1440,7 @@ module RuntimeID = struct
               ?(int31 = (Sys.int_size = 31))
               ?(static = not Config.supports_shared_libraries)
               ?(no_compression = (Config.compression_c_libraries = ""))
-              ?(ansi = Config.target_win32 && not Config.windows_unicode) () =
+              ?(ansi = target_win32 && not Config.windows_unicode) () =
     if release < 0 || release > 63 || reserved < 0 || reserved > 31 then
       invalid_arg fn
     else
