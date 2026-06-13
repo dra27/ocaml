@@ -79,12 +79,6 @@ val c_has_debug_prefix_map : bool
 val as_has_debug_prefix_map : bool
 (** Whether the assembler supports --debug-prefix-map *)
 
-val as_is_cc : bool
-(** Whether the assembler is actually an assembler, or whether we are really
-    assembling files via the C compiler
-
-    @since 5.3.2 *)
-
 val bytecode_cflags : string
 (** The flags ocamlc should pass to the C compiler *)
 
@@ -206,11 +200,6 @@ val model: string
 
 val system: string
 (** Name of operating system for the native-code compiler *)
-
-val target_win32: bool
-(** True if [target_os_type = "Win32"]
-
-    @since 5.3.2 *)
 
 val asm: string
 (** The assembler (and flags) to use for assembling

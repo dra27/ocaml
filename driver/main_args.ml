@@ -1793,6 +1793,19 @@ module Default = struct
     let _verbose = set verbose
   end
 
+  let fatalf fmt = Printf.ksprintf Compenv.fatal fmt
+
+  let parse_runtime_parameter opt =
+    let k, setting =
+      try Misc.cut_at opt '='
+      with Not_found ->
+        fatalf "-set-runtime-default: invalid runtime parameter '%s'. \
+                Expected <name>=<value>." opt in
+      if k = "standard_library_default" then
+        Clflags.standard_library_default := Some setting
+      else
+        fatalf "-set-runtime-default: unrecognized runtime parameter %s." k
+
   module Compiler = struct
     let _a = set make_archive
     let _annot = set annotations
@@ -1831,7 +1844,7 @@ module Default = struct
     let _plugin _p = plugin := true
     let _pp s = preprocessor := (Some s)
     let _runtime_variant s = runtime_variant := s
-    let _set_runtime_default s = Compenv.parse_runtime_parameter s
+    let _set_runtime_default s = parse_runtime_parameter s
     let _stop_after pass =
       let module P = Compiler_pass in
         match P.of_string pass with
