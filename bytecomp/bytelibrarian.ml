@@ -48,12 +48,12 @@ let lib_dllibs = ref []
    Notice that here we scan .cma files given on the command line from
    left to right, hence options must be added after. *)
 
-let add_ccobjs l =
+let add_ccobjs l dllibs =
   if not !Clflags.no_auto_link then begin
     if l.lib_custom then Clflags.custom_runtime := true;
     lib_ccobjs := !lib_ccobjs @ l.lib_ccobjs;
     lib_ccopts := !lib_ccopts @ l.lib_ccopts;
-    lib_dllibs := !lib_dllibs @ l.lib_dllibs
+    lib_dllibs := !lib_dllibs @ dllibs
   end
 
 let copy_object_file oc name =
@@ -79,7 +79,7 @@ let copy_object_file oc name =
       seek_in ic toc_pos;
       let toc = (input_value ic : library) in
       List.iter (Bytelink.check_consistency file_name) toc.lib_units;
-      add_ccobjs toc;
+      add_ccobjs toc (Dll.read_suffixed_dllibs_from_channel ic toc);
       List.iter (copy_compunit ic oc) toc.lib_units;
       close_in ic;
       List.map (fun u -> name, u) toc.lib_units
@@ -107,16 +107,30 @@ let create_archive file_list lib_name =
        (match Linkdeps.check ldeps with
         | None -> ()
         | Some e -> raise (Error (Link_error e)));
+       let suffixed, lib_dllibs =
+         let f (~suffixed, l) (a, b) = (suffixed::a, l::b) in
+         List.fold_right f (!Clflags.dllibs @ !lib_dllibs) ([], [])
+       in
        let toc =
          { lib_units = (List.map snd units);
            lib_custom = !Clflags.custom_runtime;
            lib_ccobjs = !Clflags.ccobjs @ !lib_ccobjs;
            lib_ccopts = !Clflags.all_ccopts @ !lib_ccopts;
-           lib_dllibs = !Clflags.dllibs @ !lib_dllibs } in
+           lib_dllibs } in
        let pos_toc = pos_out outchan in
        Emitcode.marshal_to_channel_with_possibly_32bit_compat
          ~filename:lib_name ~kind:"bytecode library"
          outchan toc;
+       (* If lib_dllibs is empty or none of the entries had suffixed:true then
+          there's no need to write the suffixed list. Otherwise, output the
+          reverse cma magic number again and then the suffixed list to be
+          List.combine'd with lib_dllibs when the library is unmarshalled. *)
+       if List.mem true suffixed then begin
+         for i = String.length cma_magic_number - 1 downto 0 do
+           output_char outchan Config.cma_magic_number.[i]
+         done;
+         output_value outchan suffixed
+       end;
        seek_out outchan ofs_pos_toc;
        output_binary_int outchan pos_toc;
     )

@@ -80,7 +80,7 @@ let dllib (~suffixed, name) =
   else
     name
 
-let print_cma_infos (lib : Cmo_format.library) =
+let print_cma_infos (lib : Cmo_format.library) lib_dllibs =
   printf "Force custom: %a\n" yesno_of_bool lib.lib_custom;
   printf "Extra C object files:";
   (* PR#4949: print in linking order *)
@@ -89,7 +89,7 @@ let print_cma_infos (lib : Cmo_format.library) =
   List.iter print_spaced_string (List.rev lib.lib_ccopts);
   printf "\n";
   print_string "Extra dynamically-loaded libraries:";
-  List.iter print_spaced_string (List.rev_map dllib lib.lib_dllibs);
+  List.iter print_spaced_string (List.rev_map dllib lib_dllibs);
   printf "\n";
   List.iter print_cmo_infos lib.lib_units
 
@@ -424,8 +424,9 @@ let dump_obj_by_kind filename ic obj_kind =
        let toc_pos = input_binary_int ic in
        seek_in ic toc_pos;
        let toc = (input_value ic : library) in
+       let lib_dllibs = Dll.read_suffixed_dllibs_from_channel ic toc in
        close_in ic;
-       print_cma_infos toc
+       print_cma_infos toc lib_dllibs
     | Cmi | Cmt ->
        close_in ic;
        let cmi, cmt = Cmt_format.read filename in

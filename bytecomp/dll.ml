@@ -66,6 +66,27 @@ let extract_dll_name (~suffixed, file) =
       else
         file
 
+(* This dance avoids the need to bump the magic number for .cma format, which is
+   a bit awkward to do with old releases, because we don't reserve indexes for
+   maintenance releases. In OCaml 5.5+, Cmo_format.lib_dllibs is a
+   (suffixed:bool * string) list, but for these backports we instead keep the
+   old string list for Cmo_format.lib_dllibs and append a bool list after the
+   toc. This value is guarded by the cma magic number written in reverse. *)
+let rebmun_cigam_amc =
+  let magic_length = String.length Config.cma_magic_number in
+  let init i = Config.cma_magic_number.[magic_length - i - 1] in
+  String.init magic_length init
+
+let read_suffixed_dllibs_from_channel ic l =
+  let open Cmo_format in
+  let magic_length = String.length Config.cma_magic_number in
+  match In_channel.really_input_string ic magic_length with
+  | Some magic when magic = rebmun_cigam_amc ->
+      let combine suffixed l acc = (~suffixed, l)::acc in
+      List.fold_right2 combine (input_value ic : bool list) l.lib_dllibs []
+  | _ ->
+      List.map (fun l -> (~suffixed:false, l)) l.lib_dllibs
+
 (* Open a list of DLLs, adding them to opened_dlls.
    Raise [Failure msg] in case of error. *)
 
