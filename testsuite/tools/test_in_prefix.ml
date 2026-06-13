@@ -68,42 +68,6 @@ let run_tests ~sh config env =
   TestBytecodeBinaries.run config env;
   TestLinkModes.run ~sh config env
 
-type launch_method =
-| Shebang_bin_sh of string
-| Executable
-
-type runtime_launch_info = {
-  buffer : string;
-  launcher : launch_method;
-  executable_offset : int
-}
-
-let read_runtime_launch_info file =
-  let buffer =
-    try
-      In_channel.with_open_bin file In_channel.input_all
-    with Sys_error msg -> Harness.fail_because "%s: %s" file msg
-  in
-  try
-    let bindir_start = String.index buffer '\n' + 1 in
-    let bindir_end = String.index_from buffer bindir_start '\000' in
-    let executable_offset = bindir_end + 2 in
-    let launcher =
-      let kind = String.sub buffer 0 (bindir_start - 1) in
-      if kind = "exe" then
-        Executable
-      else if kind <> "" && (kind.[0] = '/' || kind = "sh") then
-        Shebang_bin_sh kind
-      else
-        raise Not_found in
-    if String.length buffer < executable_offset
-       || buffer.[executable_offset - 1] <> '\n' then
-      raise Not_found
-    else
-      {launcher; buffer; executable_offset}
-  with Not_found ->
-    Harness.fail_because "%s: corrupt header" file
-
 let rename_exe_in_test_root env from_base to_base =
   Sys.rename (Environment.in_test_root env (Harness.exe from_base))
              (Environment.in_test_root env (Harness.exe to_base))

@@ -547,7 +547,7 @@ let compile_test usr_bin_sh config env test test_program description =
       | Output_obj(C_ocamlopt, Static) ->
           f ~mode:Native
             ~clibs:["-lcomprmarsh"; "-lunixnat";
-                    Toolchain.compression_c_libraries]
+                    Config.compression_c_libraries]
             ["-output-obj"]
       | Output_obj(C_ocamlopt, Shared) ->
           (* cf. ocaml/ocaml#13693 - on Fedora/RHEL, this executable
@@ -558,7 +558,7 @@ let compile_test usr_bin_sh config env test test_program description =
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
           f ~mode:Native ~use_shared_runtime:true ~may_segfault
             ~clibs:["-lcomprmarsh"; "-lunixnat";
-                    Toolchain.compression_c_libraries]
+                    Config.compression_c_libraries]
             ~linker_exit_code ["-output-obj"]
       | Output_complete_obj(C_ocamlc, Static) ->
           (* At the moment, the partial linker will pass -lws2_32 and -ladvapi32
@@ -588,7 +588,7 @@ let compile_test usr_bin_sh config env test test_program description =
           (* At the moment, the partial linker will pass -lzstd to ld -r which
              will (normally) fail). Until this is done, pass the libraries
              manually, using -noautolink. *)
-          f ~mode:Native ~clibs:[Toolchain.compression_c_libraries]
+          f ~mode:Native ~clibs:[Config.compression_c_libraries]
             ~linker_exit_code
             ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
                                                     "-cclib"; "-lcomprmarsh"]
@@ -597,7 +597,7 @@ let compile_test usr_bin_sh config env test test_program description =
              fails with GNU ld, but not with the macOS linker *)
           let compilation_exit_code = fails_if (Config.system <> "macosx") in
           f ~mode:Native ~use_shared_runtime:true
-            ~compilation_exit_code ~clibs:[Toolchain.compression_c_libraries]
+            ~compilation_exit_code ~clibs:[Config.compression_c_libraries]
             ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
                                                     "-cclib"; "-lcomprmarsh"]
       | Output_complete_exe Static ->
@@ -787,7 +787,7 @@ let run ~sh config env =
       "nat_complete_obj_shared" "-output-complete-obj shared runtime";
   ] in
   let tests =
-    if Config.shebangscripts then
+    if config.shebangscripts then
       (compile_test (Default_ocamlc(Header_shebang, Disable))
         "byt_default_sh_disable" "with absolute #!") ::
       (compile_test (Default_ocamlc(Header_shebang, Fallback))

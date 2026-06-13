@@ -827,7 +827,7 @@ module RuntimeID : sig
   (** Manipulation of the Runtime ID values used to mangle the filenames of
       shared libraries and the bytecode interpreters.
 
-      @since 5.5 *)
+      @since 5.3.2 *)
 
   (** Runtime IDs *)
   type t = private {

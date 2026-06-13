@@ -89,7 +89,7 @@ let primitives : (string, int) Hashtbl.t = Hashtbl.create 100
 #52 "bytecomp/dll.ml"
 (* Extract the name of a DLLs from its external name (xxx.so or -lxxx) *)
 
-let extract_dll_name (~suffixed, file) =
+let extract_dll_name (suffixed, file) =
   if not suffixed && Filename.check_suffix file Config.ext_dll then
     Filename.chop_suffix file Config.ext_dll
   else

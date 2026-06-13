@@ -630,7 +630,7 @@ let process_action
   | ProcessObjects names ->
       ccobjs := names @ !ccobjs
   | ProcessDLLs (suffixed, names) ->
-      dllibs := (List.map (fun n -> (~suffixed, n)) names) @ !dllibs
+      dllibs := (List.map (fun n -> (suffixed, n)) names) @ !dllibs
   | ProcessOtherFile name ->
       if Filename.check_suffix name ocaml_mod_ext
       || Filename.check_suffix name ocaml_lib_ext then
@@ -643,7 +643,7 @@ let process_action
         ccobjs := name :: !ccobjs
       end
       else if not !native_code && Filename.check_suffix name Config.ext_dll then
-        dllibs := (~suffixed:false, name) :: !dllibs
+        dllibs := (false, name) :: !dllibs
       else
         match Compiler_pass.of_input_filename name with
         | Some start_from ->

@@ -555,16 +555,16 @@ let link_bytecode ?final_name tolink exec_name standalone =
        Symtable.init();
        clear_crc_interfaces ();
        let (tocheck, sharedobjs) =
-         let process_dllib ((~suffixed, name) as dllib) (tocheck, sharedobjs) =
+         let process_dllib ((suffixed, name) as dllib) (tocheck, sharedobjs) =
            let resolved_name = Dll.extract_dll_name dllib in
            let partial_name =
              if suffixed then
                if String.starts_with ~prefix:"-l" name then
-                 (~suffixed, "dll" ^ String.sub name 2 (String.length name - 2))
+                 (suffixed, "dll" ^ String.sub name 2 (String.length name - 2))
                else
                  dllib
              else
-               (~suffixed:false, resolved_name)
+               (false, resolved_name)
            in
            (resolved_name::tocheck, partial_name::sharedobjs)
          in
@@ -598,7 +598,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
          end;
          (* The names of the DLLs *)
          if sharedobjs <> [] then begin
-           let output_sharedobj (~suffixed, name) =
+           let output_sharedobj (suffixed, name) =
              output_char outchan (if suffixed then '-' else ':');
              output_string outchan name;
              output_byte outchan 0
@@ -727,7 +727,7 @@ let c_string_literal_of_string s =
          with the characters above converted to their C representations. On
          Windows, where the string is [wchar_t *], all characters for which
          iswprint returns 0 are escaped using the extended [\x] notation. *)
-    | c when Config.target_win32 && (c < 32 (* ' ' *) || c >= 127) ->
+    | c when Sys.win32 && (c < 32 (* ' ' *) || c >= 127) ->
         (* Convert u to UTF-16LE, allowing for surrogate pairs *)
         let len = Bytes.set_utf_16le_uchar utf16le 0 u in
         for i = 1 to len / 2 do
@@ -736,7 +736,7 @@ let c_string_literal_of_string s =
     | _ ->
         Buffer.add_utf_8_uchar b u
   in
-  if Config.target_win32 then
+  if Sys.win32 then
     Buffer.add_char b 'L';
   Buffer.add_char b '"';
   Seq.iter escape (to_utf_8_seq s);
