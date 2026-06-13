@@ -557,16 +557,16 @@ let link_bytecode ?final_name tolink exec_name standalone =
        Symtable.init();
        clear_crc_interfaces ();
        let (tocheck, sharedobjs) =
-         let process_dllib ((~suffixed, name) as dllib) (tocheck, sharedobjs) =
+         let process_dllib ((suffixed, name) as dllib) (tocheck, sharedobjs) =
            let resolved_name = Dll.extract_dll_name dllib in
            let partial_name =
              if suffixed then
                if String.starts_with ~prefix:"-l" name then
-                 (~suffixed, "dll" ^ String.sub name 2 (String.length name - 2))
+                 (suffixed, "dll" ^ String.sub name 2 (String.length name - 2))
                else
                  dllib
              else
-               (~suffixed:false, resolved_name)
+               (false, resolved_name)
            in
            (resolved_name::tocheck, partial_name::sharedobjs)
          in
@@ -600,7 +600,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
          end;
          (* The names of the DLLs *)
          if sharedobjs <> [] then begin
-           let output_sharedobj (~suffixed, name) =
+           let output_sharedobj (suffixed, name) =
              output_char outchan (if suffixed then '-' else ':');
              output_string outchan name;
              output_byte outchan 0

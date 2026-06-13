@@ -26,12 +26,12 @@ val version: string
 val release_number: int
 (** The release number for the compiler
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 
 val is_official_release: bool
 (** True if the compiler is an unmodified official OCaml release
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 
 val bindir: string
 (** The directory containing the binary programs. If the compiler was configured
@@ -48,7 +48,7 @@ val standard_library_relative: string option
 val target_bindir: string
 (** The directory containing the runtime binaries on the target system
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 
 val standard_library_default: string
 (** The effective value for the default directory containing the standard
@@ -343,7 +343,7 @@ val tsan : bool
 
 (** Launch mechanisms for bytecode executables
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 type launch_method =
 | Executable
     (** Use the executable launcher stub *)
@@ -357,11 +357,11 @@ type launch_method =
 val launch_method : launch_method
 (** Default launch mechanism for bytecode executables
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 
 (** Mechanisms used by tendered bytecode executables to locate the interpreter
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 type search_method =
 | Disable
     (** Interpreter searching disabled - check fixed absolute location only *)
@@ -374,23 +374,23 @@ type search_method =
 val search_method : search_method
 (** Default search mechanism for bytecode executables
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 
 val suffixing : bool
 (** Whether the runtime executable and shared library filenames and C stub
     library filenames are being mangled with Runtime IDs and the {!target}.
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 
 val bytecode_runtime_id : string
 (** The Runtime ID for this build of the bytecode runtime system
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 
 val native_runtime_id : string
 (** The Runtime ID for this build of the native runtime system
 
-    @since 5.5 *)
+    @since 5.4.2 *)
 
 (** Access to configuration values *)
 val print_config : out_channel -> unit
