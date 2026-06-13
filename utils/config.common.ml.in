@@ -26,7 +26,9 @@ let version = Sys.ocaml_version
 let is_official_release = false
 let release_number = 19
 
-let standard_library_default_raw = standard_library_default
+external standard_library_default : unit -> string = "%standard_library_default"
+
+let standard_library_default_raw = standard_library_default ()
 
 external stdlib_dirs : string -> string * string option
    = "caml_sys_get_stdlib_dirs"
