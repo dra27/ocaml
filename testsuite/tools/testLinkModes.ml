@@ -734,7 +734,11 @@ let compiler_where env ?runtime mode =
 (* This test verifies both that all compilation mechanisms are working and that
    each of these programs can correctly identify the Standard Library location.
    Any failures will cause either an exception or a compilation error. *)
-let run ~sh config env =
+let run ~sh config legacy env =
+  let module Config = struct
+    include Config
+    let shebangscripts = legacy.shebangscripts
+  end in
   let pp_path = Environment.pp_path env in
   Format.printf "\nTesting compilation mechanisms for %a\n%!"
                 pp_path (Environment.bindir env);

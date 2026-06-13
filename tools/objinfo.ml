@@ -74,7 +74,7 @@ let print_cmo_infos cu =
 let print_spaced_string s =
   printf " %s" s
 
-let dllib (~suffixed, name) =
+let dllib (suffixed, name) =
   if suffixed then
     Printf.sprintf "%s-<target>-<bytecode-runtime-id>" name
   else

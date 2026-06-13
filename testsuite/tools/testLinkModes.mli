@@ -14,5 +14,5 @@
 
 (** Test 5 - all the compiler's linking mechanisms work. *)
 
-val run : sh:string -> Harness.Import.config
+val run : sh:string -> Harness.Import.config -> Harness.Import.legacy
   -> Environment.t -> ([ `None | `Some of Environment.t -> 'a ] as 'a) list
