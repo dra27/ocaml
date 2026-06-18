@@ -263,7 +263,8 @@ let print_cmx_infos (ui, crc) =
      | None -> "no"
      | Some pack -> "YES: " ^ pack);
   printf
-    "Requires caml_standard_library_nat: %a\n" yesno_of_bool ui.ui_need_stdlib
+    "Requires caml_standard_library_nat: %a\n"
+    yesno_of_bool (Compilenv.needs_stdlib_location ui)
 
 let print_cmxa_infos (lib : Cmx_format.library_infos) =
   printf "Extra C object files:";

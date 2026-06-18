@@ -88,8 +88,8 @@ let current_unit =
     ui_send_fun = [];
     ui_force_link = false;
     ui_export_info = default_ui_export_info;
-    ui_for_pack = None;
-    ui_need_stdlib = false }
+    ui_for_pack = None }
+let current_ui_need_stdlib = ref false
 
 let linuxlike_mangling = match Config.system with
   | "macosx"
@@ -138,7 +138,7 @@ let reset ?packname name =
   current_unit.ui_send_fun <- [];
   current_unit.ui_force_link <- !Clflags.link_everything;
   current_unit.ui_for_pack <- packname;
-  current_unit.ui_need_stdlib <- false;
+  current_ui_need_stdlib := false;
   Hashtbl.clear exported_constants;
   structured_constants := structured_constants_empty;
   current_unit.ui_export_info <- default_ui_export_info;
@@ -358,13 +358,39 @@ let need_send_fun n =
 (* Record that caml_standard_library_nat is needed *)
 
 let need_stdlib_location () =
-  current_unit.ui_need_stdlib <- true
+  current_ui_need_stdlib := true
+
+(* Relocatable OCaml needs an extra piece of information recorded in cmx format,
+   but for backporting to previous releases it was desirable not to change the
+   magic numbers. The additional ui_need_stdlib field is stored, but not
+   declared in the type, which allows .cmx files produced with earlier versions
+   of the compiler in the same series still to be loaded. *)
+let unit_info_size = Obj.size (Obj.repr current_unit)
+let needs_stdlib_location ui =
+  let ui = Obj.repr ui in
+  if Obj.size ui <= unit_info_size then
+    false
+  else
+    let field = Obj.field ui unit_info_size in
+    if Obj.is_int field then
+      (Obj.obj field : bool)
+    else
+      false
 
 (* Write the description of the current unit *)
 
-let write_unit_info info filename =
+let write_unit_info ?(ui_need_stdlib=false) info filename =
   let oc = open_out_bin filename in
   output_string oc cmx_magic_number;
+  let info =
+    let[@ocaml.warning "+missing-record-field-pattern"]
+      {ui_name; ui_symbol; ui_defines; ui_imports_cmi;
+       ui_imports_cmx; ui_curry_fun; ui_apply_fun; ui_send_fun;
+       ui_export_info; ui_force_link; ui_for_pack} = info in
+    ui_name, ui_symbol, ui_defines, ui_imports_cmi,
+    ui_imports_cmx, ui_curry_fun, ui_apply_fun, ui_send_fun,
+    ui_export_info, ui_force_link, ui_for_pack, ui_need_stdlib
+  in
   output_value oc info;
   flush oc;
   let crc = Digest.file filename in
@@ -373,7 +399,7 @@ let write_unit_info info filename =
 
 let save_unit_info filename =
   current_unit.ui_imports_cmi <- Env.imports();
-  write_unit_info current_unit filename
+  write_unit_info ~ui_need_stdlib:!current_ui_need_stdlib current_unit filename
 
 let current_unit () =
   match Compilation_unit.get_current () with
