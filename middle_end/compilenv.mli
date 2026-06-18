@@ -108,6 +108,9 @@ val need_stdlib_location: unit -> unit
         (* Record that caml_standard_library_nat needs to be initialised if this
            unit is linked. *)
 
+val needs_stdlib_location: unit_infos -> bool
+        (* Accessor for the hidden ui_need_stdlib field *)
+
 val stdlib_symbol_name: Ident.t
         (* The name of the symbol defined globally for
            %standard_library_default *)
@@ -143,7 +146,7 @@ val backtrack: structured_constants -> unit
 
 val read_unit_info: string -> unit_infos * Digest.t
         (* Read infos and MD5 from a [.cmx] file. *)
-val write_unit_info: unit_infos -> string -> unit
+val write_unit_info: ?ui_need_stdlib:bool -> unit_infos -> string -> unit
         (* Save the given infos in the given file *)
 val save_unit_info: string -> unit
         (* Save the infos for the current unit in the given file *)

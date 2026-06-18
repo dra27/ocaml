@@ -217,9 +217,7 @@ let build_package_cmx members cmxfile =
     else
       Clambda (get_approx ui)
   in
-  let ui_need_stdlib =
-    List.exists (function {ui_need_stdlib; _} -> ui_need_stdlib) units
-  in
+  let ui_need_stdlib = List.exists Compilenv.needs_stdlib_location units in
   Export_info_for_pack.clear_import_state ();
   let pkg_infos =
     { ui_name = ui.ui_name;
@@ -241,10 +239,9 @@ let build_package_cmx members cmxfile =
       ui_force_link =
           List.exists (fun info -> info.ui_force_link) units;
       ui_export_info;
-      ui_for_pack = None;
-      ui_need_stdlib;
+      ui_for_pack = None
     } in
-  Compilenv.write_unit_info pkg_infos cmxfile
+  Compilenv.write_unit_info ~ui_need_stdlib pkg_infos cmxfile
 
 (* Make the .cmx and the .o for the package *)
 
