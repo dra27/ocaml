@@ -72,6 +72,8 @@
 #define SEEK_END 2
 #endif
 
+extern const char_os *caml_runtime_standard_library_default;
+
 const char_os * caml_runtime_standard_library_effective = NULL;
 
 static char magicstr[EXEC_MAGIC_LENGTH+1];
@@ -460,7 +462,14 @@ extern void caml_install_invalid_parameter_handler(void);
 
 #endif
 
+CAMLextern char_os *caml_locate_standard_library (const char_os *exe_name,
+                                                  const char_os *stdlib_default,
+                                                  char_os **dirname);
+
 /* Main entry point when loading code from a file */
+
+extern const bool caml_byte_program_mode_custom;
+extern char_os *caml_standard_library_default;
 
 CAMLexport void caml_main(char_os **argv)
 {
@@ -501,8 +510,8 @@ CAMLexport void caml_main(char_os **argv)
      For STANDARD mode (i.e. the current executable is ocamlrun), argv[0] is
      tried first, as this should be the path to shebang-script/executable
      originally executed by the user. */
-  CAMLassert(caml_byte_program_mode != EMBEDDED);
-  if (caml_byte_program_mode != APPENDED || proc_self_exe == NULL) {
+  CAMLassert(caml_byte_program_mode != COMPLETE_EXE);
+  if (!caml_byte_program_mode_custom || proc_self_exe == NULL) {
     exe_name = argv[0];
     fd = caml_attempt_open(&exe_name, &trail, 0);
   }
@@ -513,12 +522,12 @@ CAMLexport void caml_main(char_os **argv)
      With -custom, we have an executable that is ocamlrun itself
      concatenated with the bytecode.  So, if the attempt with argv[0]
      failed, it is worth trying again with executable_name. */
-  if (caml_byte_program_mode == APPENDED || fd < 0) {
+  if (caml_byte_program_mode_custom || fd < 0) {
     if (proc_self_exe != NULL) {
       exe_name = proc_self_exe;
       fd = caml_attempt_open(&exe_name, &trail, 0);
     }
-    if (fd < 0 && caml_byte_program_mode == APPENDED)
+    if (fd < 0 && caml_byte_program_mode_custom)
       error("unable to open file '%s'", caml_stat_strdup_of_os(exe_name));
   }
 
