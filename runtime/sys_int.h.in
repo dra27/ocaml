@@ -13,26 +13,10 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef CAML_SYS_H
-#define CAML_SYS_H
+/* Operating system and standard library configuration. */
 
-#ifdef CAML_INTERNALS
+#undef HAS_STRLCPY
 
-#include "misc.h"
+#undef HAS_LIBGEN_H
 
-CAMLextern char * caml_strerror(int errnum, char * buf, size_t buflen);
-
-#define NO_ARG Val_int(0)
-
-CAMLnoret CAMLextern void caml_sys_error (value);
-
-CAMLnoret CAMLextern void caml_sys_io_error (value);
-
-CAMLextern double caml_sys_time_unboxed(value);
-CAMLextern void caml_sys_init (const char_os * exe_name, char_os ** argv);
-
-CAMLnoret CAMLextern void caml_do_exit (int);
-
-#endif /* CAML_INTERNALS */
-
-#endif /* CAML_SYS_H */
+/* Define HAS_LIBGEN_H if you have /usr/include/libgen.h. */

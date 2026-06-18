@@ -456,7 +456,7 @@ static void read_main_debug_info(struct debug_info *di)
 
      See  https://github.com/ocaml/ocaml/issues/9344 for details.
   */
-  if (caml_params->cds_file == NULL && caml_byte_program_mode == EMBEDDED)
+  if (caml_params->cds_file == NULL && caml_byte_program_mode == COMPLETE_EXE)
     CAMLreturn0;
 
   if (caml_params->cds_file != NULL) {

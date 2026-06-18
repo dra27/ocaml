@@ -142,6 +142,7 @@ NORETURN static void exit_with_error(const wchar_t *wstr1,
 #else
 
 #include "caml/s.h"
+#include "sys_int.h"
 
 #include <stdio.h>
 #include <stdlib.h>
