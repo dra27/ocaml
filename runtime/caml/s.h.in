@@ -72,8 +72,6 @@
 
 #undef HAS_TIMES
 
-#undef HAS_STRLCPY
-
 #undef HAS_SECURE_GETENV
 
 #undef HAS___SECURE_GETENV
@@ -113,10 +111,6 @@
 #undef HAS_UNISTD
 
 /* Define HAS_UNISTD if you have /usr/include/unistd.h. */
-
-#undef HAS_LIBGEN_H
-
-/* Define HAS_LIBGEN_H if you have /usr/include/libgen.h. */
 
 #undef HAS_DIRENT
 

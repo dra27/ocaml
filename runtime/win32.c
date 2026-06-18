@@ -1274,6 +1274,14 @@ value caml_win32_xdg_defaults(void)
   CAMLreturn(result);
 }
 
+#define Is_separator(c) (c == '\\' || c == '/')
+
+#define Is_relative_dir(dir) \
+  (dir[0] == '.' \
+   && (dir[1] == '\0' \
+       || Is_separator(dir[1]) \
+       || (dir[1] == '.' && (dir[2] == '\0' || Is_separator(dir[2])))))
+
 CAMLextern char_os* caml_locate_standard_library (const wchar_t *exe_name,
                                                   const wchar_t *stdlib_default,
                                                   wchar_t **dirname)
@@ -1301,7 +1309,7 @@ CAMLextern char_os* caml_locate_standard_library (const wchar_t *exe_name,
     *(basename - 1) = 0;
 
     LPWSTR candidate =
-      caml_stat_wcsconcat(3, root, CAML_DIR_SEP, stdlib_default);
+      caml_stat_wcsconcat(3, root, T("\\"), stdlib_default);
     HANDLE h =
       CreateFile(candidate, 0,
                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,

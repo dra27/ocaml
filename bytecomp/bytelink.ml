@@ -765,6 +765,8 @@ let link_bytecode_as_c tolink outfile with_main =
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 #define CAML_INTERNALS
 #define CAMLDLLIMPORT
 #define CAML_INTERNALS_NO_PRIM_DECLARATIONS
@@ -774,7 +776,10 @@ extern "C" {
 #include <caml/sys.h>
 #include <caml/misc.h>
 
-const enum caml_byte_program_mode caml_byte_program_mode = EMBEDDED;
+extern const char_os *caml_runtime_standard_library_default;
+
+enum caml_byte_program_mode caml_byte_program_mode = COMPLETE_EXE;
+const bool caml_byte_program_mode_custom = false;
 
 static int caml_code[] = {
 |};
@@ -972,10 +977,15 @@ extern "C" {
 #define CAML_INTERNALS
 #define CAML_INTERNALS_NO_PRIM_DECLARATIONS
 
+#include <stdbool.h>
+
 #include <caml/mlvalues.h>
 #include <caml/startup.h>
 
-const enum caml_byte_program_mode caml_byte_program_mode = APPENDED;
+extern const char_os *caml_runtime_standard_library_default;
+
+enum caml_byte_program_mode caml_byte_program_mode = STANDARD;
+const bool caml_byte_program_mode_custom = true;
 
 |};
          Symtable.output_primitive_table poc;

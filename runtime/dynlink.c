@@ -85,6 +85,18 @@ static c_primitive lookup_primitive(char * name)
 
 #define LD_CONF_NAME T("ld.conf")
 
+#ifdef _WIN32
+
+#define CAML_DIR_SEP T("\\")
+#define Is_separator(c) (c == '\\' || c == '/')
+
+#else
+
+#define CAML_DIR_SEP T("/")
+#define Is_separator(c) (c == '/')
+
+#endif /* _WIN32 */
+
 /* Return a copy of [path], interpreting explicit-relative paths relative to
    [root]. [root] must not end with a directory separator and is expected to be
    absolute. The result of this function can never be ".", ".." or a path
@@ -270,6 +282,8 @@ static void open_shared_lib(char_os * name)
   caml_stat_free(suffixed);
   caml_stat_free(realname);
 }
+
+extern const char_os *caml_runtime_standard_library_effective;
 
 /* Build the table of primitives, given a search path and a list
    of shared libraries (both 0-separated in a char array).

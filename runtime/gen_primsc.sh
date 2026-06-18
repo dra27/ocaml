@@ -28,6 +28,8 @@ esac
 cat <<'EOF'
 /* Generated file, do not edit */
 
+#include <stdbool.h>
+
 #define CAML_INTERNALS
 #include "caml/mlvalues.h"
 #include "caml/prims.h"
@@ -69,6 +71,7 @@ echo '  0 };'
 # - caml_runtime_standard_library_default for bytecode images on this runtime
 cat <<'EOF'
 
-const enum caml_byte_program_mode caml_byte_program_mode = STANDARD;
+enum caml_byte_program_mode caml_byte_program_mode = STANDARD;
+const bool caml_byte_program_mode_custom = false;
 const char_os *caml_runtime_standard_library_default = OCAML_STDLIB_DIR;
 EOF

@@ -28,6 +28,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include "caml/config.h"
+#include "sys_int.h"
 #ifdef HAS_GETTIMEOFDAY
 #include <sys/time.h>
 #endif
@@ -579,6 +580,12 @@ static char * caml_dirname (const char * path)
 #endif
 }
 
+#define Is_relative_dir(dir) \
+  (dir[0] == '.' \
+   && (dir[1] == '\0' \
+       || dir[1] == '/' \
+       || (dir[1] == '.' && (dir[2] == '\0' || dir[2] == '/'))))
+
 CAMLextern char_os* caml_locate_standard_library (const char *exe_name,
                                                   const char *stdlib_default,
                                                   char **dirname)
@@ -586,7 +593,7 @@ CAMLextern char_os* caml_locate_standard_library (const char *exe_name,
   if (Is_relative_dir(stdlib_default)) {
     char * root = caml_dirname(exe_name);
     char * candidate =
-      caml_stat_strconcat(3, root, CAML_DIR_SEP, stdlib_default);
+      caml_stat_strconcat(3, root, "/", stdlib_default);
     /* In practice, a system which can be configured --with-relative-libdir will
        also have realpath. The directory is normalised here for consistency with
        the behaviour on Windows, which doesn't have a direct equivalent of

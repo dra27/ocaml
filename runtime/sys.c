@@ -710,6 +710,8 @@ CAMLprim value caml_sys_const_backend_type(value unit)
 /* If this remains unset then caml_runtime_standard_library_default is used */
 char_os *caml_standard_library_default = NULL;
 
+extern const char_os *caml_runtime_standard_library_default;
+
 CAMLprim value caml_sys_const_standard_library_default(value unit)
 {
   return caml_copy_string_of_os(
@@ -717,6 +719,10 @@ CAMLprim value caml_sys_const_standard_library_default(value unit)
                                   : caml_runtime_standard_library_default);
 }
 #endif
+
+CAMLextern char_os *caml_locate_standard_library (const char_os *exe_name,
+                                                  const char_os *stdlib_default,
+                                                  char_os **dirname);
 
 CAMLprim value caml_sys_get_stdlib_dirs(value vstdlib_default)
 {
