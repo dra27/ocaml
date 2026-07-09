@@ -418,6 +418,11 @@ OCaml 5.5.1
   ````
   (Florian Angeletti, report by Hazem ElMasry, review by Gabriel Scherer)
 
+- #14901, #14923: Fix the generated installation script to cope with macOS's
+  geriatric version of bash when executing in opam's sandbox.
+  (David Allsopp, report by Julian Fondren and Sacha-Élie Ayoun, investigation
+   and initial fix by Kate Deplaix, review by ???)
+
 OCaml 5.5.0 (19 June 2026)
 -------------------------
 
