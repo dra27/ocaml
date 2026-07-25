@@ -90,6 +90,9 @@ OCaml 5.4 maintenance version
   with frame pointer support.
   (Xavier Leroy, review by Vincent Laviron, report by Richard Jones)
 
+- #14871, #14914: Ignore OCAMLTOP_INCLUDE_PATH during the build.
+  (David Allsopp, report by Andreas Rossberg, review by Florian Angeletti)
+
 OCaml 5.4.1 (17 February 2026)
 ------------------------------
 
