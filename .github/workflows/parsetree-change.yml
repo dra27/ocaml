@@ -12,7 +12,7 @@ on:
 
 jobs:
   comment-and-label:
-    if: ${{github.repository == 'ocaml/ocaml'
+    if: ${{github.repository == 'dra27/ocaml'
            && !contains(github.event.pull_request.labels.*.name, 'parsetree-change')}}
     permissions:
       pull-requests: write
