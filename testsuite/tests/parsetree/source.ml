@@ -7559,3 +7559,9 @@ let f = function (module M : (A with type t = int [@a])) -> ()
 
 (* 5.5 Features *)
 type t = external "foo"
+
+(* Pexp_hole *)
+let _ = f _ ~_ ?_ ~l:_ ?o:_ ~_:_ ?_:_;;
+let _ = (_ : int);;
+let _ = _ 0;;
+let _ = _.l <- _;;

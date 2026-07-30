@@ -403,6 +403,8 @@ and expression i ppf x =
       line i ppf "Pexp_struct_item\n";
       structure_item i ppf si;
       expression i ppf e
+  | Pexp_hole ->
+      line i ppf "Pexp_hole\n"
 
 and function_param i ppf { pparam_desc = desc; pparam_loc = loc } =
   match desc with

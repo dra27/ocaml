@@ -1022,6 +1022,7 @@ and simple_expr ctxt f x =
     (* |`Normal -> longident_loc f li *)
     (* | `Prefix _ | `Infix _ -> pp f "( %a )" longident_loc li) *)
     | Pexp_constant c -> constant f c;
+    | Pexp_hole -> pp f "_"
     | Pexp_pack (me, opty) ->
         pp f "(module@;%a" (module_expr ctxt) me;
         Option.iter (pp f " :@ %a" (package_type ctxt)) opty;

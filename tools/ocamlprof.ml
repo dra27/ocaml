@@ -305,6 +305,7 @@ and rw_exp iflag sexp =
   | Pexp_struct_item (si, exp) ->
       rewrite_str_item iflag si;
       rewrite_exp iflag exp
+  | Pexp_hole -> ()
 
 and rewrite_ifbody iflag ghost sifbody =
   if !instr_if && not ghost then

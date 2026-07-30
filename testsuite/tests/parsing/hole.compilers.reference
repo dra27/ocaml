@@ -1,0 +1,133 @@
+[
+  structure_item 
+    Pstr_value Nonrec
+    [
+      <def>
+        pattern 
+          Ppat_any
+        expression 
+          Pexp_hole
+    ]
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_apply
+      expression 
+        Pexp_ident "f" 
+      [
+        <arg>
+        Nolabel
+          expression 
+            Pexp_hole
+        <arg>
+        Nolabel
+          expression 
+            Pexp_constant
+            constant 
+              PConst_int (0,None)
+      ]
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_apply
+      expression 
+        Pexp_hole
+      [
+        <arg>
+        Nolabel
+          expression 
+            Pexp_constant
+            constant 
+              PConst_int (0,None)
+      ]
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_field
+      expression 
+        Pexp_hole
+      "a" 
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_send "m"
+      expression 
+        Pexp_hole
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_constraint
+      expression 
+        Pexp_hole
+      core_type 
+        Ptyp_constr "int" 
+        []
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_tuple
+      [
+        None
+        expression 
+          Pexp_hole
+        None
+        expression 
+          Pexp_hole
+      ]
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_construct "Some" 
+      Some
+        expression 
+          Pexp_hole
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_lazy
+      expression 
+        Pexp_hole
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_apply
+      expression 
+        Pexp_ident "+" 
+      [
+        <arg>
+        Nolabel
+          expression 
+            Pexp_constant
+            constant 
+              PConst_int (1,None)
+        <arg>
+        Nolabel
+          expression 
+            Pexp_hole
+      ]
+  structure_item 
+    Pstr_eval
+    expression 
+      Pexp_apply
+      expression 
+        Pexp_ident "f" 
+      [
+        <arg>
+        Labelled "_"
+          expression 
+            Pexp_hole
+        <arg>
+        Optional "_"
+          expression 
+            Pexp_hole
+        <arg>
+        Labelled "_"
+          expression 
+            Pexp_hole
+        <arg>
+        Optional "_"
+          expression 
+            Pexp_hole
+      ]
+]
+
