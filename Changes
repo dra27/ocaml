@@ -16,6 +16,11 @@ Working version
 - #14692: Allow unparenthesized application expressions in record update syntax
   (Stephen Dolan, review by Damien Doligez)
 
+- #14???: the wildcard `_` now parses in all simple expressions as `Pexp_hole`.
+  This parsetree node must be transformed by ppx rewriters; the compiler itself
+  always rejects them.
+  (David Allsopp and Nailen Matschke, review by ???)
+
 ### Runtime system:
 
 - #10258: Overhaul the locale code used for mingw/msvc in float<->string
