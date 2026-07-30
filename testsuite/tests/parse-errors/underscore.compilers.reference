@@ -45,35 +45,35 @@ Error: Syntax error: wildcard "_" not expected.
 Line 5, characters 2-3:
 5 | f _;;
       ^
-Error: Syntax error
+Error: Syntax error: wildcard "_" not expected.
 Line 2, characters 5-6:
 2 | Some _;;
          ^
-Error: Syntax error
+Error: Syntax error: wildcard "_" not expected.
 Line 2, characters 5-6:
 2 | lazy _;;
          ^
-Error: Syntax error
+Error: Syntax error: wildcard "_" not expected.
 Line 2, characters 5-6:
 2 | f ~x:_;;
          ^
-Error: Syntax error
+Error: Syntax error: wildcard "_" not expected.
 Line 2, characters 3-4:
 2 | g ~_;;
        ^
-Error: Syntax error
+Error: Syntax error: wildcard "_" not expected.
 Line 2, characters 5-6:
 2 | g ~_:_;;
          ^
-Error: Syntax error
+Error: Syntax error: wildcard "_" not expected.
 Line 2, characters 3-4:
 2 | o ?_;;
        ^
-Error: Syntax error
+Error: Syntax error: wildcard "_" not expected.
 Line 2, characters 5-6:
 2 | o ?_:_;;
          ^
-Error: Syntax error
+Error: Syntax error: wildcard "_" not expected.
 Line 4, characters 9-10:
 4 | let x = ~_;;
              ^
@@ -81,5 +81,5 @@ Error: Syntax error
 Line 2, characters 4-5:
 2 | f ~ _ : 3;;
         ^
-Error: Syntax error
+Error: Syntax error: wildcard "_" not expected.
 
