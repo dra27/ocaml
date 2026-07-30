@@ -954,6 +954,9 @@ The precedences must be listed from low to high.
           NEW PREFIXOP STRING TRUE UIDENT
           LBRACKETPERCENT QUOTED_STRING_EXPR
           METAOCAML_BRACKET_OPEN METAOCAML_ESCAPE
+/* BEGIN AVOID */
+          UNDERSCORE
+/* END AVOID */
 
 /* Entry points */
 
@@ -2484,10 +2487,6 @@ fun_expr:
     { mk_indexop_expr user_indexing_operators ~loc:$sloc $1 }
   | fun_expr attribute
       { Exp.attr $1 $2 }
-/* BEGIN AVOID */
-  | UNDERSCORE
-     { not_expecting $loc($1) "wildcard \"_\"" }
-/* END AVOID */
 ;
 %inline expr:
   | or_function(fun_expr) { $1 }
@@ -2693,6 +2692,10 @@ simple_expr:
   | mod_longident DOT
     LPAREN MODULE ext_attributes module_expr COLON error
       { unclosed "(" $loc($3) ")" $loc($8) }
+/* BEGIN AVOID */
+  | UNDERSCORE
+      { not_expecting $loc($1) "wildcard \"_\"" }
+/* END AVOID */
 ;
 labeled_simple_expr:
     simple_expr %prec below_HASH
@@ -2702,12 +2705,20 @@ labeled_simple_expr:
   | TILDE label = LIDENT
       { let loc = $loc(label) in
         (Labelled label, mkexpvar ~loc label) }
+/* BEGIN AVOID */
+  | TILDE UNDERSCORE
+      { not_expecting $loc($2) "wildcard \"_\"" }
+/* END AVOID */
   | TILDE LPAREN label = LIDENT ty = type_constraint RPAREN
       { (Labelled label, mkexp_constraint ~loc:($startpos($2), $endpos)
                            (mkexpvar ~loc:$loc(label) label) ty) }
   | QUESTION label = LIDENT
       { let loc = $loc(label) in
         (Optional label, mkexpvar ~loc label) }
+/* BEGIN AVOID */
+  | QUESTION UNDERSCORE
+      { not_expecting $loc($2) "wildcard \"_\"" }
+/* END AVOID */
   | OPTLABEL simple_expr %prec below_HASH
       { (Optional $1, $2) }
 ;
