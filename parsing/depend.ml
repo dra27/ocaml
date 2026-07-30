@@ -270,6 +270,7 @@ let rec add_expr bv exp =
   | Pexp_struct_item (si, e) ->
       let bv, _ = add_struct_item (bv, String.Map.empty) si in
       add_expr bv e
+  | Pexp_hole -> ()
 
 and add_function_param bv param =
   match param.pparam_desc with

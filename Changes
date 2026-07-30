@@ -16,6 +16,11 @@ Working version
 - #14692: Allow unparenthesized application expressions in record update syntax
   (Stephen Dolan, review by Damien Doligez)
 
+- #XXXXX: the wildcard "_" is now parsed as an expression (Pexp_hole)
+  anywhere a simple expression is allowed. Holes are rejected by the
+  type-checker and are intended to be eliminated by ppx rewriters.
+  (David Allsopp)
+
 ### Runtime system:
 
 - #10258: Overhaul the locale code used for mingw/msvc in float<->string

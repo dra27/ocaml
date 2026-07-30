@@ -489,6 +489,7 @@ module E = struct
     | Pexp_unreachable -> ()
     | Pexp_struct_item (si, e) ->
         sub.structure_item sub si; sub.expr sub e
+    | Pexp_hole -> ()
 
   let iter_binding_op sub {pbop_op; pbop_pat; pbop_exp; pbop_loc} =
     iter_loc iter_string sub pbop_op;
