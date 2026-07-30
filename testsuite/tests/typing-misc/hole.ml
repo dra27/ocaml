@@ -141,9 +141,9 @@ This argument cannot be applied with label "~x"
 
 let a5 = g ~_
 [%%expect{|
-Line 1, characters 11-13:
+Line 1, characters 12-13:
 1 | let a5 = g ~_
-               ^^
+                ^
 Error: wildcard "_" not expected.
 |}]
 
@@ -157,9 +157,9 @@ Error: wildcard "_" not expected.
 
 let a7 = o ?_
 [%%expect{|
-Line 1, characters 11-13:
+Line 1, characters 12-13:
 1 | let a7 = o ?_
-               ^^
+                ^
 Error: wildcard "_" not expected.
 |}]
 

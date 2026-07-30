@@ -2702,7 +2702,7 @@ labeled_simple_expr:
       { let loc = $loc(label) in
         (Labelled label, mkexpvar ~loc label) }
   | TILDE UNDERSCORE
-      { (Labelled "_", mkexp ~loc:$sloc Pexp_hole) }
+      { (Labelled "_", mkexp ~loc:$loc($2) Pexp_hole) }
   | TILDE LPAREN label = LIDENT ty = type_constraint RPAREN
       { (Labelled label, mkexp_constraint ~loc:($startpos($2), $endpos)
                            (mkexpvar ~loc:$loc(label) label) ty) }
@@ -2710,7 +2710,7 @@ labeled_simple_expr:
       { let loc = $loc(label) in
         (Optional label, mkexpvar ~loc label) }
   | QUESTION UNDERSCORE
-      { (Optional "_", mkexp ~loc:$sloc Pexp_hole) }
+      { (Optional "_", mkexp ~loc:$loc($2) Pexp_hole) }
   | OPTLABEL simple_expr %prec below_HASH
       { (Optional $1, $2) }
 ;
