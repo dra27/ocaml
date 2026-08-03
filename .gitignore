@@ -223,6 +223,7 @@ META
 /otherlibs/dynlink/native/dynlink.mli
 /otherlibs/unix/unix.ml
 
+/parsing/keywords_token.mli
 /parsing/parser.ml
 /parsing/parser.mli
 /parsing/lexer.ml

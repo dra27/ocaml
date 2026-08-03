@@ -40,98 +40,6 @@ type error =
 
 exception Error of error * Location.t
 
-(* The table of keywords *)
-
-let all_keywords =
-  let v5_3 = Some (5,3) in
-  let v1_0 = Some (1,0) in
-  let v1_6 = Some (1,6) in
-  let v4_2 = Some (4,2) in
-  let always = None in
-  [
-    "and", AND, always;
-    "as", AS, always;
-    "assert", ASSERT, v1_6;
-    "begin", BEGIN, always;
-    "class", CLASS, v1_0;
-    "constraint", CONSTRAINT, v1_0;
-    "do", DO, always;
-    "done", DONE, always;
-    "downto", DOWNTO, always;
-    "effect", EFFECT, v5_3;
-    "else", ELSE, always;
-    "end", END, always;
-    "exception", EXCEPTION, always;
-    "external", EXTERNAL, always;
-    "false", FALSE, always;
-    "for", FOR, always;
-    "fun", FUN, always;
-    "function", FUNCTION, always;
-    "functor", FUNCTOR, always;
-    "if", IF, always;
-    "in", IN, always;
-    "include", INCLUDE, always;
-    "inherit", INHERIT, v1_0;
-    "initializer", INITIALIZER, v1_0;
-    "lazy", LAZY, v1_6;
-    "let", LET, always;
-    "match", MATCH, always;
-    "method", METHOD, v1_0;
-    "module", MODULE, always;
-    "mutable", MUTABLE, always;
-    "new", NEW, v1_0;
-    "nonrec", NONREC, v4_2;
-    "object", OBJECT, v1_0;
-    "of", OF, always;
-    "open", OPEN, always;
-    "or", OR, always;
-(*  "parser", PARSER; *)
-    "private", PRIVATE, v1_0;
-    "rec", REC, always;
-    "sig", SIG, always;
-    "struct", STRUCT, always;
-    "then", THEN, always;
-    "to", TO, always;
-    "true", TRUE, always;
-    "try", TRY, always;
-    "type", TYPE, always;
-    "val", VAL, always;
-    "virtual", VIRTUAL, v1_0;
-    "when", WHEN, always;
-    "while", WHILE, always;
-    "with", WITH, always;
-
-    "lor", INFIXOP3("lor"), always; (* Should be INFIXOP2 *)
-    "lxor", INFIXOP3("lxor"), always; (* Should be INFIXOP2 *)
-    "mod", INFIXOP3("mod"), always;
-    "land", INFIXOP3("land"), always;
-    "lsl", INFIXOP4("lsl"), always;
-    "lsr", INFIXOP4("lsr"), always;
-    "asr", INFIXOP4("asr"), always
-]
-
-
-let keyword_table = Hashtbl.create 149
-
-let populate_keywords (version,keywords) =
-  let greater (x:(int*int) option) (y:(int*int) option) =
-    match x, y with
-    | None, _ | _, None -> true
-    | Some x, Some y -> x >= y
-  in
-  let tbl = keyword_table in
-  Hashtbl.clear tbl;
-  let add_keyword (name, token, since) =
-    if greater version since then Hashtbl.replace tbl name (Some token)
-  in
-  List.iter add_keyword all_keywords;
-  List.iter (fun name ->
-    match List.find (fun (n,_,_) -> n = name) all_keywords with
-    | (_,tok,_) -> Hashtbl.replace tbl name (Some tok)
-    | exception Not_found -> Hashtbl.replace tbl name None
-    ) keywords
-
-
 (* To buffer string literals *)
 
 let string_buffer = Buffer.create 256
@@ -322,11 +230,8 @@ let lax_delim raw_name =
      if Utf8_lexeme.is_lowercase name then Some name
      else None
 
-let is_keyword name =
-  Hashtbl.mem keyword_table name
-
 let find_keyword lexbuf name =
-  match Hashtbl.find keyword_table name with
+  match Keywords.token_of_string name with
   | Some x -> x
   | None -> error lexbuf (Unknown_keyword name)
   | exception Not_found -> LIDENT name
@@ -334,7 +239,7 @@ let find_keyword lexbuf name =
 let check_label_name ?(raw_escape=false) lexbuf name =
   if Utf8_lexeme.is_capitalized name then
     error lexbuf (Capitalized_label name);
-  if not raw_escape && is_keyword name then
+  if not raw_escape && Keywords.is_keyword name then
     error lexbuf (Keyword_as_label name)
 
 (* Update the current location with file name and line number. *)
@@ -1025,7 +930,7 @@ and skip_hash_bang = parse
       loop NoLine Initial lexbuf
 
   let init ?(keyword_edition=None,[]) () =
-    populate_keywords keyword_edition;
+    Keywords.init keyword_edition;
     is_in_string := false;
     comment_start_loc := [];
     comment_list := [];

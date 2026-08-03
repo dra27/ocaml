@@ -138,7 +138,7 @@ let rec contains_unscoped_ident = function
 let kfalse _ = false
 
 let maybe_escape s =
-  if Lexer.is_keyword s then "\\#" ^ s else s
+  if Keywords.is_keyword s then "\\#" ^ s else s
 
 let rec name ?(paren=kfalse) = function
     Pident id -> maybe_escape (Ident.name id)
