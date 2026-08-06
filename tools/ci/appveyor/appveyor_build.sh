@@ -223,16 +223,20 @@ case "$1" in
     (
       cd "$FULL_BUILD_PREFIX-$PORT"
       export PATH="$FLEXDLLROOT:$PATH"
+      date
       opam init --cli=2.4 --bare --yes --disable-sandboxing --auto-setup \
                 --cygwin-local-install
       # These commands intentionally run using opam's "default" CLI
+      date
       opam switch create "$OPAMSWITCH" --empty
       opam pin add --no-action --kind=path ocaml-variants .
       opam pin add --no-action flexdll flexdll
-      opam install --yes flexdll winpthreads
+      date
+      opam install --yes flexdll
       opam install --yes --assume-built ocaml-variants
       git checkout -- ocaml-variants.install
       rm -f config.cache ocaml-variants-fixup.sh ocaml-compiler-clone.sh
+      date
       opam exec -- ocamlc -v
     )
     run "test $PORT in prefix" \
