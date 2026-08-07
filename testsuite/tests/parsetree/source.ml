@@ -7565,3 +7565,10 @@ let _ = f _ ~_ ?_ ~l:_ ?o:_ ~_:_ ?_:_;;
 let _ = (_ : int);;
 let _ = _ 0;;
 let _ = _.l <- _;;
+
+(* Pmod_hole *)
+module Hole = _;;
+module Hole' = F(_)(_ : S)(struct end);;
+include _;;
+open _;;
+let _ = (module _ : S);;
