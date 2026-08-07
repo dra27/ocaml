@@ -170,3 +170,77 @@ Line 1, characters 14-15:
                   ^
 Error: wildcard "_" not expected.
 |}]
+
+(* "_" also parses as a module expression (a hole, Pmod_hole) and is
+   likewise rejected by the type-checker. *)
+
+module type S = sig end
+module F (X : S) = struct end
+[%%expect{|
+module type S = sig end
+module F : (X : S) -> sig end
+|}]
+
+module M = _
+[%%expect{|
+Line 1, characters 11-12:
+1 | module M = _
+               ^
+Error: wildcard "_" not expected.
+|}]
+
+module N = F(_)
+[%%expect{|
+Line 1, characters 13-14:
+1 | module N = F(_)
+                 ^
+Error: wildcard "_" not expected.
+|}]
+
+module O = (_ : S)
+[%%expect{|
+Line 1, characters 12-13:
+1 | module O = (_ : S)
+                ^
+Error: wildcard "_" not expected.
+|}]
+
+include _
+[%%expect{|
+Line 1, characters 8-9:
+1 | include _
+            ^
+Error: wildcard "_" not expected.
+|}]
+
+open _
+[%%expect{|
+Line 1, characters 5-6:
+1 | open _
+         ^
+Error: wildcard "_" not expected.
+|}]
+
+module type P = module type of _
+[%%expect{|
+Line 1, characters 31-32:
+1 | module type P = module type of _
+                                   ^
+Error: wildcard "_" not expected.
+|}]
+
+let x = (module _ : S)
+[%%expect{|
+Line 1, characters 16-17:
+1 | let x = (module _ : S)
+                    ^
+Error: wildcard "_" not expected.
+|}]
+
+let y = let module L = _ in ()
+[%%expect{|
+Line 1, characters 23-24:
+1 | let y = let module L = _ in ()
+                           ^
+Error: wildcard "_" not expected.
+|}]

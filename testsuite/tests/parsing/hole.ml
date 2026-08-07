@@ -15,6 +15,18 @@ lazy _;;
 (* Labelled argument sugar *)
 f ~_ ?_ ~_:_ ?_:_;;
 
+(* "_" is a module expression (Pmod_hole) *)
+module M = _;;
+module N = _(M);;
+module O = _();;
+module P = F(_);;
+module Q = (_ : sig end);;
+module R = functor () -> _;;
+include _;;
+open _;;
+let _ = (module _ : S);;
+let _ = let module L = _ in ();;
+
 (* TEST
  flags = "-dparsetree -dno-locations -stop-after parsing";
  setup-ocamlc.byte-build-env;

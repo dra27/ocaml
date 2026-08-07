@@ -2600,6 +2600,8 @@ and type_module_aux ~alias ~strengthen ~funct_body anchor env smod =
       Shape.leaf_for_unpack ()
   | Pmod_extension ext ->
       raise (Error_forward (Builtin_attributes.error_of_extension ext))
+  | Pmod_hole ->
+      Typecore.Error.log_and_raise smod.pmod_loc env Typecore.Unexpected_hole
 
 and type_application loc ~strengthen ~funct_body env smod =
   let rec extract_application ~funct_body env sargs smod =
