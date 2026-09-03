@@ -89,6 +89,11 @@ let mk_custom f =
 let mk_dllib f =
   "-dllib", Arg.String f, "<lib>  Use the dynamically-loaded library <lib>"
 
+let mk_dllib_suffixed f =
+  "-dllib-suffixed", Arg.String f,
+  "<lib>  Use the dynamically-loaded library <lib>, with the runtime suffix \
+          appended to the name"
+
 let mk_dllpath f =
   "-dllpath", Arg.String f,
   "<dir>  Add <dir> to the run-time search path for shared libraries"
@@ -159,6 +164,10 @@ let mk_H f =
   "-H", Arg.String f,
   "<dir>  Add <dir> to the list of \"hidden\" include directories\n\
  \     (Like -I, but the program can not directly reference these dependencies)"
+
+let mk_set_runtime_default f =
+  "-set-runtime-default", Arg.String f, "<param>=<value>  Set the default for \
+      runtime parameter <param> to <value> (see the manual for further details)"
 
 let mk_impl f =
   "-impl", Arg.String f, "<file>  Compile <file> as a .ml file"
@@ -517,6 +526,25 @@ let mk_unsafe_string =
  in
  "-unsafe-string", Arg.Unit err, " (option not available)"
 
+let mk_launch_method f =
+  "-launch-method", Arg.String f,
+  "<method>  Specify the mechanism for the bytecode launcher:\n\
+  \          exe - use the executable launcher in runtime-launch-info\n\
+  \          sh - use a #!, using sh if the interpreter path cannot be used\n\
+  \          /path/interpreter - use #!, or the given sh-compatible \n\
+  \            interpreter if the interpreter path cannot be used"
+
+let mk_search_method f =
+  "-runtime-search", Arg.Symbol (["disable"; "fallback"; "enable"], f),
+  Printf.sprintf
+    "  Control the way the bytecode header searches for the interpreter\n\
+    \    The following settings are supported:\n\
+    \      disable  use a fixed absolute path to the interpreter\n\
+    \      fallback search for interpreter only if not found at the absolute \
+                    path\n\
+    \      enable   always search for the interpreter\n\
+    \    The default setting is 'disable'."
+
 let mk_use_runtime f =
   "-use-runtime", Arg.String f,
   "<file>  Generate bytecode for the given runtime system"
@@ -872,6 +900,7 @@ module type Compiler_options = sig
   val _runtime_variant : string -> unit
   val _with_runtime : unit -> unit
   val _without_runtime : unit -> unit
+  val _set_runtime_default : string -> unit
   val _short_paths : unit -> unit
   val _thread : unit -> unit
   val _v : unit -> unit
@@ -912,10 +941,13 @@ module type Bytecomp_options = sig
   val _custom : unit -> unit
   val _no_check_prims : unit -> unit
   val _dllib : string -> unit
+  val _dllib_suffixed : string -> unit
   val _dllpath : string -> unit
   val _make_runtime : unit -> unit
   val _vmthread : unit -> unit
   val _use_runtime : string -> unit
+  val _launch_method : string -> unit
+  val _search_method : string -> unit
   val _output_complete_exe : unit -> unit
 
   val _dinstr : unit -> unit
@@ -1046,6 +1078,7 @@ struct
     mk_config_var F._config_var;
     mk_custom F._custom;
     mk_dllib F._dllib;
+    mk_dllib_suffixed F._dllib_suffixed;
     mk_dllpath F._dllpath;
     mk_dtypes F._annot;
     mk_for_pack_byt F._for_pack;
@@ -1099,6 +1132,7 @@ struct
     mk_without_runtime F._without_runtime;
     mk_safe_string;
     mk_safer_matching F._safer_matching;
+    mk_set_runtime_default F._set_runtime_default;
     mk_short_paths F._short_paths;
     mk_strict_sequence F._strict_sequence;
     mk_no_strict_sequence F._no_strict_sequence;
@@ -1111,6 +1145,8 @@ struct
     mk_unsafe_string;
     mk_use_runtime F._use_runtime;
     mk_use_runtime_2 F._use_runtime;
+    mk_launch_method F._launch_method;
+    mk_search_method F._search_method;
     mk_v F._v;
     mk_verbose F._verbose;
     mk_version F._version;
@@ -1314,6 +1350,7 @@ struct
     mk_S F._S;
     mk_safe_string;
     mk_safer_matching F._safer_matching;
+    mk_set_runtime_default F._set_runtime_default;
     mk_shared F._shared;
     mk_short_paths F._short_paths;
     mk_strict_sequence F._strict_sequence;
@@ -1756,6 +1793,19 @@ module Default = struct
     let _verbose = set verbose
   end
 
+  let fatalf fmt = Printf.ksprintf Compenv.fatal fmt
+
+  let parse_runtime_parameter opt =
+    let k, setting =
+      try Misc.cut_at opt '='
+      with Not_found ->
+        fatalf "-set-runtime-default: invalid runtime parameter '%s'. \
+                Expected <name>=<value>." opt in
+      if k = "standard_library_default" then
+        Clflags.standard_library_default := Some setting
+      else
+        fatalf "-set-runtime-default: unrecognized runtime parameter %s." k
+
   module Compiler = struct
     let _a = set make_archive
     let _annot = set annotations
@@ -1794,6 +1844,7 @@ module Default = struct
     let _plugin _p = plugin := true
     let _pp s = preprocessor := (Some s)
     let _runtime_variant s = runtime_variant := s
+    let _set_runtime_default s = parse_runtime_parameter s
     let _stop_after pass =
       let module P = Compiler_pass in
         match P.of_string pass with
@@ -1923,7 +1974,9 @@ third-party libraries such as Lwt, but with a different API."
     let _custom = set custom_runtime
     let _dcamlprimc = set keep_camlprimc_file
     let _dinstr = set dump_instr
-    let _dllib s = Compenv.defer (ProcessDLLs (Misc.rev_split_words s))
+    let _dllib s = Compenv.defer (ProcessDLLs (false, Misc.rev_split_words s))
+    let _dllib_suffixed s =
+      Compenv.defer (ProcessDLLs (true, Misc.rev_split_words s))
     let _dllpath s = dllpaths := ((!dllpaths) @ [s])
     let _make_runtime () =
       custom_runtime := true; make_runtime := true; link_everything := true
@@ -1937,6 +1990,34 @@ third-party libraries such as Lwt, but with a different API."
     let _output_obj () = output_c_object := true; custom_runtime := true
     let _use_prims s = use_prims := s
     let _use_runtime s = use_runtime := s
+    let _launch_method s =
+      let setting =
+        try
+          let s, bindir = Misc.cut_at s ' ' in
+          target_bindir := bindir;
+          s
+        with Not_found ->
+          s
+      in
+      match setting with
+      | "exe" ->
+          launch_method := Config.Executable;
+      | "sh" ->
+          launch_method := Config.Shebang None
+      | s when s <> "" && s.[0] = '/' ->
+          launch_method := Config.Shebang (Some s)
+      | _ ->
+          Compenv.fatal
+            "-launch-method: expect sh, exe or an absolute path for <method>"
+    let _search_method = function
+    | "disable" ->
+        search_method := Config.Disable
+    | "fallback" ->
+        search_method := Config.Fallback
+    | "enable" ->
+        search_method := Config.Enable
+    | _ ->
+        assert false
     let _v () = Compenv.print_version_and_library "compiler"
     let _vmthread () = Compenv.fatal vmthread_removed_message
   end

@@ -2,9 +2,9 @@
 /*                                                                        */
 /*                                 OCaml                                  */
 /*                                                                        */
-/*             Sebastien Hinderer, projet Cambium, INRIA Paris            */
+/*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           */
 /*                                                                        */
-/*   Copyright 2021 Institut National de Recherche en Informatique et     */
+/*   Copyright 1996 Institut National de Recherche en Informatique et     */
 /*     en Automatique.                                                    */
 /*                                                                        */
 /*   All rights reserved.  This file is distributed under the terms of    */
@@ -13,13 +13,10 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Macros defining the current version of OCaml */
+/* Operating system and standard library configuration. */
 
-#undef OCAML_VERSION_MAJOR
-#undef OCAML_VERSION_MINOR
-#undef OCAML_VERSION_PATCHLEVEL
-#undef OCAML_VERSION_ADDITIONAL
-#undef OCAML_VERSION_EXTRA
-#undef OCAML_VERSION
-#undef OCAML_VERSION_STRING
-#undef OCAML_RELEASE_NUMBER
+#undef HAS_STRLCPY
+
+#undef HAS_LIBGEN_H
+
+/* Define HAS_LIBGEN_H if you have /usr/include/libgen.h. */

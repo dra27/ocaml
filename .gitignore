@@ -26,6 +26,7 @@
 *.cmx[as]
 *.cmti
 *.annot
+*.stripped
 *.exe
 *.exe.manifest
 .DS_Store
@@ -240,6 +241,7 @@ META
 /runtime/primitives
 /runtime/primitives*.new
 /runtime/prims.c
+/runtime/sys_int.h
 /runtime/caml/exec.h
 /runtime/caml/opnames.h
 /runtime/caml/version.h
@@ -251,13 +253,10 @@ META
 /runtime/build_config.h
 /runtime/sak
 
-/stdlib/runtime.info
 /stdlib/runtime-launch-info
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
-/stdlib/target_runtime.info
-/stdlib/target_runtime-launch-info
 
 /testsuite/**/*.result
 /testsuite/**/*.opt_result
@@ -272,6 +271,7 @@ META
 
 /testsuite/tools/codegen
 /testsuite/tools/dump_load_path
+/testsuite/tools/poisonedruntime
 /testsuite/tools/expect
 /testsuite/tools/lexcmm.ml
 /testsuite/tools/parsecmm.ml
@@ -281,6 +281,7 @@ META
 /testsuite/tools/test_in_prefix.opt
 /testsuite/tools/toolchain.ml
 
+/tools/byterntm.ml
 /tools/ocamldep
 /tools/ocamldep.opt
 /tools/ocamlprof
