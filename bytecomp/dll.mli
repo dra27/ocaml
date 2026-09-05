@@ -15,8 +15,14 @@
 
 (* Handling of dynamically-linked libraries *)
 
-(* Extract the name of a DLLs from its external name (xxx.so or -lxxx) *)
-val extract_dll_name: string -> string
+(* Extract the name of a DLLs from its mangled or external name. If
+   [~suffixed:true] then the name is just the undecorated basename of the DLL
+   (no -l and no .so). If [~suffixed:false] then the external name may include
+   the DLL extension or linking symbol (xxx.so or -lxxx) *)
+val extract_dll_name: (suffixed:bool * string) -> string
+
+val read_suffixed_dllibs_from_channel:
+  in_channel -> Cmo_format.library -> (suffixed:bool * string) list
 
 type dll_mode =
   | For_checking     (* will just check existence of symbols;

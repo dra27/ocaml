@@ -51,13 +51,41 @@ let remove_path dirs =
 
 (* Extract the name of a DLLs from its external name (xxx.so or -lxxx) *)
 
-let extract_dll_name file =
-  if Filename.check_suffix file Config.ext_dll then
+let extract_dll_name (~suffixed, file) =
+  if not suffixed && Filename.check_suffix file Config.ext_dll then
     Filename.chop_suffix file Config.ext_dll
-  else if String.length file >= 2 && String.sub file 0 2 = "-l" then
-    "dll" ^ String.sub file 2 (String.length file - 2)
   else
-    file (* will cause error later *)
+    let file =
+      if String.starts_with ~prefix:"-l" file then
+      "dll" ^ String.sub file 2 (String.length file - 2)
+    else
+      file
+    in
+      if suffixed then
+        Misc.RuntimeID.stubslib file
+      else
+        file
+
+(* This dance avoids the need to bump the magic number for .cma format, which is
+   a bit awkward to do with old releases, because we don't reserve indexes for
+   maintenance releases. In OCaml 5.5+, Cmo_format.lib_dllibs is a
+   (suffixed:bool * string) list, but for these backports we instead keep the
+   old string list for Cmo_format.lib_dllibs and append a bool list after the
+   toc. This value is guarded by the cma magic number written in reverse. *)
+let rebmun_cigam_amc =
+  let magic_length = String.length Config.cma_magic_number in
+  let init i = Config.cma_magic_number.[magic_length - i - 1] in
+  String.init magic_length init
+
+let read_suffixed_dllibs_from_channel ic l =
+  let open Cmo_format in
+  let magic_length = String.length Config.cma_magic_number in
+  match In_channel.really_input_string ic magic_length with
+  | Some magic when magic = rebmun_cigam_amc ->
+      let combine suffixed l acc = (~suffixed, l)::acc in
+      List.fold_right2 combine (input_value ic : bool list) l.lib_dllibs []
+  | _ ->
+      List.map (fun l -> (~suffixed:false, l)) l.lib_dllibs
 
 (* Open a list of DLLs, adding them to opened_dlls.
    Raise [Failure msg] in case of error. *)
@@ -138,22 +166,7 @@ let synchronize_primitive num symb =
     assert (actual_num = num)
   end
 
-(* Read the [ld.conf] file and return the corresponding list of directories *)
-
-let ld_conf_contents () =
-  let path = ref [] in
-  begin try
-    let ic = open_in (Filename.concat Config.standard_library "ld.conf") in
-    begin try
-      while true do
-        path := input_line ic :: !path
-      done
-    with End_of_file -> ()
-    end;
-    close_in ic
-  with Sys_error _ -> ()
-  end;
-  List.rev !path
+external ld_conf_contents : string -> string list = "caml_dynlink_parse_ld_conf"
 
 (* Split the CAML_LD_LIBRARY_PATH environment variable and return
    the corresponding list of directories.  *)
@@ -169,7 +182,7 @@ let ld_library_path_contents () =
 let init_compile nostdlib =
   search_path :=
     ld_library_path_contents() @
-    (if nostdlib then [] else ld_conf_contents())
+    (if nostdlib then [] else ld_conf_contents Config.standard_library_default)
 
 (* Initialization for linking in core (dynlink or toplevel) *)
 
