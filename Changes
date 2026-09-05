@@ -121,6 +121,9 @@ OCaml 4.14.2 (14 March 2024)
 - #11590: Allow installing to a destination path containing spaces.
   (Élie Brami, review by Sébastien Hinderer and David Allsopp)
 
+- #11675: Stop installing ocamloptp when the native compiler is not built.
+  (Sébastien Hinderer, review by David Allsopp and Florian Angeletti)
+
 - #12372: Pass option -no-execute-only to the linker for OpenBSD >= 7.3
   so that code sections remain readable, as needed for closure marshaling.
   (Xavier Leroy and Anil Madhavapeddy, review by Anil Madhavapeddy and
