@@ -495,7 +495,11 @@ let link_bytecode_as_c tolink outfile with_main =
 \n#include <caml/misc.h>\n";
        List.iter (fun (f, _) -> Printf.fprintf outchan "\n#undef %s" f)
          guarded_primitives;
-       output_string outchan "\nstatic int caml_code[] = {\n";
+       output_string outchan "\
+\nenum caml_byte_program_mode caml_byte_program_mode = EMBEDDED;\
+\n\
+\nstatic int caml_code[] = {\
+\n";
        Symtable.init();
        clear_crc_interfaces ();
        let currpos = ref 0 in
@@ -505,12 +509,20 @@ let link_bytecode_as_c tolink outfile with_main =
        and currpos_fun () = !currpos in
        List.iter (link_file output_fun currpos_fun) tolink;
        (* The final STOP instruction *)
-       Printf.fprintf outchan "\n0x%x};\n\n" Opcodes.opSTOP;
+       Printf.fprintf outchan "\
+\n0x%x};\
+\nasize_t caml_code_size = sizeof(caml_code);\
+\ncode_t caml_start_code = caml_code;\
+\n\n" Opcodes.opSTOP;
        (* The table of global data *)
        output_string outchan "static char caml_data[] = {\n";
        output_data_string outchan
          (Marshal.to_string (Symtable.initial_global_table()) []);
-       output_string outchan "\n};\n\n";
+       output_string outchan "\
+\n};\
+\nchar * caml_marshalled_global_data = caml_data;\
+\nasize_t caml_marshalled_global_data_size = sizeof(caml_data);\
+\n\n";
        (* The sections *)
        let sections =
          [ "SYMB", Symtable.data_global_map();
@@ -519,61 +531,13 @@ let link_bytecode_as_c tolink outfile with_main =
        output_string outchan "static char caml_sections[] = {\n";
        output_data_string outchan
          (Marshal.to_string sections []);
-       output_string outchan "\n};\n\n";
+       output_string outchan "\
+\n};\
+\nchar * caml_section_table = caml_sections;\
+\nasize_t caml_section_table_size = sizeof(caml_sections);\
+\n\n";
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
-       (* The entry point *)
-       if with_main then begin
-         output_string outchan "\
-\nint main_os(int argc, char_os **argv)\
-\n{\
-\n  caml_byte_program_mode = COMPLETE_EXE;\
-\n  caml_startup_code(caml_code, sizeof(caml_code),\
-\n                    caml_data, sizeof(caml_data),\
-\n                    caml_sections, sizeof(caml_sections),\
-\n                    /* pooling */ 0,\
-\n                    argv);\
-\n  caml_do_exit(0);\
-\n  return 0; /* not reached */\
-\n}\n"
-       end else begin
-         output_string outchan "\
-\nvoid caml_startup(char_os ** argv)\
-\n{\
-\n  caml_startup_code(caml_code, sizeof(caml_code),\
-\n                    caml_data, sizeof(caml_data),\
-\n                    caml_sections, sizeof(caml_sections),\
-\n                    /* pooling */ 0,\
-\n                    argv);\
-\n}\
-\n\
-\nvalue caml_startup_exn(char_os ** argv)\
-\n{\
-\n  return caml_startup_code_exn(caml_code, sizeof(caml_code),\
-\n                               caml_data, sizeof(caml_data),\
-\n                               caml_sections, sizeof(caml_sections),\
-\n                               /* pooling */ 0,\
-\n                               argv);\
-\n}\
-\n\
-\nvoid caml_startup_pooled(char_os ** argv)\
-\n{\
-\n  caml_startup_code(caml_code, sizeof(caml_code),\
-\n                    caml_data, sizeof(caml_data),\
-\n                    caml_sections, sizeof(caml_sections),\
-\n                    /* pooling */ 1,\
-\n                    argv);\
-\n}\
-\n\
-\nvalue caml_startup_pooled_exn(char_os ** argv)\
-\n{\
-\n  return caml_startup_code_exn(caml_code, sizeof(caml_code),\
-\n                               caml_data, sizeof(caml_data),\
-\n                               caml_sections, sizeof(caml_sections),\
-\n                               /* pooling */ 1,\
-\n                               argv);\
-\n}\n"
-       end;
        output_string outchan "\
 \n#ifdef __cplusplus\
 \n}\
@@ -687,9 +651,23 @@ let link objfiles output_name =
          #endif\n";
          Symtable.output_primitive_table poc;
          output_string poc "\
-         #ifdef __cplusplus\n\
-         }\n\
-         #endif\n";
+\n\
+/* Stub values for caml_startup et al. */\n\
+#include <stddef.h>\n\
+enum caml_byte_program_mode { APPENDED, EMBEDDED };\n\
+typedef int opcode_t;\n\
+typedef opcode_t * code_t;\n\
+opcode_t caml_start_code[] = {0};\n\
+size_t caml_code_size = sizeof(caml_start_code);\n\
+char * caml_marshalled_global_data = NULL;\n\
+size_t caml_marshalled_global_data_size = 0;\n\
+char * caml_section_table = NULL;\n\
+size_t caml_section_table_size = 0;\n\
+\n\
+enum caml_byte_program_mode caml_byte_program_mode = APPENDED;\n\
+#ifdef __cplusplus\n\
+}\n\
+#endif\n";
          close_out poc;
          let exec_name = fix_exec_name output_name in
          if not (build_custom_runtime prim_name exec_name)
