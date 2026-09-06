@@ -182,16 +182,7 @@ let libdir_rules config file =
           && List.mem basename ["config.cmt"; "config_main.cmt";
                                 "ocamlcommon.cma"] in
         (* The compiler's artefacts are all compiled with -g *)
-<<<<<<< HEAD
         (stdlib, true, false, false)
-      else if basename = "runtime-launch-info" then
-        (* When the compiler is configured with a relative libdir,
-           runtime-launch-info just contains ".", rather than the prefix *)
-        let stdlib = (config.has_relative_libdir = None) in
-        (stdlib, false, false, false)
-=======
-        (~stdlib, ~ocaml_debug:true, ~c_debug:false, ~s:false)
->>>>>>> da60a2e7920
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. *)

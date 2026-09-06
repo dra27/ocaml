@@ -20,19 +20,13 @@
 (* The main OCaml version string has moved to ../build-aux/ocaml_version.m4 *)
 let version = Sys.ocaml_version
 
-<<<<<<< HEAD
-let standard_library_default_raw = standard_library_default
-=======
 (* is_official_release and release_number are automatically updated autoconf
    from values in ../build-aux/ocaml_version.m4 - do not edit these lines
    directly. *)
 let is_official_release = false
-let release_number = 21
+let release_number = 20
 
-external standard_library_default : unit -> string = "%standard_library_default"
-
-let standard_library_default_raw = standard_library_default ()
->>>>>>> da60a2e7920
+let standard_library_default_raw = standard_library_default
 
 external stdlib_dirs : string -> string * string option
    = "caml_sys_get_stdlib_dirs"

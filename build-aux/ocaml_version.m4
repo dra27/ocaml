@@ -33,15 +33,10 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
 # incremented with each minor release, and likewise must be an unpadded integer.
 
 m4_define([OCAML__VERSION_MAJOR], [5])
-<<<<<<< HEAD
 m4_define([OCAML__VERSION_MINOR], [4])
+m4_define([OCAML__RELEASE_NUMBER], [20])
 m4_define([OCAML__VERSION_PATCHLEVEL], [2])
-=======
-m4_define([OCAML__VERSION_MINOR], [5])
-m4_define([OCAML__RELEASE_NUMBER], [21])
-m4_define([OCAML__VERSION_PATCHLEVEL], [0])
 
->>>>>>> da60a2e7920
 # Note that the OCAML__VERSION_EXTRA string defined below is always empty
 # for officially-released versions of OCaml.
 m4_define([OCAML__VERSION_EXTRA], [dev0-2026-02-17])
