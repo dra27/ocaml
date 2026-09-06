@@ -104,14 +104,9 @@ let flexdll_dirs = [@flexdll_dir@]
 let ar_supports_response_files = @ar_supports_response_files@
 
 let tsan = @tsan@
-<<<<<<< HEAD
-=======
-
-let shebangscripts = @shebangscripts@
 
 let suffixing = @suffixing@
 
 let launch_method = {@QS@|@launch_method_target@|@QS@}
 
 let search_method = {@QS@|@runtime_search_target@|@QS@}
->>>>>>> da60a2e7920

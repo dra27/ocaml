@@ -30,11 +30,8 @@ val linkdeps_unit :
 
 val extract_crc_interfaces: unit -> crcs
 
-<<<<<<< HEAD
 val to_utf_8_seq : string -> Uchar.t Seq.t
 
-=======
->>>>>>> da60a2e7920
 type error =
   | File_not_found of filepath
   | Not_an_object_file of filepath

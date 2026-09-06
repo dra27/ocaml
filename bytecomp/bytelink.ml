@@ -446,16 +446,11 @@ let write_header outchan =
   in
   let runtime, search =
     if String.length !Clflags.use_runtime > 0 then
-<<<<<<< HEAD
-      (true, make_absolute !Clflags.use_runtime)
-=======
-      (* Do not use BUILD_PATH_PREFIX_MAP mapping for this. *)
       let runtime = !Clflags.use_runtime in
       if Filename.is_relative runtime then
         Filename.concat (Sys.getcwd ()) runtime, Config.Disable
       else
-        runtime, Config.Disable
->>>>>>> da60a2e7920
+        make_absolute runtime, Config.Disable
     else
       let runtime =
         let runtime = "ocamlrun" ^ !Clflags.runtime_variant in

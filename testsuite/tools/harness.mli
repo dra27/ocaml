@@ -75,15 +75,11 @@ module Import : sig
     bytecode_shebangs_by_default: bool;
       (** True if ocamlc uses a shebang-style header rather than an executable
           header for tendered bytecode executables. *)
-<<<<<<< HEAD
     shebangscripts: bool;
       (** {v $(SHEBANGSCRIPTS) v} - {v Makefile.config v} *)
-    libraries: string list list
-=======
     filename_mangling: bool;
       (** True if the Runtime ID is being used for filename mangling. *)
     libraries: string list list;
->>>>>>> da60a2e7920
       (** Sorted list of basenames of libraries to test.
           Derived from {v [$(OTHERLIBRARIES)] v} - {v Makefile.config v} *)
   }

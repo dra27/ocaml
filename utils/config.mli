@@ -341,8 +341,6 @@ val ar_supports_response_files: bool
 val tsan : bool
 (** Whether ThreadSanitizer instrumentation is enabled *)
 
-<<<<<<< HEAD
-=======
 (** Launch mechanisms for bytecode executables
 
     @since 5.5 *)
@@ -378,11 +376,6 @@ val search_method : search_method
 
     @since 5.5 *)
 
-val shebangscripts : bool
-(** Whether the target supports shebang scripts
-
-    @since 5.5 *)
-
 val suffixing : bool
 (** Whether the runtime executable and shared library filenames and C stub
     library filenames are being mangled with Runtime IDs and the {!target}.
@@ -399,7 +392,6 @@ val native_runtime_id : string
 
     @since 5.5 *)
 
->>>>>>> da60a2e7920
 (** Access to configuration values *)
 val print_config : out_channel -> unit
 

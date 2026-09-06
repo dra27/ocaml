@@ -68,7 +68,6 @@ let run_tests ~sh config env =
   TestBytecodeBinaries.run config env;
   TestLinkModes.run ~sh config env
 
-<<<<<<< HEAD
 type launch_method =
 | Shebang_bin_sh of string
 | Executable
@@ -104,11 +103,10 @@ let read_runtime_launch_info file =
       {launcher; buffer; executable_offset}
   with Not_found ->
     Harness.fail_because "%s: corrupt header" file
-=======
+
 let rename_exe_in_test_root env from_base to_base =
   Sys.rename (Environment.in_test_root env (Harness.exe from_base))
              (Environment.in_test_root env (Harness.exe to_base))
->>>>>>> da60a2e7920
 
 let () =
   let ~config, ~pwd, ~prefix, ~bindir:_, ~bindir_suffix, ~libdir,
@@ -159,16 +157,6 @@ let () =
   in
   let header_size, filename_mangling =
     let file = Filename.concat libdir "runtime-launch-info" in
-<<<<<<< HEAD
-    read_runtime_launch_info file in
-  let header_size =
-    let {buffer; executable_offset; _} = runtime_launch_info in
-    String.length buffer - executable_offset in
-  let bytecode_shebangs_by_default =
-    runtime_launch_info.launcher <> Executable in
-  let launcher_searches_for_ocamlrun = Sys.win32 in
-  let target_launcher_searches_for_ocamlrun = Sys.win32 in
-=======
     In_channel.with_open_bin file @@ fun ic ->
       In_channel.length ic, (input_char ic <> '\000')
   in
@@ -178,7 +166,6 @@ let () =
     (config.has_runtime_search <> Config.Disable) in
   let target_launcher_searches_for_ocamlrun =
     (Config.search_method <> Config.Disable) in
->>>>>>> da60a2e7920
   let config =
     {config with libraries;
                  launcher_searches_for_ocamlrun;
