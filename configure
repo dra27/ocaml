@@ -3643,13 +3643,8 @@ ac_config_files="$ac_config_files Makefile.config"
 
 ac_config_files="$ac_config_files stdlib/sys.ml"
 
-<<<<<<< HEAD
-dnlAC_CONFIG_FILES(manual/src/version.tex)
-dnlAC_CONFIG_FILES(manual/src/html_processing/src/common.ml)
 ac_config_files="$ac_config_files ocamltest/ocamltest_config.ml"
 
-=======
->>>>>>> 172b5c5d074
 ac_config_files="$ac_config_files otherlibs/dynlink/dynlink_config.ml"
 
 ac_config_files="$ac_config_files utils/config.common.ml"
@@ -3674,10 +3669,8 @@ ac_config_files="$ac_config_files otherlibs/runtime_events/META"
 
 ac_config_files="$ac_config_files stdlib/META"
 
-<<<<<<< HEAD
 ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
 
-=======
 if test -d manual
 then :
   ac_config_files="$ac_config_files manual/src/version.tex"
@@ -3685,7 +3678,6 @@ then :
   ac_config_files="$ac_config_files manual/src/html_processing/src/common.ml"
 
 fi
->>>>>>> 172b5c5d074
 
 # Definitions related to the version of OCaml
 printf "%s\n" "#define OCAML_VERSION_MAJOR 5" >>confdefs.h
