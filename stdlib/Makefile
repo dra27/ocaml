@@ -71,11 +71,7 @@ install::
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(call INSTALL_ITEMS, *.cmt *.cmti *.mli *.ml *.ml.in, lib)
 endif
-<<<<<<< HEAD
-	$(INSTALL_DATA) target_$(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
-=======
-	$(call INSTALL_ITEMS, $(HEADER_NAME), lib)
->>>>>>> f6c8af418c3
+	$(call INSTALL_ITEM, target_$(HEADER_NAME), lib, , $(HEADER_NAME))
 
 .PHONY: installopt
 installopt: installopt-default
