@@ -1,8 +1,97 @@
+OCaml 5.4 maintenance version
+-----------------------------
+
+### Runtime system:
+
+* #14243: Explicit relative paths in ld.conf (".", "..", "./<path...>",
+  "../<path...>") are interpreted as being relative to the directory ld.conf
+  was loaded from, and the default ld.conf now uses relative paths, rather than
+  embedding the absolute path to the Standard Library. The brave may continue to
+  put implicit paths in ld.conf. The interpretation of CAML_LD_LIBRARY_PATH is
+  unaltered. Additionally, ld.conf is loaded from all of $OCAMLLIB/ld.conf,
+  $CAMLLIB/ld.conf and standard_library_default/ld.conf rather than just the
+  first one found. ld.conf files with CRLF line endings are now consistently
+  normalised on both Windows and Unix.
+  (David Allsopp, review by Jonah Beckford, Damien Doligez and Hugo Heuzard)
+
+- #14244, #14802, #14846: Added --with-relative-libdir which allows the runtime
+  and the compilers to locate the Standard Library relative to where the
+  binaries themselves are installed, removing the absolute path previously
+  embedded in caml_standard_library_default. Executables linked with
+  `ocamlc -custom` now always attempt to load bytecode from the executable
+  itself, rather than first trying `argv[0]`.
+  (David Allsopp, review by Jonah Beckford, Antonin Décimo, Damien Doligez,
+   Samuel Hym and Vincent Laviron)
+
+- #14245: Introduce Runtime IDs for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system. The IDs are used, along with the host
+  triplet, to provide mangled names for the ocamlrun executable and its variants
+  and the DLL versions of both the bytecode and native runtimes, with symlinks
+  created for the original names. They are also used to mangle the names of stub
+  libraries so that stub libraries compiled for a given configuration of the
+  runtime will only be sought by that runtime. The behaviour is disabled by
+  configuring with --disable-suffixing.
+  (David Allsopp, review by Damien Doligez and Samuel Hym)
+
+### Tools:
+
+- #14245: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by Damien Doligez and Samuel Hym)
+
+### Compiler user-interface and warnings:
+
+- #14244: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp, Jonah Beckford, Damien Doligez and
+   Samuel Hym)
+
+- #14245: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix. New option -runtime-search extends the bytecode executable
+  header to be able to search for the runtime interpreter in the directory
+  containing the executable and in PATH rather than relying on a single
+  hard-coded path.
+  (David Allsopp, review by Damien Doligez and Samuel Hym)
+
+### Internal/compiler-libs changes:
+
+- #14243: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by Jonah Beckford, Damien Doligez and Hugo Heuzard)
+
+### Build system:
+
+- #14243: New configure option --with-additional-stublibsdir allows an
+  additional directory to be added to the start of ld.conf. Additionally, the
+  stublibs subdirectory is no longer created, nor added to ld.conf, when
+  building OCaml with --disable-shared.
+  (David Allsopp, review by Jonah Beckford, Damien Doligez and Hugo Heuzard)
+
+- #14244: When targeting native Windows on Cygwin or MSYS2, preserve
+  backslashes in the supplied `--prefix` (in particular, backslashes instead of
+  slashes will then be displayed by `ocamlopt -config-var standard_library`).
+  If the supplied prefix contains a slash, then it is normalised, as
+  previously.
+  (David Allsopp, review by Jonah Beckford, Antonin Décimo, Damien Doligez and
+   Samuel Hym)
+
+- #14245: New --enable-runtime-search configure option controls the
+  -runtime-search option used to build the bytecode binaries in the compiler
+  distribution. --enable-runtime-search-target controls the default value of
+  -runtime-search used for bytecode executables produced by the compiler.
+  (David Allsopp, review by Damien Doligez and Samuel Hym)
+
 ### Bug fixes:
 
 - #14574, #14577, #14589: Fix wrong assembly code generated for ARM64
   with frame pointer support.
   (Xavier Leroy, review by Vincent Laviron, report by Richard Jones)
+
+- #14871, #14914: Ignore OCAMLTOP_INCLUDE_PATH during the build.
+  (David Allsopp, report by Andreas Rossberg, review by Florian Angeletti)
 
 OCaml 5.4.1 (17 February 2026)
 ------------------------------

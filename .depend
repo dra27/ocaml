@@ -44,7 +44,8 @@ utils/clflags.cmx : \
     utils/clflags.cmi
 utils/clflags.cmi : \
     utils/profile.cmi \
-    utils/misc.cmi
+    utils/misc.cmi \
+    utils/config.cmi
 utils/compression.cmo : \
     utils/compression.cmi
 utils/compression.cmx : \
@@ -2364,6 +2365,7 @@ bytecomp/bytelibrarian.cmo : \
     utils/linkdeps.cmi \
     utils/format_doc.cmi \
     bytecomp/emitcode.cmi \
+    bytecomp/dll.cmi \
     utils/config.cmi \
     file_formats/cmo_format.cmi \
     utils/clflags.cmi \
@@ -2376,6 +2378,7 @@ bytecomp/bytelibrarian.cmx : \
     utils/linkdeps.cmx \
     utils/format_doc.cmx \
     bytecomp/emitcode.cmx \
+    bytecomp/dll.cmx \
     utils/config.cmx \
     file_formats/cmo_format.cmi \
     utils/clflags.cmx \
@@ -2490,14 +2493,17 @@ bytecomp/bytesections.cmi :
 bytecomp/dll.cmo : \
     utils/misc.cmi \
     utils/config.cmi \
+    file_formats/cmo_format.cmi \
     utils/binutils.cmi \
     bytecomp/dll.cmi
 bytecomp/dll.cmx : \
     utils/misc.cmx \
     utils/config.cmx \
+    file_formats/cmo_format.cmi \
     utils/binutils.cmx \
     bytecomp/dll.cmi
-bytecomp/dll.cmi :
+bytecomp/dll.cmi : \
+    file_formats/cmo_format.cmi
 bytecomp/emitcode.cmo : \
     parsing/unit_info.cmi \
     lambda/translmod.cmi \
@@ -5235,6 +5241,7 @@ middle_end/flambda/closure_conversion.cmo : \
     lambda/debuginfo.cmi \
     middle_end/convert_primitives.cmi \
     utils/config.cmi \
+    middle_end/compilenv.cmi \
     middle_end/compilation_unit.cmi \
     middle_end/flambda/base_types/closure_origin.cmi \
     middle_end/flambda/base_types/closure_id.cmi \
@@ -5264,6 +5271,7 @@ middle_end/flambda/closure_conversion.cmx : \
     lambda/debuginfo.cmx \
     middle_end/convert_primitives.cmx \
     utils/config.cmx \
+    middle_end/compilenv.cmx \
     middle_end/compilation_unit.cmx \
     middle_end/flambda/base_types/closure_origin.cmx \
     middle_end/flambda/base_types/closure_id.cmx \
@@ -7973,6 +7981,17 @@ lex/table.cmo : \
 lex/table.cmx : \
     lex/table.cmi
 lex/table.cmi :
+tools/byterntm.cmo : \
+    utils/misc.cmi \
+    bytecomp/bytesections.cmi \
+    tools/byterntm.cmi
+tools/byterntm.cmx : \
+    utils/misc.cmx \
+    bytecomp/bytesections.cmx \
+    tools/byterntm.cmi
+tools/byterntm.cmi : \
+    utils/misc.cmi \
+    bytecomp/bytesections.cmi
 tools/cmpbyt.cmo : \
     bytecomp/bytesections.cmi \
     tools/cmpbyt.cmi
@@ -8068,6 +8087,9 @@ tools/objinfo.cmo : \
     typing/ident.cmi \
     utils/format_doc.cmi \
     middle_end/flambda/export_info.cmi \
+    bytecomp/dll.cmi \
+    utils/config.cmi \
+    middle_end/compilenv.cmi \
     middle_end/compilation_unit.cmi \
     file_formats/cmxs_format.cmi \
     file_formats/cmx_format.cmi \
@@ -8075,6 +8097,7 @@ tools/objinfo.cmo : \
     file_formats/cmo_format.cmi \
     file_formats/cmi_format.cmi \
     bytecomp/bytesections.cmi \
+    tools/byterntm.cmi \
     utils/binutils.cmi \
     tools/objinfo.cmi
 tools/objinfo.cmx : \
@@ -8091,6 +8114,9 @@ tools/objinfo.cmx : \
     typing/ident.cmx \
     utils/format_doc.cmx \
     middle_end/flambda/export_info.cmx \
+    bytecomp/dll.cmx \
+    utils/config.cmx \
+    middle_end/compilenv.cmx \
     middle_end/compilation_unit.cmx \
     file_formats/cmxs_format.cmi \
     file_formats/cmx_format.cmi \
@@ -8098,6 +8124,7 @@ tools/objinfo.cmx : \
     file_formats/cmo_format.cmi \
     file_formats/cmi_format.cmx \
     bytecomp/bytesections.cmx \
+    tools/byterntm.cmx \
     utils/binutils.cmx \
     tools/objinfo.cmi
 tools/objinfo.cmi :
@@ -10522,9 +10549,11 @@ testsuite/lib/testing.cmx : \
 testsuite/lib/testing.cmi :
 testsuite/tools/cmdline.cmo : \
     testsuite/tools/harness.cmi \
+    utils/config.cmi \
     testsuite/tools/cmdline.cmi
 testsuite/tools/cmdline.cmx : \
     testsuite/tools/harness.cmx \
+    utils/config.cmx \
     testsuite/tools/cmdline.cmi
 testsuite/tools/cmdline.cmi : \
     testsuite/tools/harness.cmi
@@ -10560,6 +10589,7 @@ testsuite/tools/environment.cmo : \
     file_formats/cmt_format.cmi \
     file_formats/cmo_format.cmi \
     bytecomp/bytesections.cmi \
+    tools/byterntm.cmi \
     testsuite/tools/environment.cmi
 testsuite/tools/environment.cmx : \
     otherlibs/unix/unix.cmx \
@@ -10570,6 +10600,7 @@ testsuite/tools/environment.cmx : \
     file_formats/cmt_format.cmx \
     file_formats/cmo_format.cmi \
     bytecomp/bytesections.cmx \
+    tools/byterntm.cmx \
     testsuite/tools/environment.cmi
 testsuite/tools/environment.cmi : \
     testsuite/tools/harness.cmi
@@ -10613,13 +10644,20 @@ testsuite/tools/expect.cmi : \
     parsing/location.cmi
 testsuite/tools/harness.cmo : \
     otherlibs/unix/unix.cmi \
+    utils/misc.cmi \
     utils/config.cmi \
+    tools/byterntm.cmi \
     testsuite/tools/harness.cmi
 testsuite/tools/harness.cmx : \
     otherlibs/unix/unix.cmx \
+    utils/misc.cmx \
     utils/config.cmx \
+    tools/byterntm.cmx \
     testsuite/tools/harness.cmi
-testsuite/tools/harness.cmi :
+testsuite/tools/harness.cmi : \
+    utils/misc.cmi \
+    utils/config.cmi \
+    tools/byterntm.cmi
 testsuite/tools/lexcmm.cmo : \
     testsuite/tools/parsecmm.cmi \
     utils/misc.cmi \
@@ -10681,12 +10719,14 @@ testsuite/tools/parsecmmaux.cmi : \
     middle_end/backend_var.cmi
 testsuite/tools/testBytecodeBinaries.cmo : \
     otherlibs/unix/unix.cmi \
+    utils/misc.cmi \
     testsuite/tools/harness.cmi \
     testsuite/tools/environment.cmi \
     utils/config.cmi \
     testsuite/tools/testBytecodeBinaries.cmi
 testsuite/tools/testBytecodeBinaries.cmx : \
     otherlibs/unix/unix.cmx \
+    utils/misc.cmx \
     testsuite/tools/harness.cmx \
     testsuite/tools/environment.cmx \
     utils/config.cmx \
@@ -10730,6 +10770,7 @@ testsuite/tools/testRelocation.cmo : \
     testsuite/tools/harness.cmi \
     testsuite/tools/environment.cmi \
     utils/config.cmi \
+    bytecomp/bytelink.cmi \
     testsuite/tools/testRelocation.cmi
 testsuite/tools/testRelocation.cmx : \
     otherlibs/unix/unix.cmx \
@@ -10737,6 +10778,7 @@ testsuite/tools/testRelocation.cmx : \
     testsuite/tools/harness.cmx \
     testsuite/tools/environment.cmx \
     utils/config.cmx \
+    bytecomp/bytelink.cmx \
     testsuite/tools/testRelocation.cmi
 testsuite/tools/testRelocation.cmi : \
     testsuite/tools/harness.cmi \
@@ -10790,11 +10832,13 @@ testsuite/tools/test_in_prefix.cmx : \
     testsuite/tools/test_in_prefix.cmi
 testsuite/tools/test_in_prefix.cmi :
 testsuite/tools/test_ld_conf.cmo : \
+    otherlibs/unix/unix.cmi \
     testsuite/tools/harness.cmi \
     testsuite/tools/environment.cmi \
     utils/config.cmi \
     testsuite/tools/test_ld_conf.cmi
 testsuite/tools/test_ld_conf.cmx : \
+    otherlibs/unix/unix.cmx \
     testsuite/tools/harness.cmx \
     testsuite/tools/environment.cmx \
     utils/config.cmx \

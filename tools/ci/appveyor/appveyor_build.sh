@@ -70,7 +70,10 @@ function set_configuration {
   CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
   CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
 
-  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2" '--enable-ocamltest')
+  args=('--cache-file' "$CACHE_FILE" \
+        '--prefix' "$2/_opam" \
+        '--docdir' "$2/_opam/doc/ocaml" \
+        '--enable-ocamltest')
 
   case "$1" in
     cygwin*)
@@ -87,6 +90,10 @@ function set_configuration {
       args+=('--host=x86_64-pc-windows' '--enable-dependency-generation' \
              '--enable-native-toplevel');;
   esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--with-relative-libdir' \
+           '--enable-runtime-search' '--enable-runtime-search-target=fallback')
+  fi
 
   # Remove old configure cache if the configure script or the OS
   # have changed
@@ -103,6 +110,8 @@ function set_configuration {
     if ((failed)) ; then cat config.log ; exit $failed ; fi
   fi
 
+  cp "$CACHE_FILE" config.cache
+
 #  FILE=$(pwd | cygpath -f - -m)/Makefile.config
 #  run "Content of $FILE" cat Makefile.config
 }
@@ -110,7 +119,7 @@ function set_configuration {
 PARALLEL_URL='https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel'
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 FLEXDLLROOT="$PROGRAMFILES/flexdll"
-OCAMLROOT=$(echo "$OCAMLROOT" | cygpath -f - -m)
+export OPAMSWITCH="$OCAMLROOT"
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
@@ -195,6 +204,39 @@ case "$1" in
           make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    make -C "$FULL_BUILD_PREFIX-$PORT" INSTALL_MODE=clone install
+    (
+      cd "$OCAMLROOT"
+      mv _opam destdir
+      #ret="$PWD"
+      #script="$PWD/ocaml-compiler-clone.sh"
+      #cd "$(find $PWD/install -name _opam -type d)"
+      mkdir -p "destdir/share/ocaml"
+      cp "$FULL_BUILD_PREFIX-$PORT/config."{cache,status} 'destdir/share/ocaml/'
+      cp "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" \
+           'destdir/share/ocaml/clone'
+      cd destdir
+      sh "$FULL_BUILD_PREFIX-$PORT/ocaml-compiler-clone.sh" "$PWD" \
+                                                            "$OCAMLROOT/_opam"
+    )
+    rm -rf "$OCAMLROOT"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" OPAM_PACKAGE_NAME=ocaml-variants \
+      INSTALL_MODE=opam install
+    (
+      cd "$FULL_BUILD_PREFIX-$PORT"
+      export PATH="$FLEXDLLROOT:$PATH"
+      opam init --cli=2.4 --bare --yes --disable-sandboxing --auto-setup \
+                --cygwin-local-install
+      # These commands intentionally run using opam's "default" CLI
+      opam switch create "$OPAMSWITCH" --empty
+      opam pin add --no-action --kind=path ocaml-variants .
+      opam pin add --no-action flexdll flexdll
+      opam install --yes flexdll winpthreads
+      opam install --yes --assume-built ocaml-variants
+      git checkout -- ocaml-variants.install
+      rm -f config.cache ocaml-variants-fixup.sh ocaml-compiler-clone.sh
+      opam exec -- ocamlc -v
+    )
     run "test $PORT in prefix" \
       $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
             test-in-prefix

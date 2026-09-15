@@ -21,7 +21,7 @@
 let boot_cannot_call s = "/ The boot compiler should not call " ^ s
 
 let bindir = "/tmp"
-let standard_library_default = "/tmp"
+let target_bindir = bindir
 let ccomp_type = "n/a"
 let c_compiler = boot_cannot_call "the C compiler"
 let c_output_obj = ""
@@ -57,6 +57,8 @@ let align_double = true
 let align_int64 = true
 let function_sections = false
 let afl_instrument = false
+let bytecode_runtime_id = ""
+let native_runtime_id = ""
 let native_compiler = false
 let tsan = false
 let architecture = "none"
@@ -79,3 +81,6 @@ let target = host
 let systhread_supported = false
 let flexdll_dirs = []
 let ar_supports_response_files = true
+let suffixing = false
+let launch_method = "sh"
+let search_method = "always"

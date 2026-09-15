@@ -23,11 +23,43 @@
 val version: string
 (** The current version number of the system *)
 
+val release_number: int
+(** The release number for the compiler
+
+    @since 5.4.2 *)
+
+val is_official_release: bool
+(** True if the compiler is an unmodified official OCaml release
+
+    @since 5.4.2 *)
+
 val bindir: string
-(** The directory containing the binary programs *)
+(** The directory containing the binary programs. If the compiler was configured
+    with [--with-relative-libdir] then this will be the directory containing the
+    currently executing runtime. *)
+
+val standard_library_relative: string option
+(** The explicit relative path from the compiler binaries to the standard
+    libraries directory if the compiler was configured with
+    [--with-relative-libdir], or [None] otherwise.
+
+    @since 5.4.2 *)
+
+val target_bindir: string
+(** The directory containing the runtime binaries on the target system
+
+    @since 5.4.2 *)
+
+val standard_library_default: string
+(** The effective value for the default directory containing the standard
+    libraries. This is always an absolute path, computed using
+    {!standard_library_relative} if necessary.
+
+    @since 5.4.2 *)
 
 val standard_library: string
-(** The directory containing the standard libraries *)
+(** The effective directory containing the standard libraries, taking CAMLLIB
+    and OCAMLLIB into account. *)
 
 val ccomp_type: string
 (** The "kind" of the C compiler, assembler and linker used: one of
@@ -179,7 +211,9 @@ val target_os_type: string
 (** Operating system targetted by the native-code compiler. One of
 -  ["Unix"] (for all Unix versions, including Linux and macOS),
 -  ["Win32"] (for MS-Windows, OCaml compiled with MSVC++ or MinGW-w64),
--  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin). *)
+-  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin).
+
+    @since 5.4 *)
 
 val asm: string
 (** The assembler (and flags) to use for assembling
@@ -285,6 +319,57 @@ val ar_supports_response_files: bool
 
 val tsan : bool
 (** Whether ThreadSanitizer instrumentation is enabled *)
+
+(** Launch mechanisms for bytecode executables
+
+    @since 5.4.2 *)
+type launch_method =
+| Executable
+    (** Use the executable launcher stub *)
+| Shebang of string option
+    (** Use a shebang-style launcher. Whenever possible, the interpreter will be
+        the runtime itself, but if the path to the runtime is not valid for a
+        shebang line, then a shell script is generated. When this is necessary,
+        the parameter in [Shebang (Some sh)] is the full path to [sh]; if the
+        parameter is [None], then the linker searches PATH for [sh]. *)
+
+val launch_method : launch_method
+(** Default launch mechanism for bytecode executables
+
+    @since 5.4.2 *)
+
+(** Mechanisms used by tendered bytecode executables to locate the interpreter
+
+    @since 5.4.2 *)
+type search_method =
+| Disable
+    (** Interpreter searching disabled - check fixed absolute location only *)
+| Fallback
+    (** Check fixed absolute location first, but fall back to a search if that
+        fails *)
+| Enable
+    (** Always search for the interpreter *)
+
+val search_method : search_method
+(** Default search mechanism for bytecode executables
+
+    @since 5.4.2 *)
+
+val suffixing : bool
+(** Whether the runtime executable and shared library filenames and C stub
+    library filenames are being mangled with Runtime IDs and the {!target}.
+
+    @since 5.4.2 *)
+
+val bytecode_runtime_id : string
+(** The Runtime ID for this build of the bytecode runtime system
+
+    @since 5.4.2 *)
+
+val native_runtime_id : string
+(** The Runtime ID for this build of the native runtime system
+
+    @since 5.4.2 *)
 
 (** Access to configuration values *)
 val print_config : out_channel -> unit
