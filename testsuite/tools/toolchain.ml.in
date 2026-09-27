@@ -15,6 +15,7 @@
 open Harness.Import
 
 let c_compiler_vendor = {@QS@|@ocaml_cc_vendor@|@QS@}
+let as_is_cc = @as_is_cc@
 
 (* cf. OCAML_CC_VENDOR in aclocal.m4 and utils.config.mli *)
 let is_clang =

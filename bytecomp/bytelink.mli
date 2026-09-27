@@ -47,3 +47,5 @@ exception Error of error
 
 val report_error: error Format_doc.format_printer
 val report_error_doc: error Format_doc.printer
+
+val to_utf_8_seq : string -> Uchar.t Seq.t
