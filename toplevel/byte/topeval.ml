@@ -301,7 +301,7 @@ and really_load_file recursive ppf name filename ic =
                 "Cannot load required shared library %s.@.Reason: %s.@."
                 name reason;
               raise Load_failed)
-          lib.lib_dllibs;
+          (Dll.read_suffixed_dllibs_from_channel ic lib);
         List.iter (load_compunit ic filename ppf) lib.lib_units;
         true
       end else begin

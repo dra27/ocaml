@@ -19,8 +19,7 @@
    than compiled on its own *)
 
 let bindir = {@QS@|@ocaml_bindir@|@QS@}
-
-let standard_library_default = {@QS@|@ocaml_libdir@|@QS@}
+let target_bindir = {@QS@|@TARGET_BINDIR@|@QS@}
 
 let ccomp_type = {@QS@|@ccomptype@|@QS@}
 let c_compiler = {@QS@|@CC@|@QS@}
@@ -44,6 +43,7 @@ let bytecomp_c_compiler =
 let native_c_compiler =
   c_compiler ^ " " ^ native_cflags ^ " " ^ native_cppflags
 let native_c_libraries = {@QS@|@cclibs@|@QS@}
+let compression_c_libraries = {@QS@|@zstd_libs@|@QS@}
 let native_ldflags = {@QS@|@native_ldflags@|@QS@}
 let native_pack_linker = {@QS@|@PACKLD@|@QS@}
 let default_rpath = {@QS@|@rpath@|@QS@}
@@ -64,6 +64,9 @@ let flat_float_array = @flat_float_array@
 
 let function_sections = @function_sections@
 let afl_instrument = @afl@
+
+let bytecode_runtime_id = {@QS@|@bytecode_runtime_id@|@QS@}
+let native_runtime_id = {@QS@|@native_runtime_id@|@QS@}
 
 let native_compiler = @native_compiler@
 
@@ -92,3 +95,9 @@ let flexdll_dirs = [@flexdll_dir@]
 let ar_supports_response_files = @ar_supports_response_files@
 
 let tsan = @tsan@
+
+let suffixing = @suffixing@
+
+let launch_method = {@QS@|@launch_method_target@|@QS@}
+
+let search_method = {@QS@|@runtime_search_target@|@QS@}
