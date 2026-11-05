@@ -264,7 +264,7 @@ jobs:
           make tests
 
       - name: Install the compiler
-        if: matrix.opam != 'true'
+        if: matrix.opam != 'true' || matrix.libdir == 'relative'
         run: |
           make install
 
@@ -280,7 +280,7 @@ jobs:
           cp "$script" "$root/destdir/share/ocaml/clone"
           (cd "$root/destdir" && sh "$script" "$PWD" "${{ matrix.prefix }}/_opam")
           "$root/_opam/bin/ocamlc.exe" -config
-          rm -rf "$root" "$script"
+          rm -rf "$root${{ matrix.opam != 'true' && '/destdir' || ''}}" "$script"
 
       - name: Create opam switch
         if: matrix.opam == 'true'
