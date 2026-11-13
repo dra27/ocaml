@@ -418,11 +418,46 @@ let write_sh_launcher outchan bin_sh bindir search runtime =
    called) *)
 
 let write_header outchan =
+  let zinc_runtime_id, write_exe_launcher =
+    let header =
+      let header = "runtime-launch-info" in
+      try Load_path.find header
+      with Not_found -> raise (Error (File_not_found header))
+    in
+    let data =
+      try In_channel.with_open_bin header In_channel.input_all
+      with Sys_error msg -> raise (Error (Camlheader (msg, header)))
+    in
+    let zinc_runtime_id, offset =
+      if String.length data < 2 then
+        raise (Error (Camlheader ("corrupt header", header)))
+      (* Compatibility with previous header format - remove post-bootstrap *)
+      else if List.mem data.[0] ['/'; 'e'; 's'] then
+        None, String.index data '\000' + 2
+      else if data.[0] = '\000' then
+        None, 1
+      else
+        let zinc = Misc.RuntimeID.of_zinc_hi (String.sub data 0 2) in
+        if Option.fold ~none:false ~some:Misc.RuntimeID.is_zinc zinc then
+          zinc, 2
+        else
+          raise (Error (Camlheader ("corrupt header", header)))
+    in
+    let write_exe_header outchan =
+      let len = String.length data in
+      Out_channel.output_substring outchan data offset (len - offset)
+    in
+    zinc_runtime_id, write_exe_header
+  in
   let runtime, search =
     if String.length !Clflags.use_runtime > 0 then
       make_absolute !Clflags.use_runtime, Config.Disable
     else
-      let runtime = "ocamlrun" ^ !Clflags.runtime_variant in
+      let runtime =
+        let runtime = "ocamlrun" ^ !Clflags.runtime_variant in
+        let some = Misc.RuntimeID.ocamlrun !Clflags.runtime_variant in
+        Option.fold ~none:runtime ~some zinc_runtime_id
+      in
       if !Clflags.search_method <> Config.Disable then
         runtime, !Clflags.search_method
       else
@@ -450,18 +485,6 @@ let write_header outchan =
         else
           Shebang_runtime
   in
-  let write_exe_launcher data =
-    (* Compatibility with previous header format - remove post-bootstrap *)
-    let data =
-      if data = "" || not (List.mem data.[0] ['/'; 'e'; 's']) then
-        data
-      else
-        let exe_start = String.index data '\000' + 2 in
-        let len = String.length data in
-        String.sub data exe_start (len - exe_start)
-    in
-    Out_channel.output_string outchan data
-  in
   (* Write the header *)
   match launcher with
   | Shebang_runtime ->
@@ -471,20 +494,11 @@ let write_header outchan =
       Bytesections.init_record outchan
   | Shebang_bin_sh bin_sh ->
       (* Use the shebang launcher *)
-      write_sh_launcher outchan bin_sh !Clflags.target_bindir search runtime;
+      write_sh_launcher outchan bin_sh bindir search runtime;
       Bytesections.init_record outchan
   | Executable ->
       (* Use the executable stub launcher *)
-      let header =
-        let header = "runtime-launch-info" in
-        try Load_path.find header
-        with Not_found -> raise (Error (File_not_found header))
-      in
-      let data =
-        try In_channel.with_open_bin header In_channel.input_all
-        with Sys_error msg -> raise (Error (Camlheader (msg, header)))
-      in
-      write_exe_launcher data;
+      write_exe_launcher outchan;
       (* The runtime name needs recording in RNTM *)
       let toc_writer = Bytesections.init_record outchan in
       (* stdlib/header.c determines which mode is needed based on whether the
@@ -497,8 +511,8 @@ let write_header outchan =
       else begin
         if search = Enable then
           (* Ensure bindir does _not_ end up with a separator *)
-          output_string outchan (Filename.(
-            dirname (concat !Clflags.target_bindir current_dir_name)));
+          output_string outchan
+            (Filename.(dirname (concat bindir current_dir_name)));
         output_char outchan '\000';
         output_string outchan runtime
       end;
@@ -537,13 +551,28 @@ let link_bytecode ?final_name tolink exec_name standalone =
        let start_code = pos_out outchan in
        Symtable.init();
        clear_crc_interfaces ();
-       let sharedobjs = List.map Dll.extract_dll_name !Clflags.dllibs in
+       let (tocheck, sharedobjs) =
+         let process_dllib ((~suffixed, name) as dllib) (tocheck, sharedobjs) =
+           let resolved_name = Dll.extract_dll_name dllib in
+           let partial_name =
+             if suffixed then
+               if String.starts_with ~prefix:"-l" name then
+                 (~suffixed, "dll" ^ String.sub name 2 (String.length name - 2))
+               else
+                 dllib
+             else
+               (~suffixed:false, resolved_name)
+           in
+           (resolved_name::tocheck, partial_name::sharedobjs)
+         in
+         List.fold_right process_dllib !Clflags.dllibs ([], [])
+       in
        let check_dlls = standalone && Config.target = Config.host in
        if check_dlls then begin
          (* Initialize the DLL machinery *)
          Dll.init_compile !Clflags.no_std_include;
          Dll.add_path (Load_path.get_path_list ());
-         try Dll.open_dlls Dll.For_checking sharedobjs
+         try Dll.open_dlls Dll.For_checking tocheck
          with Failure reason -> raise(Error(Cannot_open_dll reason))
        end;
        let output_fun buf =
@@ -560,11 +589,20 @@ let link_bytecode ?final_name tolink exec_name standalone =
        (* DLL stuff *)
        if standalone then begin
          (* The extra search path for DLLs *)
-         output_string outchan (concat_null_terminated !Clflags.dllpaths);
-         Bytesections.record toc_writer DLPT;
+         if !Clflags.dllpaths <> [] then begin
+           output_string outchan (concat_null_terminated !Clflags.dllpaths);
+           Bytesections.record toc_writer DLPT
+         end;
          (* The names of the DLLs *)
-         output_string outchan (concat_null_terminated sharedobjs);
-         Bytesections.record toc_writer DLLS
+         if sharedobjs <> [] then begin
+           let output_sharedobj (~suffixed, name) =
+             output_char outchan (if suffixed then '-' else ':');
+             output_string outchan name;
+             output_byte outchan 0
+           in
+           List.iter output_sharedobj sharedobjs;
+           Bytesections.record toc_writer DLLS
+         end
        end;
        (* The names of all primitives *)
        Symtable.output_primitive_names outchan;
@@ -827,13 +865,20 @@ value caml_startup_pooled_exn(char_os ** argv)
   if not with_main && !Clflags.debug then
     output_cds_file ((Filename.chop_extension outfile) ^ ".cds")
 
+let runtime_library_name runtime_variant =
+  if runtime_variant = "_shared" && Config.suffixing then
+    Misc.RuntimeID.shared_runtime Sys.Bytecode
+  else
+    "-lcamlrun" ^ runtime_variant
+
 (* Build a custom runtime *)
 
 let build_custom_runtime prim_name exec_name =
   let runtime_lib =
     if not !Clflags.with_runtime
     then ""
-    else "-lcamlrun" ^ !Clflags.runtime_variant in
+    else runtime_library_name !Clflags.runtime_variant
+  in
   let stable_name =
     if not !Clflags.keep_camlprimc_file then
       Some "camlprim.c"
@@ -976,7 +1021,8 @@ const enum caml_byte_program_mode caml_byte_program_mode = APPENDED;
                  let runtime_lib =
                    if not !Clflags.with_runtime
                    then ""
-                   else "-lcamlrun" ^ !Clflags.runtime_variant in
+                   else runtime_library_name !Clflags.runtime_variant
+                 in
                  Ccomp.call_linker mode output_name
                    ([obj_file] @ List.rev !Clflags.ccobjs @ [runtime_lib])
                    c_libs = 0
