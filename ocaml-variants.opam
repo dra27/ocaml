@@ -1,7 +1,7 @@
 opam-version: "2.0"
-version: "4.14.6+trunk"
+version: "4.14.3+relocatable"
 license: "LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception"
-synopsis: "OCaml 4.14 maintenance version"
+synopsis: "Relocatable OCaml 4.14 branch"
 maintainer: "caml-list@inria.fr"
 authors: [
   "Xavier Leroy"
@@ -9,13 +9,14 @@ authors: [
   "Alain Frisch"
   "Jacques Garrigue"
   "Didier Rémy"
+  "KC Sivaramakrishnan"
   "Jérôme Vouillon"
 ]
 homepage: "https://github.com/ocaml/ocaml/"
 bug-reports: "https://github.com/ocaml/ocaml/issues"
 depends: [
-  # This is OCaml 4.14.6
-  "ocaml" {= "4.14.6" & post}
+  # This is OCaml 4.14.3
+  "ocaml" {= "4.14.3" & post}
 
   # General base- packages
   "base-unix" {post}
@@ -65,6 +66,10 @@ build: [
     "--host=i686-w64-mingw32"   {os-distribution = "cygwin" & system-mingw:installed & arch-x86_32:installed}
     "--prefix=%{prefix}%"
     "--docdir=%{doc}%/ocaml"
+    "--with-additional-stublibsdir"
+    "--with-relative-libdir"
+    "--enable-runtime-search"
+    "--enable-runtime-search-target=fallback"
     "--with-flexdll=%{flexdll:share}%" {os = "win32" & flexdll:installed}
     "-C"
     "--with-afl" {ocaml-option-afl:installed}
