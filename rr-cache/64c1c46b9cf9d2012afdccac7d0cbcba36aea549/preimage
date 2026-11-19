@@ -101,7 +101,7 @@ case "${OCAML_ARCH}" in
     . "$HOME/.msenv64"
   ;;
   solaris)
-    echo This version of OCaml does not support Solaris. Exiting.
+    echo OCaml 4.11 does not support Solaris. Exiting.
     exit
   ;;
   *) arch_error;;
@@ -143,8 +143,7 @@ host=''
 conffile=Makefile.config
 make=make
 instdir="$HOME/ocaml-tmp-install"
-reldir='../lib/ocaml'
-confoptions="${OCAML_CONFIGURE_OPTIONS}"
+confoptions="--enable-ocamltest ${OCAML_CONFIGURE_OPTIONS}"
 make_native=true
 cleanup=false
 check_make_alldepend=false
@@ -175,7 +174,6 @@ case "${OCAML_ARCH}" in
     build='--build=i686-pc-cygwin'
     host='--host=i686-w64-mingw32'
     instdir='C:/ocamlmgw'
-    reldir='..\lib\ocaml'
     cleanup=true
     check_make_alldepend=true
   ;;
@@ -183,7 +181,6 @@ case "${OCAML_ARCH}" in
     build='--build=x86_64-pc-cygwin'
     host='--host=x86_64-w64-mingw32'
     instdir='C:/ocamlmgw64'
-    reldir='..\lib\ocaml'
     cleanup=true
     check_make_alldepend=true
   ;;
@@ -191,14 +188,12 @@ case "${OCAML_ARCH}" in
     build='--build=i686-pc-cygwin'
     host='--host=i686-pc-windows'
     instdir='C:/ocamlms'
-    reldir='..\lib\ocaml'
     cleanup=true
   ;;
   msvc64)
     build='--build=x86_64-pc-cygwin'
     host='--host=x86_64-pc-windows'
     instdir='C:/ocamlms64'
-    reldir='..\lib\ocaml'
     cleanup=true
   ;;
   *) arch_error;;
@@ -253,13 +248,25 @@ fi
 
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
+<<<<<<<
 grep -F -e prefix -e DIR= Makefile.config
 grep -F 'LIBDIR' Makefile.build_config
 
+if $bootstrap; then
+  $make $jobs --warn-undefined-variables core
+  $make $jobs --warn-undefined-variables coreboot
+  if $make_native; then
+    $make $jobs --warn-undefined-variables opt.opt
+    $make $jobs --warn-undefined-variables ocamlnat
+  else
+    $make $jobs --warn-undefined-variables all
+  fi
+=======
 if $make_native; then
   $make $jobs --warn-undefined-variables
   $make $jobs --warn-undefined-variables ocamlnat
   if $check_make_alldepend; then $make --warn-undefined-variables alldepend; fi
+>>>>>>>
 else
   $make $jobs --warn-undefined-variables
 fi
@@ -278,14 +285,21 @@ if test -n "$jobs" && test -x /usr/bin/parallel
 then PARALLEL="$jobs $PARALLEL" $make --warn-undefined-variables parallel
 else $make --warn-undefined-variables all
 fi
+<<<<<<<
+=======
 cd ..
 
 git clean -q -f -d -x
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' \
-                 '--with-relative-libdir=$reldir' $confoptions
+                 --with-relative-libdir $confoptions
 grep -F -e prefix -e DIR= Makefile.config
 grep -F 'LIBDIR' Makefile.build_config
 $make $jobs
 $make install
 $make -f Makefile.test -C testsuite/in_prefix test-in-prefix
 rm -rf "$instdir"
+
+if $bootstrap; then
+  git checkout boot/ocamlc boot/ocamllex
+fi
+>>>>>>>

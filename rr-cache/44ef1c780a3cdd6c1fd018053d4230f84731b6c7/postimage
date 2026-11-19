@@ -154,7 +154,6 @@ host=''
 conffile=Makefile.config
 make=make
 instdir="$HOME/ocaml-tmp-install"
-reldir='../lib/ocaml'
 confoptions="--enable-ocamltest --enable-dependency-generation \
 --enable-codegen-invariants ${OCAML_CONFIGURE_OPTIONS}"
 make_native=true
@@ -192,7 +191,6 @@ case "${OCAML_ARCH}" in
     build='--build=i686-pc-cygwin'
     host='--host=i686-w64-mingw32'
     instdir='C:/ocamlmgw'
-    reldir='..\lib\ocaml'
     cleanup=true
     check_make_alldepend=true
     init_submodule_flexdll=true
@@ -201,7 +199,6 @@ case "${OCAML_ARCH}" in
     build='--build=x86_64-pc-cygwin'
     host='--host=x86_64-w64-mingw32'
     instdir='C:/ocamlmgw64'
-    reldir='..\lib\ocaml'
     cleanup=true
     check_make_alldepend=true
     init_submodule_flexdll=true
@@ -210,7 +207,6 @@ case "${OCAML_ARCH}" in
     build='--build=i686-pc-cygwin'
     host='--host=i686-pc-windows'
     instdir='C:/ocamlms'
-    reldir='..\lib\ocaml'
     cleanup=true
     init_submodule_flexdll=true
     init_submodule_winpthreads=true
@@ -219,7 +215,6 @@ case "${OCAML_ARCH}" in
     build='--build=x86_64-pc-cygwin'
     host='--host=x86_64-pc-windows'
     instdir='C:/ocamlms64'
-    reldir='..\lib\ocaml'
     cleanup=true
     init_submodule_flexdll=true
     init_submodule_winpthreads=true
@@ -341,9 +336,8 @@ cd ..
 
 git clean -q -f -d -x
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' \
-                 '--with-relative-libdir=$reldir' \
-                 --enable-runtime-search=always --enable-runtime-search-target \
-                 $confoptions
+                 --with-relative-libdir --enable-runtime-search \
+                 --enable-runtime-search-target=fallback $confoptions
 grep -F -e prefix -e DIR= Makefile.config
 grep -F 'LIBDIR' Makefile.build_config
 $make $jobs
