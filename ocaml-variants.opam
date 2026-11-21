@@ -1,7 +1,7 @@
 opam-version: "2.0"
-version: "4.10.3+trunk"
+version: "4.10.3+relocatable"
 license: "LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception"
-synopsis: "OCaml development version"
+synopsis: "Relocatable OCaml 4.10 branch"
 maintainer: "caml-list@inria.fr"
 authors: [
   "Xavier Leroy"
