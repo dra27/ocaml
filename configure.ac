@@ -735,7 +735,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
   cc_warnings='-Wall -Wdeclaration-after-statement'])
 
 AS_CASE([$enable_warn_error,AC_PACKAGE_VERSION],
-  [yes,*|,*+dev*],
+  [yes,*|,*+dev*|,*+relocatable],
     [cc_warnings="$cc_warnings $warn_error_flag"])
 
 # We select high optimization levels, provided we can turn off:
@@ -2062,7 +2062,7 @@ AS_IF([test x"$enable_ocamldoc" = "xno"],
   [ocamldoc=ocamldoc])
 
 AS_CASE([$enable_ocamltest,AC_PACKAGE_VERSION],
-  [yes,*|,*+dev*],[ocamltest='ocamltest'],
+  [yes,*|,*+dev*|,*+relocatable],[ocamltest='ocamltest'],
   [ocamltest=''])
 
 AS_IF([test x"$enable_flambda" = "xyes"],
@@ -2247,7 +2247,7 @@ m4_define([ALPHABET], [0123456789abcdefghijklmnopqrstuv])
 AC_DEFUN([BASE32], ["$(echo 'ALPHABET' | cut -c $(expr \( $1 \) + 1))"])
 
 m4_define([OCAML__DEVELOPMENT_VERSION],
-  m4_bmatch(AC_PACKAGE_VERSION,[\+dev],[true],[false]))
+  m4_bmatch(AC_PACKAGE_VERSION,[\+dev\|\+relocatable$],[true],[false]))
 m4_define([OCAML__RELEASE_NUMBER],
   m4_eval(m4_esyscmd(head -n1 VERSION | sed -e 's/[^.]\.0*//;s/\..*//') + 1))
 m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
