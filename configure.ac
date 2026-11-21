@@ -693,7 +693,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
   [msvc-*],
     [outputobj=-Fo; CPP="cl -nologo -EP"; gcc_warnings=""],
   [outputobj='-o $(EMPTY)'; AS_CASE([AC_PACKAGE_VERSION],
-    [*+dev*],
+    [*+dev*|*+relocatable],
       [gcc_warnings="-Wall -Werror"],
     [gcc_warnings="-Wall"]
   )]
@@ -2144,7 +2144,7 @@ m4_define([ALPHABET], [0123456789abcdefghijklmnopqrstuv])
 AC_DEFUN([BASE32], ["$(echo 'ALPHABET' | cut -c $(expr \( $1 \) + 1))"])
 
 m4_define([OCAML__DEVELOPMENT_VERSION],
-  m4_bmatch(AC_PACKAGE_VERSION,[\+dev],[true],[false]))
+  m4_bmatch(AC_PACKAGE_VERSION,[\+dev\|\+relocatable$],[true],[false]))
 m4_define([OCAML__RELEASE_NUMBER],
   m4_eval(m4_esyscmd(head -n1 VERSION | sed -e 's/[^.]\.0*//;s/\..*//') + 1))
 m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
