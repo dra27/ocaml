@@ -12,6 +12,16 @@
 #*                                                                        *
 #**************************************************************************
 
+branches:
+  only:
+    - relocatable-base-4.14
+
+# Do not build feature branch with open Pull Requests
+skip_branch_with_pr: true
+
+# Do not build feature branch with open Pull Requests
+skip_branch_with_pr: true
+
 # Compile the 64 bits version
 platform:
   - x64
@@ -26,10 +36,12 @@ environment:
     CYG_ROOT: C:/cygwin64
     CYG_MIRROR: http://mirrors.kernel.org/sourceware/cygwin/
     CYG_CACHE: C:/cygwin64/var/cache/setup
-    FLEXDLL_VERSION: 0.39
+    FLEXDLL_VERSION: 0.43
     OCAMLRUNPARAM: v=0,b
     FORCE_CYGWIN_UPGRADE: 0
     BUILD_MODE: world.opt
+    # Fully print commands executed by Make
+    # MAKEFLAGS: V=1
   matrix:
     - PORT: mingw32
       BOOTSTRAP_FLEXDLL: true
