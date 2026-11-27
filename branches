@@ -102,10 +102,10 @@ backport-merge-utils-makefile@5.0 43bcc9844fcba57f8f01b59657ba9374ec8b8030
 backport-in-prefix-test@5.4 26136b6c489a3203be7446ea664d423324b04980
 in-prefix-test-5.3@fixup~1 96db080a80c1ac5e7498e0e1e73f596befb9ba70
 in-prefix-test-5.2@fixup~1 210978b70b6fb3ec79e07988af9e7362836763de
-in-prefix-test-5.1@5.1@fixup bc6acd0dbc113a5d54a6b8fd50825ab417db8eb0
-in-prefix-test-5.0@5.0@fixup 4740ae71671711c3fa98ae0b99f84ea448ba7a74
+in-prefix-test-5.1@5.1@fixup 557ef3303fda849aa4239d74da15f56e3c164d8e
+in-prefix-test-5.0@5.0@fixup c88ad2d6155f0b8fff68685b9dac0ca111658029
 in-prefix-test-4.14@4.14@fixup 610c0e8f3d127b6d304c38ee15a6f3ffd1e99ca1
-in-prefix-test-4.13@4.13@fixup aa472a12d1fa3e2b1e85cc6961662eee4dba66b1
+in-prefix-test-4.13@4.13@fixup 5dcd00f0bed8a9870ae9c2944ee1c697155786ef
 in-prefix-test-4.12@fixup~1 996d467fe1fe5d52f9299e22301d99deaeaab868
 in-prefix-test-4.11@fixup~1 a61eba4b673900292829079c440e84d2a24a6c3b
 in-prefix-test-4.10@fixup~1 37dc73cc2a7984728b05327ac3d4150e81a1e020
@@ -120,7 +120,7 @@ apple-arm64-4.11@4.11 5cbd3c0e575d667d60bb110a6c02e0b69ccbf8b1
 merge-headers@4.08 497ea09ee406adba342de58b23362cb72d95ee97
 fix-flexdll-bootstrap@4.11 06639b3e0ce945b67fdb9a311772f0b88933a409
 fix-mingw-lld@4.11 c5fdb47365f05f8abfffa4dc2b77651bfbe318cf
-faster-flexdll-4.12@4.12 d716418ed8108911202c46eb7ee5f5600dbb324f
+faster-flexdll-4.12@4.12 86631bc7ee47caa587dba433085ff9529ea6c741
 faster-flexdll-4.11@4.11@fixup cefbfe73381751f388c06de0605c41b51f2599cc
 faster-flexdll-4.08@4.08@fixup 73af8a91476a47c4e72f8a93f82350c02c08f121
 fix-stdlib-manpages-4.09@4.09 aacb1a450c4b4a871bd04c0dc8e7cb952d78758b
