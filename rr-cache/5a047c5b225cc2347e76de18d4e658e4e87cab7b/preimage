@@ -10,9 +10,6 @@ OCaml 4.09 maintenance branch
 
 ### Runtime system:
 
-- #10062: set ARCH_INT64_PRINTF_FORMAT correctly for both modes of mingw-w64
-  (David Allsopp, review by Xavier Leroy)
-
 - #10250, #10266: Dynamically allocate alternate signal stacks to
   accommodate changes in Glibc 2.34.
   (Xavier Leroy, reports by Tomasz Kłoczko and R.W.M. Jones, review by Anil
@@ -38,12 +35,12 @@ OCaml 4.09 maintenance branch
   -fsmall-toc to enable the previous behaviour.
   (David Allsopp, report by Nathaniel Wesley Filardo, review by Xavier Leroy)
 
- - #9752, #10026: Revised handling of calling conventions for
-   external C functions.
-   Provide a more precise description of the types of unboxed arguments,
-   so that the ARM64 iOS/macOS calling conventions can be honored.
-   Backported from OCaml 4.12.0
-   (Xavier Leroy, review by Mark Shinwell and Eduardo Rafael)
+- #9752, #10026: Revised handling of calling conventions for
+  external C functions.
+  Provide a more precise description of the types of unboxed arguments,
+  so that the ARM64 iOS/macOS calling conventions can be honored.
+  Backported from OCaml 4.12.0
+  (Xavier Leroy, review by Mark Shinwell and Eduardo Rafael)
 
 - #9969, #9981: Added mergeable flag to ELF sections containing mergeable
   constants.  Fixes compatibility with the integrated assembler in clang 11.0.0.
